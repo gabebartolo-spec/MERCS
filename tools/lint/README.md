@@ -18,6 +18,7 @@ rules about strings.
 | `content_counts.py` | A2 | `CAP-OVER` `CAP-MISSING` `CAP-FILE` |
 | `no_weights.py` | gate gap #14, docs/10 | `WEIGHT-FILE` `WEIGHT-PATH` `WEIGHT-GIT` |
 | `worktrees.sh` | C1 | `WT-OVER` (error), `WT-UNCOUNTED` `WT-PRUNABLE` (warnings) |
+| `function_limits.py` | 05 Typing and structure | `FUNC-LINES` (over 40 lines) `FUNC-COMPLEXITY` (over 12) |
 
 Each lint's docstring (`worktrees.sh` header) is the full rule list. Decisions worth knowing:
 

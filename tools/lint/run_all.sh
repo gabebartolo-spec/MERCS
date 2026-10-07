@@ -62,6 +62,7 @@ run_step magic_numbers "$py" tools/lint/magic_numbers.py
 run_step strings "$py" tools/lint/strings.py
 run_step content_counts "$py" tools/lint/content_counts.py
 run_step no_weights "$py" tools/lint/no_weights.py
+run_step function_limits "$py" tools/lint/function_limits.py
 run_step worktrees bash tools/lint/worktrees.sh
 run_step self-test "$py" tools/lint/test_lints.py
 
