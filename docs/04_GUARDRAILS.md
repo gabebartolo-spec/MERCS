@@ -126,8 +126,8 @@ bug assigned to the Merge & CI agent.
 
 ### C3. Status and decision drift
 *Rule:* a decision exists only in `docs/DECISIONS.md`. STATUS.md is updated in the same PR that
-changes state. The steward sync runs weekly from the inbox.
-*Enforced by:* review; steward summary diff.
+changes state. The Merge & CI agent's weekly upkeep catches the rest.
+*Enforced by:* review; weekly summary diff.
 
 ### C4. Idle agents and busywork
 *Rule:* agents end their turn with a state line. "Available" is a valid state. Nobody invents work

@@ -50,16 +50,14 @@ protocol format. Reviews phase gates. Is never asked to read a wall of text.
 - Asks the director every look question with labelled images in the same message.
 - Is the only agent allowed to start a GPU job.
 
-### Doc Steward — ChatGPT
-- Keeps `docs/DECISIONS.md`, `docs/STATUS.md` history, `docs/08_ROADMAP.md` phase status lines,
-  and cross-document consistency tidy. Produces weekly summaries for the director.
-- Input contract: the Merge & CI agent exports a "doc change request" markdown file
-  (`docs/_inbox/<date>.md`) listing merged PRs, decisions taken and status changes. ChatGPT
-  returns full replacement files for the affected docs only, with a change list at the top.
-- Output contract: the Merge & CI agent diffs, sanity-checks (no decision text altered, caps
-  respected) and commits them as `docs: steward sync <date>`.
-- Has **no design authority**. It may flag an inconsistency; it may never resolve one by choosing.
-  It never touches code, data or assets.
+### Document upkeep (Merge & CI agent; no separate tool)
+- The Merge & CI agent keeps `docs/DECISIONS.md`, `docs/STATUS.md` history, the roadmap's phase
+  status lines and cross-document references tidy, in the same PR that changes the state, and
+  writes a weekly summary for the director (`docs/summaries/<date>.md`, under 300 words, game
+  words).
+- Upkeep never changes a decision, rule, cap, number or licence status. An inconsistency is
+  flagged to the Concept Lead, never resolved by choosing.
+- ChatGPT is not part of the team (D-016).
 
 ## Concurrency and cadence
 
@@ -93,7 +91,7 @@ protocol format. Reviews phase gates. Is never asked to read a wall of text.
 
 - Every message between agents names the PR or item and the commit. No "received" or "noted".
 - A CI failure or a conflict goes straight to the branch owner.
-- The director receives: questions in protocol format, gate reviews, and the weekly steward
+- The director receives: questions in protocol format, gate reviews, and the weekly
   summary. Nothing else unless they ask.
 - Decisions are written to `docs/DECISIONS.md` within the same PR that acts on them. A decision
   that exists only in a chat does not exist.

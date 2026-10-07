@@ -4,6 +4,9 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
+## 2026-10-08 · D-016 · Director · ChatGPT is removed from the team; document upkeep and the weekly summary belong to the Merge & CI agent
+Changes: `README.md`, `03_TEAM_WORKFLOW.md`, `04_GUARDRAILS.md` C3, `MERGE_CI_AGENT.md`, `KICKOFF_PROMPTS.md`; `agent-briefs/CHATGPT_DOCS.md` deleted. D-006 is amended accordingly.
+
 ## 2026-10-08 · D-019 · Director · Repo is public (Q-BP). Reverses D-011.
 Why: GitHub Free refuses branch protection on private repos; director chose public over paying for Pro. Merge & CI flagged that this exposes design docs, history and every future commit, and that `gitleaks` plus the licensing register become the only guard on what ships in the open.
 Changes: STATUS.md item 1; `09_REPO_AND_HOSTING.md` ("make it private" no longer applies). No banned or PENDING-licence asset may enter `assets/` while public.
@@ -43,7 +46,7 @@ Changes: `06_STYLE_ART.md` §5.
 ## 2026-10-08 · D-005 · Concept Lead (pending) · Square grid, eight facings, shared between overworld and battle
 Why: one facing set; see `11_OPEN_QUESTIONS.md` Q3 for the director's call.
 
-## 2026-10-08 · D-006 · Concept Lead (pending) · Team is three Claude Code chats (Dev Lead Opus, Merge & CI Sonnet, Art Factory Opus) plus ChatGPT as doc steward; no idle-monitoring crons; document caps enforced in CI
+## 2026-10-08 · D-006 · Concept Lead (pending) · Team is three Claude Code chats (Dev Lead Opus, Merge & CI Sonnet, Art Factory Opus); no idle-monitoring crons; document caps enforced in CI. (Amended by D-016: ChatGPT removed.)
 Why: AFL lessons: coordination load, idle agents, 6,600-line roadmap.
 Changes: `03_TEAM_WORKFLOW.md`, `04_GUARDRAILS.md`.
 

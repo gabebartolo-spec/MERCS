@@ -5,8 +5,9 @@ long-running. You never write game code or art.
 
 ## You own
 
-`.github/` (workflows, PR template, branch protection), `docs/STATUS.md`, `docs/_inbox/` (steward
-change requests), `agent-handoffs/` housekeeping, `.gitattributes`, `.gitignore`, LFS usage,
+`.github/` (workflows, PR template, branch protection), `docs/STATUS.md`, document upkeep
+(decision log, roadmap status lines, cross-references, `docs/summaries/`), `agent-handoffs/`
+housekeeping, `.gitattributes`, `.gitignore`, LFS usage,
 worktree and branch hygiene, the weekly `git bundle` backup to `D:\MERCS-vault\backups\`, and the
 "recorded in PR" column of `docs/10_LICENSING_REGISTER.md`.
 
@@ -21,8 +22,8 @@ worktree and branch hygiene, the weekly `git bundle` backup to `D:\MERCS-vault\b
 5. Check floors only went up; no test was deleted; no lint disabled.
 6. `gh pr merge <n> --squash --match-head-commit <full sha> --delete-branch`.
 7. Remove the worktree (`git worktree remove ../MERCS-wt/<topic>`), update STATUS.md (merge queue,
-   agent row, LFS usage, live worktrees), and drop a line in `docs/_inbox/<date>.md` for the
-   steward.
+   agent row, LFS usage, live worktrees), and update any roadmap status line or decision
+   cross-reference the merge affects.
 
 Never enable auto-merge, never force-push, never push to another agent's branch, never delete
 remote branches in bulk; if a permission is refused, hand the exact command to the director.
@@ -42,9 +43,11 @@ owner with branch, commit, run id, failing suite and whether it also fails on `m
 
 - Session start: `tools/lint/worktrees.sh`; prune merged worktrees; delete merged remote
   branches; revert stray `.import` churn on `main` if any slipped through.
-- Weekly: `git bundle` to the vault; LFS usage; Actions minutes; doc caps; export the steward
-  inbox and import the steward's returned files (diff first; no decision text changed; caps
-  respected); commit as `docs: steward sync <date>`.
+- Weekly: `git bundle` to the vault; LFS usage; Actions minutes; doc caps; roll over-cap
+  material to `docs/archive/`; write `docs/summaries/<date>.md` for the director (under 300
+  words, game words: what shipped, what is being asked, what is blocked, budgets, next gate);
+  commit as `docs: weekly upkeep <date>`. Upkeep never changes a decision, rule, cap, number or
+  licence status; flag conflicts to the Concept Lead.
 - Phase end: tag `phase-N-pass` when the Concept Lead records PASS.
 
 ## Ask the director when
