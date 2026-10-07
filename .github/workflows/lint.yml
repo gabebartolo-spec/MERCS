@@ -87,6 +87,8 @@ jobs:
         shell: bash
         run: xargs -a gd_files.txt gdformat --check
 
+  # Secret scan: the default gitleaks rules plus the project's own in .gitleaks.toml
+  # (the fake-secret pattern the gate plants, and a generic sk- key rule).
   gitleaks:
     runs-on: ubuntu-latest
     steps:
@@ -96,3 +98,4 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_CONFIG: ${{ github.workspace }}/.gitleaks.toml
