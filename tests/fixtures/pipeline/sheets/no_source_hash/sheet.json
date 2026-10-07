@@ -1,0 +1,180 @@
+{
+  "schema": "mercs.sheet/1",
+  "body": "average_m",
+  "layer": "body",
+  "clip": "rest",
+  "image": "sheet.png",
+  "image_pixel_sha256": "cb08385fbd042248834f79d2f74112eb14079e66e7c73df0af0fc5b538b755d0",
+  "frame_w": 64,
+  "frame_h": 64,
+  "frame_count": 8,
+  "frames_per_facing": 1,
+  "facings": [
+    "S",
+    "SE",
+    "E",
+    "NE",
+    "N",
+    "NW",
+    "W",
+    "SW"
+  ],
+  "frames": [
+    {
+      "facing": "S",
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "facing": "SE",
+      "index": 1,
+      "x": 64,
+      "y": 0,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "facing": "E",
+      "index": 2,
+      "x": 128,
+      "y": 0,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "facing": "NE",
+      "index": 3,
+      "x": 192,
+      "y": 0,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "facing": "N",
+      "index": 4,
+      "x": 256,
+      "y": 0,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "facing": "NW",
+      "index": 5,
+      "x": 320,
+      "y": 0,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "facing": "W",
+      "index": 6,
+      "x": 384,
+      "y": 0,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "facing": "SW",
+      "index": 7,
+      "x": 448,
+      "y": 0,
+      "w": 64,
+      "h": 64
+    }
+  ],
+  "pivot": {
+    "x": 32,
+    "y": 56,
+    "doc": "feet centre in frame pixels, the same in every frame"
+  },
+  "palette": {
+    "id": "master_draft",
+    "file": "tools/pipeline/palette/master_draft.json",
+    "sha256": "767b261e300cbe8962ace5dddb7337748f0752b0f067c2a826c578ffe23fcf3a",
+    "status": "DRAFT"
+  },
+  "provenance": {
+    "sources": [
+      {
+        "file": "facing_0_S.png",
+        "kind": "render_4x",
+        "sha256": ""
+      },
+      {
+        "file": "facing_1_SE.png",
+        "kind": "render_4x",
+        "sha256": "7e9c9a0194719c62b91f4ec5d0b3a235aa333d064d9750c61d5815ee5d244695"
+      },
+      {
+        "file": "facing_2_E.png",
+        "kind": "render_4x",
+        "sha256": "437444e6851cb39792d9d3fbe818830155836031780e228786cb2714fbb6ce93"
+      },
+      {
+        "file": "facing_3_NE.png",
+        "kind": "render_4x",
+        "sha256": "0f159037e3bad63b60eb639c226dc80c7938355a9ddc279ae01660e6854376ae"
+      },
+      {
+        "file": "facing_4_N.png",
+        "kind": "render_4x",
+        "sha256": "a59721425ccfad6494938eb952133e0814b2d1f80adc8e4f7c78ba1a37cbb964"
+      },
+      {
+        "file": "facing_5_NW.png",
+        "kind": "render_4x",
+        "sha256": "0b59ee0d0de1ab78ffd33de541d3e2d0bcad91aa8dfb7938d1111709b4f374c0"
+      },
+      {
+        "file": "facing_6_W.png",
+        "kind": "render_4x",
+        "sha256": "f26e5a529185ee23eecf26a6834e955748989b17970ad31416b149d524d0b0a0"
+      },
+      {
+        "file": "facing_7_SW.png",
+        "kind": "render_4x",
+        "sha256": "46b98fe11bc07081665fed1032257468c46a627c38a399e8b8dda8fbed3e9a39"
+      }
+    ],
+    "inputs": {
+      "body_blend": {
+        "file": "tools/pipeline/bodies/average_m.blend",
+        "sha256": "aa9da1d3b091ba89a52779a3b9571897c8a5c89c3ea1c620822666c18df47f94"
+      },
+      "camera_rig": {
+        "file": "tools/pipeline/camera_rig.json",
+        "sha256": "c6c0fea28aecf5fa19bde5426852f57b3c3a7b09e59d3ffb5f4cd301591651ba"
+      },
+      "light_rig": {
+        "file": "tools/pipeline/light_rig.json",
+        "sha256": "c246e0a0750c346e72d157f94127d301898fdb47e488b8db81d938b3626212b3"
+      },
+      "render_script": {
+        "file": "tools/pipeline/render_character.py",
+        "sha256": "2a54a5ab7e2c699cd4ff8c8443e49f3142e40678cb11d4ebfa90d130c115112b"
+      },
+      "pixelate_config": {
+        "file": "tools/pipeline/pixelate.json",
+        "sha256": "356dda9ced2ba4177d0f80e9bbcde55786585d2165529561d41016da4f0b4699"
+      }
+    },
+    "tools": {
+      "blender": "5.2.2 LTS",
+      "python": "3.14.7",
+      "scripts": {
+        "pngio.py": "c97d8df63884ddc60bfeb5ff6464c46b913c40f53939b6dcc7db856cffc6438c",
+        "palette_lib.py": "f22644e8a13658cb3543f958ed0d15c4521242dbf05ae06829ccba14cce085a0",
+        "pixelate.py": "1436619a5cfab5a636f312e4c9e4c0e493f82c9d5c843abdbd6b650f9bc37eab",
+        "pack_sheets.py": "dda1e4f1e6af14be8908c53468c273fbffeb857df0a20ac5e3dbc2fe7987b615"
+      }
+    },
+    "licence_rows": [
+      "Blender",
+      "MPFB (MakeHuman Plugin for Blender)",
+      "Python, Pillow, NumPy"
+    ]
+  }
+}

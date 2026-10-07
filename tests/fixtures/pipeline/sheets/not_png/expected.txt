@@ -1,0 +1,2 @@
+# rules validate_sheet.py must report for this planted-bad sheet
+SHEET-PNG
