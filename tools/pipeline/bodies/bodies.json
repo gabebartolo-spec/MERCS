@@ -1,0 +1,13 @@
+{
+  "_doc": "Base bodies for the frozen rig. Macro values are MPFB 0..1 sliders; height_m is the measured target the build script fits by bisection on the 'height' macro. Director 2026-10-08: men and women, two bodies on one skeleton (decision id assigned by Merge & CI).",
+  "rig": "mixamo",
+  "height_tolerance_m": 0.002,
+  "bodies": {
+    "average_m": {
+      "height_m": 1.78,
+      "macros": {"gender": 1.0, "age": 0.5, "muscle": 0.5, "weight": 0.5, "proportions": 0.5,
+                 "cupsize": 0.5, "firmness": 0.5,
+                 "race": {"asian": 0.33, "caucasian": 0.33, "african": 0.33}}
+    }
+  }
+}

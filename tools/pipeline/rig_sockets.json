@@ -1,0 +1,11 @@
+{
+  "_doc": "Equipment sockets (06_STYLE_ART.md section 3). Each socket is an Empty parented to a bone, placed at the bone head, tail or mid point plus offset_m. Chest and back offsets put the socket on the body surface of average_m (measured 2026-10-08: chest front y -0.145, back y +0.077 at z 1.32). offset_m is in armature rest space (metres): +X is the body's left, -Y is the body's front, +Z is up. Offsets are fixed with the rig freeze; changing one changes the contract hash.",
+  "sockets": {
+    "hand_r":      {"bone": "mixamorig:RightHand", "at": "mid", "offset_m": [0.0, 0.0, 0.0]},
+    "hand_l":      {"bone": "mixamorig:LeftHand",  "at": "mid", "offset_m": [0.0, 0.0, 0.0]},
+    "head":        {"bone": "mixamorig:Head",      "at": "head", "offset_m": [0.0, 0.0, 0.10]},
+    "back":        {"bone": "mixamorig:Spine2",    "at": "head", "offset_m": [0.0, 0.06, 0.0]},
+    "chest_badge": {"bone": "mixamorig:Spine2",    "at": "head", "offset_m": [0.0, -0.20, 0.0]},
+    "hip_l":       {"bone": "mixamorig:Hips",      "at": "head", "offset_m": [0.17, 0.0, -0.05]}
+  }
+}
