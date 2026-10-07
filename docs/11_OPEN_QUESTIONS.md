@@ -70,7 +70,10 @@ consistency; more gives skin and cloth subtlety. Recommendation: 56.
 
 **Q9. Fonts.** Two OFL faces from a labelled sheet: one for UI, one serif for names and titles.
 
-## Added 2026-10-08 from the Three Pillars brief (answer before Phase 2)
+## Added 2026-10-08 from the Three Pillars brief — answered the same day
+
+Q13: you appoint, the company reacts (D-TBD-succession). Q14: inherit a small company with a
+sitting captain (D-TBD-start). Kept below for the record.
 
 **Q13. How is the next captain chosen when the captain dies or steps down?**
 - **You appoint, the company reacts (Recommended).** You pick any living member; one to three

@@ -92,9 +92,10 @@ Deliverables
   history (empty for now), one "what this person is good at" paragraph generated from data.
 - Tavern recruit screen with three candidates and a price; recruit → roster.
 - The office of captain: one roster member holds it; the overworld figure is the captain; the
-  inspect screen shows the office. Succession rules are data (`data/balance/captaincy.json`),
-  chosen by the director in Q13; the succession event itself is Phase 4. The starting company is
-  handed to the player with a sitting captain (Q14).
+  inspect screen shows the office. Succession is by the player's appointment with company
+  reactions (D-TBD-succession); the rules live in `data/balance/captaincy.json`; the succession
+  event itself is Phase 4 and the reaction scenes Phase 5. The starting company is inherited with
+  a sitting captain (D-TBD-start).
 - `effect` fixture: two seeds produce two mercs a playtester can tell apart in one sentence each.
 - Save v1 with migration scaffold.
 
