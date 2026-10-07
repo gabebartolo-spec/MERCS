@@ -38,6 +38,7 @@ temp dir), so two agents' runs never share saves, settings or caches.
 |---|---|---:|
 | `data` | Every file in `data/` has a schema in `data/schema/` and validates; ids are unique per collection; the validator accepts each known-good and rejects each known-bad fixture in `fixtures/data/` for the reason the fixture names | 88 |
 | `smoke` | The main scene opens headless and stays up; exactly the five sanctioned autoloads (D-021); the typing warnings stay errors and the renderer and viewport stay as set; every script compiles | 24 |
+| `stage` | The Phase 1 grey-box capture stage (`presentation/world/street_stage.tscn`) loads with its street, light, camera and sprite as `data/balance/stage.json` says; `pitch_degrees` moves the camera; the sprite's `pixel_size` follows its height; CRISP and WHOLE_SCREEN pixel modes instantiate (640 × 360 SubViewport scaled 3×, sprite snapped to its pixel grid); the walk loop completes | 39 |
 
 The harness self-test (`tools/test_run_tests.sh`) proves the runner fails a suite short
 of its floor or without one, and that an untyped declaration
