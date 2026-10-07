@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Backgrounds",
+  "description": "Where a mercenary comes from. data/backgrounds.json. Phase 0 fixes the file shape and the id only; a field is added here in the PR that adds the first entry using it.",
+  "type": "object",
+  "required": ["backgrounds"],
+  "additionalProperties": false,
+  "properties": {
+    "backgrounds": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^bg_[a-z0-9]+(_[a-z0-9]+)*$"}
+        }
+      }
+    }
+  }
+}

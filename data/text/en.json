@@ -1,0 +1,3 @@
+{
+  "_comment": "Every player-visible string, by key. Code calls Text.t(\"merc.died.title\", {...}); no player-visible string lives in a script (04_GUARDRAILS.md B12). Schema: data/schema/text.schema.json."
+}

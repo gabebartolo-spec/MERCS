@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Player-visible text",
+  "description": "data/text/<language>.json. Every string a player can read lives here; code calls Text.t(\"<key>\"). Keys are dot-separated snake_case with at least two parts, e.g. merc.died.title.",
+  "type": "object",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^[a-z0-9_]+(\\.[a-z0-9_]+)+$": {"type": "string", "minLength": 1}
+  }
+}
