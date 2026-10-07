@@ -12,7 +12,7 @@ Current phase: **0 — Foundation** (not started). Gate signer: Concept Lead.
 |-------|-------|------|-------------|-------|
 | Dev Lead (Opus 5.5) | available | — | — | — |
 | Merge & CI (Sonnet 5.5) | awaiting director | Phase 0 items 1 + 2 done; item 2 in PR #1; `test` requirement added after item 3 | claude/mercs-merge-ci-setup-83f2a5 | 2026-10-08 |
-| Art Factory (Opus 5.5) | available | — | — | — |
+| Art Factory (Opus 5.5) | awaiting director | Phase 0 items 5, 6 done; PR review, empty Recycle Bin | claude/art-factory-setup-f074a4 | 2026-10-08 |
 | Concept Lead (Fable 5.1) | available | Phase 0 gate review when items 1–7 land | — | 2026-10-08 |
 
 States: working · running a check · awaiting director · blocked · available.
@@ -47,4 +47,4 @@ States: working · running a check · awaiting director · blocked · available.
 0 / 10 GiB.
 
 ## Live worktrees
-0 / 4.
+1 / 4 (claude/art-factory-setup-f074a4).

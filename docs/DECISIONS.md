@@ -8,6 +8,18 @@ changes.
 Why: GitHub Free refuses branch protection on private repos; director chose public over paying for Pro. Merge & CI flagged that this exposes design docs, history and every future commit, and that `gitleaks` plus the licensing register become the only guard on what ships in the open.
 Changes: STATUS.md item 1; `09_REPO_AND_HOSTING.md` ("make it private" no longer applies). No banned or PENDING-licence asset may enter `assets/` while public.
 
+## 2026-10-08 · D-018 · Director (clarified by Art agent, from Q12) · The "Pixel-ART Style (Pony)" file is removed and its register row dropped
+Why: the file was a saved web page from a failed PixAI download (137 KB of HTML), not a model.
+Changes: `10_LICENSING_REGISTER.md` row removed; file sent to the Recycle Bin.
+
+## 2026-10-08 · D-017 · Art agent (pending director ratification) · The two Civitai-only models stay PENDING (concept only) because Civitai is region-blocked here
+Why: Civitai answers `REGION_BLOCKED` from this machine, so the permissions block cannot be read. Sprites are rendered (D-002), so these were only ever concept tools.
+Changes: `10_LICENSING_REGISTER.md` rows for `pixelArtDiffusionXL_spriteShaper` and the sprite-sheet LoRA carry the hash and the reason; neither may ship or train the portrait LoRA.
+
+## 2026-10-08 · D-016 · Director (clarified by Art agent, from Q12) · Uninstall four Unity editors; keep 6000.3.23f1
+Why: five editors were installed, not four; the director's Orc-Survivor project uses 6000.3.23f1. Clarifies D-015.
+Changes: `02_MACHINE_AND_LOCAL_AI.md` and `tools/machine_profile.json` list one remaining Unity editor.
+
 ## 2026-10-08 · D-015 · Director · Banned Qwen-Image 2.1 files, Realistic Vision and the four unused Unity installs may be deleted (Q12)
 Changes: STATUS.md item 5 is unblocked; the Art agent deletes rather than quarantines.
 
