@@ -52,8 +52,9 @@ Godot GridMap library → capture fixture → director gate`.
 
 ### 2.2 Motion library
 - Source: Mixamo (free with an Adobe account; usable in commercial games, not redistributable as
-  raw files, so clips live in the vault, not the repo). Phase 1 set: idle, walk, run, attack_1h,
-  attack_2h, attack_polearm, shoot_bow, block, hit, death_fwd, death_back, down, flee, surrender.
+  raw files, so clips live in the vault, not the repo). Phase 1 set, six clips matching
+  `06_STYLE_ART.md` §3: idle, walk, attack_1h, hit, death, down. Phase 3 adds run, attack_2h,
+  attack_polearm, shoot_bow, block, death_back, flee, surrender.
 - Retarget in Blender by script (`retarget_clip.py`), clean curves, normalise root to in-place,
   bake at 12 fps for sprites. Each clip has a cue JSON (`hit_frame`, `release_frame`).
 - Bespoke motion (a limp walk, a one-handed re-grip) comes from editing library clips in Blender

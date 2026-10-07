@@ -1,0 +1,24 @@
+# Expected error findings for tools/lint/strings.py, one per line: RULE path:line.
+# Taken from the PLANT markers written when each violation was planted, never from lint output.
+# (retreat.gd:55 is the triple-quoted literal: it cannot carry a marker, so it is listed by hand.)
+TEXT-LITERAL presentation/battle/hit_text.gd:13
+TEXT-SCENE presentation/vfx/label_fx.tscn:6
+TEXT-LITERAL ui/screens/retreat.gd:45
+TEXT-LITERAL ui/screens/retreat.gd:46
+TEXT-LITERAL ui/screens/retreat.gd:47
+TEXT-LITERAL ui/screens/retreat.gd:48
+TEXT-LITERAL ui/screens/retreat.gd:49
+TEXT-LITERAL ui/screens/retreat.gd:50
+TEXT-LITERAL ui/screens/retreat.gd:51
+TEXT-LITERAL ui/screens/retreat.gd:52
+TEXT-LITERAL ui/screens/retreat.gd:53
+TEXT-LITERAL ui/screens/retreat.gd:54
+TEXT-LITERAL ui/screens/retreat.gd:55
+TEXT-LITERAL ui/screens/retreat.gd:58
+TEXT-SCENE ui/screens/retreat.tscn:16
+TEXT-SCENE ui/screens/retreat.tscn:17
+TEXT-SCENE ui/screens/retreat.tscn:20
+TEXT-SCENE ui/screens/retreat.tscn:23
+TEXT-SCENE ui/screens/retreat.tscn:24
+TEXT-SCENE ui/screens/retreat.tscn:27
+TEXT-SCENE ui/screens/retreat.tscn:31

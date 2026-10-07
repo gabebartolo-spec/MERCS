@@ -1,0 +1,7 @@
+{
+  "_comment": "Exactly at the cap of two: allowed.",
+  "traits": [
+    {"id": "tr_patient"},
+    {"id": "tr_vain"}
+  ]
+}

@@ -70,6 +70,27 @@ consistency; more gives skin and cloth subtlety. Recommendation: 56.
 
 **Q9. Fonts.** Two OFL faces from a labelled sheet: one for UI, one serif for names and titles.
 
+## Added 2026-10-08 from the Three Pillars brief — answered the same day
+
+Q13: you appoint, the company reacts (D-TBD-succession). Q14: inherit a small company with a
+sitting captain (D-TBD-start). Kept below for the record.
+
+**Q13. How is the next captain chosen when the captain dies or steps down?**
+- **You appoint, the company reacts (Recommended).** You pick any living member; one to three
+  mercenaries object or approve from their traits and memories, with real morale and loyalty
+  consequences, and an unpopular choice can cause a departure. Cost: the reaction scenes are
+  Phase 5 content.
+- Seniority or rank decides automatically. Cheapest; removes a decision you would enjoy.
+- The company votes. Dramatic, but you lose control of your own company at its worst moment.
+- No answer: the Dev Lead builds "you appoint" behind a data flag in Phase 2; reactions land in
+  Phase 5.
+
+**Q14. Does the campaign start with a company you inherit, or with a captain you create?**
+- **Inherit a small company with a sitting captain (Recommended).** You get people and their
+  history from day one, and the first death can be the captain's. Cost: a short authored opening.
+- Create the captain. Stronger ownership, but it quietly recreates a protagonist the player will
+  never risk.
+
 ## Design questions the Dev Lead will raise during their phases
 
 - Phase 3: how much of the enemy's equipment should be visible before a fight begins (it changes

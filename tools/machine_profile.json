@@ -1,0 +1,18 @@
+{
+  "probed_at": "2026-10-08T00:42:00+11:00",
+  "gpu": {"name": "NVIDIA GeForce RTX 4070 SUPER", "vram_mib": 12282, "driver": "617.14"},
+  "ram_gib": 32,
+  "disk": {"C": {"free_gib": 159}, "D": {"free_gib": 364}},
+  "comfyui": {
+    "core": "v0.39.1",
+    "custom_nodes": [],
+    "models_root": "D:/MERCS-vault/models",
+    "models_root_link": "StabilityMatrix Data/Models is a directory junction to D:/MERCS-vault/models"
+  },
+  "vault": "D:/MERCS-vault",
+  "blender": "5.2.2",
+  "godot": "4.7.2-stable",
+  "unity_editors": ["6000.3.23f1"],
+  "vram_tier": "12-16",
+  "notes": "C: free rises by about 33 GB once the director empties the Recycle Bin (banned models). About 9.6 GB of PENDING models (TRELLIS.2, Pixal3D VAEs, DINOv3, MoGe-2, BiRefNet) still sit in ComfyUI's own models/ folder on C:."
+}

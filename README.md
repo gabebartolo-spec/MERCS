@@ -42,9 +42,8 @@ Reference documents (read when needed, by section):
 | Director | human | vision, taste, approvals, money |
 | Concept Lead | Claude Fable 5.1 (this chat) | architecture, research, roadmap gates, audits, briefs |
 | Dev Lead | Claude Code, Opus 5.5 | game code, tests, phase deliverables |
-| Merge & CI | Claude Code, Sonnet 5.5 | merges, CI, branch hygiene, STATUS.md |
+| Merge & CI | Claude Code, Sonnet 5.5 | merges, CI, branch hygiene, STATUS.md, document upkeep and weekly summary |
 | Art Factory | Claude Code, Opus 5.5 | asset pipeline, renders, portraits, style validators |
-| Doc Steward | ChatGPT | formatting and consistency of docs, decision log upkeep |
 
 Only three Claude Code chats run at once (Dev Lead, Merge & CI, Art Factory). Details in
 [docs/03_TEAM_WORKFLOW.md](docs/03_TEAM_WORKFLOW.md).

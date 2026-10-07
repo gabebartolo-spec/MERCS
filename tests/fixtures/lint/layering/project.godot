@@ -1,0 +1,12 @@
+; Lint fixture. Godot never opens this (see ../.gdignore); layering.py reads [autoload].
+
+config_version=5
+
+[application]
+
+config/name="LintFixture"
+
+[autoload]
+
+GameData="*res://presentation/autoload/game_data.gd"
+UiState="*res://ui/ui_state.gd"

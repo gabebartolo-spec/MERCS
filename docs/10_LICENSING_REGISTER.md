@@ -17,7 +17,7 @@ each row is re-checked when its version changes.
 | Blender | 5.2 | GPL-2.0+ | CLEARED | outputs are yours; the tool is not shipped |
 | MPFB (MakeHuman Plugin for Blender) | 2.0.x | code AGPL/GPL; **base mesh and targets CC0** | CLEARED | ship rendered sprites freely; do not ship the plugin |
 | Mixamo (Adobe) | service | Adobe General Terms: free, royalty-free use in games; no redistribution of raw clips/characters | CLEARED | clips stay in the vault, never in the repo; credit Adobe Mixamo in credits as courtesy |
-| ComfyUI | 0.38 → 0.39 | GPL-3.0 | CLEARED | tool only |
+| ComfyUI | 0.39.1 (updated 2026-10-08) | GPL-3.0 | CLEARED | tool only |
 | StabilityMatrix | current | AGPL-3.0 | CLEARED | launcher only |
 | comfy-cli / comfy-mcp | 1.22 | GPL-3.0 / per repo | CLEARED | tool only |
 | Python, Pillow, NumPy | 3.14 | PSF / HPND / BSD | CLEARED | |
@@ -32,14 +32,25 @@ each row is re-checked when its version changes.
 
 | Model | File | Licence | Status | Source checked |
 |-------|------|---------|--------|----------------|
-| Qwen-Image 2.1 (DiT + text encoders + VAE) | `DiffusionModels/qwen_image_2.1_int8_convrot.safetensors` and `TextEncoders/qwen3.5_9b…`, `qwen3vl_8b…`, `VAE/qwen_image_2.1_vae_bf16` | Qwen Research Licence: non-commercial without a separate agreement | **BANNED** | HF model card and licence file; press coverage of the licence change from the Apache 2.0 Qwen-Image 1.x line |
-| Anima 1.0 Turbo | `StableDiffusion/anima_turboV11.safetensors` | CircleStone Labs Non-Commercial Licence (derivative of NVIDIA Cosmos-Predict2) | **BANNED** | HF model card |
-| pixelArtDiffusionXL spriteShaper | `StableDiffusion/pixelArtDiffusionXL_spriteShaper.safetensors` | base SDXL: CreativeML OpenRAIL++-M (commercial OK); fine-tune permissions on Civitai not yet quoted | PENDING | Art agent must paste the Civitai permissions block into this row |
-| pixel-art-xl v1.1 LoRA | `Lora/pixel-art-xl-v1.1.safetensors` | Civitai per-model | PENDING | as above |
-| Pixel Art Sprite Sheet LoRA | `Lora/Pixel_Art_Sprite_Sheet_space_candy_media.safetensors` | Civitai per-model | PENDING | as above |
-| Pixel-ART Style SDXL (Pony) | root of Models | Pony V6 base: Fair AI Public License 1.0-SD; LoRA per Civitai | PENDING | as above |
+| Qwen-Image 2.1 (DiT + text encoders + VAE) | `DiffusionModels/qwen_image_2.1_int8_convrot.safetensors` and `TextEncoders/qwen3.5_9b…`, `qwen3vl_8b…`, `VAE/qwen_image_2.1_vae_bf16` | Qwen Research Licence: non-commercial without a separate agreement | **BANNED** | HF model card and licence file; press coverage of the licence change from the Apache 2.0 Qwen-Image 1.x line. All four files deleted 2026-10-08 (Recycle Bin emptied by the director) (D-015) |
+| Anima 1.0 Turbo | `StableDiffusion/anima_turboV11.safetensors` | CircleStone Labs Non-Commercial Licence (derivative of NVIDIA Cosmos-Predict2) | **BANNED** | HF model card. Civitai model 2458426 / version 3263843. Deleted 2026-10-08 (Recycle Bin emptied by the director) |
+| pixelArtDiffusionXL spriteShaper | `StableDiffusion/pixelArtDiffusionXL_spriteShaper.safetensors` | base SDXL: CreativeML OpenRAIL++-M (commercial OK); fine-tune permissions on Civitai not yet quoted | PENDING | Civitai model 277680 / version 364043 (local metadata); SHA256 `7adffa28d400…9f04a93`. Civitai API and site answer `REGION_BLOCKED` from this machine (2026-10-08), so the permissions block cannot be read. Stays PENDING, concept only (D-017) |
+| pixel-art-xl v1.1 LoRA | `Lora/pixel-art-xl-v1.1.safetensors` | Civitai per-model; the same author (nerijs) publishes it on HF as `nerijs/pixel-art-xl` under CreativeML OpenRAIL-M | PENDING | SHA256 `bbf3d8defbfb…445de274` matched Civitai model 120096 / version 135931 by hash; Civitai permissions block then `REGION_BLOCKED`. The HF file is the same size but a different hash (`4234637cb80c…e353eef7`), so the HF licence supports but does not prove this file. Concept only (D-017) |
+| Pixel Art Sprite Sheet LoRA | `Lora/Pixel_Art_Sprite_Sheet_space_candy_media.safetensors` | Civitai per-model | PENDING | SHA256 `9a4d682f6873…6f45051e`; Civitai lookup `REGION_BLOCKED`; no HF mirror found. Concept only (D-017) |
 | Hunyuan3D-2mv | `StableDiffusion/hunyuan3d-dit-v2-mv_fp16.safetensors` | Tencent Hunyuan 3D 2.0 Community Licence: commercial OK under 1M MAU; **not valid in EU, UK, South Korea** | CLEARED for reference/blockout meshes only | HF licence file; developer is in Australia; never ship a raw Hunyuan mesh |
-| Realistic Vision 6.0 | `StableDiffusion/realisticVisionV60B1_v51HyperVAE.safetensors` | SD1.5 OpenRAIL-M | CLEARED but unused | delete to free space |
+| Realistic Vision 6.0 | `StableDiffusion/realisticVisionV60B1_v51HyperVAE.safetensors` | SD1.5 OpenRAIL-M | CLEARED but unused | deleted 2026-10-08 (Recycle Bin emptied by the director) (D-015) |
+
+## Models found in ComfyUI's own `models/` folder (outside the vault; fetched earlier via comfy-mcp)
+
+Found 2026-10-08 under `Data/Packages/ComfyUI/models/` on C:. Licence tags read from the HF repo metadata, not yet from the licence files, so every row is PENDING. Not on the Phase 1 path.
+
+| Model | File | Licence (HF tag) | Status | Source checked |
+|-------|------|------------------|--------|----------------|
+| TRELLIS.2 4B (image-to-3D) | `diffusion_models/trellis_2_int8_convrot.safetensors` (5.3 GB) | MIT (`microsoft/TRELLIS.2-4B`, repack `Comfy-Org/TRELLIS.2`) | PENDING | HF metadata 2026-10-08 |
+| Pixal3D TRELLIS.2 VAEs | `vae/trellis_2_shape_vae_bf16`, `vae/trellis_2_texture_vae_bf16` (2.0 GB) | MIT (`Comfy-Org/Pixal3D`, base `TencentARC/Pixal3D`) | PENDING | HF metadata 2026-10-08 |
+| DINOv3 ViT-L | `clip_vision/dino_v3_L_naf_fp32.safetensors` (1.2 GB) | upstream is Meta's DINOv3 Licence (`license:other`, gated); the `Comfy-Org/Pixal3D` repack is tagged MIT, which does not override Meta's terms | PENDING | HF metadata 2026-10-08; read Meta's licence before any use |
+| MoGe-2 ViT-L normal | `geometry_estimation/moge_2_vitl_normal_fp16.safetensors` (0.7 GB) | MIT (`Ruicheng/moge-2-vitl-normal`, repack `Comfy-Org/MoGe`) | PENDING | HF metadata 2026-10-08 |
+| BiRefNet | `background_removal/birefnet.safetensors` (0.4 GB) | MIT (`Comfy-Org/BiRefNet`) | PENDING (row below is CLEARED for the upstream; this repack is unverified) | HF metadata 2026-10-08 |
 
 ## Generative models recommended for download (not yet installed; each needs a director yes if >10 GB)
 

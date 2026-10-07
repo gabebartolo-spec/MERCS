@@ -1,0 +1,2 @@
+# caps.json parses but is not the documented shape.
+CAP-FILE data/caps.json:0

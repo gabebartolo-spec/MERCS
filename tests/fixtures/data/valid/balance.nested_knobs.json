@@ -1,0 +1,1 @@
+{"hit_chance_base": 60, "allow_retreat": true, "wounds": {"bleed_per_turn": 1, "thresholds": [10, 20.5]}}

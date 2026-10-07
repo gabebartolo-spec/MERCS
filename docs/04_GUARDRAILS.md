@@ -42,6 +42,15 @@ stop, report, recommend, wait.
 obligations, never a sadism slider.
 *Enforced by:* CI lint; Concept Lead review of each storylet batch.
 
+### A9. Gamified rarity and disposable death
+*Pitfall:* agents reach for Common/Rare/Epic/Legendary labels, coloured borders and star ratings
+because every loot game has them; and a dead mercenary vanishes like a used item.
+*Rule:* no rarity tiers, labels, colours or badges anywhere; a mercenary is rare because an
+unusual combination happened and the player recognises it. Every member who ever served has a
+chronicle entry that survives death and retirement.
+*Enforced by:* `strings.py` banned-word list for UI labels (`rare`, `epic`, `legendary`); the
+`chronicle` fixture in Phase 4; review.
+
 ## B. Engineering pitfalls
 
 ### B1. "It compiles, so it works"
@@ -64,9 +73,9 @@ never read inside `sim/`. Tests pin seeds. A flaky test is fixed by pinning, nev
 → `ui`, never backwards) in CI.
 
 ### B4. Hallucinated or wrong-version APIs
-*Rule:* Godot 4.7.2 only. Before using an unfamiliar class or method, the agent reads the local
-docs (`godot --doctool` output committed under `docs/godot-api/` in Phase 0, or the online 4.7
-docs). Static typing is on so wrong signatures fail at parse.
+*Rule:* Godot 4.7.2 only. Before using an unfamiliar class or method, the agent reads the
+online 4.7 class reference (or a local `godot --doctool` dump if one is ever committed; not
+required). Static typing is on so wrong signatures fail at parse.
 *Enforced by:* CI runs `godot --headless --import` then every suite; a `SCRIPT ERROR` fails the
 run even when checks pass.
 
@@ -88,8 +97,9 @@ an old-save fixture. Save → reload → continue round-trip test on every persi
 *Enforced by:* `tests/save/` suite with fixtures from every prior phase; `mercs-sim-review` skill.
 
 ### B8. God files and autoload sprawl
-*Rule:* 400 lines per GDScript file, 40 per function, at most 6 autoloads (`Rng`, `GameData`,
-`EventBus`, `SaveSystem`, `Settings`, `Debug`). A new autoload is a decision.
+*Rule:* 400 lines per GDScript file, 40 per function, at most 5 autoloads (`GameData`,
+`EventBus`, `SaveSystem`, `Settings`, `Debug`). `Rng` is a plain RefCounted class in `sim/`, not
+an autoload, because sim must not depend on the scene tree (D-021). A new autoload is a decision.
 *Enforced by:* `gdlint` config in CI (`max-file-lines`, `max-public-methods`); layering lint.
 
 ### B9. Magic numbers and hidden balance
@@ -115,19 +125,20 @@ so localisation and a copy pass are never a rewrite.
 ## C. Process pitfalls
 
 ### C1. Worktree and branch sprawl (128 worktrees, 99 remote branches on AFL)
-*Rule:* at most four live worktrees under `../MERCS-wt/`; a worktree is removed when its PR merges
-or is closed; remote branches are deleted on merge (squash merge, delete branch).
+*Rule:* at most four live worktrees, whether under `../MERCS-wt/<topic>` or the app's
+`.claude/worktrees/` (both counted, D-021); a worktree is removed when its PR merges or is
+closed; remote branches are deleted on merge (squash merge, delete branch).
 *Enforced by:* Merge & CI weekly prune; `tools/lint/worktrees.sh` run at session start.
 
 ### C2. Unreadable documents
 *Rule:* caps in `03_TEAM_WORKFLOW.md`. Documents are read by section. A doc past its cap is a
 bug assigned to the Merge & CI agent.
-*Enforced by:* CI `doc_caps.py`.
+*Enforced by:* the `doc-caps` job in `lint.yml` (includes `CLAUDE.md` at 120).
 
 ### C3. Status and decision drift
 *Rule:* a decision exists only in `docs/DECISIONS.md`. STATUS.md is updated in the same PR that
-changes state. The steward sync runs weekly from the inbox.
-*Enforced by:* review; steward summary diff.
+changes state. The Merge & CI agent's weekly upkeep catches the rest.
+*Enforced by:* review; weekly summary diff.
 
 ### C4. Idle agents and busywork
 *Rule:* agents end their turn with a state line. "Available" is a valid state. Nobody invents work

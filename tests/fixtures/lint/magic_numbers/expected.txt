@@ -1,0 +1,32 @@
+# Expected error findings for tools/lint/magic_numbers.py (caps.json phase 3), one per line: RULE path:line.
+# Taken from the PLANT markers written when each violation was planted, never from lint output.
+MAGIC-NUMBER sim/bad_numbers.gd:25
+MAGIC-NUMBER sim/bad_numbers.gd:26
+MAGIC-NUMBER sim/bad_numbers.gd:27
+MAGIC-NUMBER sim/bad_numbers.gd:28
+MAGIC-NUMBER sim/bad_numbers.gd:29
+MAGIC-NUMBER sim/bad_numbers.gd:30
+MAGIC-NUMBER sim/bad_numbers.gd:31
+MAGIC-NUMBER sim/bad_numbers.gd:32
+MAGIC-NUMBER sim/bad_numbers.gd:33
+MAGIC-NUMBER sim/bad_numbers.gd:34
+MAGIC-NUMBER sim/bad_numbers.gd:35
+MAGIC-NUMBER sim/bad_numbers.gd:40
+MAGIC-NUMBER sim/bad_numbers.gd:44
+COLOUR-LITERAL ui/screens/hud.gd:16
+COLOUR-LITERAL ui/screens/hud.gd:17
+COLOUR-LITERAL ui/screens/hud.gd:18
+COLOUR-LITERAL ui/screens/hud.gd:19
+COLOUR-LITERAL ui/screens/hud.gd:20
+COLOUR-LITERAL ui/screens/hud.gd:21
+COLOUR-LITERAL ui/screens/hud.gd:22
+COLOUR-LITERAL ui/screens/hud.gd:23
+COLOUR-LITERAL ui/screens/hud.gd:24
+COLOUR-LITERAL ui/screens/hud.gd:25
+COLOUR-LITERAL ui/screens/hud.gd:26
+COLOUR-LITERAL ui/screens/hud.gd:27
+COLOUR-LITERAL ui/screens/hud.gd:28
+COLOUR-LITERAL ui/screens/hud.gd:29
+COLOUR-LITERAL ui/screens/hud.tscn:8
+COLOUR-LITERAL ui/screens/hud.tscn:12
+COLOUR-LITERAL ui/theme/dark.tres:5

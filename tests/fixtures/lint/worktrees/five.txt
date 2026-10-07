@@ -1,0 +1,27 @@
+worktree C:/Users/DANTE/Documents/GitHub/MERCS
+HEAD 2222222222222222222222222222222222222221
+branch refs/heads/main
+
+worktree C:/Users/DANTE/Documents/GitHub/MERCS-wt/p0-scaffold
+HEAD 3333333333333333333333333333333333333332
+branch refs/heads/claude/p0-scaffold
+
+worktree C:/Users/DANTE/Documents/GitHub/MERCS-wt/p0-lints
+HEAD 4444444444444444444444444444444444444443
+branch refs/heads/claude/p0-lints
+
+worktree C:/Users/DANTE/Documents/GitHub/MERCS-wt/p0-skills
+HEAD 5555555555555555555555555555555555555554
+branch refs/heads/claude/p0-skills
+
+worktree C:/Users/DANTE/Documents/GitHub/MERCS-wt/p1-merc-gen
+HEAD 6666666666666666666666666666666666666665
+branch refs/heads/claude/p1-merc-gen
+
+worktree C:/Users/DANTE/Documents/GitHub/MERCS-wt/p1-battle
+HEAD 7777777777777777777777777777777777777776
+branch refs/heads/claude/p1-battle
+
+worktree C:/Users/DANTE/Documents/GitHub/MERCS/.claude/worktrees/mercs-dev-lead-setup-0b99b1
+HEAD 8888888888888888888888888888888888888887
+branch refs/heads/claude/mercs-dev-lead-setup-0b99b1

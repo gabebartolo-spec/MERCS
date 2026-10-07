@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Injuries",
+  "description": "Injuries a mercenary can carry. data/injuries.json. Phase 0 fixes the file shape and the id only; a field is added here in the PR that adds the first entry using it.",
+  "type": "object",
+  "required": ["injuries"],
+  "additionalProperties": false,
+  "properties": {
+    "injuries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^inj_[a-z0-9]+(_[a-z0-9]+)*$"}
+        }
+      }
+    }
+  }
+}

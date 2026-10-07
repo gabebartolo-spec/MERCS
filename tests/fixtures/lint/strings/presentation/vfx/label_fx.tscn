@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://c0lintfixturelabelfx"]
+
+[node name="LabelFx" type="Node2D"]
+
+[node name="Floating" type="Label" parent="."]
+text = "Critical hit"
+
+[node name="Quiet" type="Label" parent="."]
+text = "battle.miss"

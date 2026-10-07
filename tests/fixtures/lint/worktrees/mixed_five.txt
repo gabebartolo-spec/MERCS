@@ -1,0 +1,32 @@
+worktree C:/Users/DANTE/Documents/GitHub/MERCS
+HEAD aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+branch refs/heads/main
+
+worktree C:/Users/DANTE/Documents/GitHub/MERCS-wt/p0-scaffold
+HEAD bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+branch refs/heads/claude/p0-scaffold
+
+worktree C:/Users/DANTE/Documents/GitHub/MERCS-wt/p0-lints
+HEAD cccccccccccccccccccccccccccccccccccccccc
+branch refs/heads/claude/p0-lints
+
+worktree C:/Users/DANTE/Documents/GitHub/MERCS-wt/p0-skills
+HEAD dddddddddddddddddddddddddddddddddddddddd
+branch refs/heads/claude/p0-skills
+
+worktree C:/Users/DANTE/Documents/GitHub/MERCS/.claude/worktrees/mercs-dev-lead-setup-0b99b1
+HEAD eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+branch refs/heads/claude/mercs-dev-lead-setup-0b99b1
+
+worktree C:/Users/DANTE/Documents/GitHub/MERCS/.claude/worktrees/art-factory-setup-f074a4
+HEAD ffffffffffffffffffffffffffffffffffffffff
+branch refs/heads/claude/art-factory-setup-f074a4
+
+worktree C:/Users/DANTE/Documents/GitHub/MERCS/.claude/worktrees/stale-session
+HEAD 1111111111111111111111111111111111111111
+detached
+prunable gitdir file points to non-existent location
+
+worktree C:/Users/DANTE/Documents/GitHub/MERCS-wt-old/leftover
+HEAD 2222222222222222222222222222222222222222
+branch refs/heads/claude/leftover

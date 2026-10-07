@@ -18,16 +18,18 @@ MERCS/
     backgrounds.json  traits.json  equipment.json  injuries.json
     storylets/*.json  factions.json  balance/*.json  text/en.json
   sim/                       pure logic, RefCounted only, headless
-    core/      Rng.gd  Clock.gd  Ids.gd
-    merc/      Merc.gd  MercGen.gd  Injury.gd  Memory.gd  Progression.gd
-    battle/    Battle.gd  Grid.gd  Actions.gd  Morale.gd  Resolver.gd
-    world/     World.gd  Faction.gd  Contracts.gd  Travel.gd  Region.gd
-    story/     Storylet.gd  Casting.gd  Checks.gd
-    save/      SaveModel.gd  Migrations.gd
+    core/      rng.gd  clock.gd  ids.gd  result.gd
+    merc/      merc.gd  merc_gen.gd  injury.gd  memory.gd  progression.gd
+    battle/    battle.gd  grid.gd  actions.gd  morale.gd  resolver.gd
+    world/     world.gd  faction.gd  contracts.gd  travel.gd  region.gd
+    story/     storylet.gd  casting.gd  checks.gd
+    save/      save_model.gd  migrations.gd
   presentation/              reads sim events, drives scenes
+    autoload/  game_data.gd  event_bus.gd  save_system.gd  settings.gd  debug.gd
+    text.gd                  Text.t() lookup; lives here so both presentation and ui may use it
     world/  battle/  characters/  vfx/
   ui/                        screens and UiKit
-    UiKit.gd  Text.gd  screens/*.tscn|gd  widgets/
+    ui_kit.gd  screens/*.tscn|gd  widgets/
   assets/                    engine-ready only (sprites, portraits, env, audio, fonts)
     golden/                  reference images for style review
   tools/
@@ -63,16 +65,23 @@ points that return event lists.
 - 400 lines per file, 40 per function, 4 parameters per function (pass a small typed object past
   that), cyclomatic complexity 12.
 - No `await` in `sim/`. Presentation may await tweens and timers.
-- Signals for sim → presentation; direct calls for presentation → sim entry points. The `EventBus`
-  autoload carries only typed event records (`BattleEvent`, `WorldEvent`, `StoryEvent`).
+- Sim → presentation: sim objects expose their own signals or return typed event lists from
+  entry points (`battle.apply(action) -> Array[BattleEvent]`); presentation relays them onto the
+  `EventBus` autoload, which carries only typed event records (`BattleEvent`, `WorldEvent`,
+  `StoryEvent`). Sim never references `EventBus` or any other autoload (D-021). Presentation → sim
+  is direct calls on entry points.
+- Autoloads (five, under `presentation/autoload/`): `GameData`, `EventBus`, `SaveSystem`,
+  `Settings`, `Debug`. Sim never references them.
 - Errors: `sim/` returns typed result objects (`Result.ok(value)` / `Result.err(code)`), never
   pushes errors or prints. `presentation/` may `push_warning` for asset problems.
 
 ## Randomness
 
-`Rng` wraps `RandomNumberGenerator` with a named stream per system (`Rng.stream("battle")`,
-`Rng.stream("world")`, `Rng.stream("merc_gen")`), each derived from the save seed and a counter
-held in the save. A test constructs `Rng.from_seed(424242)`. Nothing else makes random numbers.
+`Rng` (`sim/core/rng.gd`, RefCounted, `class_name Rng`) wraps `RandomNumberGenerator` with a
+named stream per system (`rng.stream("battle")`, `rng.stream("world")`, `rng.stream("merc_gen")`),
+each derived from the save seed and a counter held in the save model. It is **not an autoload**:
+sim objects receive their `Rng` from the save model or their constructor, so sim never touches the
+scene tree (D-021). A test constructs `Rng.from_seed(424242)`. Nothing else makes random numbers.
 
 ## Data
 
@@ -87,8 +96,9 @@ held in the save. A test constructs `Rng.from_seed(424242)`. Nothing else makes 
 
 - One runner per suite `tests/run_<suite>_tests.gd`, prints `"<Suite> tests: %d checks, %d failures"`
   and quits non-zero on failure. Floors in `tests/expected_checks.txt` only go up.
-- Suites from Phase 0: `data` (schema + caps), `sim_merc`, `sim_battle`, `sim_world`, `story`,
-  `save`, `effect` (player-effect fixtures, see guardrail A1), `assets`, `ui`, `perf`.
+- Suites: `smoke` and `data` (schema + caps) from Phase 0; then `sim_merc`, `sim_battle`,
+  `sim_world`, `story`, `save`, `effect` (player-effect fixtures, see guardrail A1), `assets`,
+  `ui`, `perf` as their phases arrive. gdlint and gdformat run in `lint.yml` from Phase 0.
 - Seeded fixtures under `tests/fixtures/` are the reproduction currency: a bug report is a fixture
   file plus the expected outcome.
 
