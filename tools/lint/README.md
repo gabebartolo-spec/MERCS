@@ -26,10 +26,12 @@ Each lint's docstring (`worktrees.sh` header) is the full rule list. Decisions w
   Both `Rng.gd` and `rng.gd`, `UiKit.gd` and `ui_kit.gd` match.
 - `COLOUR-LITERAL` looks at `ui/` only (D3). `&"..."` and `^"..."` literals are never
   flagged as colours or player text: they are the escape hatch for identifiers.
+- `strings.py` treats the print family, `push_warning`, `push_error`, `assert` and any
+  `Debug.<method>(...)` call as developer text, never player text.
 - Content collections are `data/<name>.json` or `data/<name>/*.json`; `data/schema/`,
   `data/text/`, `data/balance/` and `caps.json` are not collections.
-- Worktrees: only `<parent of main>/MERCS-wt/*` counts, at most 4. Session worktrees under
-  `.claude/worktrees/` and prunable (stale) entries do not count.
+- Worktrees: `<parent of main>/MERCS-wt/*` and the app's `<main>/.claude/worktrees/*` both
+  count, at most 4 together (D-021 item 3). Prunable (stale) entries do not count.
 - A repo with no `sim/`, `ui/`, `data/` or `project.godot` yet passes with `ok: 0 ...`.
 
 ## Self-test

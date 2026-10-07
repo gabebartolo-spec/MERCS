@@ -1,24 +1,25 @@
 #!/usr/bin/env bash
-# worktrees.sh: guardrail C1, at most four live worktrees under ../MERCS-wt/.
+# worktrees.sh: guardrail C1, at most four live worktrees (D-021 item 3).
 #
 # Reads `git worktree list --porcelain`, or the file named by $WORKTREE_LIST (the self-test
 # feeds it captured listings). The first entry is the main worktree. Entries inside
-# <parent directory of main>/MERCS-wt/ are counted. Other linked worktrees (such as the
-# desktop app's <main>/.claude/worktrees/* sessions) are listed but never counted. A
-# prunable entry is a stale registration rather than a live worktree: it is not counted
-# either, and is reported with its fix.
+# <parent directory of main>/MERCS-wt/ and inside the desktop app's session folder
+# <main>/.claude/worktrees/ are both counted. Any other linked worktree is listed as a
+# warning but not counted. A prunable entry is a stale registration rather than a live
+# worktree: it is not counted either, and is reported with its fix.
 #
-#   WT-OVER       more than MAX_WORKTREES live worktrees under MERCS-wt   (error, exit 1)
-#   WT-UNCOUNTED  a linked worktree outside MERCS-wt                       (warning)
-#   WT-PRUNABLE   a stale entry: run `git worktree prune`                  (warning)
+#   WT-OVER       more than MAX_WORKTREES live worktrees in those two places (error, exit 1)
+#   WT-UNCOUNTED  a linked worktree anywhere else                            (warning)
+#   WT-PRUNABLE   a stale entry: run `git worktree prune`                    (warning)
 #
 # Output follows the other lints: <source>:0: [warning ]RULE message, then `ok: ...`.
 # Windows paths (C:/...) and POSIX paths both work; Windows paths compare case-blind.
 #
 # Usage: bash tools/lint/worktrees.sh
 
-MAX_WORKTREES=4 # guardrail C1: at most four live worktrees under ../MERCS-wt/
+MAX_WORKTREES=4 # guardrail C1: at most four live worktrees, both places together (D-021)
 WT_DIR_NAME="MERCS-wt"
+SESSION_DIR_NAME=".claude/worktrees"
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 source_name="git-worktree-list"
@@ -105,21 +106,27 @@ main_path="${paths[0]}"
 wt_dir="${main_path%/*}/$WT_DIR_NAME"
 prefix="$(lower_if_windows "$wt_dir/")"
 
+session_dir="$main_path/$SESSION_DIR_NAME"
+session_prefix="$(lower_if_windows "$session_dir/")"
+
 counted=()
 for ((i = 1; i < ${#paths[@]}; i++)); do
   path="${paths[i]}"
+  key="$(lower_if_windows "$path")"
   if [ -n "${prunable[i]}" ]; then
     emit warning WT-PRUNABLE "$path is stale (${prunable[i]}); run: git worktree prune"
-  elif [[ "$(lower_if_windows "$path")" == "$prefix"* ]]; then
-    counted+=("${path:${#prefix}}")
+  elif [[ "$key" == "$prefix"* ]]; then
+    counted+=("$WT_DIR_NAME/${path:${#prefix}}")
+  elif [[ "$key" == "$session_prefix"* ]]; then
+    counted+=("$SESSION_DIR_NAME/${path:${#session_prefix}}")
   else
-    emit warning WT-UNCOUNTED "$path is a linked worktree outside $wt_dir (not counted)"
+    emit warning WT-UNCOUNTED "$path is a linked worktree outside $wt_dir and $session_dir (not counted)"
   fi
 done
 
 count="${#counted[@]}"
 if [ "$count" -gt "$MAX_WORKTREES" ]; then
-  emit error WT-OVER "$count live worktrees under $wt_dir (max $MAX_WORKTREES, guardrail C1): $(join_by ', ' "${counted[@]}"). Tell Merge & CI and stop until pruned."
+  emit error WT-OVER "$count live worktrees (max $MAX_WORKTREES, guardrail C1, D-021): $(join_by ', ' "${counted[@]}"). Tell Merge & CI and stop until pruned."
   exit 1
 fi
-echo "ok: $count of $MAX_WORKTREES live worktrees under $wt_dir"
+echo "ok: $count of $MAX_WORKTREES live worktrees ($WT_DIR_NAME and $SESSION_DIR_NAME)"

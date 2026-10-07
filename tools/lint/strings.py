@@ -7,7 +7,7 @@ Scans *.gd and *.tscn under ui/ and presentation/.
                 (%d, %s, %05.1f) are dropped it holds a letter and either whitespace or a
                 leading uppercase letter. Exempt: the first argument of Text.t(; anything
                 inside print, prints, printt, printraw, printerr, print_rich, print_verbose,
-                print_debug, push_warning, push_error and assert calls; res://, user:// and
+                print_debug, push_warning, push_error, assert and Debug.<any> calls; res://, user:// and
                 uid:// paths; &"..." and ^"..." literals (the escape hatch for names such as
                 &"Idle"); dictionary keys ("key": inside {}) and subscripts (x["key"]).
   TEXT-SCENE    a .tscn line that sets text, tooltip_text, placeholder_text, title or
@@ -28,7 +28,8 @@ SCANNED = ("ui", "presentation")
 PATH_PREFIXES = ("res://", "user://", "uid://")
 DEV_CALLS = ("print", "prints", "printt", "printraw", "printerr", "print_rich", "print_verbose",
              "print_debug", "push_warning", "push_error", "assert")
-DEV_CALL = re.compile(r"(?<!\w)(?:" + "|".join(DEV_CALLS) + r")\s*$")
+# Any method of the Debug autoload is a developer call too (Concept Lead review of #5).
+DEV_CALL = re.compile(r"(?:(?<!\w)(?:" + "|".join(DEV_CALLS) + r")|(?<![\w.])Debug\s*\.\s*\w+)\s*$")
 TEXT_KEY = re.compile(r"(?<!\w)Text\s*\.\s*t\s*\(\s*(\x01)")
 PRINTF = re.compile(r"%[-+#0]*\d*(?:\.\d+)?[a-zA-Z]")
 ESCAPE = re.compile(r"\\(.)", re.S)
@@ -57,7 +58,7 @@ def bracket_context(code: str) -> dict[int, tuple[str, bool]]:
     context: dict[int, tuple[str, bool]] = {}
     for i, ch in enumerate(code):
         if ch in "([{":
-            dev = ch == "(" and DEV_CALL.search(code, max(0, i - 32), i) is not None
+            dev = ch == "(" and DEV_CALL.search(code, max(0, i - 64), i) is not None
             stack.append((ch, dev))
         elif ch in ")]}":
             if stack:
