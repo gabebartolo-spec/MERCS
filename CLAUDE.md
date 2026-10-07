@@ -57,9 +57,10 @@ taste and final judgement. Agents supply execution, evidence and honest pushback
 - One Godot process per agent at a time. Isolate every run: `APPDATA=<your scratch dir>`.
   Never kill Godot by image name; kill by the PID you recorded.
 - ComfyUI and Blender renders are the Art agent's. Other agents do not start GPU jobs.
-- Worktrees: `git worktree add -b claude/<topic> ../MERCS-wt/<topic> origin/main`. Remove the
-  worktree when the PR merges. More than four live worktrees is a violation; the Merge & CI agent
-  prunes.
+- Worktrees: `git worktree add -b claude/<topic> ../MERCS-wt/<topic> origin/main`, or the app's
+  own `.claude/worktrees/`. Remove the worktree when the PR merges. More than four live worktrees
+  in total is a violation; the Merge & CI agent prunes.
+- Decisions in a PR are written as `D-TBD-<slug>`; the Merge & CI agent numbers them at merge.
 - Windows line endings: edit with tools that preserve them; never commit a whole-file CRLF flip.
 - Bash heredocs choke on long GDScript. Write a scratch file and run it.
 - Stage files by name. Never `git add -A`. Revert `.import` churn before committing.

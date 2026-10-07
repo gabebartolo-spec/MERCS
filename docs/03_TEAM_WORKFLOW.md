@@ -57,7 +57,10 @@ protocol format. Reviews phase gates. Is never asked to read a wall of text.
   words).
 - Upkeep never changes a decision, rule, cap, number or licence status. An inconsistency is
   flagged to the Concept Lead, never resolved by choosing.
-- ChatGPT is not part of the team (D-016).
+- ChatGPT is not part of the team (D-020).
+- **Decision ids are assigned at merge (D-021).** A PR writes `D-TBD-<slug>` in `DECISIONS.md`
+  and in every reference; the Merge & CI agent replaces it with the next free `D-NNN` in the
+  squash commit. Agents never pick a number.
 
 ## Concurrency and cadence
 
@@ -96,7 +99,7 @@ protocol format. Reviews phase gates. Is never asked to read a wall of text.
 - Decisions are written to `docs/DECISIONS.md` within the same PR that acts on them. A decision
   that exists only in a chat does not exist.
 
-## Document caps (enforced by `tools/lint/doc_caps.py` in CI)
+## Document caps (enforced by the `doc-caps` job in `.github/workflows/lint.yml`)
 
 | Document | Cap | When it is hit |
 |----------|-----|----------------|

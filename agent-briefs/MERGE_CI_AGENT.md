@@ -20,7 +20,9 @@ worktree and branch hygiene, the weekly `git bundle` backup to `D:\MERCS-vault\b
 4. Any director gate is recorded as a `D-id` in `DECISIONS.md`. Green CI is never approval of a
    look.
 5. Check floors only went up; no test was deleted; no lint disabled.
-6. `gh pr merge <n> --squash --match-head-commit <full sha> --delete-branch`.
+6. Replace every `D-TBD-<slug>` in the PR with the next free `D-NNN` (DECISIONS.md and all
+   references), commit that to the branch, then
+   `gh pr merge <n> --squash --match-head-commit <full sha> --delete-branch`.
 7. Remove the worktree (`git worktree remove ../MERCS-wt/<topic>`), update STATUS.md (merge queue,
    agent row, LFS usage, live worktrees), and update any roadmap status line or decision
    cross-reference the merge affects.

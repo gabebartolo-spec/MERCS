@@ -1,18 +1,20 @@
 # 09 — Repo, hosting and CI
 
-## Decision: local working copies + private GitHub mono-repo + local vault on D:
+## Decision: local working copies + GitHub mono-repo + local vault on D:
 
 | Where | What lives there | Why |
 |-------|------------------|-----|
-| `github.com/gabebartolo-spec/MERCS` (**make it private**) | code, data, docs, engine-ready assets (LFS), CI | one source of truth; free private repos; 2,000 Actions minutes/month; 10 GiB LFS storage and bandwidth free |
+| `github.com/gabebartolo-spec/MERCS` (**public**, D-019) | code, data, docs, engine-ready assets (LFS), CI | one source of truth; GitHub Free only enforces branch protection on public repos, and the director chose public over paying for Pro; 2,000 Actions minutes/month; 10 GiB LFS free |
 | `C:\Users\DANTE\Documents\GitHub\MERCS` | the main checkout | fast NVMe; C: has 84 GB free so only the checkout lives here |
 | `C:\Users\DANTE\Documents\GitHub\MERCS-wt\<topic>` | at most four worktrees | isolation per task; pruned on merge |
 | `D:\MERCS-vault\` | models, raw renders at 4×, concept outputs, Mixamo clips, Blender sources, logs, backups | 375 GB free; these are large, regenerable or non-redistributable, and must not hit LFS quota |
 | Backup of the vault | director's choice (external drive or cloud); not provisioned by agents | spend decision |
 
-The repo is currently **public and empty**. Making it private is the first action, because the
-design documents and generated assets of a commercial game should not be public, and because the
-licence posture of some models is per-user.
+The repo is **public** (D-019, reversing D-011) because GitHub Free refuses branch protection on
+private repos. Consequences the whole team lives with: every commit, document and asset is
+visible; `gitleaks` and the licence register are the only guard on what enters the open; no
+PENDING-licence asset may enter `assets/`; nothing commercially sensitive (store pricing, contracts,
+keys) goes in the repo. Revisit if the director takes GitHub Pro.
 
 ## Why one repo, not two
 
@@ -64,7 +66,7 @@ churn is reverted in code PRs, `vault/`, `.env`, `__pycache__/`, `out/`, `review
 | `tests.yml` | PR, push to main | plan → N shards (Godot headless suites) → aggregate `test`; skips docs-only PRs | ~6–8 min per run; keep under 30 runs/day |
 | `lint.yml` | PR | gdlint, gdformat check, layering, magic numbers, strings, doc caps, worktree count file, gitleaks, JSON schema | ~2 min |
 | `assets.yml` | PR touching `assets/` or `tools/pipeline/` | validators + Godot assets fixture + contact-sheet artefact | ~4 min |
-| `build.yml` | push to main, tag | Windows export; artefact kept 14 days | ~5 min |
+| `build.yml` | push to main, tag | Windows export; artefact kept 30 days | ~5 min |
 | `capture.yml` | manual | golden-scene captures and a short clip for director review | on demand |
 
 Godot in CI: pinned 4.7.2 download (cached), `--headless --import` once, then suites with
