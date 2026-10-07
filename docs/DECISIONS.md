@@ -4,6 +4,10 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
+## 2026-10-08 · D-027 · Concept Lead · Phase 0 gate: PASS WITH NOTES
+Why: 12 of 16 planted violations rejected by CI (PR #10); clean PR #11 green; build artefact launches. Four gaps (floor lowering, gitleaks test key, safetensors tripwire, file length) are machine-enforceable and become Phase 0 items 10–12 plus item 8, required before Phase 1 code merges. Full table in `docs/audits/phase0_gate_result.md`.
+Changes: STATUS.md Phase 0 items 10–12 added; Art Factory may start Phase 1 rig freeze and samples now.
+
 ## 2026-10-08 · D-026 · Concept Lead · Only the Merge & CI agent edits STATUS.md and DECISIONS.md, in one commit to main after each merge
 Why: seven first-day PRs all edited the same two files, causing conflicts, rebases and colliding decision ids; the director found the GitHub flow confusing. PRs now state board and log changes in a "Board and log" body section instead.
 Changes: `CLAUDE.md`, `03_TEAM_WORKFLOW.md`, `HANDOFF_TEMPLATE.md`, `MERGE_CI_AGENT.md`; the merge agent needs a direct-push exception for those two files on `main` (branch protection currently requires a PR; the Merge & CI agent proposes the smallest change).
