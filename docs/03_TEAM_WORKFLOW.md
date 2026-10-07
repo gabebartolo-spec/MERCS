@@ -58,6 +58,10 @@ protocol format. Reviews phase gates. Is never asked to read a wall of text.
 - Upkeep never changes a decision, rule, cap, number or licence status. An inconsistency is
   flagged to the Concept Lead, never resolved by choosing.
 - ChatGPT is not part of the team (D-020).
+- **One writer for the board and the log (D-TBD-one-writer).** `docs/STATUS.md` and
+  `docs/DECISIONS.md` are edited only by the Merge & CI agent, in a single follow-up commit to
+  `main` after each merge, from the PR body's "Board and log" section. No other PR touches them,
+  so PRs never conflict on shared lines and decision ids never collide.
 - **Decision ids are assigned at merge (D-021).** A PR writes `D-TBD-<slug>` in `DECISIONS.md`
   and in every reference; the Merge & CI agent replaces it with the next free `D-NNN` in the
   squash commit. Agents never pick a number.

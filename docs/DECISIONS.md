@@ -4,6 +4,10 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
+## 2026-10-08 · D-TBD-one-writer · Concept Lead · Only the Merge & CI agent edits STATUS.md and DECISIONS.md, in one commit to main after each merge
+Why: seven first-day PRs all edited the same two files, causing conflicts, rebases and colliding decision ids; the director found the GitHub flow confusing. PRs now state board and log changes in a "Board and log" body section instead.
+Changes: `CLAUDE.md`, `03_TEAM_WORKFLOW.md`, `HANDOFF_TEMPLATE.md`, `MERGE_CI_AGENT.md`; the merge agent needs a direct-push exception for those two files on `main` (branch protection currently requires a PR; the Merge & CI agent proposes the smallest change).
+
 ## 2026-10-08 · D-TBD-succession · Director · The player appoints the next captain and the company reacts (Q13)
 Why: director's answer. Reaction scenes (one to three voices from traits and memories, with morale and loyalty consequences; an unpopular pick can cause a departure) are Phase 5 content; the appointment flag ships in Phase 2.
 Changes: `08_ROADMAP.md` Phases 2, 4, 5; `data/balance/captaincy.json` when created.

@@ -23,7 +23,10 @@ worktree and branch hygiene, the weekly `git bundle` backup to `D:\MERCS-vault\b
 6. Replace every `D-TBD-<slug>` in the PR with the next free `D-NNN` (DECISIONS.md and all
    references), commit that to the branch, then
    `gh pr merge <n> --squash --match-head-commit <full sha> --delete-branch`.
-7. Remove the worktree (`git worktree remove ../MERCS-wt/<topic>`), update STATUS.md (merge queue,
+7. Record the PR's "Board and log" section: update `docs/STATUS.md` and append any decision to
+   `docs/DECISIONS.md` with the next free number, as one commit straight to `main`
+   (`docs: board and log after #<n>`); this is the only path by which those files change.
+8. Remove the worktree (`git worktree remove ../MERCS-wt/<topic>`), update STATUS.md (merge queue,
    agent row, LFS usage, live worktrees), and update any roadmap status line or decision
    cross-reference the merge affects.
 

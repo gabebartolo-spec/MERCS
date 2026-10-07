@@ -60,7 +60,9 @@ taste and final judgement. Agents supply execution, evidence and honest pushback
 - Worktrees: `git worktree add -b claude/<topic> ../MERCS-wt/<topic> origin/main`, or the app's
   own `.claude/worktrees/`. Remove the worktree when the PR merges. More than four live worktrees
   in total is a violation; the Merge & CI agent prunes.
-- Decisions in a PR are written as `D-TBD-<slug>`; the Merge & CI agent numbers them at merge.
+- Only the Merge & CI agent edits `docs/STATUS.md` and `docs/DECISIONS.md`, in one commit after
+  each merge. Every other PR leaves those files alone and states its status and decision changes
+  in the PR body ("Board and log" section). This is what stops PRs conflicting with each other.
 - Windows line endings: edit with tools that preserve them; never commit a whole-file CRLF flip.
 - Bash heredocs choke on long GDScript. Write a scratch file and run it.
 - Stage files by name. Never `git add -A`. Revert `.import` churn before committing.
