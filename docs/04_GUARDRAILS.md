@@ -42,6 +42,15 @@ stop, report, recommend, wait.
 obligations, never a sadism slider.
 *Enforced by:* CI lint; Concept Lead review of each storylet batch.
 
+### A9. Gamified rarity and disposable death
+*Pitfall:* agents reach for Common/Rare/Epic/Legendary labels, coloured borders and star ratings
+because every loot game has them; and a dead mercenary vanishes like a used item.
+*Rule:* no rarity tiers, labels, colours or badges anywhere; a mercenary is rare because an
+unusual combination happened and the player recognises it. Every member who ever served has a
+chronicle entry that survives death and retirement.
+*Enforced by:* `strings.py` banned-word list for UI labels (`rare`, `epic`, `legendary`); the
+`chronicle` fixture in Phase 4; review.
+
 ## B. Engineering pitfalls
 
 ### B1. "It compiles, so it works"

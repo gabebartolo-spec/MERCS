@@ -46,6 +46,34 @@ not high fantasy. Beauty and warmth exist so brutality has contrast. Cruelty is 
 9. **Contracts come from simulated causes.** Solve the cause and the problem changes.
 10. **Visual target: detailed pixel characters inside perspective low-poly 3D**, Pokémon Black/White in structure, Westeros in tone.
 
+## The player is the company (from the Three Pillars brief, 2026-10-08)
+
+There is no immortal protagonist and no invisible commander. The company is the persistent
+entity the player plays. One current mercenary holds the **office of captain**: a normal recruit
+who can fight, be maimed, retire, betray or die. When the captain dies the campaign continues;
+a successor is chosen and the overworld figure becomes the new captain. Succession is a story
+event, not a portrait swap: senior mercenaries disagree over who deserves command, a noble may
+refuse to serve under a thief, the most famous fighter may be a poor leader. A captured enemy
+officer recruited early could one day hold the office; nothing special-cases it.
+
+Deploying the captain is a choice with weight: morale and coordination improve, but the company
+is destabilised if the captain falls. A field sergeant commands when the captain stays behind.
+
+**The company chronicle is the permanent collection.** Every member who ever served, living,
+retired or dead, keeps a chronicle entry: portrait history, origin and recruitment, battles,
+kills, injuries, relationships, titles and deeds, equipment of renown, and the cause and place of
+death. Permadeath and collecting are compatible because the collection is the company's history,
+not the current roster.
+
+**Down is not yet dead.** When a mercenary drops in battle the outcome stays uncertain until the
+fight resolves and triage happens, unless the death was visually incontrovertible. Post-battle
+reveals, desperate surgery and survival stories live here. **Retreat is legitimate**: encounters
+do not scale to the company, scouting and judgement matter, and a mercenary left behind may
+survive as a prisoner whose location surfaces later as a rumour.
+
+**Integration test for any mercenary:** if removing them changes nothing but combat power, they
+are not yet woven into collection, narrative and combat.
+
 ## Core loop
 
 1. Arrive at a hub, settlement or discovered site in the 2.5D overworld.
@@ -98,6 +126,23 @@ the director supplied. The brief remains inspiration, not scripture.
 | Generative video (Wan, AnimateDiff) | R&D tool for bespoke 2D motion | parked entirely until the slice passes | 12 GB VRAM makes 14B video impractical; the deterministic pipeline does not need it |
 | Qwen-Image 2.1 for concepting | implied by prior use | banned from anything that feeds the product | research-only licence |
 | Roster size | "modest reserve" | hard cap of 12 in the slice (6 deployed + 6 reserve) | attachment and permadeath weight; raise only after the success test |
+
+### Additions from the Three Pillars brief (director, 2026-10-08; `docs/source-briefs/`)
+
+| Addition | Where it lands |
+|----------|----------------|
+| The company is the player; the captain is a mortal office with succession and deploy-or-delegate | this file; roadmap Phases 2, 3, 4, 8; question Q13, Q14 |
+| Company chronicle for living, retired and dead members | roadmap Phase 4 and Phase 8 caps |
+| Down is not yet dead: post-battle triage | roadmap Phase 4 |
+| Retreat is legitimate; encounters do not scale; left-behind mercs can be rescued later | roadmap Phases 3, 6 |
+| Regional recruitment pools as the "habitat" layer | roadmap Phase 7 |
+| No rarity labels or coloured borders; rarity is recognised, not announced | guardrail A9 |
+| Moral scenes voice one to three relevant mercenaries, never everyone | roadmap Phase 5 |
+| Which mercenary attempts a check is itself the roleplay | already pillar 7; Phase 5 deliverable |
+
+Everything else in that brief (storylet casting, memories over meters, weapons as tactical
+identity, morale as bridge, persistent violence, the vertical-slice shape) was already in this
+pack and is unchanged.
 
 ## What this game is not
 

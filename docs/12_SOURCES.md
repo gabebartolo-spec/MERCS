@@ -24,6 +24,10 @@ Licence and platform facts in this pack were checked against these. Re-verify a 
 - GitHub LFS quotas and metered billing (10 GiB free storage and bandwidth; US$0.07/GiB-month, US$0.0875/GiB): https://docs.github.com/en/enterprise-cloud@latest/billing/concepts/product-billing/git-lfs
 - GitHub Actions free minutes for private repos (2,000/month on Free): https://docs.github.com/en/billing
 
+## Director's briefs (in `docs/source-briefs/`)
+- `Mercenary_Collector_RPG_Claude_Design_Brief.docx` (2026-10-07): the original concept, systems and production brief this pack was built from.
+- `Mercenary_Collector_Three_Pillars_Claude_Brief.docx` (2026-10-08): the three-pillar synthesis; adds the company-as-player model, chronicle, triage, retreat and regional pools (D-TBD-three-pillars).
+
 ## Comparable games (reception signals from the director's design brief, directional only)
 Pokémon Black/White, Battle Brothers, Wildermyth, RimWorld, Cassette Beasts, Monster Sanctuary,
 Darkest Dungeon, XCOM 2, Baldur's Gate 3, Esoteric Ebb, Jagged Alliance 3, Into the Breach,
