@@ -1,0 +1,21 @@
+{
+  "_doc": "DRAFT master palette, NOT APPROVED. 56 colours in the named ramps of 06_STYLE_ART.md section 2, so the pipeline has a palette to quantise to and validate against. The palette size (48 / 56 / 64) and every colour are director decisions from sample set 3 (docs/specs/phase1_visual_proof.md section 5). Colour index = position in the flattened ramp list, in file order; never reorder an approved palette. Skin: only the neutral ramp the sprites render in; the six skin_1..6 recolour ramps are added when the director picks the size. heraldry is the only high-saturation ramp (faction cloth, shields, banners). blood is overlay-only, never in a base sprite.",
+  "schema": "mercs.palette/1",
+  "id": "master_draft",
+  "status": "DRAFT",
+  "approved": false,
+  "ramps": [
+    {"name": "soot", "purpose": "outlines, iron, charred wood", "colours": ["#141216", "#221f24", "#302b2f", "#3e383a"]},
+    {"name": "slate", "purpose": "stone, steel shadow, sky", "colours": ["#3b4350", "#4f5966", "#67717c", "#848c94", "#a4aab0"]},
+    {"name": "iron", "purpose": "mail, plate, blades", "colours": ["#2e3236", "#474d52", "#646b70", "#868c8f", "#aeb2b2"]},
+    {"name": "soil", "purpose": "ground, leather lowlights", "colours": ["#2a2018", "#3d2e22", "#54402f", "#6d5640", "#8a7156"]},
+    {"name": "timber", "purpose": "wood, leather", "colours": ["#33251b", "#4b3624", "#66492f", "#82603e", "#a07d55"]},
+    {"name": "bone", "purpose": "linen, skin highlights, bone", "colours": ["#8f8574", "#a99f8b", "#c2b9a3", "#d8d0bb", "#ebe5d3"]},
+    {"name": "skin_neutral", "purpose": "the one skin ramp sprites render in; recoloured by index", "colours": ["#4a2e22", "#6b4331", "#8c5b43", "#ab765a", "#c69475", "#ddb497"]},
+    {"name": "cloth_faded", "purpose": "commoner clothing: dull red, blue, green pairs", "colours": ["#6e3a33", "#8c5248", "#3c4a5e", "#56677d", "#4a5640", "#65735a"]},
+    {"name": "verdure_cold", "purpose": "vegetation", "colours": ["#1f2f2b", "#2f4540", "#445e55", "#5f7a6c"]},
+    {"name": "heraldry", "purpose": "faction colours: crimson/gold, blue/white, black(soot)/yellow", "colours": ["#8e1b24", "#b8323a", "#c9962b", "#23468c", "#e9e6dc", "#d9b92e"]},
+    {"name": "blood", "purpose": "overlay only: two reds and a dried brown", "colours": ["#5c0f12", "#7e1a1c", "#4a2a1e"]},
+    {"name": "fire", "purpose": "torch and ember accents", "colours": ["#d9762b", "#f2c14e"]}
+  ]
+}

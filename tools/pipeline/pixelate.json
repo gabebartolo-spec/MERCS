@@ -1,0 +1,11 @@
+{
+  "_doc": "Pixel post parameters (07_ASSET_PIPELINE.md section 2.5). Changing any value is a director-visible decision because every sheet must be rebuilt. Reduction: each scale x scale block of the 4x render becomes one 1x pixel. A 4x sample counts as covered when its alpha >= alpha_threshold; the 1x pixel is opaque when at least coverage_min_samples of the block are covered, and its colour is the integer-rounded mean RGB of the covered samples (a box filter, which does the work of 07's 0.5 px pre-blur plus nearest). The mean is then mapped to the nearest palette colour by squared RGB distance, ties to the lowest palette index, with no dithering. Output alpha is binary (0 or 255) and transparent pixels are written as 0,0,0,0. ramps_by_layer limits a layer to some ramps (per-ramp protection: the body only ever lands in the neutral skin ramp and soot). Outline (06 section 3, 1 px soot) is not implemented yet.",
+  "schema": "mercs.pixelate/1",
+  "scale": 4,
+  "alpha_threshold": 128,
+  "coverage_min_samples": 8,
+  "palette": "tools/pipeline/palette/master_draft.json",
+  "ramps_by_layer": {
+    "body": ["skin_neutral", "soot"]
+  }
+}

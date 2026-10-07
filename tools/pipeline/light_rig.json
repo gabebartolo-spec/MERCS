@@ -1,0 +1,23 @@
+{
+  "_doc": "Fixed sprite light rig (06_STYLE_ART.md section 3). Lights are placed relative to the camera, so every facing is lit the same way and the character turns under them. Directions: azimuth_deg is measured from the camera's view axis seen from above, positive towards camera-left; 0 = light shining from behind the camera onto the character's camera-facing side, 180 = from behind the character. elevation_deg is above the horizon. All lights are suns with cast shadows off: shadows are a separate blob sprite in-engine. Energies are sun strength in W/m2. The rim light is a DRAFT addition: 06 section 3 lists one key and one fill only; keep or drop is a director decision from the sample sheet.",
+  "schema": "mercs.light_rig/1",
+  "engine": "BLENDER_EEVEE",
+  "engine_doc": "EEVEE, one render sample (no anti-aliasing at the 4x stage), transparent film, Standard view transform so colours are not tone-mapped",
+  "render_samples": 1,
+  "filter_size_px": 0.0,
+  "view_transform": "Standard",
+  "world_color": [0.0, 0.0, 0.0],
+  "world_strength": 0.0,
+  "lights": [
+    {"name": "key", "azimuth_deg": 45.0, "elevation_deg": 45.0, "energy": 3.0, "color": [1.0, 0.96, 0.9]},
+    {"name": "fill", "azimuth_deg": -60.0, "elevation_deg": 20.0, "energy": 0.6, "color": [0.85, 0.9, 1.0], "doc": "20 % of key energy, from camera-right"},
+    {"name": "rim", "azimuth_deg": 160.0, "elevation_deg": 35.0, "energy": 1.5, "color": [1.0, 1.0, 1.0], "doc": "DRAFT, see _doc"}
+  ],
+  "body_material": {
+    "name": "mercs_neutral_skin",
+    "base_color_srgb": "#b58a6e",
+    "roughness": 1.0,
+    "specular": 0.0,
+    "doc": "flat neutral skin; sprites render in the neutral skin ramp and are recoloured later by palette index (06 section 2)"
+  }
+}
