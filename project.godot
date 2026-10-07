@@ -1,0 +1,18 @@
+; Engine configuration file (Godot 4.7.2).
+; MERCS. The [debug] block makes the typing warnings errors: an untyped declaration
+; or an unsafe access does not compile. tests/run_smoke_tests.gd fails if any of
+; them is relaxed.
+
+config_version=5
+
+[application]
+
+config/name="MERCS"
+
+[debug]
+
+gdscript/warnings/untyped_declaration=2
+gdscript/warnings/unsafe_property_access=2
+gdscript/warnings/unsafe_method_access=2
+gdscript/warnings/unsafe_cast=2
+gdscript/warnings/unsafe_call_argument=2
