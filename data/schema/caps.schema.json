@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Content caps",
+  "description": "data/caps.json: the current phase and how many entries each content collection may hold (04_GUARDRAILS.md A2). tools/lint/content_counts.py enforces the counts; raising a cap is a director decision.",
+  "type": "object",
+  "required": ["phase", "caps"],
+  "additionalProperties": false,
+  "properties": {
+    "phase": {"type": "integer", "minimum": 0},
+    "caps": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z0-9]+(_[a-z0-9]+)*$": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

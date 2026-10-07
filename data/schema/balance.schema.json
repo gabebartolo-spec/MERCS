@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Balance knobs",
+  "description": "data/balance/<system>.json, with a sibling <system>.md that explains each knob in one line. A knob is a number, a boolean, a list of numbers, or a group of knobs.",
+  "type": "object",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^[a-z0-9]+(_[a-z0-9]+)*$": {"$ref": "#/$defs/knob"}
+  },
+  "$defs": {
+    "knob": {
+      "type": ["number", "boolean", "array", "object"],
+      "items": {"type": "number"},
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z0-9]+(_[a-z0-9]+)*$": {"$ref": "#/$defs/knob"}
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Traits",
+  "description": "Mercenary traits. data/traits.json. Phase 0 fixes the file shape and the id only; a field is added here in the PR that adds the first entry using it.",
+  "type": "object",
+  "required": ["traits"],
+  "additionalProperties": false,
+  "properties": {
+    "traits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^trait_[a-z0-9]+(_[a-z0-9]+)*$"}
+        }
+      }
+    }
+  }
+}
