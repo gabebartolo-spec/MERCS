@@ -2,7 +2,7 @@
   "_comment": "Phase 0 has no content, so every cap is 0. The phase that adds content raises its caps here, as listed in 08_ROADMAP.md; anything beyond that is a director decision (04_GUARDRAILS.md A2).",
   "phase": 0,
   "caps": {
-    "backgrounds": 0,
+    "backgrounds": 12,
     "traits": 0,
     "equipment": 0,
     "injuries": 0,

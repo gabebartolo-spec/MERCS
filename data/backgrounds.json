@@ -1,4 +1,18 @@
 {
-  "_comment": "Empty until the phase that adds the first entry (08_ROADMAP.md). Schema: data/schema/backgrounds.schema.json.",
-  "backgrounds": []
+  "_comment": "GATE TEST: 13 entries, cap 12 (GATE-10); the last entry lacks its required id (GATE-9).",
+  "backgrounds": [
+    {"id": "bg_gate_01"},
+    {"id": "bg_gate_02"},
+    {"id": "bg_gate_03"},
+    {"id": "bg_gate_04"},
+    {"id": "bg_gate_05"},
+    {"id": "bg_gate_06"},
+    {"id": "bg_gate_07"},
+    {"id": "bg_gate_08"},
+    {"id": "bg_gate_09"},
+    {"id": "bg_gate_10"},
+    {"id": "bg_gate_11"},
+    {"id": "bg_gate_12"},
+    {"_comment": "GATE-9 missing required key id"}
+  ]
 }

@@ -20,6 +20,8 @@ EventBus="*res://presentation/autoload/event_bus.gd"
 SaveSystem="*res://presentation/autoload/save_system.gd"
 Settings="*res://presentation/autoload/settings.gd"
 Debug="*res://presentation/autoload/debug.gd"
+; GATE-15 sixth autoload
+Gate="*res://presentation/autoload/gate.gd"
 
 [debug]
 
