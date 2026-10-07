@@ -67,8 +67,9 @@ jobs:
       - name: List GDScript files
         shell: bash
         run: |
-          # Every .gd file outside .godot/ and .claude/. Limits live in .gdlintrc (docs/05).
-          find . -name '*.gd' -not -path './.godot/*' -not -path './.claude/*' | sort > gd_files.txt
+          # Every .gd file outside .godot/, .claude/ and tests/fixtures/lint/ (planted lookalikes for
+          # the project lints, not production code). Limits live in .gdlintrc (docs/05).
+          find . -name '*.gd' -not -path './.godot/*' -not -path './.claude/*' \n            -not -path './tests/fixtures/lint/*' | sort > gd_files.txt
           echo "$(wc -l < gd_files.txt) GDScript files"
       - name: File names are snake_case (docs/05)
         shell: bash
