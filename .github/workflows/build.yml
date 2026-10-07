@@ -1,22 +1,22 @@
 name: build
 
 # Exports the Windows build and proves it launches. Runs on every push to main (the
-# artefact the director plays), on demand, and on a pull request that changes how the
-# build is made. The exported game runs headless for 120 frames and must load the main
-# scene from project.godot without logging an error; the .exe is then uploaded as the
-# "MERCS-windows" artefact. No LFS assets exist in Phase 0; the phase that adds them
-# turns on `lfs: true` at checkout (and caches the objects; LFS bandwidth is metered).
+# artefact the director plays) and on demand; never on a pull request. The export and
+# the headless launch do not compile sim/ or count autoloads, so on a PR this job went
+# green in 34 s while `test` was red (Phase 0 gate, side finding): a build is only
+# meaningful once `test` has passed, which on main it has. A PR that changes
+# project.godot, export_presets.cfg or this file is proven by the push to main that
+# merges it, or by running the workflow by hand on the branch. The exported game runs
+# headless for 120 frames and must load the main scene from project.godot without
+# logging an error; the .exe is then uploaded as the "MERCS-windows" artefact. No LFS
+# assets exist in Phase 0; the phase that adds them turns on `lfs: true` at checkout
+# (and caches the objects; LFS bandwidth is metered).
 on:
   push:
     branches: [main]
     paths-ignore:
       - "docs/**"
       - "**/*.md"
-  pull_request:
-    paths:
-      - project.godot
-      - export_presets.cfg
-      - .github/workflows/build.yml
   workflow_dispatch:
 
 concurrency:

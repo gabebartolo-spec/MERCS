@@ -140,10 +140,24 @@ if [ "$SUITES_ONLY" != 1 ] && [ "$#" -eq 0 ]; then
 	if GODOT="$GODOT" tools/test_run_tests.sh > "$LOG_DIR/harness_selftest.log" 2>&1; then
 		summary+=("| harness_selftest | pass | |")
 	else
-		tail -15 "$LOG_DIR/harness_selftest.log"
-		note_error "tools/test_run_tests.sh: the harness no longer catches what it must"
+		selftest_log="$LOG_DIR/harness_selftest.log"
+		tail -15 "$selftest_log"
+		# Name what failed. The self-test prints one "FAIL: <what>" line per broken
+		# expectation; when its first step ("the real floor should pass") failed, the
+		# smoke suite itself is red and the harness is not at fault, so say so and quote
+		# the suite's own failure line.
+		what=$(grep -E "^FAIL:" "$selftest_log" | head -1 | sed 's/^FAIL: //')
+		suite_line=$(grep -oE "suite '[^']+' failed: [^(]*" "$selftest_log" | head -1)
+		if [ -z "$what" ]; then
+			detail="no FAIL line in the self-test log, see $selftest_log"
+		elif [ "$what" = "the real floor should pass" ] && [ -n "$suite_line" ]; then
+			detail="the smoke suite is red, not the harness: $suite_line"
+		else
+			detail="$what${suite_line:+ ($suite_line)}"
+		fi
+		note_error "harness self-test (tools/test_run_tests.sh): $detail"
 		failed=1
-		summary+=("| harness_selftest | FAIL | see log |")
+		summary+=("| harness_selftest | FAIL | $detail |")
 	fi
 fi
 

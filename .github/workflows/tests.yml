@@ -34,7 +34,8 @@ env:
   GODOT_VERSION: "4.7.2"
 
 jobs:
-  # Decides whether the Godot checks run, and checks every suite is in a shard.
+  # Decides whether the Godot checks run, checks every suite is in a shard, and checks
+  # no floor in tests/expected_checks.txt went down against the base branch.
   plan:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -45,7 +46,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2 # the PR merge commit and the base it merges into
+          fetch-depth: 0 # the PR merge commit, its base, and origin/<base> for the floors check
 
       # Anything outside docs/ and *.md files counts as code.
       - name: Check for code changes
@@ -67,6 +68,13 @@ jobs:
           if [ "$code" = false ]; then echo "Skipping the Godot checks ($reason)."; fi
           echo "code=$code" >> "$GITHUB_OUTPUT"
           echo "reason=$reason" >> "$GITHUB_OUTPUT"
+
+      # Guardrail B6 as a machine rule (gate gap #12): a floor in tests/expected_checks.txt
+      # only goes up. Fails, naming the suite, if the PR lowers a floor or drops a suite's
+      # line. Pushes to main have nothing to compare against.
+      - name: Check no floor in tests/expected_checks.txt went down
+        if: github.event_name == 'pull_request'
+        run: bash tools/check_floors.sh "origin/${{ github.base_ref }}"
 
       # A suite missing from tools/ci_shards.txt would never run in CI.
       - name: Check the shards cover every suite
@@ -175,12 +183,16 @@ jobs:
         run: |
           echo "plan=$PLAN code=$CODE shards=$SHARDS extras=$EXTRAS"
           if [ "$PLAN" != success ]; then
-            echo "::error::the plan job failed: a suite is missing from tools/ci_shards.txt, or the checkout failed"
+            echo "::error::the plan job failed: a floor in tests/expected_checks.txt went down, a suite is missing from tools/ci_shards.txt, or the checkout failed"
             exit 1
           fi
           if [ "$CODE" = true ]; then
-            if [ "$SHARDS" != success ] || [ "$EXTRAS" != success ]; then
-              echo "::error::a test shard or the harness self-test did not pass"
+            if [ "$SHARDS" != success ]; then
+              echo "::error::a test shard did not pass (shards: $SHARDS); the red shard's log names the suite and check"
+              exit 1
+            fi
+            if [ "$EXTRAS" != success ]; then
+              echo "::error::the harness self-test job did not pass (extras: $EXTRAS); its log names what failed"
               exit 1
             fi
           else
