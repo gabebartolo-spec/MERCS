@@ -67,7 +67,7 @@ def parse_findings(output: str) -> tuple[set[str], set[str]]:
 
 def run(argv: list[str], env_extra: dict[str, str] | None = None) -> subprocess.CompletedProcess:
     env = {k: v for k, v in os.environ.items() if k not in ("GITHUB_ACTIONS", "WORKTREE_LIST")}
-    env.update({"PYTHONIOENCODING": "utf-8", "PYTHONUTF8": "1"})
+    env.update({"PYTHONIOENCODING": "utf-8", "PYTHONUTF8": "1", "PYTHONDONTWRITEBYTECODE": "1"})
     env.update(env_extra or {})
     try:
         return subprocess.run(argv, cwd=ROOT, env=env, capture_output=True, text=True,
