@@ -1,0 +1,2 @@
+# caps.json is not valid JSON (trailing comma on line 3).
+CAP-FILE data/caps.json:3

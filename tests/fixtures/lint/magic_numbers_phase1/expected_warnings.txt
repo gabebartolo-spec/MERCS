@@ -1,0 +1,2 @@
+# MAGIC-NUMBER warnings expected, one per line: RULE path:line.
+MAGIC-NUMBER sim/warn_only.gd:5

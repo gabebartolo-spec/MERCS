@@ -1,0 +1,28 @@
+worktree /home/dev/src/MERCS
+HEAD 2222222222222222222222222222222222222221
+branch refs/heads/main
+
+worktree /home/dev/src/MERCS-wt/a
+HEAD 3333333333333333333333333333333333333332
+branch refs/heads/claude/a
+
+worktree /home/dev/src/MERCS-wt/b
+HEAD 3333333333333333333333333333333333333332
+branch refs/heads/claude/b
+
+worktree /home/dev/src/MERCS-wt/c
+HEAD 3333333333333333333333333333333333333332
+branch refs/heads/claude/c
+
+worktree /home/dev/src/MERCS-wt/d
+HEAD 3333333333333333333333333333333333333332
+branch refs/heads/claude/d
+
+worktree /home/dev/src/MERCS-wt/gone
+HEAD 4444444444444444444444444444444444444443
+detached
+prunable gitdir file points to non-existent location
+
+worktree /home/dev/src/MERCS/.claude/worktrees/session-1
+HEAD 5555555555555555555555555555555555555554
+branch refs/heads/claude/session-1

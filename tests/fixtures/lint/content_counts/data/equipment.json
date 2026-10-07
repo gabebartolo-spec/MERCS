@@ -1,0 +1,4 @@
+{
+  "_comment": "The equipment key holds an object, not an array: CAP-FILE.",
+  "equipment": {"wpn_arming_sword": 1}
+}

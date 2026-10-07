@@ -1,0 +1,8 @@
+# Expected error findings for tools/lint/content_counts.py, one per line: RULE path:line.
+# Written when the data files were planted, never from lint output.
+CAP-OVER data/backgrounds.json:0
+CAP-FILE data/equipment.json:0
+CAP-FILE data/injuries.json:4
+CAP-OVER data/storylets:0
+CAP-FILE data/storylets/act3.json:0
+CAP-MISSING data/perks.json:0

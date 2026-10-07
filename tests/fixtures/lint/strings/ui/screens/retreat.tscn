@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://c0lintfixtureretreat"]
+
+; Look-alike: a comment line text = "Retreat" is not a property.
+
+[node name="Title Bar" type="Control"]
+layout_mode = 3
+text_direction = 1
+metadata/note = "Retreat note here"
+
+[node name="Key" type="Label" parent="."]
+text = "ui.retreat"
+tooltip_text = ""
+placeholder_text = "ui.name_hint"
+
+[node name="Plain" type="Button" parent="."]
+text = "Retreat"
+tooltip_text = "Leave the field now"
+
+[node name="Edit" type="LineEdit" parent="."]
+placeholder_text = "Enter a name"
+
+[node name="Dialog" type="AcceptDialog" parent="."]
+title = "Are you sure?"
+dialog_text = "Really retreat?"
+
+[node name="Long" type="Label" parent="."]
+text = "First line
+Second Line here"
+
+[node name="Escaped" type="Label" parent="."]
+text = "say \"Hold the line\" now"
+
+[node name="Format" type="Label" parent="."]
+text = "%d / %d"
