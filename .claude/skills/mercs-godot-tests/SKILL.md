@@ -16,7 +16,8 @@ GODOT="C:/Users/DANTE/Desktop/Godot_v4.7.2-stable_win64.exe/Godot_v4.7.2-stable_
   tools/run_tests.sh data smoke
 ```
 
-`GODOT` is the console build, so output reaches the shell. The script:
+`GODOT` is the console build of the engine of record, so output reaches the shell; if the install
+moves, `docs/02_MACHINE_AND_LOCAL_AI.md` has the path. The script:
 1. imports the project and fails on any SCRIPT ERROR, Parse Error or Compile Error;
 2. runs each named suite, `tests/run_<suite>_tests.gd`, with `--headless --fixed-fps 60` and a time
    limit (`SUITE_TIMEOUT`, default 900 s);
@@ -31,7 +32,7 @@ the work the way CI does.
 - **Name the suites you touched** (one to three while iterating); a full run is for wide changes or for
   checking `main`. Phase 0 suites: `data` (every data file validates against its schema in
   `data/schema/`, and the validator rejects the known-bad fixtures in `tests/fixtures/data/`) and
-  `smoke` (the main scene opens headless, exactly the six sanctioned autoloads, a project-settings
+  `smoke` (the main scene opens headless, exactly the five sanctioned autoloads (D-021), a project-settings
   guard, every script compiles with typing warnings as errors). Later suites: `docs/05_STYLE_CODE.md`
   "Tests".
 - **One Godot process per agent at a time.** Long runs go in the background; record the task id and the
@@ -64,7 +65,7 @@ the work the way CI does.
 - **Seeds:** pin them (`docs/05_STYLE_CODE.md` "Randomness"); a test that reads the clock is a bug
   (CLAUDE.md rule 2). A suite with no randomness says `## Seeded by design: <why>` in its header.
 - **Autoloads in a `--script`:** if a suite fails to compile with "Identifier not found" on an autoload
-  (`Rng`, `GameData`, ...), it named the autoload before the autoloads existed. `load()` it inside the
+  (`GameData`, `EventBus`, ...), it named the autoload before the autoloads existed. `load()` it inside the
   run method after the first frame, and give typed variables to values returned from a `load()`ed script.
 - **New checks prove themselves:** show each failing on a known-bad fixture before trusting it.
 

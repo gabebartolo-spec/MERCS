@@ -13,7 +13,8 @@ need, so nobody has to reread your conversation.
 ## Before you start
 
 Work only on what `docs/STATUS.md` "Assigned items" lists (CLAUDE.md: a roadmap item is context, not
-authorisation). Branch from current main in your own worktree; more than four live is a violation.
+authorisation). Branch from current main in your own worktree; more than four live (`../MERCS-wt/` and the app's
+`.claude/worktrees/` together, D-021) is a violation.
 
 ```bash
 bash tools/lint/worktrees.sh            # more than four live: tell Merge & CI and stop

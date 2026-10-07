@@ -44,7 +44,7 @@ Put this in the PR body, under Evidence (`agent-briefs/HANDOFF_TEMPLATE.md` sect
 | Identity | Is every reference keyed by id, never by a generated display name? Ids never change once a save can contain them (`docs/05_STYLE_CODE.md` "Naming"). |
 
 3. **Check determinism and parity.** All randomness from `Rng` streams; nothing new reads the clock or calls
-   `randi` or `randf` outside `Rng.gd` (B2). The enemy gets only information it could plausibly have (rule
+   `randi` or `randf` outside `sim/core/rng.gd` (B2, D-021). The enemy gets only information it could plausibly have (rule
    6): a new faction or AI rule must not read the player's hidden state (unrevealed roster, wounds,
    plans) without a plausible way for that information to have reached it.
 4. **For rule or balance changes**, ask for (or run) the seeded paired fixture: the same seeds before
