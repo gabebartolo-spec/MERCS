@@ -62,7 +62,8 @@ your state (guardrail C3). States: working, running a check, awaiting director, 
 
 - **You do not merge.** Merge & CI merges on green for the exact head commit, after any required
   review and any director gate (`agent-briefs/MERGE_CI_AGENT.md` "Merge procedure"). Never enable
-  auto-merge. Draft and docs-only PRs skip `tests.yml`: mark a draft ready when its tests should run.
+  auto-merge. Draft and docs-only PRs skip the Godot jobs in `tests.yml` (`test` still
+  reports): mark a draft ready when its tests should run.
 - **A push after `test` went green makes that green stale.** Merge & CI merges only the exact head it
   checked, so every later push means waiting for a new green. Push when the work is final.
 - **Sync your own branch** when main moves under it: merge or rebase `origin/main`

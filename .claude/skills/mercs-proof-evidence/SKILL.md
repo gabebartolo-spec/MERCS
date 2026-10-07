@@ -50,7 +50,7 @@ so and propose cutting it (CLAUDE.md: the mercenaries are the game).
 ## Seeds
 
 All randomness comes from `Rng` streams built from a seed (`docs/05_STYLE_CODE.md` "Randomness"); a
-test constructs `Rng.from_seed(<n>)`. Pin the seed in the test and write it in the PR. A check that
+test builds its stream from a fixed seed. Pin the seed in the test and write it in the PR. A check that
 fails now and then is an unpinned seed or a clock read (guardrail B2): pin it, never rerun it. For
 balance, compare before and after on the same seeds, pair by seed, and use several seeds, not one
 favourite. A reproduction is a fixture file under `tests/fixtures/` plus the expected outcome

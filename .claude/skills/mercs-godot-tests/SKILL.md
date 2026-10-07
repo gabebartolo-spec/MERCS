@@ -47,18 +47,22 @@ the work the way CI does.
 
 ## Adding a suite or checks
 
-- Runner: `tests/run_<suite>_tests.gd`, printing `<Suite> tests: N checks, M failures` and quitting
-  non-zero on failure. Model it on `tests/run_data_tests.gd`.
-- Register a new suite in three places: `ALL_SUITES` in `tools/run_tests.sh`; one line in
+- Runner: `tests/run_<suite>_tests.gd`, extending `tests/lib/runner.gd`: override `suite_name()` and
+  `run_checks()` and call `check(condition, expectation)` once per check; the base prints
+  `<Suite> tests: N checks, M failures` and quits non-zero on failure. Model it on
+  `tests/run_smoke_tests.gd`.
+- Register a new suite in four places: `ALL_SUITES` in `tools/run_tests.sh`; one line in
   `tools/ci_shards.txt` (a short shard; Merge & CI rebalances when a shard passes 10 minutes); a floor
-  in `tests/expected_checks.txt` as `<suite> <floor>`. Then run `bash tools/check_ci_shards.sh`: every
+  in `tests/expected_checks.txt` as `<suite> <floor>`; a row in the suites table of `tests/README.md`. Then run `bash tools/check_ci_shards.sh`: every
   suite in `ALL_SUITES` must sit in exactly one shard.
 - **Floors only go up** (guardrail B6). A suite under its floor fails ("checks went missing"); a suite
-  with no floor fails. Set a new suite's floor to its real count; when you add checks to an existing
+  with no floor fails. Count checks per rule, not per data entry or file (one check whose message names every
+  offender), so adding or removing content never moves a floor. Set a new suite's floor to its real count; when you add checks to an existing
   suite, raise only that suite's line by your increment. Never lower a floor, widen a threshold, delete
   a test or skip a lint to get green. A threshold change needs a line in `docs/DECISIONS.md` and a
   Concept Lead ack.
-- **Seeds:** pin them (`Rng.from_seed(<n>)`); a test that reads the clock is a bug (CLAUDE.md rule 2).
+- **Seeds:** pin them (`docs/05_STYLE_CODE.md` "Randomness"); a test that reads the clock is a bug
+  (CLAUDE.md rule 2). A suite with no randomness says `## Seeded by design: <why>` in its header.
 - **Autoloads in a `--script`:** if a suite fails to compile with "Identifier not found" on an autoload
   (`Rng`, `GameData`, ...), it named the autoload before the autoloads existed. `load()` it inside the
   run method after the first frame, and give typed variables to values returned from a `load()`ed script.
@@ -81,12 +85,14 @@ the last good commit, the runtime state (CLAUDE.md rule 10).
 
 ## CI
 
-- `.github/workflows/tests.yml`: `plan` (runs `tools/check_ci_shards.sh`; skips docs-only and draft
-  PRs) -> shard jobs from `tools/ci_shards.txt` -> the aggregate `test`, the required check. While shards
+- `.github/workflows/tests.yml`: `plan` (runs `tools/check_ci_shards.sh`; skips the Godot jobs for
+  docs-only and draft PRs) -> shard jobs from `tools/ci_shards.txt` plus one harness self-test job ->
+  the aggregate `test`, the required check, which still reports (green) when the Godot jobs were skipped. While shards
   run, "no `test` result yet" is normal.
 - Read a failure with `gh run view <id> --log-failed`. A job cancelled with no steps never started
   (runner trouble or a newer push); that is not a test result.
-- Actions minutes are budgeted (2,000 a month, `docs/09_REPO_AND_HOSTING.md`): run the suites locally and
-  push when the work is ready, not to see what CI says.
+- Run the suites locally and push when the work is ready, not to see what CI says: every agent waits on
+  the same runners. `build.yml` exports the Windows build on every push to main and uploads
+  `MERCS-windows`; a red build is as urgent as a red `test`.
 - A failure report to its owner gives: branch, commit, run id, failing suite and check, whether it
   also fails on `main`, and who acts next.

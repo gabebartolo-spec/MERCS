@@ -17,7 +17,7 @@ Context bloat is a named pitfall (guardrail C6). The rule (CLAUDE.md "Sessions a
 `agent-handoffs/<role>.md` inside the repo, so it is versioned: `dev_lead.md`, `merge_ci.md`,
 `art.md`, `concept_lead.md`. Cap 120 lines. **Rewrite it; do not append.** It is a snapshot, not a log.
 Merge & CI keeps the folder tidy (`agent-briefs/MERGE_CI_AGENT.md`); the cap is checked in CI
-(`tools/lint/doc_caps.py`). Write it on your task branch so it travels with the PR; main takes changes
+(the doc caps job in `.github/workflows/lint.yml`). Write it on your task branch so it travels with the PR; main takes changes
 only through PRs.
 
 ## What it says
