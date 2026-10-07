@@ -36,8 +36,11 @@ protocol format. Reviews phase gates. Is never asked to read a wall of text.
 - Owns merges, CI health, branch and worktree hygiene, `docs/STATUS.md`, `.github/`, the licence
   register's "recorded in PR" column, and the handoff files' housekeeping.
 - Merges on green for the exact head commit, after any required review and after the director's
-  gate where one applies. Never enables auto-merge. Never force-pushes. Never lowers a check floor.
-- Prunes merged worktrees and remote branches weekly; fails the build if more than four live
+  gate where one applies, at once and without asking anyone (D-030). Never enables auto-merge.
+  Never force-pushes. Never lowers a check floor. Never pushes to another agent's branch.
+- A routine git or GitHub permission refusal is a bug in `.claude/settings.json` to fix by PR,
+  never a command handed to the director (D-030).
+- Prunes merged worktrees and remote branches every pass; fails the build if more than four live
   worktrees exist.
 - Runs the doc-size check (`tools/lint/doc_caps.py`) and bounces any PR that pushes a capped
   document past its cap.
@@ -52,19 +55,21 @@ protocol format. Reviews phase gates. Is never asked to read a wall of text.
 
 ### Document upkeep (Merge & CI agent; no separate tool)
 - The Merge & CI agent keeps `docs/DECISIONS.md`, `docs/STATUS.md` history, the roadmap's phase
-  status lines and cross-document references tidy, in the same PR that changes the state, and
+  status lines and cross-document references tidy, in the board PR after each merge, and
   writes a weekly summary for the director (`docs/summaries/<date>.md`, under 300 words, game
   words).
 - Upkeep never changes a decision, rule, cap, number or licence status. An inconsistency is
   flagged to the Concept Lead, never resolved by choosing.
 - ChatGPT is not part of the team (D-020).
 - **One writer for the board and the log (D-026).** `docs/STATUS.md` and
-  `docs/DECISIONS.md` are edited only by the Merge & CI agent, in a single follow-up commit to
-  `main` after each merge, from the PR body's "Board and log" section. No other PR touches them,
-  so PRs never conflict on shared lines and decision ids never collide.
-- **Decision ids are assigned at merge (D-021).** A PR writes `D-TBD-<slug>` in `DECISIONS.md`
-  and in every reference; the Merge & CI agent replaces it with the next free `D-NNN` in the
-  squash commit. Agents never pick a number.
+  `docs/DECISIONS.md` are edited only by the Merge & CI agent, in one docs-only board PR after
+  each merge (`docs: board after #<n>`), from the PR body's "Board and log" section. `main` is
+  protected for admins too, so the board changes by PR like everything else (D-030). No other
+  PR touches them, so PRs never conflict on shared lines and decision ids never collide.
+- **Decision ids are assigned at merge (D-021, mechanism amended by D-030).** A PR writes the
+  decision in full under "Board and log" as `D-TBD-<slug>` and uses that slug in any reference;
+  the Merge & CI agent records it in `DECISIONS.md` with the next free `D-NNN` in the board PR.
+  Agents never pick a number.
 
 ## Concurrency and cadence
 
@@ -72,25 +77,26 @@ protocol format. Reviews phase gates. Is never asked to read a wall of text.
   may spawn up to two worktree subagents. That is the whole fleet; the AFL "medium" and "PA" tiers
   are not recreated because they generated coordination load faster than work.
 - **No idle-monitoring crons.** Each agent reports its state (working / running a check /
-  awaiting director / blocked / available) at the end of every turn in STATUS.md. The director
-  glances at STATUS.md; nobody polls.
+  awaiting director / blocked / available) at the end of every turn in its chat, and its PR body's
+  "Board and log" carries the row change; Merge & CI copies it to STATUS.md at merge. The
+  director glances at STATUS.md; nobody polls.
 - **Fresh session at every task boundary.** Write the handoff (`agent-briefs/HANDOFF_TEMPLATE.md`)
   into `agent-handoffs/<role>.md` inside the repo (not outside it, so it is versioned), then start
   a new session from it.
 - **One Godot process per agent, one GPU job on the machine.** The Art agent announces GPU jobs
-  in STATUS.md with the PID.
+  in its turn report with the PID.
 
 ## The loop for one item
 
-1. The Dev Lead (or Art agent) picks the next assigned item from STATUS.md, claims it, and opens
-   a worktree.
+1. The Dev Lead (or Art agent) picks the next assigned item from STATUS.md and opens a worktree.
 2. Writes or updates the test or validator first; shows it failing on the current state.
 3. Implements. Runs the touched suites locally with isolated `APPDATA`.
 4. Opens the PR using the PR template: what the player sees, what changed, evidence, not exercised,
    `[MERGE NOTE]`, director gate yes/no.
 5. If the item changes a look, the PR stays a prototype until the director approves from labelled
    captures in the question message.
-6. Merge & CI merges on green for the exact head, prunes the worktree, updates STATUS.md.
+6. Merge & CI merges on green for the exact head, prunes the worktree, opens and merges the
+   board PR.
 7. At the end of the phase, the Dev Lead assembles the evidence pack; the Concept Lead reviews the
    gate; the director plays the build.
 
@@ -100,8 +106,9 @@ protocol format. Reviews phase gates. Is never asked to read a wall of text.
 - A CI failure or a conflict goes straight to the branch owner.
 - The director receives: questions in protocol format, gate reviews, and the weekly
   summary. Nothing else unless they ask.
-- Decisions are written to `docs/DECISIONS.md` within the same PR that acts on them. A decision
-  that exists only in a chat does not exist.
+- Decisions are written in full in the "Board and log" section of the PR that acts on them and
+  recorded in `docs/DECISIONS.md` by Merge & CI at merge. A decision that exists only in a chat
+  does not exist.
 
 ## Document caps (enforced by the `doc-caps` job in `.github/workflows/lint.yml`)
 

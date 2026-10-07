@@ -4,6 +4,18 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
+## 2026-10-08 · D-030 · Director · Merge & CI is autonomous for routine repository administration
+Why: the director was being asked to run routine git and GitHub commands, and the merge brief contradicted itself on branch ownership, board commits and permissions, so a green, eligible PR (#19) sat unmerged. Rulings: (1) green + eligible = merge, without asking; (2) a routine git or GitHub permission refusal is a configuration bug fixed in `.claude/settings.json` by PR, never a command handed to the director; (3) the branch owner syncs and repairs their own branch, Merge & CI names the exact conflict once and never pushes to another agent's branch; (4) `docs/STATUS.md` and `docs/DECISIONS.md` change only through a docs-only board PR by Merge & CI after each merge (`main` is protected for admins too, so there is no direct commit); (5) GitHub settings match the docs: squash only, no merge commits, no rebase merges, no auto-merge; (6) routine merge-agent messages are one line. The director is reached only for look and design gates, spend, credentials and sign-ins, destructive recovery with real risk, permissions GitHub reserves for a human, and genuinely ambiguous policy.
+Changes: `agent-briefs/MERGE_CI_AGENT.md` rewritten; `.claude/settings.json` (routine git allowed; force push, hard reset, forced branch deletion, admin merge and protection edits denied); `CLAUDE.md`; `03_TEAM_WORKFLOW.md`; `04_GUARDRAILS.md` C3, C5; `09_REPO_AND_HOSTING.md`; `mercs-pr`, `mercs-handoff`; PR template gains "Board and log". Amends D-021: a feature PR no longer writes `D-TBD` into `DECISIONS.md`; the decision text travels in the PR body.
+
+## 2026-10-08 · D-029 · Director · The Art agent may drive mixamo.com in a browser session the director has signed in to
+Why: fourteen Mixamo clips are needed for Phase 1 and the account is the director's. The agent never enters credentials; the director signs in, the agent downloads to `D:\MERCS-vault\clips`.
+Changes: STATUS.md "Waiting on the director".
+
+## 2026-10-08 · D-028 · Director · Mercs are men and women: two base bodies (male and female) share one skeleton
+Why: recruits can be either; one skeleton keeps every clip shared. Logged after the merge of #13 (its body called it D-026, which was taken).
+Changes: `tools/pipeline/bodies/bodies.json`. Phase 1 proves `average_m` first; `average_f` follows on the same skeleton. Every equipment piece is fit-checked on both bodies.
+
 ## 2026-10-08 · D-027 · Concept Lead · Phase 0 gate: PASS WITH NOTES
 Why: 12 of 16 planted violations rejected by CI (PR #10); clean PR #11 green; build artefact launches. Four gaps (floor lowering, gitleaks test key, safetensors tripwire, file length) are machine-enforceable and become Phase 0 items 10–12 plus item 8, required before Phase 1 code merges. Full table in `docs/audits/phase0_gate_result.md`.
 Changes: STATUS.md Phase 0 items 10–12 added; Art Factory may start Phase 1 rig freeze and samples now.

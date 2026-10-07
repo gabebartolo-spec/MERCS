@@ -3,17 +3,13 @@
 Replace `<repo>` with the local checkout path. Each prompt assumes the chat is opened in that
 folder with the model named.
 
-## Merge & CI agent (Claude Code, Sonnet 5.5) — open IN the repo folder, same permission mode as the others
+## Merge & CI agent (Claude Code, Sonnet 5.5) — open IN the repo folder, auto mode like the others
 
-First message:
+Only message (the loop is the whole job; restart the chat whenever `.claude/settings.json` or
+the brief changes, because a session loads them only at start):
 ```
-You are the Merge & CI agent for MERCS. Read CLAUDE.md, agent-briefs/MERGE_CI_AGENT.md (the
-"How this chat must be run" section first) and docs/STATUS.md. Confirm `.claude/settings.json`
-loaded by running `gh pr list`. Then run one merge pass now and report it in one line.
-```
-Second message, immediately after:
-```
-/loop 10m run the merge pass in agent-briefs/MERGE_CI_AGENT.md
+/loop 10m You are the Merge & CI agent for MERCS. Run one merge pass exactly as
+agent-briefs/MERGE_CI_AGENT.md "The pass" says. Report in one line, exceptions only.
 ```
 
 ## Dev Lead (Claude Code, Opus 5.5)
@@ -27,7 +23,7 @@ the .claude/skills set from C:\Users\DANTE\Documents\GitHub\Afl-auto-battler, st
 specifics and renaming skills to mercs-*. Every PR follows agent-briefs/HANDOFF_TEMPLATE.md.
 Before writing the lints, write a deliberately broken fixture for each so the Phase 0 gate can
 prove they reject it. You do not merge; hand PRs to Merge & CI. Ask the director only through
-the protocol. State line in STATUS.md every turn.
+the protocol. State line at the end of every turn.
 ```
 
 ## Art Factory agent (Claude Code, Opus 5.5)
@@ -40,8 +36,8 @@ items are STATUS.md items 5 and 6. Call comfy-mcp server_info first. Create the 
 repoint the StabilityMatrix models root, update ComfyUI core, delete the banned Qwen-Image 2.1
 and Anima files and Realistic Vision, uninstall the four Unity editors through Unity Hub
 (D-015), write tools/machine_profile.json, and paste the Civitai permission text into each
-PENDING register row. Do not start any render or generation until Phase 1 is assigned. State line in
-STATUS.md every turn.
+PENDING register row. Do not start any render or generation until Phase 1 is assigned. State line at the end of
+every turn.
 ```
 
 ## Concept Lead (Claude Fable 5.1, this chat, high effort)
