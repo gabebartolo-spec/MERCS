@@ -32,10 +32,28 @@ jobs:
             cap=$(head -n 6 "$f" | sed -n 's/^Cap: \([0-9][0-9]*\) lines.*/\1/p' | head -n 1)
             [ -n "$cap" ] && check "$f" "$cap"
           done
+          check CLAUDE.md 120
           for f in agent-handoffs/*.md; do
             [ -e "$f" ] && check "$f" 120
           done
           exit $fail
+
+  project-lints:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run project lints
+        shell: bash
+        run: |
+          # Lands with the Dev Lead's lints PR; skipped until the script exists.
+          if [ -f tools/lint/run_all.sh ]; then
+            bash tools/lint/run_all.sh
+          else
+            echo "tools/lint/run_all.sh not present yet; skipping"
+          fi
 
   gitleaks:
     runs-on: ubuntu-latest
