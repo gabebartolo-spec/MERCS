@@ -1,6 +1,6 @@
 # tools/lint: project lints
 
-Five lints that enforce guardrails a formatter cannot. Python 3.11+ standard library only,
+Six lints that enforce guardrails a formatter cannot. Python 3.11+ standard library only,
 plus one bash script. Run them all with `bash tools/lint/run_all.sh` (pass/fail table, exit 1
 on any failure). Each Python lint takes `--root DIR` (default: this repo).
 
@@ -16,6 +16,7 @@ rules about strings.
 | `magic_numbers.py` | B9, D3 | `MAGIC-NUMBER` (warning before Phase 3, error from it) `COLOUR-LITERAL` |
 | `strings.py` | B12 | `TEXT-LITERAL` `TEXT-SCENE` |
 | `content_counts.py` | A2 | `CAP-OVER` `CAP-MISSING` `CAP-FILE` |
+| `no_weights.py` | gate gap #14, docs/10 | `WEIGHT-FILE` `WEIGHT-PATH` `WEIGHT-GIT` |
 | `worktrees.sh` | C1 | `WT-OVER` (error), `WT-UNCOUNTED` `WT-PRUNABLE` (warnings) |
 
 Each lint's docstring (`worktrees.sh` header) is the full rule list. Decisions worth knowing:
@@ -32,6 +33,8 @@ Each lint's docstring (`worktrees.sh` header) is the full rule list. Decisions w
   `data/text/`, `data/balance/` and `caps.json` are not collections.
 - Worktrees: `<parent of main>/MERCS-wt/*` and the app's `<main>/.claude/worktrees/*` both
   count, at most 4 together (D-021 item 3). Prunable (stale) entries do not count.
+- `no_weights.py` reads `git ls-files`, so it sees LFS pointers too, and skips
+  `tests/fixtures/lint/` (its own planted weights live there). `.bin` counts only over 1 MB.
 - A repo with no `sim/`, `ui/`, `data/` or `project.godot` yet passes with `ok: 0 ...`.
 
 ## Self-test

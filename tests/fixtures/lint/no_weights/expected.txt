@@ -1,0 +1,5 @@
+# Planted: a weights extension, a .bin over 1 MB, and a file under models/.
+# Look-alikes that must not be flagged: sim/small.bin, data/models_list.json, docs/modelsheet.md.
+WEIGHT-FILE weights/tiny.safetensors:0
+WEIGHT-FILE sim/big.bin:0
+WEIGHT-PATH models/README.txt:0
