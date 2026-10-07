@@ -34,7 +34,7 @@ States: working · running a check · awaiting director · blocked · available.
 8. Concept Lead: Phase 0 gate review (deliberately broken PR test).
 
 ## Waiting on the director
-- Nothing. Q-BP answered 2026-10-08 (D-016: repo public, protection applied; `test` required once `tests.yml` exists, item 3).
+- Nothing. Q-BP answered 2026-10-08 (D-019: repo public, protection applied; `test` required once `tests.yml` exists, item 3).
 - Q1, Q2, Q3, Q10, Q11, Q12 answered 2026-10-08 (D-010..D-015).
 
 ## Merge queue
