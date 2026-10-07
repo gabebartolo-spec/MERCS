@@ -1,0 +1,11 @@
+# Each *.txt here is a `git worktree list --porcelain` capture fed to worktrees.sh through WORKTREE_LIST.
+# A capture that must pass produces no error finding, so only the failing ones are listed: RULE file:line.
+# Live worktrees count under MERCS-wt/ and under the main checkout's .claude/worktrees/ (D-021 item 3);
+# prunable entries and look-alike folders (MERCS-wt-old) never count.
+# five.txt, posix_five.txt: five under MERCS-wt plus a session worktree (six).
+# mixed_five.txt: three under MERCS-wt plus two session worktrees. posix_sessions_five.txt: five sessions.
+# four.txt, posix_four.txt: exactly four, mixing both places; must pass.
+WT-OVER five.txt:0
+WT-OVER posix_five.txt:0
+WT-OVER mixed_five.txt:0
+WT-OVER posix_sessions_five.txt:0

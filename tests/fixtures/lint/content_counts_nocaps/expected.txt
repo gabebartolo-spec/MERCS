@@ -1,0 +1,2 @@
+# data/ exists but data/caps.json does not.
+CAP-FILE data/caps.json:0

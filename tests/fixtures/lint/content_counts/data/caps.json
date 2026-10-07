@@ -1,0 +1,13 @@
+{
+  "_comment": "Fixture caps. perks has no cap on purpose (CAP-MISSING).",
+  "phase": 0,
+  "caps": {
+    "_comment": "A _comment key may sit anywhere and is ignored.",
+    "backgrounds": 3,
+    "traits": 2,
+    "equipment": 2,
+    "injuries": 1,
+    "storylets": 2,
+    "factions": 0
+  }
+}

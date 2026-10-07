@@ -1,0 +1,9 @@
+{
+  "_comment": "Four backgrounds against a cap of three: CAP-OVER.",
+  "backgrounds": [
+    {"id": "bg_hedge_knight"},
+    {"id": "bg_deserter"},
+    {"id": "bg_ratcatcher"},
+    {"id": "bg_pilgrim"}
+  ]
+}

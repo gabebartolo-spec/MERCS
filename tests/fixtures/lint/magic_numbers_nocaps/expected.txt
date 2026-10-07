@@ -1,0 +1,1 @@
+# No caps.json: no error findings (exit 0).

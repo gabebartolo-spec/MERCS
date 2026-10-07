@@ -48,3 +48,9 @@ States: working · running a check · awaiting director · blocked · available.
 
 ## Live worktrees
 1 / 4 (claude/art-factory-setup-f074a4).
+
+## Logged for later (not assigned)
+- Phase 1, LOW, lint precision (Concept Lead review of #5): `strings.py` flags names in
+  `add_to_group`, `get_node` paths, `OS.get_name` and `$Anim.play`; `magic_numbers.py` accepts
+  `-100` and `+1` and does not exempt `sim/core/rng.gd`; `layering.py` misses `Timer.new()`-style
+  node construction in sim.
