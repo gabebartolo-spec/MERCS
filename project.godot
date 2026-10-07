@@ -1,8 +1,9 @@
 ; Engine configuration file (Godot 4.7.2).
 ; MERCS. The [debug] block makes the typing warnings errors: an untyped declaration
 ; or an unsafe access does not compile. tests/run_smoke_tests.gd fails if any of
-; them is relaxed, if the autoloads are not exactly these six (04_GUARDRAILS.md B8),
-; or if the renderer or the 1920x1080 viewport changes.
+; them is relaxed, if the autoloads are not exactly these five (04_GUARDRAILS.md B8,
+; D-021: no Rng autoload; Rng is a sim class), or if the renderer or the 1920x1080
+; viewport changes.
 
 config_version=5
 
@@ -14,7 +15,6 @@ config/features=PackedStringArray("4.7", "Forward Plus")
 
 [autoload]
 
-Rng="*res://presentation/autoload/rng.gd"
 GameData="*res://presentation/autoload/game_data.gd"
 EventBus="*res://presentation/autoload/event_bus.gd"
 SaveSystem="*res://presentation/autoload/save_system.gd"

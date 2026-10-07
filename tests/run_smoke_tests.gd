@@ -1,13 +1,13 @@
 extends "res://tests/lib/runner.gd"
 ## Smoke suite (08_ROADMAP.md Phase 0). The main scene opens headless and stays up;
-## exactly the six sanctioned autoloads are registered (04_GUARDRAILS.md B8: a new
-## autoload is a decision); the settings that keep the engine strict cannot be
+## exactly the five sanctioned autoloads are registered (04_GUARDRAILS.md B8, D-021: a
+## new autoload is a decision); the settings that keep the engine strict cannot be
 ## relaxed quietly; and every script in the project compiles with typing warnings
 ## treated as errors (the import step alone does not compile scripts).
 ## Seeded by design: nothing here is random.
 ##   godot --headless --path . --script tests/run_smoke_tests.gd
 
-const AUTOLOADS: Array[String] = ["Debug", "EventBus", "GameData", "Rng", "SaveSystem", "Settings"]
+const AUTOLOADS: Array[String] = ["Debug", "EventBus", "GameData", "SaveSystem", "Settings"]
 const AUTOLOAD_DIR := "*res://presentation/autoload/"
 const FRAMES_UP := 3
 const WARNING_AS_ERROR := 2

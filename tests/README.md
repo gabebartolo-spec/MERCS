@@ -21,7 +21,8 @@ temp dir), so two agents' runs never share saves, settings or caches.
 - Every suite has a floor in `expected_checks.txt`. A suite reporting fewer checks fails
   ("checks went missing"), a suite with no floor fails, and floors only go up (B6).
   Count checks per rule, not per data entry or per file, so content changes never move
-  a floor.
+  a floor. Fixtures and schemas are the exception: each adds checks of its own, so adding
+  one raises the `data` count, and its floor goes up in the same PR.
 - A suite whose log shows `SCRIPT ERROR`, `Parse Error` or `Compile Error` fails even if
   every check it reached passed.
 - Seeds are pinned; nothing reads the clock. A suite with no randomness says
@@ -36,7 +37,7 @@ temp dir), so two agents' runs never share saves, settings or caches.
 | Suite | Covers | Floor |
 |---|---|---:|
 | `data` | Every file in `data/` has a schema in `data/schema/` and validates; ids are unique per collection; the validator accepts each known-good and rejects each known-bad fixture in `fixtures/data/` for the reason the fixture names | 88 |
-| `smoke` | The main scene opens headless and stays up; exactly the six sanctioned autoloads; the typing warnings stay errors and the renderer and viewport stay as set; every script compiles | 26 |
+| `smoke` | The main scene opens headless and stays up; exactly the five sanctioned autoloads (D-021); the typing warnings stay errors and the renderer and viewport stay as set; every script compiles | 24 |
 
 The harness self-test (`tools/test_run_tests.sh`) proves the runner fails a suite short
 of its floor or without one, and that an untyped declaration
