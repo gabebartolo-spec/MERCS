@@ -47,6 +47,9 @@ STATUS.md item <n> / decision <D-id>
 ## Not exercised
 <what this PR does not prove; "insufficient evidence" is an honest line>
 
+## Board and log
+<the STATUS.md row and item changes, and any decision in full (D-TBD-<slug>, who, what, why), for the Merge & CI agent to record after merge; "none" is valid>
+
 ## [MERGE NOTE]
 - Hot files touched: <sim core, save model, UiKit, caps, floors, docs>
 - Floors: <suite base → new (+inc)>

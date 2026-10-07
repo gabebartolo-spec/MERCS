@@ -91,6 +91,11 @@ Deliverables
 - Inspect screen: portrait, sprite turntable, background sentence, traits in plain words, equipment,
   history (empty for now), one "what this person is good at" paragraph generated from data.
 - Tavern recruit screen with three candidates and a price; recruit → roster.
+- The office of captain: one roster member holds it; the overworld figure is the captain; the
+  inspect screen shows the office. Succession is by the player's appointment with company
+  reactions (D-TBD-succession); the rules live in `data/balance/captaincy.json`; the succession
+  event itself is Phase 4 and the reaction scenes Phase 5. The starting company is inherited with
+  a sitting captain (D-TBD-start).
 - `effect` fixture: two seeds produce two mercs a playtester can tell apart in one sentence each.
 - Save v1 with migration scaffold.
 
@@ -120,6 +125,11 @@ Deliverables
   collapses morale; a surrender ends a fight with living enemies.
 - `perf` suite baseline.
 - Enemy AI that is not psychic: acts on seen units and known equipment only.
+- Retreat: a withdraw order that ends the fight with the units that reach the map edge; units
+  left behind are captured or killed by a seeded roll (their later fate is Phase 6). Encounter
+  strength is set by the world, never scaled to the company.
+- Deploy-or-delegate: the captain may sit out a fight; a field sergeant stands in. The morale
+  effect of each choice is visible before the fight.
 
 **Gate (Director):** plays five fights; can say why each was won or lost without a tooltip;
 at least one ended by surrender or rout.
@@ -140,7 +150,16 @@ Deliverables
   surgery check.
 - Permanent states change sprite overlay, portrait (inpainted from the same seed), role options and
   tags; adaptation choices (left-hand retrain, scout, mentor, camp role).
-- Death handling: roster removal, grave entry, memory creation for witnesses, company morale event.
+- Triage: a downed mercenary is "down", not dead, until the battle resolves; then a seeded triage
+  roll (surgeon skill, wound severity, time down) yields survived, permanently injured or died.
+  Visually incontrovertible deaths (named kill frames) skip triage.
+- Death handling: roster removal, memory creation for witnesses, company morale event, and if
+  the dead mercenary held the captaincy, a succession event with one to three dissenting voices
+  drawn from traits and memories.
+- Company chronicle: an entry per member who ever served (living, retired, dead) with portrait
+  history, origin, recruitment, battles, injuries, relationships, titles, equipment of renown,
+  cause and place of death. Chronicle screen reachable from camp. `chronicle` fixture: a dead
+  mercenary's entry survives save and reload.
 - Epithets: four earned titles from deeds with visual or tag effects.
 - `effect` fixtures: a lost eye changes archery; a limp selects the limp clip; a death creates a
   memory on two comrades.
@@ -166,6 +185,9 @@ Deliverables
 - Memory system: concrete sentences with actor, target, place, deed; referenced by later storylets.
 - Relationship states (friends, rivals, mentor/protégé, grudge, oath) with causes shown in words.
 - Camp screen where storylets fire; dialogue presentation from UiKit; copy in `data/text/`.
+- Moral gates are company arguments: one to three relevant voices chosen by trait, origin and
+  memory, never everyone; the player chooses the approach and, where it matters, which mercenary
+  attempts the check.
 - Storylet lint (tags, tone balance, pronouns) in CI; the Concept Lead reviews every batch.
 
 **Gate (Director):** after two in-game weeks the director retells one story that happened between
@@ -184,6 +206,8 @@ Deliverables
   from traits, origin and memories; a recruited enemy with a grudge in the roster.
 - Recurring-enemy hook: a released captain can return.
 - Two additional recruit sources beyond tavern: battlefield survivor, rescued prisoner.
+- A mercenary left behind in a Phase 3 retreat who survived capture surfaces as a rumour and can
+  be rescued or ransomed back, returning with a memory of being abandoned.
 - `effect` fixtures for each branch producing a different company state.
 
 **Gate (Director):** recruits a surrendered captain, and someone in the company hates it for a
@@ -204,6 +228,10 @@ Deliverables
   from problems, consequence of solving a problem, travel and supply, rumour surfacing.
 - Overworld presentation: hub, roads, sites, weather, day/night, travel encounters feeding battle.
 - Legendary location as an authored content package.
+- Regional recruitment pools: each of the three sites draws backgrounds, weapon traditions and
+  trait weights from its region and faction state (war zones yield deserters and veterans,
+  mining country yields miners and brawlers), so "where do I look for this kind of person" is a
+  real question.
 - Contract board and rumour screens.
 - Optional R&D slot (after the above are green, if time allows): Three.js animation lab round-trip
   test for one bespoke clip, as specified in the animation research brief.
@@ -218,13 +246,17 @@ region's problem is visibly different.
 **Goal:** everything above in one 60–90 minute playable loop, polished enough to judge.
 
 Caps: 20–30 backgrounds, several dozen storylets, 12-person roster, one region, three factions,
-one legendary location, save/load, settings, a start-to-death-or-triumph arc.
+one legendary location, a mortal captain with succession, a company chronicle, save/load,
+settings, a start-to-death-or-triumph arc.
 
 Deliverables
 - Integration of Phases 1–7 in one build with save/load, settings, main menu, audio placeholder
   pass (licensed or original only), a start and an end state.
 - Playtest protocol and notes template; two outside playtests if the director can arrange them.
 - Concept Lead drift audit and licence audit; all registers CLEARED or items removed.
+
+**Integration check (Concept Lead, before the director plays):** remove any three roster members
+one at a time in a fixture; if nothing changes but combat power, the slice is not ready.
 
 **Success test (Director):** *Did I recruit someone, learn who they are, watch relationships form,
 see them physically change through injury, adapt how I used them, and feel something when they
