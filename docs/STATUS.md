@@ -11,7 +11,7 @@ Current phase: **0 — Foundation** (not started). Gate signer: Concept Lead.
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
 | Dev Lead (Opus 5.5) | available | — | — | — |
-| Merge & CI (Sonnet 5.5) | available | — | — | — |
+| Merge & CI (Sonnet 5.5) | awaiting director | Phase 0 items 1 + 2 done; item 2 in PR #1; `test` requirement added after item 3 | claude/mercs-merge-ci-setup-83f2a5 | 2026-10-08 |
 | Art Factory (Opus 5.5) | available | — | — | — |
 | Concept Lead (Fable 5.1) | available | Phase 0 gate review when items 1–7 land | — | 2026-10-08 |
 
@@ -34,7 +34,8 @@ States: working · running a check · awaiting director · blocked · available.
 8. Concept Lead: Phase 0 gate review (deliberately broken PR test).
 
 ## Waiting on the director
-- Nothing. Q1, Q2, Q3, Q10, Q11, Q12 answered 2026-10-08 (D-010..D-015). Phase 0 is assigned.
+- Nothing. Q-BP answered 2026-10-08 (D-019: repo public, protection applied; `test` required once `tests.yml` exists, item 3).
+- Q1, Q2, Q3, Q10, Q11, Q12 answered 2026-10-08 (D-010..D-015).
 
 ## Merge queue
 (empty)

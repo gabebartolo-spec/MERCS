@@ -4,6 +4,10 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
+## 2026-10-08 · D-019 · Director · Repo is public (Q-BP). Reverses D-011.
+Why: GitHub Free refuses branch protection on private repos; director chose public over paying for Pro. Merge & CI flagged that this exposes design docs, history and every future commit, and that `gitleaks` plus the licensing register become the only guard on what ships in the open.
+Changes: STATUS.md item 1; `09_REPO_AND_HOSTING.md` ("make it private" no longer applies). No banned or PENDING-licence asset may enter `assets/` while public.
+
 ## 2026-10-08 · D-015 · Director · Banned Qwen-Image 2.1 files, Realistic Vision and the four unused Unity installs may be deleted (Q12)
 Changes: STATUS.md item 5 is unblocked; the Art agent deletes rather than quarantines.
 
