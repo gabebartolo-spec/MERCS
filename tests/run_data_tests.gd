@@ -29,7 +29,10 @@ func run_checks() -> void:
 	_check_fixtures("valid")
 	_check_fixtures("invalid")
 	_check_unsupported_keyword_is_reported()
-	check(_parse_errors.is_empty(), "every data, schema and fixture file is valid JSON: %s" % [_parse_errors])
+	check(
+		_parse_errors.is_empty(),
+		"every data, schema and fixture file is valid JSON: %s" % [_parse_errors]
+	)
 
 
 func _load_schemas() -> void:
@@ -70,9 +73,14 @@ func _check_data_files() -> void:
 			ids[id] = path
 		seen_ids[schema_name] = ids
 	check(files.size() > 0, "%s holds data files" % DATA_DIR)
-	check(unschemed.is_empty(), "every data file has a schema in %s, missing: %s" % [SCHEMA_DIR, unschemed])
+	check(
+		unschemed.is_empty(),
+		"every data file has a schema in %s, missing: %s" % [SCHEMA_DIR, unschemed]
+	)
 	check(invalid.is_empty(), "every data file validates against its schema: %s" % [invalid])
-	check(repeated.is_empty(), "every id is unique within its collection, repeated: %s" % [repeated])
+	check(
+		repeated.is_empty(), "every id is unique within its collection, repeated: %s" % [repeated]
+	)
 
 
 func _data_files() -> Array[String]:
@@ -107,7 +115,9 @@ func _check_fixtures(kind: String) -> void:
 		else:
 			_check_rejected(path, document, errors)
 	for schema_name: String in _schemas:
-		check(covered.has(schema_name), "schema %s has a %s fixture in %s" % [schema_name, kind, dir])
+		check(
+			covered.has(schema_name), "schema %s has a %s fixture in %s" % [schema_name, kind, dir]
+		)
 
 
 func _check_rejected(path: String, document: Variant, errors: Array[String]) -> void:
@@ -116,7 +126,10 @@ func _check_rejected(path: String, document: Variant, errors: Array[String]) -> 
 		var object: Dictionary = document
 		comment = str(object.get("_comment", ""))
 	var expected := comment.trim_prefix(EXPECT_PREFIX)
-	check(comment.begins_with(EXPECT_PREFIX), "known-bad %s says what it breaks (\"_comment\": \"expect: ...\")" % path)
+	check(
+		comment.begins_with(EXPECT_PREFIX),
+		'known-bad %s says what it breaks ("_comment": "expect: ...")' % path
+	)
 	var found := false
 	for error: String in errors:
 		found = found or expected in error
@@ -125,7 +138,10 @@ func _check_rejected(path: String, document: Variant, errors: Array[String]) -> 
 
 func _check_unsupported_keyword_is_reported() -> void:
 	var errors := JsonSchema.new().validate({}, {"type": "object", "maxProperties": 3})
-	check(errors.size() == 1 and "not supported" in errors[0], "an unsupported schema keyword is an error, got %s" % [errors])
+	check(
+		errors.size() == 1 and "not supported" in errors[0],
+		"an unsupported schema keyword is an error, got %s" % [errors]
+	)
 
 
 ## Schema errors plus duplicate ids inside the document.
@@ -162,6 +178,8 @@ func _collection_ids(document: Variant, schema_name: String) -> Array[String]:
 func _parse(path: String) -> Variant:
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(path)) != OK:
-		_parse_errors.append("%s line %d: %s" % [path, json.get_error_line(), json.get_error_message()])
+		_parse_errors.append(
+			"%s line %d: %s" % [path, json.get_error_line(), json.get_error_message()]
+		)
 		return null
 	return json.data
