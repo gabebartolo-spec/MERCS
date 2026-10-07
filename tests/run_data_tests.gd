@@ -16,6 +16,7 @@ const SCHEMA_SUFFIX := ".schema.json"
 const EXPECT_PREFIX := "expect: "
 
 var _schemas: Dictionary = {}
+var _parse_errors: Array[String] = []
 
 
 func suite_name() -> String:
@@ -28,6 +29,7 @@ func run_checks() -> void:
 	_check_fixtures("valid")
 	_check_fixtures("invalid")
 	_check_unsupported_keyword_is_reported()
+	check(_parse_errors.is_empty(), "every data, schema and fixture file is valid JSON: %s" % [_parse_errors])
 
 
 func _load_schemas() -> void:
@@ -43,27 +45,34 @@ func _load_schemas() -> void:
 
 
 ## data/<name>.json uses schema <name>; data/<dir>/<file>.json uses schema <dir>.
-## Checks are per file, not per entry, so adding or removing content never moves the floor.
+## One check per rule, not per file or entry: adding or removing content never moves
+## the floor, and a failure names every file that broke the rule.
 func _check_data_files() -> void:
+	var files := _data_files()
+	var unschemed: Array[String] = []
+	var invalid: Array[String] = []
+	var repeated: Array[String] = []
 	var seen_ids: Dictionary = {}
-	for path: String in _data_files():
+	for path: String in files:
 		var schema_name := path.trim_prefix(DATA_DIR + "/").get_slice("/", 0).trim_suffix(".json")
-		check(_schemas.has(schema_name), "%s has a schema, data/schema/%s%s" % [path, schema_name, SCHEMA_SUFFIX])
 		if not _schemas.has(schema_name):
+			unschemed.append(path)
 			continue
 		var document: Variant = _parse(path)
 		var schema: Dictionary = _schemas[schema_name]
-		var errors := JsonSchema.new().validate(document, schema)
-		check(errors.is_empty(), "%s validates against its schema: %s" % [path, errors])
+		for error: String in JsonSchema.new().validate(document, schema):
+			invalid.append("%s %s" % [path, error])
 		# Ids are unique across every file of a collection (data/storylets/*.json).
 		var ids: Dictionary = seen_ids.get(schema_name, {})
-		var repeated: Array[String] = []
 		for id: String in _collection_ids(document, schema_name):
 			if ids.has(id):
-				repeated.append(id)
+				repeated.append("%s in %s and %s" % [id, ids[id], path])
 			ids[id] = path
 		seen_ids[schema_name] = ids
-		check(repeated.is_empty(), "every id in %s is unique in its collection, repeated: %s" % [path, repeated])
+	check(files.size() > 0, "%s holds data files" % DATA_DIR)
+	check(unschemed.is_empty(), "every data file has a schema in %s, missing: %s" % [SCHEMA_DIR, unschemed])
+	check(invalid.is_empty(), "every data file validates against its schema: %s" % [invalid])
+	check(repeated.is_empty(), "every id is unique within its collection, repeated: %s" % [repeated])
 
 
 func _data_files() -> Array[String]:
@@ -149,8 +158,10 @@ func _collection_ids(document: Variant, schema_name: String) -> Array[String]:
 	return ids
 
 
+## Parse problems are collected and checked once at the end (run_checks).
 func _parse(path: String) -> Variant:
 	var json := JSON.new()
-	var error := json.parse(FileAccess.get_file_as_string(path))
-	check(error == OK, "%s is valid JSON (line %d: %s)" % [path, json.get_error_line(), json.get_error_message()])
+	if json.parse(FileAccess.get_file_as_string(path)) != OK:
+		_parse_errors.append("%s line %d: %s" % [path, json.get_error_line(), json.get_error_message()])
+		return null
 	return json.data

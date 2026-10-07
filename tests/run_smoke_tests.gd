@@ -61,13 +61,18 @@ func _check_autoloads() -> void:
 		check(node != null, "autoload %s is in the tree" % autoload)
 
 
+## One check for all scripts, so adding or deleting a script never moves the floor;
+## a failure names every script that did not compile.
 func _check_scripts_compile() -> void:
 	var paths: Array[String] = []
 	_collect_scripts("res://", paths)
-	check(paths.size() > 0, "the project has scripts to compile")
+	var broken: Array[String] = []
 	for path: String in paths:
 		var script: GDScript = load(path) as GDScript
-		check(script != null and script.can_instantiate(), "%s compiles with typing warnings as errors" % path)
+		if script == null or not script.can_instantiate():
+			broken.append(path)
+	check(paths.size() > 0, "the project has scripts to compile")
+	check(broken.is_empty(), "all %d scripts compile with typing warnings as errors, broken: %s" % [paths.size(), broken])
 
 
 ## Like the editor, skips folders holding a .gdignore (tests/fixtures/compile/ keeps a
