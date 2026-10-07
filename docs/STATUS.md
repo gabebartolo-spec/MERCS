@@ -4,7 +4,7 @@ Cap: 150 lines. Owned by the Merge & CI agent; every agent updates its own row i
 that changes its state. History rolls to `docs/archive/status_<month>.md`.
 
 ## Phase
-Current phase: **0 — Foundation** (not started). Gate signer: Concept Lead.
+Current phase: **0 — Foundation** (items 1–7 merged; gate run pending). Gate signer: Concept Lead.
 
 ## Agents
 
@@ -13,7 +13,7 @@ Current phase: **0 — Foundation** (not started). Gate signer: Concept Lead.
 | Dev Lead (Opus 5.5) | available | Phase 0 items 3, 4, 7 done, handed to Merge & CI | #4 claude/p0-scaffold, #5 claude/p0-lints, #6 claude/p0-skills | 2026-10-08 |
 | Merge & CI (Sonnet 5.5) | awaiting director | Phase 0 items 1 + 2 done; item 2 in PR #1; `test` requirement added after item 3 | claude/mercs-merge-ci-setup-83f2a5 | 2026-10-08 |
 | Art Factory (Opus 5.5) | available | Phase 0 items 5, 6 done (#3); waiting for the Phase 0 gate | — | 2026-10-08 |
-| Concept Lead (Fable 5.1) | available | Phase 0 gate review when items 1–7 land | — | 2026-10-08 |
+| Concept Lead (Fable 5.1) | working | Phase 0 gate review; board and log after #2, #8 | claude/board-and-log | 2026-10-08 |
 
 States: working · running a check · awaiting director · blocked · available.
 

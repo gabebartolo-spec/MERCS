@@ -4,19 +4,19 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
-## 2026-10-08 · D-TBD-one-writer · Concept Lead · Only the Merge & CI agent edits STATUS.md and DECISIONS.md, in one commit to main after each merge
+## 2026-10-08 · D-026 · Concept Lead · Only the Merge & CI agent edits STATUS.md and DECISIONS.md, in one commit to main after each merge
 Why: seven first-day PRs all edited the same two files, causing conflicts, rebases and colliding decision ids; the director found the GitHub flow confusing. PRs now state board and log changes in a "Board and log" body section instead.
 Changes: `CLAUDE.md`, `03_TEAM_WORKFLOW.md`, `HANDOFF_TEMPLATE.md`, `MERGE_CI_AGENT.md`; the merge agent needs a direct-push exception for those two files on `main` (branch protection currently requires a PR; the Merge & CI agent proposes the smallest change).
 
-## 2026-10-08 · D-TBD-succession · Director · The player appoints the next captain and the company reacts (Q13)
+## 2026-10-08 · D-025 · Director · The player appoints the next captain and the company reacts (Q13)
 Why: director's answer. Reaction scenes (one to three voices from traits and memories, with morale and loyalty consequences; an unpopular pick can cause a departure) are Phase 5 content; the appointment flag ships in Phase 2.
 Changes: `08_ROADMAP.md` Phases 2, 4, 5; `data/balance/captaincy.json` when created.
 
-## 2026-10-08 · D-TBD-start · Director · A campaign starts with a small inherited company and a sitting captain (Q14)
+## 2026-10-08 · D-024 · Director · A campaign starts with a small inherited company and a sitting captain (Q14)
 Why: director's answer. Keeps the captain mortal from the first hour; a short authored opening is Phase 8 content.
 Changes: `08_ROADMAP.md` Phases 2 and 8.
 
-## 2026-10-08 · D-TBD-three-pillars · Director (clarified by Concept Lead; ratified with Q13–Q14) · The Three Pillars brief is integrated: the company is the player, the captain is a mortal office with succession, a company chronicle persists every member, down is not dead until triage, retreat is legitimate, regional recruitment pools, no rarity labels
+## 2026-10-08 · D-023 · Director (clarified by Concept Lead; ratified with Q13–Q14) · The Three Pillars brief is integrated: the company is the player, the captain is a mortal office with succession, a company chronicle persists every member, down is not dead until triage, retreat is legitimate, regional recruitment pools, no rarity labels
 Why: the director added `Mercenary_Collector_Three_Pillars_Claude_Brief.docx` to the repo on 2026-10-08; it extends the original brief and conflicts with nothing in the pack. Both briefs now live in `docs/source-briefs/`.
 Changes: `00_VISION.md` (new section and additions table), `04_GUARDRAILS.md` A9, `08_ROADMAP.md` Phases 2–8, `11_OPEN_QUESTIONS.md` Q13–Q14, `12_SOURCES.md`. Director answers Q13 and Q14 before Phase 2.
 

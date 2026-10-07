@@ -93,9 +93,9 @@ Deliverables
 - Tavern recruit screen with three candidates and a price; recruit → roster.
 - The office of captain: one roster member holds it; the overworld figure is the captain; the
   inspect screen shows the office. Succession is by the player's appointment with company
-  reactions (D-TBD-succession); the rules live in `data/balance/captaincy.json`; the succession
+  reactions (D-025); the rules live in `data/balance/captaincy.json`; the succession
   event itself is Phase 4 and the reaction scenes Phase 5. The starting company is inherited with
-  a sitting captain (D-TBD-start).
+  a sitting captain (D-024).
 - `effect` fixture: two seeds produce two mercs a playtester can tell apart in one sentence each.
 - Save v1 with migration scaffold.
 
