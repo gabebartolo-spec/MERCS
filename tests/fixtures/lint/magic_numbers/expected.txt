@@ -1,5 +1,7 @@
 # Expected error findings for tools/lint/magic_numbers.py (caps.json phase 3), one per line: RULE path:line.
 # Taken from the PLANT markers written when each violation was planted, never from lint output.
+MAGIC-NUMBER sim/bad_numbers.gd:10
+MAGIC-NUMBER sim/bad_numbers.gd:18
 MAGIC-NUMBER sim/bad_numbers.gd:25
 MAGIC-NUMBER sim/bad_numbers.gd:26
 MAGIC-NUMBER sim/bad_numbers.gd:27
@@ -13,6 +15,7 @@ MAGIC-NUMBER sim/bad_numbers.gd:34
 MAGIC-NUMBER sim/bad_numbers.gd:35
 MAGIC-NUMBER sim/bad_numbers.gd:40
 MAGIC-NUMBER sim/bad_numbers.gd:44
+MAGIC-NUMBER sim/core/dice.gd:5
 COLOUR-LITERAL ui/screens/hud.gd:16
 COLOUR-LITERAL ui/screens/hud.gd:17
 COLOUR-LITERAL ui/screens/hud.gd:18

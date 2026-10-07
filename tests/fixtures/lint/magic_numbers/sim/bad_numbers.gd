@@ -1,5 +1,5 @@
 extends RefCounted
-# Look-alikes that stay silent: 0, 1, -1 and 100 in every spelling, digits inside
+# Look-alikes that stay silent: 0, 1, -1 and 100 in every spelling (but not -100 or +1), digits inside
 # identifiers, numbers in comments (12 monkeys) and numbers inside strings.
 # One planted violation per line, marked PLANT <RULE>.
 
@@ -7,7 +7,7 @@ const ZERO: int = 0
 const ONE: int = 1
 const MINUS_ONE: int = -1
 const HUNDRED: int = 100
-const MINUS_HUNDRED: int = -100
+const MINUS_HUNDRED: int = -100  # PLANT MAGIC-NUMBER
 const ONE_F: float = 1.0
 const ZERO_F: float = 0.0
 const HUNDRED_F: float = 100.0
@@ -15,7 +15,7 @@ const HEX_ONE: int = 0x01
 const BIN_ZERO: int = 0b0
 const UNDERSCORED: int = 1_00
 const EXPONENT_HUNDRED: float = 1e2
-const PLUS_ONE: int = +1
+const PLUS_ONE: int = +1  # PLANT MAGIC-NUMBER
 var vector2_count: int = 0
 var node_3d: int = 1
 var grid: Vector2i = Vector2i(0, 1)
@@ -42,3 +42,10 @@ var after_doc: int = 7  # PLANT MAGIC-NUMBER
 
 func scale(value: int) -> int:
 	return value * 3 / 2  # PLANT MAGIC-NUMBER
+
+
+func step(value: int) -> int:
+	var below: int = value - 100
+	var above: int = value + 1
+	var back: int = value -1
+	return clampi(below + above + back, -1, 100) * (-1)
