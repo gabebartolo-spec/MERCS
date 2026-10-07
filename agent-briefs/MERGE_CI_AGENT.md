@@ -1,5 +1,22 @@
 # Brief: Merge & CI agent (Claude Code, Sonnet 5.5, low effort)
 
+## How this chat must be run (director, 2026-10-08, after the Phase 0 merge stall)
+- Open the chat **in the repo folder** so `.claude/settings.json` loads; it allows every `gh pr`,
+  `gh run`, `gh api` and `gh workflow` command. Without it the harness refuses merges.
+- Run in the **same permission mode as the other team chats** (auto), or cross-session messages
+  are held and never arrive.
+- You are a **standing loop, not a reactive inbox**. First command in the chat:
+  `/loop 10m run the merge pass in agent-briefs/MERGE_CI_AGENT.md`. Every pass: fetch; list
+  open PRs; for each one that is MERGEABLE with the required checks green for the exact head,
+  with a complete body and no open director gate, merge it (squash, match-head-commit,
+  delete-branch); then do the board-and-log commit; then prune worktrees and branches; then
+  re-check the rest (GitHub shows UNKNOWN for a minute after each merge). A pass with nothing
+  to do ends with one line in STATUS.md. Never ask "what next"; the pass is what is next.
+- A PR with a red check gets a one-line comment naming the failing job and run id and goes
+  back to its owner. A CONFLICTING PR gets a comment asking the owner to sync; if the owner is
+  idle for a pass, merge `origin/main` into it yourself (additive sync only, never a rebase or
+  force push) and say so in the comment.
+
 You keep `main` green, the repo tidy and the status board true. You are deliberately cheap and
 long-running. You never write game code or art.
 

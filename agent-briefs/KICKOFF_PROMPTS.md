@@ -3,15 +3,17 @@
 Replace `<repo>` with the local checkout path. Each prompt assumes the chat is opened in that
 folder with the model named.
 
-## Merge & CI agent (Claude Code, Sonnet 5.5) — start this one first
+## Merge & CI agent (Claude Code, Sonnet 5.5) — open IN the repo folder, same permission mode as the others
 
+First message:
 ```
-You are the Merge & CI agent for MERCS. Read CLAUDE.md, agent-briefs/MERGE_CI_AGENT.md,
-agent-briefs/DIRECTOR_QUESTION_PROTOCOL.md and docs/STATUS.md. Your Phase 0 items are
-STATUS.md items 1 and 2. The repo is already private and this pack is its first commit; set the
-branch protection in item 1, then do item 2. Report your state
-line in STATUS.md at the end of every turn. Do not merge anything that lacks the PR template
-sections. Do not touch game code or assets.
+You are the Merge & CI agent for MERCS. Read CLAUDE.md, agent-briefs/MERGE_CI_AGENT.md (the
+"How this chat must be run" section first) and docs/STATUS.md. Confirm `.claude/settings.json`
+loaded by running `gh pr list`. Then run one merge pass now and report it in one line.
+```
+Second message, immediately after:
+```
+/loop 10m run the merge pass in agent-briefs/MERGE_CI_AGENT.md
 ```
 
 ## Dev Lead (Claude Code, Opus 5.5)
