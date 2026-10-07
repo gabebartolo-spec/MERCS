@@ -53,10 +53,13 @@ churn is reverted in code PRs, `vault/`, `.env`, `__pycache__/`, `out/`, `review
 
 ## Branching
 
-- `main` is always green and always buildable. Protected: PR required, `test` check required,
-  squash merge only, delete branch on merge, no force push, no auto-merge.
-- Branches `claude/<topic>`; one PR per branch; rebase or merge `origin/main` before asking for
-  merge.
+- `main` is always green and always buildable. Protected, admins included: PR required; `test`,
+  `doc-caps`, `gitleaks` and `project-lints` required; linear history; squash merge only (merge
+  commits and rebase merges are disabled on GitHub); delete branch on merge; no force push; no
+  auto-merge. Merge & CI's board PRs go through the same protection; nothing is committed to
+  `main` directly (D-030).
+- Branches `claude/<topic>`; one PR per branch. The branch owner merges `origin/main` into it
+  when it conflicts; nobody pushes to another agent's branch.
 - Tags `phase-N-pass` when a gate passes; `slice-vN` for playable builds.
 
 ## CI (GitHub Actions, free tier)

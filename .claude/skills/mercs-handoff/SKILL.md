@@ -33,8 +33,8 @@ and Rules learnt the hard way (under 10 lines). Short, factual, current; delete 
 - **Attempts** is the fix-loop record (guardrail B5): for each open bug, what was tried and why it
   failed, so the next session does not repeat attempt three.
 - **Open decisions** names the question ids and who they wait on. A decision that exists only in a
-  chat does not exist: once the director answers, it goes into `docs/DECISIONS.md` in the PR that acts
-  on it.
+  chat does not exist: once the director answers, it goes in full into the "Board and log" section of the PR that
+  acts on it, and Merge & CI records it in `docs/DECISIONS.md` at merge.
 - **Running jobs** lists PIDs, Actions run ids and ComfyUI job ids, and what to do with each result. A
   Godot PID you did not record is a process you cannot safely stop (see mercs-godot-tests).
 - Messages from other agents during the old session are not in the handoff unless you wrote them there.
@@ -50,5 +50,5 @@ Read, in this order (`agent-briefs/HANDOFF_TEMPLATE.md` section A; CLAUDE.md):
 Then check that every PR the handoff names still matches GitHub (`gh pr view <n>`: merged, red, new
 head commit?) and that the branch tip is the sha written there. Carry on from "Unfinished changes". If
 something you need is missing, ask its owner, or the director in protocol format
-(`agent-briefs/DIRECTOR_QUESTION_PROTOCOL.md`); do not guess. Report your state in your STATUS.md row.
+(`agent-briefs/DIRECTOR_QUESTION_PROTOCOL.md`); do not guess. Report your state at the end of your turn.
 With nothing assigned, say "available" and wait; do not invent work (guardrail C4).

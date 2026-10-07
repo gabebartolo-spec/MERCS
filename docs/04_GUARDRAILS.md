@@ -136,8 +136,9 @@ bug assigned to the Merge & CI agent.
 *Enforced by:* the `doc-caps` job in `lint.yml` (includes `CLAUDE.md` at 120).
 
 ### C3. Status and decision drift
-*Rule:* a decision exists only in `docs/DECISIONS.md`. STATUS.md is updated in the same PR that
-changes state. The Merge & CI agent's weekly upkeep catches the rest.
+*Rule:* a decision exists only in `docs/DECISIONS.md`. STATUS.md and DECISIONS.md are updated
+only by the Merge & CI agent, in the board PR after each merge, from the merged PR's "Board and
+log" section (D-026, D-030). Every pass checks the board against `gh pr list`.
 *Enforced by:* review; weekly summary diff.
 
 ### C4. Idle agents and busywork
@@ -146,8 +147,10 @@ to look busy, and nobody is re-fed by a cron.
 *Enforced by:* STATUS.md state column; director spot checks.
 
 ### C5. Permission laundering
-*Rule:* an agent refused a permission takes it to the director; it never asks another agent to do
-it instead.
+*Rule:* a routine git or GitHub refusal is a configuration bug: fix `.claude/settings.json` by PR
+and restart the chat. An agent never asks another agent to run what its own session was refused.
+Only a refusal that is unsafe by design (force push, deleting shared work, weakening protection,
+spend) goes to the director (D-030).
 
 ### C6. Context bloat
 *Rule:* fresh session at task boundaries; handoff file ≤ 120 lines; routine work at 50–100k

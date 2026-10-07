@@ -1,6 +1,6 @@
 ---
 name: mercs-pr
-description: Opening, syncing and handing over a pull request the MERCS way - worktree and branch, the PR body sections and [MERGE NOTE], floors, director gates, who merges, the STATUS.md row, and how to report a PR to Merge & CI. Use it whenever you are about to open a PR, update one after main moved, resolve a conflict in tests/expected_checks.txt, write a commit message, or tell another agent about a PR or CI result.
+description: Opening, syncing and handing over a pull request the MERCS way - worktree and branch, the PR body sections and [MERGE NOTE], floors, director gates, who merges, the Board and log section, and how to report a PR to Merge & CI. Use it whenever you are about to open a PR, update one after main moved, resolve a conflict in tests/expected_checks.txt, write a commit message, or tell another agent about a PR or CI result.
 ---
 
 # A PR the MERCS way
@@ -40,6 +40,7 @@ section missing, and a PR with no "Not exercised" line fails review on sight.
 ## What changes                    the mechanism, in a few lines
 ## Evidence                        suites and counts, fixture and seed, capture or clip, player-effect fixture
 ## Not exercised                   what this PR does not prove; "insufficient evidence" is honest
+## Board and log                   your STATUS row change and any decision in full (D-TBD-<slug>); "none" is valid
 ## [MERGE NOTE]
 - Hot files touched: <sim core, save model, UiKit, caps, floors, docs>
 - Floors: <suite base -> new (+inc)>
@@ -52,12 +53,14 @@ See mercs-proof-evidence for what goes under Evidence and mercs-sim-review for t
 to how anything looks stays a prototype until the director approves it from labelled captures in a
 question message (`docs/03_TEAM_WORKFLOW.md` "The loop for one item", step 5;
 `agent-briefs/DIRECTOR_QUESTION_PROTOCOL.md`). Green CI is never approval of a look. Write the answer
-into `docs/DECISIONS.md` in the same PR that acts on it.
+in full under "Board and log" in the PR that acts on it; Merge & CI records it in `docs/DECISIONS.md`.
 
-## STATUS.md in the same PR
+## STATUS.md and DECISIONS.md: never in your PR
 
-Update your own row in `docs/STATUS.md` (state, item, branch / PR, since) in the same PR that changes
-your state (guardrail C3). States: working, running a check, awaiting director, blocked, available.
+Only Merge & CI edits `docs/STATUS.md` and `docs/DECISIONS.md` (CLAUDE.md; D-026, D-030). Put your
+row change (state, item, branch / PR) and any decision, in full as `D-TBD-<slug>`, under "## Board and
+log" in the PR body; Merge & CI records them in a board PR after the merge. A PR that touches either
+file is sent back. States: working, running a check, awaiting director, blocked, available.
 
 ## After opening
 
@@ -90,5 +93,6 @@ Dev Lead blockers and findings go to the Concept Lead; the director gets only qu
 format and the phase evidence pack.
 
 Say which state you are in. Waiting on a result or an approval is a valid state; do not invent work to
-look busy. Never ask another agent to do something your own session was refused permission for: take
-it to the director (guardrail C5).
+look busy. Never ask another agent to do something your own session was refused permission for. A
+routine git or GitHub refusal is a bug in `.claude/settings.json`: fix it by PR and restart; only an
+unsafe-by-design refusal goes to the director (guardrail C5, D-030).

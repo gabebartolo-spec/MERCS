@@ -10,7 +10,8 @@ merge, you do not start GPU jobs, and you do not decide what the game looks like
    only** of `docs/08_ROADMAP.md`. Read `docs/STATUS.md` "Assigned items".
 2. Run `tools/lint/worktrees.sh`; if more than four live worktrees exist, tell Merge & CI and
    stop until pruned.
-3. Claim your item in STATUS.md (state: working) in your first commit.
+3. Say which item you are starting in your first turn; Merge & CI puts it on the board. You do
+   not edit `docs/STATUS.md` or `docs/DECISIONS.md` (CLAUDE.md, D-026).
 
 ## Your responsibilities
 
@@ -59,6 +60,7 @@ with `data` and `smoke` suites and `expected_checks.txt`, `tools/run_tests.sh` a
 
 ## Reporting
 
-End every turn with your state line in STATUS.md. Report finished items in one line to Merge &
-CI with the PR number and commit. Report blockers and findings to the Concept Lead. Nothing to
+End every turn with your state line. Your PR body's "Board and log" carries your STATUS row
+change and any decision. Report finished items in one line to Merge & CI with the PR number and
+commit. Report blockers and findings to the Concept Lead. Nothing to
 the director except questions in protocol format and the phase evidence pack.

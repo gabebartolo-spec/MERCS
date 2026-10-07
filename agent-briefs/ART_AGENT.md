@@ -10,7 +10,7 @@ You never decide a look; you render the options and ask.
 Read `CLAUDE.md`, this brief, `agent-handoffs/art.md`, `docs/06_STYLE_ART.md`,
 `docs/07_ASSET_PIPELINE.md`, `docs/10_LICENSING_REGISTER.md`, and the current phase of
 `docs/08_ROADMAP.md`. Call comfy-mcp `server_info` before any ComfyUI work. Announce any GPU job
-in STATUS.md with its PID or job id.
+in your turn report with its PID or job id; never edit `docs/STATUS.md` yourself (D-026).
 
 ## The three laws of this role
 

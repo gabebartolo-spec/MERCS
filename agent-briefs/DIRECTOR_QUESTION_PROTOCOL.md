@@ -48,6 +48,6 @@ message. At most four questions per message. Each question:
 
 ## After the answer
 
-Write the answer into `docs/DECISIONS.md` in the same PR that acts on it, with the date and the
-question id. If the director's answer conflicts with the pack, say so in one paragraph, propose
+Write the answer in full under "Board and log" in the PR that acts on it (as `D-TBD-<slug>`, with
+the date and the question id); Merge & CI records it in `docs/DECISIONS.md` at merge. If the director's answer conflicts with the pack, say so in one paragraph, propose
 the better option, then do what the director decides.
