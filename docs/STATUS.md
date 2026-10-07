@@ -10,7 +10,7 @@ Current phase: **0 — Foundation** (not started). Gate signer: Concept Lead.
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | working | Phase 0 items 3, 4, 7 | claude/p0-scaffold, claude/p0-lints, claude/p0-skills | 2026-10-08 |
+| Dev Lead (Opus 5.5) | available | Phase 0 items 3, 4, 7 done, handed to Merge & CI | #4 claude/p0-scaffold, #5 claude/p0-lints, #6 claude/p0-skills | 2026-10-08 |
 | Merge & CI (Sonnet 5.5) | awaiting director | Phase 0 items 1 + 2 done; item 2 in PR #1; `test` requirement added after item 3 | claude/mercs-merge-ci-setup-83f2a5 | 2026-10-08 |
 | Art Factory (Opus 5.5) | available | — | — | — |
 | Concept Lead (Fable 5.1) | available | Phase 0 gate review when items 1–7 land | — | 2026-10-08 |
