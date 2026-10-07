@@ -33,6 +33,13 @@ DEV_CALL = re.compile(r"(?:(?<!\w)(?:" + "|".join(DEV_CALLS) + r")|(?<![\w.])Deb
 TEXT_KEY = re.compile(r"(?<!\w)Text\s*\.\s*t\s*\(\s*(\x01)")
 PRINTF = re.compile(r"%[-+#0]*\d*(?:\.\d+)?[a-zA-Z]")
 ESCAPE = re.compile(r"\\(.)", re.S)
+# Engine names passed as plain strings: groups, node paths and animations (#5 review).
+ENGINE_NAME_CALLS = ("add_to_group", "remove_from_group", "is_in_group", "get_node", "get_node_or_null",
+                     "has_node", "play", "play_backwards", "queue", "has_animation")
+ENGINE_NAME_ARG = re.compile(r"(?<!\w)(?:" + "|".join(ENGINE_NAME_CALLS) + r")\s*\(\s*$")
+OS_NAME = r"(?<![\w.])OS\s*\.\s*get_name\s*\(\s*\)"
+OS_NAME_BEFORE = re.compile(OS_NAME + r"\s*[!=]=\s*$")
+OS_NAME_AFTER = re.compile(r"\s*[!=]=\s*" + OS_NAME)
 SCENE_PROPERTY = re.compile(r'^\s*(text|tooltip_text|placeholder_text|title|dialog_text)\s*=\s*"')
 SCENE_STRING_END = re.compile(r'(?:[^"\\]|\\.)*"', re.S)
 
@@ -68,11 +75,19 @@ def bracket_context(code: str) -> dict[int, tuple[str, bool]]:
     return context
 
 
+def names_engine_thing(code: str, pos: int) -> bool:
+    """True for the first argument of a group, node or animation call, or a string compared
+    with OS.get_name(): engine names, not player text."""
+    before = code[max(0, pos - 64):pos]
+    return (ENGINE_NAME_ARG.search(before) is not None or OS_NAME_BEFORE.search(before) is not None
+            or OS_NAME_AFTER.match(code, pos + 1) is not None)
+
+
 def is_exempt(lit: Lit, code: str, context: dict[int, tuple[str, bool]], key_args: set[int]) -> bool:
     if lit.prefix in ("&", "^") or lit.text.startswith(PATH_PREFIXES) or lit.pos in key_args:
         return True
     opener, in_dev_call = context[lit.pos]
-    if in_dev_call:
+    if in_dev_call or names_engine_thing(code, lit.pos):
         return True
     after = next_char(code, lit.pos)
     if opener == "{":  # a dictionary key: "key": value
