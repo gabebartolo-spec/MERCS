@@ -4,6 +4,10 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
+## 2026-10-08 · D-022 · Director · The Merge & CI agent may run `gh pr merge`
+Why: Claude Code's auto-mode classifier refused the merge agent's `gh pr merge` as "Merge Without Review", leaving the director to merge by hand. The director chose a shared allow rule over per-merge prompts or manual merges.
+Changes: `.claude/settings.json` (shared) allows only `gh pr merge`. All other review guards stand: PR required, green `test`, template, director look gates, audit comments.
+
 ## 2026-10-08 · D-021 · Concept Lead · Phase 0 review rulings
 Why: the first six PRs exposed gaps in the pack, found by the Concept Lead's pre-merge audit.
 1. **No `Rng` autoload.** Sim code must not depend on autoloads (guardrail B3), so the random
