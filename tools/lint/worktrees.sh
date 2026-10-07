@@ -41,7 +41,7 @@ emit() { # emit <error|warning> <RULE> <message>
   fi
   printf '%s:0: %s%s %s\n' "$source_name" "$tag" "$rule" "$message"
   if [ -n "${GITHUB_ACTIONS:-}" ]; then
-    printf '::%s file=%s,line=0::%s %s\n' "$kind" "$source_name" "$rule" "$message"
+    printf '::%s file=%s,line=0::%s %s\n' "$kind" "$source_name" "$rule" "${message//%/%25}"
   fi
 }
 

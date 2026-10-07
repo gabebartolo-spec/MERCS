@@ -82,7 +82,9 @@ class Report:
             print(f"{item.path}:{item.line}: {tag}{item.rule} {item.message}")
             if annotate:
                 kind = "warning" if item.warning else "error"
-                print(f"::{kind} file={item.path},line={item.line}::{item.rule} {item.message}")
+                where = item.path.replace("%", "%25").replace(":", "%3A").replace(",", "%2C")
+                text = f"{item.rule} {item.message}".replace("%", "%25")
+                print(f"::{kind} file={where},line={item.line}::{text}")
         if any(not item.warning for item in self.items):
             return 1
         print(f"ok: {ok_message}")
