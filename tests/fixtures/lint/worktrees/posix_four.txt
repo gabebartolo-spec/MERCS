@@ -14,10 +14,6 @@ worktree /home/dev/src/MERCS-wt/c
 HEAD 3333333333333333333333333333333333333332
 branch refs/heads/claude/c
 
-worktree /home/dev/src/MERCS-wt/d
-HEAD 3333333333333333333333333333333333333332
-branch refs/heads/claude/d
-
 worktree /home/dev/src/MERCS-wt/gone
 HEAD 4444444444444444444444444444444444444443
 detached

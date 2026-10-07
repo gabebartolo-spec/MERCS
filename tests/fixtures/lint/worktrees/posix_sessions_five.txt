@@ -1,0 +1,23 @@
+worktree /home/dev/src/MERCS
+HEAD 3333333333333333333333333333333333333333
+branch refs/heads/main
+
+worktree /home/dev/src/MERCS/.claude/worktrees/session-1
+HEAD 4444444444444444444444444444444444444444
+branch refs/heads/claude/session-1
+
+worktree /home/dev/src/MERCS/.claude/worktrees/session-2
+HEAD 5555555555555555555555555555555555555555
+branch refs/heads/claude/session-2
+
+worktree /home/dev/src/MERCS/.claude/worktrees/session-3
+HEAD 6666666666666666666666666666666666666666
+branch refs/heads/claude/session-3
+
+worktree /home/dev/src/MERCS/.claude/worktrees/session-4
+HEAD 7777777777777777777777777777777777777777
+branch refs/heads/claude/session-4
+
+worktree /home/dev/src/MERCS/.claude/worktrees/session-5
+HEAD 8888888888888888888888888888888888888888
+branch refs/heads/claude/session-5

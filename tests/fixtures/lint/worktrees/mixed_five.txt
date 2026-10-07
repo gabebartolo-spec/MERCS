@@ -1,34 +1,32 @@
 worktree C:/Users/DANTE/Documents/GitHub/MERCS
-HEAD 2222222222222222222222222222222222222221
+HEAD aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 branch refs/heads/main
 
 worktree C:/Users/DANTE/Documents/GitHub/MERCS-wt/p0-scaffold
-HEAD 3333333333333333333333333333333333333332
+HEAD bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 branch refs/heads/claude/p0-scaffold
 
 worktree C:/Users/DANTE/Documents/GitHub/MERCS-wt/p0-lints
-HEAD 4444444444444444444444444444444444444443
+HEAD cccccccccccccccccccccccccccccccccccccccc
 branch refs/heads/claude/p0-lints
-locked
 
 worktree C:/Users/DANTE/Documents/GitHub/MERCS-wt/p0-skills
-HEAD 5555555555555555555555555555555555555554
+HEAD dddddddddddddddddddddddddddddddddddddddd
 branch refs/heads/claude/p0-skills
 
-worktree C:/Users/DANTE/Documents/GitHub/MERCS-wt/p1-old-spike
-HEAD 7777777777777777777777777777777777777776
+worktree C:/Users/DANTE/Documents/GitHub/MERCS/.claude/worktrees/mercs-dev-lead-setup-0b99b1
+HEAD eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+branch refs/heads/claude/mercs-dev-lead-setup-0b99b1
+
+worktree C:/Users/DANTE/Documents/GitHub/MERCS/.claude/worktrees/art-factory-setup-f074a4
+HEAD ffffffffffffffffffffffffffffffffffffffff
+branch refs/heads/claude/art-factory-setup-f074a4
+
+worktree C:/Users/DANTE/Documents/GitHub/MERCS/.claude/worktrees/stale-session
+HEAD 1111111111111111111111111111111111111111
 detached
 prunable gitdir file points to non-existent location
 
 worktree C:/Users/DANTE/Documents/GitHub/MERCS-wt-old/leftover
-HEAD 8888888888888888888888888888888888888887
+HEAD 2222222222222222222222222222222222222222
 branch refs/heads/claude/leftover
-
-worktree C:/Users/DANTE/Documents/GitHub/MERCS/.claude/worktrees/art-factory-setup-f074a4
-HEAD 9999999999999999999999999999999999999998
-branch refs/heads/claude/art-factory-setup-f074a4
-
-worktree C:/Users/DANTE/Documents/GitHub/MERCS/.claude/worktrees/stale-session
-HEAD 1111111111111111111111111111111111111119
-detached
-prunable gitdir file points to non-existent location
