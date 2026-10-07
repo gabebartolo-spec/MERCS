@@ -15,6 +15,12 @@ SIM-CLOCK sim/bad_clock.gd:20
 SIM-CLOCK sim/bad_clock.gd:24
 SIM-CLOCK sim/bad_clock.gd:28
 SIM-ENGINE sim/bad_engine.gd:4
+SIM-ENGINE sim/bad_nodes.gd:10
+SIM-ENGINE sim/bad_nodes.gd:11
+SIM-ENGINE sim/bad_nodes.gd:12
+SIM-ENGINE sim/bad_nodes.gd:13
+SIM-ENGINE sim/bad_nodes.gd:14
+SIM-ENGINE sim/bad_nodes.gd:15
 SIM-ENGINE sim/bad_engine.gd:5
 SIM-ENGINE sim/bad_engine.gd:6
 SIM-ENGINE sim/bad_engine.gd:7
