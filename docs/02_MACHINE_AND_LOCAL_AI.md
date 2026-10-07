@@ -32,16 +32,16 @@ and writes `tools/machine_profile.json` (schema at the end of this file).
 ## Model inventory on disk (StabilityMatrix `Data/Models`)
 
 Since 2026-10-08 `Data/Models` is a directory junction to `D:\MERCS-vault\models`; the files live on D:.
-Banned and unused files below were sent to the Recycle Bin the same day (D-015, D-018); rows are kept as history.
+Banned and unused files below were deleted the same day (D-015, D-018); rows are kept as history.
 
 | File | Size | Licence (see 10_LICENSING_REGISTER) | Verdict |
 |------|------|--------------------------------------|---------|
-| `DiffusionModels/qwen_image_2.1_int8_convrot.safetensors` + Qwen text encoders + VAE | 7.3 + 9.5 + 9.4 + 0.7 GB | Qwen Research Licence: **non-commercial** | **BANNED**. Sent to Recycle Bin 2026-10-08 |
-| `StableDiffusion/anima_turboV11.safetensors` | 4.2 GB | CircleStone non-commercial | **BANNED**. Sent to Recycle Bin 2026-10-08 |
+| `DiffusionModels/qwen_image_2.1_int8_convrot.safetensors` + Qwen text encoders + VAE | 7.3 + 9.5 + 9.4 + 0.7 GB | Qwen Research Licence: **non-commercial** | **BANNED**. Deleted 2026-10-08 (Recycle Bin emptied by the director) |
+| `StableDiffusion/anima_turboV11.safetensors` | 4.2 GB | CircleStone non-commercial | **BANNED**. Deleted 2026-10-08 (Recycle Bin emptied by the director) |
 | `StableDiffusion/pixelArtDiffusionXL_spriteShaper.safetensors` | 6.9 GB | SDXL base is CreativeML OpenRAIL++-M; Civitai fine-tune permissions must be read and recorded | PENDING (Civitai region-blocked, D-017); concept sheets only |
 | `Lora/pixel-art-xl-v1.1.safetensors`, `Lora/Pixel_Art_Sprite_Sheet_space_candy_media.safetensors` | 0.2 GB each | Civitai, per-model permissions | PENDING; concept only (D-017). The "Pony pixel LoRA" was a broken HTML download, removed (D-018) |
 | `StableDiffusion/hunyuan3d-dit-v2-mv_fp16.safetensors` | 4.9 GB | Tencent Hunyuan 3D Community Licence: commercial OK under 1M MAU, not valid in EU/UK/South Korea | CLEARED for prop and silhouette reference generation (Australia-based developer) |
-| `StableDiffusion/realisticVisionV60B1_v51HyperVAE.safetensors` | 2.1 GB | SD1.5 OpenRAIL-M | sent to Recycle Bin 2026-10-08 |
+| `StableDiffusion/realisticVisionV60B1_v51HyperVAE.safetensors` | 2.1 GB | SD1.5 OpenRAIL-M | deleted 2026-10-08 (Recycle Bin emptied by the director) |
 
 ## What runs locally on 12 GB VRAM, and what it is for
 
