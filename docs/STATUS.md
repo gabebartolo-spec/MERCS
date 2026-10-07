@@ -31,7 +31,14 @@ States: working · running a check · awaiting director · blocked · available.
    Hub (D-015), write `tools/machine_profile.json`.
 6. Art Factory: record Civitai permissions for the PENDING rows in `10_LICENSING_REGISTER.md`.
 7. Dev Lead: `.claude/skills/` set and `agent-handoffs/` seeds.
-8. Concept Lead: Phase 0 gate review (deliberately broken PR test).
+8. Dev Lead: gdlint + gdformat job in `lint.yml` with the limits from `05_STYLE_CODE.md`
+   (400 lines per file, 40 per function, 4 parameters, complexity 12); move `text.gd` to
+   `presentation/` when it is created.
+9. Concept Lead: Phase 0 gate review (`docs/audits/phase0_gate_plan.md`).
+
+### Phase 1 (assigned only after the Phase 0 gate is PASS)
+- Art Factory: `assets.yml` (validators + Godot assets fixture + contact-sheet artefact).
+- Dev Lead: Phase 1 LOW: lint precision gaps listed by PR #5.
 
 ## Waiting on the director
 - Nothing. Q-BP answered 2026-10-08 (D-019: repo public, protection applied; `test` required once `tests.yml` exists, item 3).

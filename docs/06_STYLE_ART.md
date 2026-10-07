@@ -31,7 +31,7 @@ colours in named ramps of 5–6 steps each **[D: final count after samples]**:
 | `bone` warm off-whites | linen, skin highlights, bone |
 | `cloth_faded` dull reds, blues, greens | commoner clothing |
 | `verdure_cold` blue-greens | vegetation |
-| `skin_1 … skin_6` | six skin ramps, never recoloured by shader |
+| `skin_1 … skin_6` | six skin ramps; sprites are rendered in one neutral skin ramp and the shader maps it to the merc's ramp by palette index (never free colour) |
 | `heraldry_*` | saturated faction colours: crimson/gold, blue/white, black/yellow (3 factions in the slice) |
 | `blood` | two reds and a brown for dried |
 | `fire` | torch and ember accents |
@@ -49,7 +49,7 @@ the same file.
 | Skeleton | Mixamo-compatible naming (so the free Mixamo library retargets cleanly), 65 bones max | frozen in Phase 1; never regenerated |
 | Sockets | `hand_r`, `hand_l`, `back`, `hip_l`, `head`, `chest_badge` | every equipment mesh attaches here |
 | Camera | orthographic, pitch **35°** **[D: 30/35/40 samples]**, 8 facings at 45° steps, facing 0 = toward camera | same pitch as the game camera |
-| Character height | **48 px** at 1× for `average` (slight 44, giant 56) **[D: 40/48/56 samples]** | world units: 1 m = 24 px |
+| Character height | **48 px** at 1× for `average` (slight 44, giant 56) **[D: 40/48/56 samples]** | world units: 1 m ≈ 27 px (48 px / 1.78 m); the figure follows the chosen height |
 | Render size | 4× (192 px tall) then integer downscale | downscale is nearest after a 2-px-equivalent pre-blur, then quantise to palette |
 | Lighting | one key (sun, 45° elevation, from camera-left), one fill at 20 %, no cast shadows on the sprite | shadows are a separate blob sprite in-engine |
 | Outline | 1-px `soot` outline added in post, inner-line only where the silhouette would merge | deterministic script |
@@ -84,7 +84,7 @@ the same file.
 
 ## 6. Environment contract
 
-- Low-poly 3D, textures at **24 px per metre** texel density to match the sprites, painted from
+- Low-poly 3D, textures at the sprite's pixels-per-metre (≈ 27 at 48 px) texel density, painted from
   the master palette (textures are quantised at export).
 - Modular kit per biome: ground tiles, walls, roofs, doors, props, foliage cards. One `GridMap`
   mesh library per biome.

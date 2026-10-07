@@ -26,9 +26,10 @@ MERCS/
     save/      save_model.gd  migrations.gd
   presentation/              reads sim events, drives scenes
     autoload/  game_data.gd  event_bus.gd  save_system.gd  settings.gd  debug.gd
+    text.gd                  Text.t() lookup; lives here so both presentation and ui may use it
     world/  battle/  characters/  vfx/
   ui/                        screens and UiKit
-    ui_kit.gd  text.gd  screens/*.tscn|gd  widgets/
+    ui_kit.gd  screens/*.tscn|gd  widgets/
   assets/                    engine-ready only (sprites, portraits, env, audio, fonts)
     golden/                  reference images for style review
   tools/
@@ -95,8 +96,9 @@ scene tree (D-021). A test constructs `Rng.from_seed(424242)`. Nothing else make
 
 - One runner per suite `tests/run_<suite>_tests.gd`, prints `"<Suite> tests: %d checks, %d failures"`
   and quits non-zero on failure. Floors in `tests/expected_checks.txt` only go up.
-- Suites from Phase 0: `data` (schema + caps), `sim_merc`, `sim_battle`, `sim_world`, `story`,
-  `save`, `effect` (player-effect fixtures, see guardrail A1), `assets`, `ui`, `perf`.
+- Suites: `smoke` and `data` (schema + caps) from Phase 0; then `sim_merc`, `sim_battle`,
+  `sim_world`, `story`, `save`, `effect` (player-effect fixtures, see guardrail A1), `assets`,
+  `ui`, `perf` as their phases arrive. gdlint and gdformat run in `lint.yml` from Phase 0.
 - Seeded fixtures under `tests/fixtures/` are the reproduction currency: a bug report is a fixture
   file plus the expected outcome.
 

@@ -64,9 +64,9 @@ never read inside `sim/`. Tests pin seeds. A flaky test is fixed by pinning, nev
 → `ui`, never backwards) in CI.
 
 ### B4. Hallucinated or wrong-version APIs
-*Rule:* Godot 4.7.2 only. Before using an unfamiliar class or method, the agent reads the local
-docs (`godot --doctool` output committed under `docs/godot-api/` in Phase 0, or the online 4.7
-docs). Static typing is on so wrong signatures fail at parse.
+*Rule:* Godot 4.7.2 only. Before using an unfamiliar class or method, the agent reads the
+online 4.7 class reference (or a local `godot --doctool` dump if one is ever committed; not
+required). Static typing is on so wrong signatures fail at parse.
 *Enforced by:* CI runs `godot --headless --import` then every suite; a `SCRIPT ERROR` fails the
 run even when checks pass.
 
