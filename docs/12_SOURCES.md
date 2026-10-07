@@ -26,7 +26,7 @@ Licence and platform facts in this pack were checked against these. Re-verify a 
 
 ## Director's briefs (in `docs/source-briefs/`)
 - `Mercenary_Collector_RPG_Claude_Design_Brief.docx` (2026-10-07): the original concept, systems and production brief this pack was built from.
-- `Mercenary_Collector_Three_Pillars_Claude_Brief.docx` (2026-10-08): the three-pillar synthesis; adds the company-as-player model, chronicle, triage, retreat and regional pools (D-TBD-three-pillars).
+- `Mercenary_Collector_Three_Pillars_Claude_Brief.docx` (2026-10-08): the three-pillar synthesis; adds the company-as-player model, chronicle, triage, retreat and regional pools (D-023).
 
 ## Comparable games (reception signals from the director's design brief, directional only)
 Pokémon Black/White, Battle Brothers, Wildermyth, RimWorld, Cassette Beasts, Monster Sanctuary,
