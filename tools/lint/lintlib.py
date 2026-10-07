@@ -70,10 +70,10 @@ class Report:
         self.items: set[Finding] = set()
 
     def error(self, path: str, line: int, rule: str, message: str) -> None:
-        self.items.add(Finding(path, line, rule, message))
+        self.items.add(Finding(path, line, rule, " ".join(message.split())))
 
     def warn(self, path: str, line: int, rule: str, message: str) -> None:
-        self.items.add(Finding(path, line, rule, message, warning=True))
+        self.items.add(Finding(path, line, rule, " ".join(message.split()), warning=True))
 
     def finish(self, ok_message: str) -> int:
         annotate = bool(os.environ.get("GITHUB_ACTIONS"))
@@ -193,12 +193,26 @@ def _take_prefix(out: list[str]) -> str:
     return ""
 
 
-def prev_char(code: str, idx: int) -> str:
-    """Last non-blank character before idx ('' at the start of the code)."""
+def prev_index(code: str, idx: int) -> int:
+    """Index of the last non-blank character before idx (-1 at the start of the code)."""
     j = idx - 1
     while j >= 0 and code[j] in " \t\r\n":
         j -= 1
+    return j
+
+
+def prev_char(code: str, idx: int) -> str:
+    """Last non-blank character before idx ('' at the start of the code)."""
+    j = prev_index(code, idx)
     return code[j] if j >= 0 else ""
+
+
+def next_char(code: str, idx: int) -> str:
+    """First non-blank character after idx ('' at the end of the code)."""
+    j = idx + 1
+    while j < len(code) and code[j] in " \t\r\n":
+        j += 1
+    return code[j] if j < len(code) else ""
 
 
 def is_member(code: str, idx: int) -> bool:
