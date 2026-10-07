@@ -4,16 +4,16 @@ Cap: 150 lines. Owned by the Merge & CI agent; every agent updates its own row i
 that changes its state. History rolls to `docs/archive/status_<month>.md`.
 
 ## Phase
-Current phase: **0 — Foundation** (items 1–7 merged; gate run pending). Gate signer: Concept Lead.
+Current phase: **0 — Foundation** (gate PASS WITH NOTES, D-027; items 8, 10–12 open). Gate signer: Concept Lead.
 
 ## Agents
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | available | Phase 0 items 3, 4, 7 done, handed to Merge & CI | #4 claude/p0-scaffold, #5 claude/p0-lints, #6 claude/p0-skills | 2026-10-08 |
+| Dev Lead (Opus 5.5) | available | Phase 0 items 8, 10, 11, 12, then Phase 1 grey-box street | — | 2026-10-08 |
 | Merge & CI (Sonnet 5.5) | awaiting director | Phase 0 items 1 + 2 done; item 2 in PR #1; `test` requirement added after item 3 | claude/mercs-merge-ci-setup-83f2a5 | 2026-10-08 |
-| Art Factory (Opus 5.5) | available | Phase 0 items 5, 6 done (#3); waiting for the Phase 0 gate | — | 2026-10-08 |
-| Concept Lead (Fable 5.1) | working | Phase 0 gate review; board and log after #2, #8 | claude/board-and-log | 2026-10-08 |
+| Art Factory (Opus 5.5) | available | Phase 1 item 1: rig freeze, then sample sets (docs/specs/phase1_visual_proof.md) | — | 2026-10-08 |
+| Concept Lead (Fable 5.1) | available | Phase 0 gate signed (D-027); next: Phase 1 sample review | — | 2026-10-08 |
 
 States: working · running a check · awaiting director · blocked · available.
 
@@ -34,7 +34,10 @@ States: working · running a check · awaiting director · blocked · available.
 8. Dev Lead: gdlint + gdformat job in `lint.yml` with the limits from `05_STYLE_CODE.md`
    (400 lines per file, 40 per function, 4 parameters, complexity 12); move `text.gd` to
    `presentation/` when it is created.
-9. Concept Lead: Phase 0 gate review (`docs/audits/phase0_gate_plan.md`).
+9. Concept Lead: Phase 0 gate review. DONE (D-027, `docs/audits/phase0_gate_result.md`).
+10. Dev Lead: `tests.yml` fails if any floor in `tests/expected_checks.txt` is lower than on `main` (gate gap #12).
+11. Dev Lead: re-test gitleaks with a non-allowlisted fake secret; add a custom rule if missed (gate gap #13). Make `build.yml`'s windows job depend on `test`; reword the harness self-test failure message.
+12. Dev Lead: `tools/lint/no_weights.py` fails on any `.safetensors`/`.ckpt`/`.gguf`/`.pth` tracked in the repo, wired into `project-lints` (gate gap #14).
 
 ### Phase 1 (assigned only after the Phase 0 gate is PASS)
 - Art Factory: `assets.yml` (validators + Godot assets fixture + contact-sheet artefact).
