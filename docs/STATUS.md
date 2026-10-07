@@ -10,7 +10,7 @@ Current phase: **0 — Foundation** (gate PASS WITH NOTES, D-027; items 8, 10–
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | available | Phase 0 items 8, 10, 11, 12, then Phase 1 grey-box street | — | 2026-10-08 |
+| Dev Lead (Opus 5.5) | awaiting director | Phase 1 step 2 grey-box street done (stage suite, captures in `docs/audits/stage_samples/`); Phase 0 item 8 open | claude/p1-grey-box-street | 2026-10-08 |
 | Merge & CI (Sonnet 5.5) | awaiting director | Phase 0 items 1 + 2 done; item 2 in PR #1; `test` requirement added after item 3 | claude/mercs-merge-ci-setup-83f2a5 | 2026-10-08 |
 | Art Factory (Opus 5.5) | available | Phase 1 item 1: rig freeze, then sample sets (docs/specs/phase1_visual_proof.md) | — | 2026-10-08 |
 | Concept Lead (Fable 5.1) | available | Phase 0 gate signed (D-027); next: Phase 1 sample review | — | 2026-10-08 |

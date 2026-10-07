@@ -1,0 +1,62 @@
+{
+  "_comment": "Phase 1 grey-box capture stage (docs/specs/phase1_visual_proof.md section 2). Every number presentation/world/street_stage.gd uses that is not an exported var lives here; stage.md explains each knob.",
+  "street": {
+    "width_m": 40,
+    "depth_m": 20,
+    "cell_size_m": 1,
+    "ground_thickness_m": 0.1,
+    "house_size_m": [6, 5, 6],
+    "house_cells_xz": [-12, -7, -4, -7, 4, -7, 12, -7, -14, 7, 14, 7],
+    "well_size_m": [1.4, 1.0, 1.4],
+    "well_cell": [4, 0, 1],
+    "cart_size_m": [2.0, 1.1, 1.2],
+    "cart_cell": [-7, 0, -3],
+    "door_size_m": [1.0, 2.2, 0.3],
+    "door_cell": [-5, 0, -4],
+    "door_offset_z_m": 0.1
+  },
+  "shades": {
+    "ground": 0.42,
+    "house": 0.62,
+    "well": 0.5,
+    "cart": 0.55,
+    "door": 0.3,
+    "sky": 0.72
+  },
+  "light": {
+    "elevation_degrees": 45,
+    "azimuth_degrees": -35,
+    "color_rgb": [1.0, 0.94, 0.84],
+    "energy": 1.2,
+    "ambient_grey": 0.55,
+    "ambient_energy": 0.6
+  },
+  "camera": {
+    "fov_degrees": 35,
+    "distance_m": 12,
+    "look_at_height_m": 1.0,
+    "near_m": 0.1,
+    "far_m": 200
+  },
+  "sprite": {
+    "merc_height_m": 1.78,
+    "texture_width_px": 24,
+    "fill_grey": 0.86,
+    "outline_grey": 0.12,
+    "walk_speed_m_s": 1.4,
+    "path_xz": [-16, 2, -1, 2, 2, 4, 16, 2, 16, 6, -16, 6]
+  },
+  "pixel": {
+    "logical_width_px": 640,
+    "logical_height_px": 360,
+    "integer_scale": 3
+  },
+  "capture": {
+    "settle_frames": 4,
+    "clip_seconds": 3,
+    "clip_fps": 30,
+    "crop_width_px": 160,
+    "crop_height_px": 90,
+    "crop_scale": 2
+  }
+}
