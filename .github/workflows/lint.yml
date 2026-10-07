@@ -55,6 +55,37 @@ jobs:
             echo "tools/lint/run_all.sh not present yet; skipping"
           fi
 
+  gdlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install gdtoolkit
+        run: pip install "gdtoolkit==4.*"
+      - name: List GDScript files
+        shell: bash
+        run: |
+          # Every .gd file outside .godot/ and .claude/. Limits live in .gdlintrc (docs/05).
+          find . -name '*.gd' -not -path './.godot/*' -not -path './.claude/*' | sort > gd_files.txt
+          echo "$(wc -l < gd_files.txt) GDScript files"
+      - name: File names are snake_case (docs/05)
+        shell: bash
+        run: |
+          # gdlint has no file-name rule; docs/05 wants snake_case.gd.
+          bad=$(grep -v -E '/[a-z0-9]+(_[a-z0-9]+)*\.gd$' gd_files.txt || true)
+          if [ -n "$bad" ]; then
+            echo "$bad" | sed 's/^/::error::not snake_case: /'
+            exit 1
+          fi
+      - name: gdlint
+        shell: bash
+        run: xargs -a gd_files.txt gdlint
+      - name: gdformat --check
+        shell: bash
+        run: xargs -a gd_files.txt gdformat --check
+
   gitleaks:
     runs-on: ubuntu-latest
     steps:
