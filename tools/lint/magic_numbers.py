@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Magic-number and colour-literal lint (guardrails B9 and D3).
 
-  MAGIC-NUMBER    a numeric literal in sim/**/*.gd whose value is not 0, 1 or 100 (any sign;
-                  int, float, 0x hex, 0b binary, 1_000 and exponent forms; digits inside
+  MAGIC-NUMBER    a numeric literal in sim/**/*.gd other than 0, 1, -1 or 100 (so -100 and +1
+                  are rejected; a binary minus as in x - 100 is not a sign); sim/core/rng.gd,
+                  whose generator constants are the algorithm, is exempt. int, float, 0x hex, 0b binary, 1_000 and exponent forms; digits inside
                   identifiers such as Vector2i are not literals). An error once data/caps.json
                   says "phase" >= STRICT_FROM_PHASE; a warning in Phases 0-2 and whenever
                   caps.json is missing or unreadable (B9: warning in Phase 1-2, error from 3).
@@ -27,10 +28,12 @@ import re
 import sys
 from pathlib import Path
 
-from lintlib import GdSource, Report, files_under, parse_args, read_text, rel, scan_gd
+from lintlib import (GdSource, Report, ends_operand, files_under, parse_args, prev_index, read_text, rel,
+                     scan_gd)
 
 STRICT_FROM_PHASE = 3  # B9: MAGIC-NUMBER is a warning in Phase 1-2 and an error from Phase 3
-ALLOWED_VALUES = frozenset({0.0, 1.0, 100.0})  # B9: 0, 1, -1 and 100 (sign is ignored)
+ALLOWED_VALUES = frozenset({0.0, 1.0, -1.0, 100.0})  # B9: 0, 1, -1 and 100, sign included
+RNG_FILE = "sim/core/rng.gd"  # generator constants are the algorithm, not balance
 COLOUR_OWNER = "ui/uikit.gd"  # compared with the lowercased path minus underscores
 
 NUMBER = re.compile(
@@ -75,12 +78,21 @@ def read_phase(root: Path) -> int | None:
     return phase if isinstance(phase, int) and not isinstance(phase, bool) else None
 
 
+def unary_sign(code: str, start: int) -> str:
+    """The unary + or - written before the number at start, or '' (x - 100 is a binary minus)."""
+    j = prev_index(code, start)
+    if j >= 0 and code[j] in "+-" and not ends_operand(code, j):
+        return code[j]
+    return ""
+
+
 def check_numbers(path: str, src: GdSource, strict: bool, report: Report) -> None:
     emit = report.error if strict else report.warn
     for match in NUMBER.finditer(src.code):
-        if number_value(match.group()) not in ALLOWED_VALUES:
+        sign = unary_sign(src.code, match.start())
+        if sign == "+" or (-1.0 if sign else 1.0) * number_value(match.group()) not in ALLOWED_VALUES:
             emit(path, src.line_at(match.start()), "MAGIC-NUMBER",
-                 f"literal {match.group()} in sim: tunable numbers live in data/balance/*.json (B9)")
+                 f"literal {sign}{match.group()} in sim: tunable numbers live in data/balance/*.json (B9)")
 
 
 def check_colours_gd(path: str, src: GdSource, report: Report) -> None:
@@ -108,6 +120,8 @@ def main() -> int:
     strict = phase is not None and phase >= STRICT_FROM_PHASE
     sim_files = files_under(root, ("sim",), (".gd",))
     for path in sim_files:
+        if rel(root, path) == RNG_FILE:
+            continue
         check_numbers(rel(root, path), scan_gd(read_text(path)), strict, report)
     ui_files = files_under(root, ("ui",), (".gd", ".tscn", ".tres"))
     for path in ui_files:
