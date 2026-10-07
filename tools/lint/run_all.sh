@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # run_all.sh: every project lint on this repo, then the lint self-test, as one pass/fail table.
 #
-# Runs layering, magic_numbers, strings and content_counts on the repo root, worktrees.sh on
+# Runs layering, magic_numbers, strings, content_counts and no_weights on the repo root, worktrees.sh on
 # the live `git worktree list`, and finally test_lints.py (each lint against its broken
 # fixture). Prints the failing checks' full output below the table and exits non-zero if any
 # check failed. Works from any directory; set PYTHON to pick the interpreter.
@@ -61,6 +61,7 @@ run_step layering "$py" tools/lint/layering.py
 run_step magic_numbers "$py" tools/lint/magic_numbers.py
 run_step strings "$py" tools/lint/strings.py
 run_step content_counts "$py" tools/lint/content_counts.py
+run_step no_weights "$py" tools/lint/no_weights.py
 run_step worktrees bash tools/lint/worktrees.sh
 run_step self-test "$py" tools/lint/test_lints.py
 

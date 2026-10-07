@@ -1,0 +1,3 @@
+# Fixture weights stay plain git, never LFS (root .gitattributes sends *.safetensors to LFS).
+*.safetensors -filter -diff -merge
+*.bin -text

@@ -10,7 +10,8 @@ the error findings as `RULE path:line`; the set the lint reports must equal it:
     unexpected = reported but not planted (precision failure)
 
 A root may also carry expected_warnings.txt, compared the same way against warnings.
-An empty expected.txt means the lint must exit 0. The worktrees lint is fed every
+An empty expected.txt means the lint must exit 0. The no_weights fixture's planted files are
+committed (git-tracked) on purpose, since that lint reads `git ls-files`. The worktrees lint is fed every
 *.txt capture in tests/fixtures/lint/worktrees/ through WORKTREE_LIST.
 
 Usage: python tools/lint/test_lints.py        (exit 1 on any failure)
@@ -42,6 +43,7 @@ PYTHON_CASES = [
     ("content_counts/no-caps", "content_counts.py", "content_counts_nocaps"),
     ("content_counts/bad-json", "content_counts.py", "content_counts_badjson"),
     ("content_counts/bad-shape", "content_counts.py", "content_counts_badshape"),
+    ("no_weights", "no_weights.py", "no_weights"),
 ]
 
 
