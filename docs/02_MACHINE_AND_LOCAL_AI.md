@@ -20,8 +20,8 @@ and writes `tools/machine_profile.json` (schema at the end of this file).
 |------|--------------------|--------|
 | Godot | 4.7.2 stable, `C:\Users\DANTE\Desktop\Godot_v4.7.2-stable_win64.exe\` | engine of record |
 | Blender | 5.2, `C:\Program Files\Blender Foundation\Blender 5.2` | headless render and bake layer; MPFB add-on already used on AFL |
-| Unity | 2022.3.20f1, 6000.3.0, 6000.3.23, 6000.5.10, 6000.6.0 | not used; may be uninstalled to recover C: space (director's call) |
-| ComfyUI | v0.38.0 (latest 0.39.1) via StabilityMatrix at `C:\Users\DANTE\Documents\SPRITE STUFF\StabilityMatrix-win-x64\Data\Packages\ComfyUI`; comfy-cli 1.22.0; comfy-mcp configured | update core before use; no custom node packs installed |
+| Unity | 6000.3.23f1 only (the director's Orc-Survivor project) | not used by MERCS; the other four editors were uninstalled 2026-10-08 (D-016) |
+| ComfyUI | v0.39.1 (updated 2026-10-08) via StabilityMatrix at `C:\Users\DANTE\Documents\SPRITE STUFF\StabilityMatrix-win-x64\Data\Packages\ComfyUI`; comfy-cli 1.22.0; comfy-mcp configured | no custom node packs installed |
 | Forge Neo | same StabilityMatrix | not needed; ComfyUI is the single control plane |
 | Ollama | gpt-oss:20b (13 GB), gemma4:26b (18 GB), qwen3.6:35b-a3b-coding (22 GB) | optional dev-time tools only, see below |
 | Node.js | 24.21 | validators and the optional Three.js lab |
@@ -31,14 +31,17 @@ and writes `tools/machine_profile.json` (schema at the end of this file).
 
 ## Model inventory on disk (StabilityMatrix `Data/Models`)
 
+Since 2026-10-08 `Data/Models` is a directory junction to `D:\MERCS-vault\models`; the files live on D:.
+Banned and unused files below were sent to the Recycle Bin the same day (D-015, D-018); rows are kept as history.
+
 | File | Size | Licence (see 10_LICENSING_REGISTER) | Verdict |
 |------|------|--------------------------------------|---------|
-| `DiffusionModels/qwen_image_2.1_int8_convrot.safetensors` + Qwen text encoders + VAE | 7.3 + 9.5 + 9.4 + 0.7 GB | Qwen Research Licence: **non-commercial** | **BANNED** for anything feeding the product. Delete to recover 27 GB, or keep off the pipeline path |
-| `StableDiffusion/anima_turboV11.safetensors` | 4.2 GB | CircleStone non-commercial | **BANNED** |
-| `StableDiffusion/pixelArtDiffusionXL_spriteShaper.safetensors` | 6.9 GB | SDXL base is CreativeML OpenRAIL++-M; Civitai fine-tune permissions must be read and recorded | PENDING licence record; candidate for concept sheets only |
-| `Lora/pixel-art-xl-v1.1.safetensors`, `Lora/Pixel_Art_Sprite_Sheet_space_candy_media.safetensors`, Pony pixel LoRA | 0.2 GB each | Civitai, per-model permissions | PENDING; concept only |
+| `DiffusionModels/qwen_image_2.1_int8_convrot.safetensors` + Qwen text encoders + VAE | 7.3 + 9.5 + 9.4 + 0.7 GB | Qwen Research Licence: **non-commercial** | **BANNED**. Sent to Recycle Bin 2026-10-08 |
+| `StableDiffusion/anima_turboV11.safetensors` | 4.2 GB | CircleStone non-commercial | **BANNED**. Sent to Recycle Bin 2026-10-08 |
+| `StableDiffusion/pixelArtDiffusionXL_spriteShaper.safetensors` | 6.9 GB | SDXL base is CreativeML OpenRAIL++-M; Civitai fine-tune permissions must be read and recorded | PENDING (Civitai region-blocked, D-017); concept sheets only |
+| `Lora/pixel-art-xl-v1.1.safetensors`, `Lora/Pixel_Art_Sprite_Sheet_space_candy_media.safetensors` | 0.2 GB each | Civitai, per-model permissions | PENDING; concept only (D-017). The "Pony pixel LoRA" was a broken HTML download, removed (D-018) |
 | `StableDiffusion/hunyuan3d-dit-v2-mv_fp16.safetensors` | 4.9 GB | Tencent Hunyuan 3D Community Licence: commercial OK under 1M MAU, not valid in EU/UK/South Korea | CLEARED for prop and silhouette reference generation (Australia-based developer) |
-| `StableDiffusion/realisticVisionV60B1_v51HyperVAE.safetensors` | 2.1 GB | SD1.5 OpenRAIL-M | not needed; delete |
+| `StableDiffusion/realisticVisionV60B1_v51HyperVAE.safetensors` | 2.1 GB | SD1.5 OpenRAIL-M | sent to Recycle Bin 2026-10-08 |
 
 ## What runs locally on 12 GB VRAM, and what it is for
 
@@ -89,9 +92,16 @@ ComfyUI batch is using the GPU.
   "gpu": {"name": "NVIDIA GeForce RTX 4070 SUPER", "vram_mib": 12282, "driver": "617.14"},
   "ram_gib": 32,
   "disk": {"C": {"free_gib": 84}, "D": {"free_gib": 375}},
-  "comfyui": {"core": "v0.38.0", "custom_nodes": [], "models_root": "D:/MERCS-vault/models"},
+  "comfyui": {
+    "core": "v0.38.0",
+    "custom_nodes": [],
+    "models_root": "D:/MERCS-vault/models",
+    "models_root_link": "how StabilityMatrix reaches models_root (e.g. a directory junction)"
+  },
+  "vault": "D:/MERCS-vault",
   "blender": "5.2",
   "godot": "4.7.2-stable",
+  "unity_editors": ["6000.3.23f1"],
   "vram_tier": "12-16",
   "notes": "C: nearly full; models live on D:"
 }
