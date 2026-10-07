@@ -1,0 +1,4 @@
+# RULE path:line for each planted error (functions at 41 lines and complexity 13); 40 and 12 pass.
+FUNC-LINES sim/limits.gd:46
+FUNC-COMPLEXITY sim/limits.gd:118
+FUNC-COMPLEXITY sim/limits.gd:149

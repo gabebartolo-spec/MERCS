@@ -44,6 +44,7 @@ PYTHON_CASES = [
     ("content_counts/bad-json", "content_counts.py", "content_counts_badjson"),
     ("content_counts/bad-shape", "content_counts.py", "content_counts_badshape"),
     ("no_weights", "no_weights.py", "no_weights"),
+    ("function_limits", "function_limits.py", "function_limits"),
 ]
 
 

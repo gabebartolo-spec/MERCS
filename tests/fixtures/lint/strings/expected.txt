@@ -3,6 +3,9 @@
 # (retreat.gd:55 is the triple-quoted literal: it cannot carry a marker, so it is listed by hand.)
 TEXT-LITERAL presentation/battle/hit_text.gd:13
 TEXT-SCENE presentation/vfx/label_fx.tscn:6
+TEXT-LITERAL ui/screens/engine_names.gd:20
+TEXT-LITERAL ui/screens/engine_names.gd:21
+TEXT-LITERAL ui/screens/engine_names.gd:22
 TEXT-LITERAL ui/screens/retreat.gd:45
 TEXT-LITERAL ui/screens/retreat.gd:46
 TEXT-LITERAL ui/screens/retreat.gd:47

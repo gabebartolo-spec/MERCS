@@ -98,6 +98,12 @@ func _check_scene_loads() -> void:
 		"the MeshLibrary has five placeholder items"
 	)
 	check(houses == 6, "the data places six houses, not %d" % houses)
+	_check_camera_and_light(stage)
+	_check_merc_material(stage.merc())
+	await _despawn(stage)
+
+
+func _check_camera_and_light(stage: StreetStage) -> void:
 	var camera: Camera3D = stage.camera()
 	check(
 		(
@@ -114,7 +120,9 @@ func _check_scene_loads() -> void:
 		),
 		"the key light is pitched %s° with shadows on" % _knob("light", "elevation_degrees")
 	)
-	var merc: Sprite3D = stage.merc()
+
+
+func _check_merc_material(merc: Sprite3D) -> void:
 	check(merc.billboard == BaseMaterial3D.BILLBOARD_FIXED_Y, "the sprite billboards on Y only")
 	check(
 		merc.texture_filter == BaseMaterial3D.TEXTURE_FILTER_NEAREST, "the sprite filters nearest"
@@ -125,7 +133,6 @@ func _check_scene_loads() -> void:
 		merc.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF,
 		"the sprite casts no shadow"
 	)
-	await _despawn(stage)
 
 
 func _check_camera_pitch() -> void:
@@ -193,6 +200,11 @@ func _check_sprite_pixel_size() -> void:
 
 
 func _check_pixel_modes() -> void:
+	await _check_crisp_mode()
+	await _check_whole_screen_mode()
+
+
+func _check_crisp_mode() -> void:
 	var crisp: StreetStage = await _spawn(StreetStage.PixelMode.CRISP, 48, 35.0)
 	check(
 		crisp.find_child("LogicalViewport", true, false) == null, "CRISP mode adds no SubViewport"
@@ -200,6 +212,9 @@ func _check_pixel_modes() -> void:
 	check(crisp.world().get_parent() == crisp, "CRISP mode keeps the world under the stage root")
 	check(crisp.camera().current, "CRISP mode's camera is current")
 	await _despawn(crisp)
+
+
+func _check_whole_screen_mode() -> void:
 	var whole: StreetStage = await _spawn(StreetStage.PixelMode.WHOLE_SCREEN, 48, 35.0)
 	var viewport: SubViewport = whole.find_child("LogicalViewport", true, false) as SubViewport
 	check(viewport != null, "WHOLE_SCREEN mode adds a SubViewport")

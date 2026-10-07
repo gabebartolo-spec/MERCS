@@ -12,7 +12,7 @@ Findings come from code only, never from comments or string contents. Rules:
   SIM-EXTENDS     a sim script extends anything but RefCounted, a sim class_name, a class
                   declared in the same file or a res://sim/ path (no extends line is fine)
   SIM-ENGINE      sim code uses Node, Node2D, Node3D, Control, Input, Engine, SceneTree,
-                  OS (non-clock), get_node, get_tree, $Node or %Node access, or a .tscn/.scn path
+                  any node class in node_classes.txt (Timer.new(), Sprite2D...), OS (non-clock), get_node, get_tree, $Node or %Node access, or a .tscn/.scn path
   SIM-CLOCK       sim code uses Time.* or an OS clock read (OS.get_ticks_msec and friends)
   SIM-AWAIT       sim code uses await
   SIM-RANDOM      sim code outside the randomness owner calls randi, randf, randi_range,
@@ -44,6 +44,8 @@ ALLOWED_IMPORTS = {
 }
 RANDOMNESS_OWNER = "sim/core/rng.gd"  # compared with the lowercased relative path
 ENGINE_CLASSES = frozenset("Node Node2D Node3D Control Input Engine SceneTree OS".split())
+NODE_CLASSES = frozenset(line for line in read_text(Path(__file__).with_name("node_classes.txt")).splitlines()
+                         if re.fullmatch(r"[A-Z][A-Za-z0-9]*", line))
 ENGINE_CALLS = frozenset({"get_node", "get_tree"})
 RANDOM_FUNCS = frozenset("randi randf randi_range randf_range randfn randomize rand_from_seed seed".split())
 RANDOM_METHODS = frozenset({"shuffle", "pick_random"})
@@ -155,7 +157,7 @@ def check_engine(script: Script, skip: set[int], report: Report) -> None:
         name, start = match.group(), match.start()
         if start in skip:
             continue
-        is_class = name in ENGINE_CLASSES and not is_member(code, start)
+        is_class = (name in ENGINE_CLASSES or name in NODE_CLASSES) and not is_member(code, start)
         if name == "OS" and OS_CLOCK_RE.match(code, start):
             continue  # reported as SIM-CLOCK
         if is_class or name in ENGINE_CALLS:
