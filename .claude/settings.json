@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(gh pr merge:*)"
+      "Bash(gh pr *)",
+      "Bash(gh run *)",
+      "Bash(gh api *)",
+      "Bash(gh workflow *)",
+      "Bash(git rev-list *)",
+      "Bash(git merge-tree *)",
+      "Bash(git worktree list*)"
     ]
   }
 }
