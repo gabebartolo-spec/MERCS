@@ -10,10 +10,10 @@ Current phase: **1 — Visual and factory proof** (Phase 0 gate PASS WITH NOTES,
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | available | Phase 0 items 8, 10, 11, 12, then Phase 1 grey-box street | — | 2026-10-08 |
+| Dev Lead (Opus 5.5) | awaiting merge | Phase 1 item 6 lints: PR #21 green | claude/p1-lint-limits | 2026-10-08 |
 | Merge & CI (Sonnet 5.5) | available | standing merge pass (D-030); board PR after each merge | — | 2026-10-08 |
 | Art Factory (Opus 5.5) | awaiting director | Phase 1 item 1 rig freeze merged (#13); Mixamo clips need the director's sign-in (D-029); sample set 1 waits on the grey-box street (#19) | — | 2026-10-08 |
-| Concept Lead (Fable 5.1) | working | merge workflow audit (D-030); render pipeline skeleton via subagent; next: Phase 1 sample review | claude/merge-workflow-audit, claude/p1-render-pipeline | 2026-10-08 |
+| Concept Lead (Fable 5.1) | working | merge workflow audit (D-030); render pipeline skeleton via subagent (relaunched); next: Phase 1 sample review | claude/merge-workflow-audit, claude/p1-render-pipeline | 2026-10-08 |
 
 States: working · running a check · awaiting director · blocked · available.
 
@@ -39,18 +39,18 @@ States: working · running a check · awaiting director · blocked · available.
 
 ### Phase 1 (gate PASS WITH NOTES, D-027)
 1. Art Factory: rig freeze (`average_m`, Mixamo skeleton, sockets, contract hash). DONE (#13).
-2. Dev Lead: grey-box street capture stage, stage suite, capture tool. PR #19 (green, eligible).
+2. Dev Lead: grey-box street capture stage, stage suite, capture tool. DONE (#19).
 3. Concept Lead (subagent): render pipeline skeleton (camera/light rigs, render, pixelate, palette draft, pack, validators). In progress, branch claude/p1-render-pipeline.
 4. Art Factory: fourteen Mixamo clips to `D:\MERCS-vault\clips` (needs D-029 sign-in), then sample set 1 (pitch × height) and sample set 2 (pixel mode, palette, fonts) as labelled sheets per `docs/specs/phase1_visual_proof.md`.
 5. Art Factory: `assets.yml` (validators + Godot assets fixture + contact-sheet artefact).
-6. Dev Lead: Phase 1 LOW: lint precision gaps listed by PR #5; function-length and complexity project lint.
+6. Dev Lead: Phase 1 LOW: lint precision gaps listed by PR #5; function-length and complexity project lint. PR #21.
 
 ## Waiting on the director
 - Sign in to mixamo.com in a browser the Art chat can use, so the fourteen clips can be downloaded (D-029).
 - Restart the Merge & CI chat in the repo folder with the one-line kickoff in `agent-briefs/KICKOFF_PROMPTS.md` once this PR merges, so the new `.claude/settings.json` and brief load.
 
 ## Merge queue
-- #19 grey-box street: green for c3c182c, no gate, eligible. Merges on the next pass.
+- #21 Phase 1 item 6 lints: green for 4536b39, no gate, eligible.
 
 ## GPU jobs
 (none)

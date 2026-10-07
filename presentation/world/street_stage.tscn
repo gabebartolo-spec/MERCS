@@ -1,0 +1,37 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://presentation/world/street_stage.gd" id="1_stage"]
+
+[node name="StreetStage" type="Node"]
+script = ExtResource("1_stage")
+
+[node name="World" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="Street" type="GridMap" parent="World"]
+unique_name_in_owner = true
+
+[node name="KeyLight" type="DirectionalLight3D" parent="World"]
+unique_name_in_owner = true
+shadow_enabled = true
+
+[node name="Ambient" type="WorldEnvironment" parent="World"]
+unique_name_in_owner = true
+
+[node name="CameraRail" type="Node3D" parent="World"]
+unique_name_in_owner = true
+
+[node name="Camera" type="Camera3D" parent="World/CameraRail"]
+unique_name_in_owner = true
+fov = 35.0
+
+[node name="WalkPath" type="Path3D" parent="World"]
+unique_name_in_owner = true
+
+[node name="Walker" type="PathFollow3D" parent="World/WalkPath"]
+unique_name_in_owner = true
+rotation_mode = 0
+loop = true
+
+[node name="PlaceholderMerc" type="Sprite3D" parent="World"]
+unique_name_in_owner = true
