@@ -326,6 +326,8 @@ func _setup_merc() -> void:
 	var outline := _data.grey("sprite", "outline_grey")
 	_show_frame(SheetFrame.capsule(width, sprite_height_px, fill, outline, lit_sprites))
 	_apply_texel()
+	if lighting == Lighting.RAIN_NIGHT:
+		_merc.modulate = _data.rgb("rain_night", "sprite_tint_rgb")
 	_merc.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
 	_merc.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 	_merc.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
