@@ -2,7 +2,7 @@
 Start from this file, CLAUDE.md, your brief (`agent-briefs/ART_AGENT.md`), and the current phase section of `docs/08_ROADMAP.md` only (`docs/STATUS.md` names the phase).
 Instructions come from the lead session "Claude2: MERCS Lead" (director's standing order, 2026-10-08).
 
-## State: awaiting director
+## State: available
 ## Task
 P1-ART-PROPORTIONS: average_m rest pose in three proportions (A realistic, B heroic, C B/W-like, D 3.5 heads) at
 48/56/64 px and pitch 35/55, plus a lit-sprite normal pass (C, 56 px, both pitches) for the stage.
@@ -13,9 +13,8 @@ claude/art-proportions, worktree ../MERCS-wt/art-proportions, PR (see `gh pr lis
 and the sample options in render_character.py, pixelate.py (--normals), pack_sheets.py (--camera,
 --normal-dir, --stem), validate_sheet.py (--camera=), contact_sheet.py (single texel size, 1x strip separate). Defaults are unchanged (self-test rebuild is byte-identical).
 ## Unfinished changes
-None in the PR. Waiting on: the director's answers (proportion, size, pitch) and the lead's stage
-captures at both pitches. After the answers: fold the chosen bone scales into a body build (not a
-sample), redo the frame/pivot and validator feet tolerance for the chosen pitch, then average_f.
+None. PR #28 holds the samples, ready to merge. The lead confirmed the sheets and the normal map in the street stage.
+Next after assignment: freeze C/56/55 into the rig (see Open decisions), then average_f.
 ## Evidence so far
 - 18 colour sheets + 2 normal strips, mercs.sheet/1. 35 degrees: 9/9 validate. 55 degrees: only SHEET-PIVOT
   (toes 14 px below pivot; the 7 px tolerance is 35-degree only, retune after the pitch decision).
@@ -27,8 +26,9 @@ sample), redo the frame/pivot and validator feet tolerance for the chosen pitch,
 - Cell 96, then 112: hands, then toes clipped at 64 px / 55 degrees. Samples use 128x128, pivot 64,108.
 - Frozen rest pose (A-pose) reads as a hunch at 55 degrees; samples aim arms and forearms down (pose, not rig).
 ## Open decisions
-- Director answered 2026-10-08: figure 56 px, pitch 55 degrees, proportion 'C pushed further' -> D (3.5 heads)
-  rendered; asked C vs D. After the pick: rig camera to 55/56, body build with the bone scales, retune validator.
+- Director decided 2026-10-08: proportion C (head 1.8, hands 1.3, thighs 0.85), figure 56 px, pitch 55 degrees.
+  Next task (not yet assigned): camera_rig.json to 55/56 with a cell that fits, C's scales baked into the body
+  build or render step, validator feet tolerance for 55 degrees, then 06_STYLE_ART section 3 text.
 - Mixamo clips need the director's Adobe account (Art cannot sign in). Needed before sample set 1.
 - Pose-bone scale must survive clips: strip scale curves on clip import, or apply the scale after the action.
 ## Running jobs
