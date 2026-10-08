@@ -85,6 +85,7 @@ func _plant(name: String, change: Dictionary) -> String:
 	var image := Image.load_from_file(ProjectSettings.globalize_path(source))
 	image.save_png(dir.path_join("sheet.png"))
 	manifest["image"] = change.get("image", "sheet.png")
+	_copy_normal(manifest, dir)
 	if change.has("frame_w"):
 		manifest["frame_w"] = change["frame_w"]
 	if change.has("pivot_y"):
@@ -104,3 +105,15 @@ func _plant(name: String, change: Dictionary) -> String:
 	file.store_string(JSON.stringify(manifest))
 	file.close()
 	return path
+
+
+## Copies the good sheet's normal map, when it names one, so a planted copy only breaks
+## the rule it is meant to.
+func _copy_normal(manifest: Dictionary, dir: String) -> void:
+	var normal_name := str(manifest.get("normal_image", ""))
+	if normal_name.is_empty():
+		return
+	var source := GOOD_SHEET.get_base_dir().path_join(normal_name)
+	var normal := Image.load_from_file(ProjectSettings.globalize_path(source))
+	if normal != null:
+		normal.save_png(dir.path_join(normal_name))

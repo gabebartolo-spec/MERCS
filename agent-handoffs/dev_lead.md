@@ -3,81 +3,72 @@ Start from this file, CLAUDE.md, your brief (`agent-briefs/DEV_LEAD_OPUS.md`), `
 §Phase 1 only, `docs/specs/phase1_visual_proof.md`, and `docs/01_ENGINE_DECISION.md` "Rendering plan".
 Then `gh pr list` and `docs/STATUS.md`: PR states below are as of writing.
 
-## State: available (awaiting Art's sample sheets; my open PRs wait on Merge & CI)
+## State: available. All Dev Lead PRs merged (#24, #25, #26, #29, #31); this PR carries a test fix.
 ## Who did this
 The director ran this session from a second Claude account with no Concept Lead, so it acted as
 lead AND Dev Lead under the original account's rules. Peers in that account: "MERCS merge and CI
 agent" (merges, board PRs) and "MERCS art agent setup" (Art Factory). Cross-session messages are
 held and can expire when sessions run in different permission modes; the director approves them.
-## Director decisions this session (2026-10-08; for Merge & CI's board PRs)
-1. Pixel mode **A, whole screen** (640 × 360 SubViewport ×3; node setup in `01_ENGINE_DECISION.md`). Logged from #25.
-2. Sprite scale **constant**: one texel = one logical pixel anywhere; distance shows by position. Logged from #25.
-3. Look direction (NOT yet a ruling): mercs read like Pokémon Black/White trainer sprites, more
-   detailed and slightly bigger; references (fan art, mood only, never in repo) show a steep
-   top-down 3/4 camera (~50–60°), big-headed short figures, dense pixel scenery; grim Westeros
-   palette (mud, stone, timber, overcast). "A lot of weather and particle effects, beautiful
-   lighting." Spec §3's pitch range (30–40°) and `06_STYLE_ART.md` proportions need revisiting
-   from Art's samples.
-4. The Dev Lead works on development and coding; art goes to the Art agent.
-5. **Testing cadence:** "avoid major testing or audits until milestones are reached at regular
+## Director decisions this session (2026-10-08; Merge & CI logs them from PR bodies)
+1. Pixel mode **A, whole screen** (640 × 360 SubViewport ×3; node setup in `01_ENGINE_DECISION.md`).
+2. Sprite scale **constant**: one texel = one logical pixel anywhere; distance shows by position.
+3. Mercs read like Pokémon Black/White trainer sprites, more detailed, a bit bigger. Picked from
+   Art's samples (#28): **proportion C** (head 1.8×, hands 1.3×, thighs 0.85×, about 4½ heads),
+   **56 px** figure, **55° pitch**. Grim Westeros palette (mud, stone, timber, overcast). References
+   were fan art, mood only, never in the repo.
+4. "A lot of weather and particle effects, beautiful lighting."
+5. The Dev Lead works on development and coding; art goes to the Art agent.
+6. **Testing cadence:** "avoid major testing or audits until milestones are reached at regular
    intervals". Per PR: run the existing suites and lints, attach one capture. New exhaustive
    suites, planted-defect rounds and audits happen at milestones (phase gates or a director-named
-   checkpoint). Narrows CLAUDE.md rule 9's amount of proof, not the rule; needs a decision entry.
-## Shipped
-- #24 MERGED: stage scale contract. Rail distance derived (no fixed 12 m): texel = 1.78 × cos(pitch)
-  / height_px, sprite Y-stretch 1/cos(pitch), so 1 texel = 1 logical px at the look-at point,
-  matching `tools/pipeline/camera_rig.json`. `SheetFrame` shows `mercs.sheet/1` frames with pivot
-  on the ground. Suite `stage_scale`.
-- #25 MERGED (squash 447316c): sample set 2. Stage exports `lighting` (DAY / RAIN_NIGHT: moon, torch, fixed-seed
-  rain, tint), `depth_scale` (CONSTANT default; texel rescaled by depth, view-angle-corrected Y),
-  `stand_at`; `StageData`, `StageWeather`; `tools/capture/sample_set_2.sh` + `sample_sheet.py`
-  rebuild `docs/audits/sample_set_2/`. Stage defaults WHOLE_SCREEN and CONSTANT.
-- #26 MERGED (squash 2f74d8a): lit sprites. Frames with a normal map draw with a shaded,
-  normal-mapped `StandardMaterial3D` (nearest, alpha scissor, Y billboard keeping scale, matte).
-  Manifest key `"normal_image"`: same size as the sheet, camera-facing tangent space, OpenGL
-  convention (R right, G up, B toward camera), n × 0.5 + 0.5. Suite `stage_light` (8).
-- This PR (claude/p1-assets-suite): suite `assets` (8): every sheet under `assets/` plus the good
-  fixture passes engine-side rules in `tests/lib/sheet_check.gd` (ENGINE-LOAD, -FACINGS, -FRAME,
-  -PIVOT, -NORMAL); each rule rejects a planted-bad copy written to user:// at run time. Pixel
-  rules stay in `tools/pipeline/validate_sheet.py` (Art's). Engine half of spec §6 "Engine";
-  `assets.yml` (CI wiring) stays Art item 5. Built before decision 5; no more suites until a milestone.
-## Merging
-This PR is synced with main after #26 (both suites registered: stage_light 8, assets 8). No force
-push (denied by D-030 settings); sync by merging main, then run the suites before pushing. No
-stacking: branch from origin/main (rule in #27).
-## Delegated
-- Art Factory ("MERCS art agent setup"), item P1-ART-PROPORTIONS: DELIVERED as PR #28 (branch
-  claude/art-proportions): 18 sheets `docs/audits/proportion_samples/sheets/average_m_<realistic|
-  heroic|bw>_p<35|55>_h<48|56|64>.json`, all 8 facings, 128 × 128 cell, pivot (64,108); bw p35/p55
-  h56 carry `normal_image`. Art is putting proportion, size and pitch questions to the director.
-  Director rule (via Art): mixels are an automatic fail; never put a 2× crop beside a 1× view.
-- Dev Lead placed them in the stage (on the #26 branch): all load and stand correctly; the lit bw
-  p55 h56 sample is clearly better than unlit (torch warms one side). At 55° the derived camera
-  sees only a narrow strip around the well; the grey-box street was laid out for 35°.
-- Contract to settle after the director picks: `camera_rig.json` frame_px 64 / pivot (32,56) vs
-  Art's 128 / (64,108); the `assets` suite and Art's validator follow the rig. Art's validator's
-  SHEET-PIVOT tolerance needs retuning at 55° (toes 14 px below the pivot).
+   checkpoint). Narrows CLAUDE.md rule 9's amount of proof, not the rule.
+7. Mixels are an automatic fail, in assets and in captures: never put a 2× crop beside a 1× view.
+## Shipped (all merged)
+- #24 stage scale contract: rail distance derived (texel = 1.78 × cos(pitch) / height_px, sprite
+  Y-stretch 1/cos(pitch)), so 1 texel = 1 logical px at the look-at point, matching
+  `tools/pipeline/camera_rig.json`. `SheetFrame` shows `mercs.sheet/1` frames, pivot on the ground.
+- #25 sample set 2: stage exports `lighting` (DAY / RAIN_NIGHT: moon, torch, fixed-seed rain),
+  `depth_scale` (CONSTANT default; texel rescaled by depth, view-angle-corrected Y), `stand_at`;
+  `StageData`, `StageWeather`; `tools/capture/sample_set_2.sh` + `sample_sheet.py`.
+- #26 lit sprites: a frame with a normal map draws with a shaded, normal-mapped
+  `StandardMaterial3D` (nearest, alpha scissor, Y billboard keeping scale, matte). Manifest key
+  `"normal_image"`: same size as the sheet, camera-facing tangent space, OpenGL convention
+  (R right, G up, B toward camera), n × 0.5 + 0.5. Unlit frames keep the night tint.
+- #29 suite `assets`: every sheet under `assets/` plus the good fixture passes engine-side rules in
+  `tests/lib/sheet_check.gd` (ENGINE-LOAD, -FACINGS, -FRAME, -PIVOT, -NORMAL), read against
+  `camera_rig.json`. Pixel rules stay in `tools/pipeline/validate_sheet.py` (Art's).
+- #31 stage defaults to 55° / 56 px; walk loop re-laid inside the 55° view (behind the well and back).
+- This PR: the assets suite's planted copies also copy the good fixture's normal map, so the suite
+  stays green when Art's rig freeze adds `normal_image` to the good fixture.
+## Suites (floors)
+data 88, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 8.
+## In flight elsewhere
+- Art: rig freeze for C / 56 / 55 on `claude/art-freeze-c55` (draft): `camera_rig.json` at 55° /
+  56 px, cell 96, pivot (48,80); C's bone scales and the arms-down stance in the render step; the
+  validator's feet tolerance; `06_STYLE_ART.md` §3; good fixture re-rendered with a normal pass.
+  It edits `tests/run_stage_light_tests.gd` so the "no normal_image falls back" check uses a copy
+  with the key removed (the director-approved plan; floor unchanged). Then `average_f`.
 ## Next for the Dev Lead, in order
-1. After the director's proportion/size/pitch answer: set the stage's default pitch and height to
-   it, re-lay the grey-box street for that pitch (at 55° widen what the camera sees or move props
-   in), and make the chosen sheet the stage's default merc.
+1. When Art's freeze lands: make the re-rendered good fixture (C, 56 px, 55°, lit) the stage's
+   default merc instead of the capsule, so every capture shows the chosen look.
 2. Street spec §6 "Street": a merc walking behind the well is occluded; two mercs crossing sort
-   correctly (needs a second merc in the stage; alpha-scissor sprites depth-test, so verify).
-3. Weather: the director wants much more. Phase 1 caps are rain + night + torch; the full
+   correctly (needs a second merc; alpha-scissor sprites depth-test, so verify). Light proof only.
+3. The grey-box props are sparse at 55°; the real modular street kit (spec step 8) is Art + Dev.
+4. Weather: the director wants much more. Phase 1 caps are rain + night + torch; the full
    catalogue (fog, snow, wind, storm, embers, light shafts) is a world-phase item. Ask before
    pulling it forward.
-4. Sample set 1 (pitch × height) still waits on the Mixamo walk clip (D-029 sign-in).
+5. Sample set 1 is superseded by the director's 55° / 56 px pick; the Mixamo walk clip (D-029
+   sign-in) is still needed for walking sprites.
 ## Worktrees
-`../MERCS-wt/p1-stage-scale` is my one worktree (branch changes per PR). Remove it when #26 and
-this PR merge. Others live: `.claude/worktrees/dual-desktop-instances-a78d20` (not mine) and Art's
-`../MERCS-wt/art-proportions`.
+`../MERCS-wt/p1-stage-scale` is the Dev Lead's one worktree (branch changes per PR); remove it when
+idle. Others: `.claude/worktrees/dual-desktop-instances-a78d20` (not mine), Art's under `../MERCS-wt/`.
 ## Rules learnt the hard way (keep under 10 lines)
 - Sprite3D rebuilds its mesh and AABB on the next frame: `await process_frame` before measuring.
 - gdformat writes CRLF here: normalise to LF after it. gdtoolkit is in ~/AppData/Roaming/Python/*/Scripts.
 - A suite that extends a script failing to parse HANGS: run with `SUITE_TIMEOUT=120`; kill by PID.
-- Constant depth scale needs the view-angle Y correction, not just the depth ratio.
-- `docs/**/*.png` are plain git, not LFS. Commit the `.gd.uid` of each new script.
 - Typed GDScript: assign a Variant to a typed local before `int()`/`float()` or a Dictionary cast.
+- `docs/**/*.png` are plain git, not LFS. Commit the `.gd.uid` of each new script.
 - Python on this PC cannot see Git Bash's /tmp: pass `$(cygpath -m path)`.
-- Syncing with `git merge -X ours` still lets non-conflicting hunks from main back in: run the suites
-  before pushing (a resurrected night-tint line broke stage_light once).
+- A merge from main can silently restore lines without a conflict: run the suites before pushing.
+- Check `gh pr view <n> --json state` before pushing to a PR branch: pushing to a merged, deleted
+  branch recreates it on the remote.
