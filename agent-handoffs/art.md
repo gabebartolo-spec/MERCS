@@ -3,33 +3,42 @@ Start from this file, CLAUDE.md, your brief (`agent-briefs/ART_AGENT.md`), and t
 Instructions come from the lead session ("Claude2: MERCS Lead" / "MERCS BOSS"). Director rule 2026-10-08:
 every sheet goes to the Lead for QC first; only passing sheets reach the director (Lead presents).
 
-## State: awaiting Lead QC
+## State: paused (director, 2026-10-09): realistic QC round 2 fixes + 84 px @45 deg sample pending
+Start nothing new until the Lead or director resumes Art. Work is local on claude/art-qc-c55; do not push or open a PR.
 ## Task
-Director 2026-10-09: proportion C (big head) DROPPED; realistic proportions, "4k" = more pixels per merc.
-P1-ART-REALISTIC-DENSITY: realistic average_m rest at pitch 55 in three densities (56 / 84 / 112 px), with the
-round-2 general fixes, as samples for the Lead's 4K street QC, then the director.
+Director 2026-10-09: proportion C DROPPED; realistic proportions, more pixels per merc. Samples for the Lead's QC
+(then the director): realistic average_m rest, pitch 55, at 56 / 84 / 112 px, plus 84 px rendered at sprite pitch 45.
 ## Branch and commit
-claude/art-qc-c55, worktree ../MERCS-wt/art-qc, local commits only, not pushed, no PR. Samples are local files.
+claude/art-qc-c55, worktree ../MERCS-wt/art-qc, local commits only (last: this handoff). Not pushed, no PR.
 ## Files I own right now
-tools/pipeline/ (build_body.py contour after rig hash; bodies.json contour_targets; average_m.blend rebuilt, rig hash
-unchanged 17b2aa42; render_character.py parts pass + recentre; pixelate.py despeckle clusters, outline, inner lines,
-skin-only body quantise; contact_sheet.py --camera + label); docs/audits/realistic_density/ (config, sheets, review).
-tools/pipeline/proportions.json still holds C (the shared default); replace with realistic only on a director pick.
-## Unfinished changes
-After the Lead/director pick a density (and maybe sprite pitch): camera_rig.json + proportions.json to the pick,
-regenerate tests/fixtures/pipeline (render_4x, _normal, NEW render_4x_parts for the rebuild test, sheets/good,
-make_bad_sheets.py), suites, capture, then #39: publish under assets/ with a register row. PR with Board and log.
-docs/audits/qc_c55/ is obsolete C evidence: delete before the PR.
+tools/pipeline/ (build_body.py, bodies/bodies.json + average_m.blend, rig_contract.json, render_character.py,
+pixelate.py/.json, contact_sheet.py); docs/audits/realistic_density/ (config/, sheets/, review PNGs = round-1 samples).
+tools/pipeline/proportions.json still holds C (shared default); replace only on a director pick.
+## Unfinished changes (Lead QC round 3 on the realistic samples, 2026-10-09)
+DONE, not yet rendered or checked:
+- (1) shoulders: clavicles ~6 deg lower (sample config); bodies.json contour adds shoulder-muscle-decr 0.4 L/R,
+  torso-muscle-dorsi-decr 0.4, neck-scale-vert-incr 0.3; body rebuilt: rig hash 17b2aa42 unchanged,
+  height_after_contour 1.7959 (render refits to 1.78).
+- (2) arms close, elbows slightly back, hands + every finger aimed down (fingers together), thumbs along index
+  (docs/audits/realistic_density/config/proportions_realistic.json). New bone_twist_deg (render_character.py
+  twist_bones): hand roll is 0 for now; measure palm direction in a 0 deg side render, then set it so palms face thighs.
+- (3) parts pass: arm vertices within 0.10 m of the shoulder joint count as body (no seam at the arm root).
+- (4) legs straight, ankles ~0.12 m apart, toes out 13 deg.  (5) buttocks 0.3.
+TO DO on resume:
+1. Render realistic at 0 deg side-on (camera from scratch cam_side: pitch 0, 96 cell, pivot 48,88, height 72);
+   check hands/palms (set bone_twist_deg), feet (E/W far toes not a stub), shoulders, neck sliver in S.
+2. Re-render h56/h84/h112 (color, normal, parts), pixelate with --parts, pack with --stem, validate --camera=,
+   contact sheets with --camera (1x and x4 as separate files).
+3. Item 6: 84 px at sprite pitch 45 with the SAME px_per_m as 55/84: char_height_px = 84*cos45/cos55 = 103.55,
+   cell ~176, pivot ~(88,152); Lead captures it with --pitch=55 --height=84. Label it.
+4. Send the Lead the paths (1x and x4 per density + the 45 deg sample), self-review first (art-qa-critic).
 ## Evidence so far
-- build_body --check with contour targets: RIG_CONTRACT_OK, height 1.7798 unchanged.
-- Stance measured: ankles 0.208 m, knees 4.1 deg, toes out 8 deg. Mud source: body quantised to soot (grey); now skin only.
-- Realistic side-on 0 deg: upright natural posture; the 55 deg "hunch" is camera foreshortening, raised to the Lead.
-- test_pipeline rebuild fails until fixtures are regenerated (expected; outline/despeckle change output).
-## Attempts (for the fix-loop rule)
-- C head: recentre full = over-correct; neck aim = no change; keep_offset 1/1.8 = correct (C now dropped).
+- Round 1 realistic samples validate; Lead confirmed engine path (#44 --logical capture), no mixels, mud gone.
+- Lead round 3 defects: gorilla shoulders/head sunk; claw hands, flared elbows; deltoid seam lines; far foot reads
+  kicked back (NE/NW) and toe stub (E/W).
+- test_pipeline rebuild fails until fixtures are regenerated after a pick (expected).
 ## Open decisions
-- Lead/director: density 56 / 84 / 112; accept 55 deg head foreshortening or shallower sprite pitch; buttocks 0.5 vs 0.3.
-- Placeholder head/hair layer (Lead asks the director).
+- Director (via Lead): density 56 / 84 / 112; sprite pitch 55 vs 45 in a 55 deg world; placeholder head/hair layer.
 ## Running jobs
 None. Mixamo: 10 clips in D:\MERCS-vault\clips\mixamo\ with SOURCES.md; not yet retargeted.
 ## Rules learnt the hard way (keep under 10 lines)

@@ -205,12 +205,15 @@ PART_GROUPS = {  # flat emission colour -> bones whose summed vertex weight mark
 }
 PART_BODY = (0.0, 0.0, 1.0)
 PART_WEIGHT = 0.5
+PART_ROOT_CLEAR_M = 0.10  # arm vertices this close to the shoulder joint count as body: no seam at the root
 
 
 def apply_parts_pass() -> None:
     """Flat colour per body part (left arm red, right arm green, the rest blue) for the pixel post's
     inner lines (06 section 3: a line only where the silhouette would merge). Finger and hand
-    groups count towards their arm by name prefix. Raw view, no dither: labels, not colour."""
+    groups count towards their arm by name prefix; the shoulder cap (within PART_ROOT_CLEAR_M of
+    the arm's root joint, at rest) counts as body, so no line is drawn where the arm joins the torso
+    (Lead QC round 3). Raw view, no dither: labels, not colour."""
     mat = bpy.data.materials.new("mercs_parts_pass")
     if mat.node_tree is None:
         mat.use_nodes = True
@@ -227,11 +230,14 @@ def apply_parts_pass() -> None:
             continue
         layer = obj.data.color_attributes.new("mercs_parts", "FLOAT_COLOR", "POINT")
         index_of = {g.index: g.name for g in obj.vertex_groups}
+        rig = obj.parent
+        roots = {rgb: rig.matrix_world @ rig.data.bones[bones[0]].head_local for rgb, bones in PART_GROUPS.items()}
         for v in obj.data.vertices:
             colour = PART_BODY
+            where = obj.matrix_world @ v.co
             for rgb, bones in PART_GROUPS.items():
                 w = sum(g.weight for g in v.groups if index_of[g.group].startswith(bones))
-                if w >= PART_WEIGHT:
+                if w >= PART_WEIGHT and (where - roots[rgb]).length >= PART_ROOT_CLEAR_M:
                     colour = rgb
             layer.data[v.index].color = (*colour, 1.0)
         obj.data.materials.clear()
@@ -299,6 +305,20 @@ def group_centroid(rig: bpy.types.Object, group: str, min_weight: float) -> Vect
     return total / n
 
 
+def twist_bones(rig: bpy.types.Object, twists: dict) -> None:
+    """Roll each named bone about its own length by degrees (pose only), e.g. palms toward the thighs."""
+    world_inv = rig.matrix_world.inverted()
+    for bone, degrees in twists.items():
+        bpy.context.view_layer.update()
+        pb = rig.pose.bones[bone]
+        m = rig.matrix_world @ pb.matrix
+        axis = (m.to_3x3() @ Vector((0.0, 1.0, 0.0))).normalized()
+        turn = Matrix.Rotation(math.radians(degrees), 4, axis)
+        head = Matrix.Translation(m.translation)
+        pb.matrix = world_inv @ (head @ turn @ head.inverted() @ m)
+    bpy.context.view_layer.update()
+
+
 def recentre_bones(rig: bpy.types.Object, specs: dict) -> None:
     """Shift a bone (pose only) so its mesh centroid's horizontal offset from another bone's head
     shrinks to keep_offset of what it was, then lift it.
@@ -325,10 +345,11 @@ def apply_proportions(rig: bpy.types.Object, path: str, name: str, height_m: flo
     spec = cfg["variants"][name]
     scales = spec["bone_scale"]
     aim = {**cfg.get("pose", {}).get("bone_direction", {}), **spec.get("bone_direction", {})}
-    if not scales and not aim:
+    if not scales and not aim and not cfg.get("pose", {}).get("bone_twist_deg"):
         return {"variant": name, "rig_scale": 1.0, "height_m": None}
     rig.data.pose_position = "POSE"
     aim_bones(rig, aim)
+    twist_bones(rig, {**cfg.get("pose", {}).get("bone_twist_deg", {}), **spec.get("bone_twist_deg", {})})
     for bone, factor in scales.items():
         pb = rig.pose.bones.get(bone)
         if pb is None:
