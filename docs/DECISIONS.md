@@ -4,6 +4,25 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
+## 2026-10-08 · D-039 · Director · Testing cadence: major testing and audits only at milestones
+Why: avoid heavy testing and audits between milestones. Per PR: run the existing suites and lints with one capture; new exhaustive suites, planted-defect rounds and audits wait for milestones. Narrows the amount of proof under `CLAUDE.md` rule 9, not the rule (#29; its suite was built before this).
+
+## 2026-10-08 · D-038 · Director · Proportion is C pushed further, chosen as C: head 1.8x, hands 1.3x, thighs 0.85x, refit to 1.78 m (about 4.5 heads)
+Why: chosen from `crop_p55_h56.png`; variant D (head 2.3x, about 3.5 heads) stays in the samples as the rejected option. Follow-up (needs assigning): freeze the look into the rig.
+Changes: nothing yet (#28).
+
+## 2026-10-08 · D-037 · Director · Game camera pitch is 55 degrees
+Why: steep, as in the reference. `06_STYLE_ART.md` §3 and `camera_rig.json` (35 degrees, 48 px, 64 cell) change in a follow-up PR; spec §3's 30-40 degree range is superseded.
+Changes: nothing yet (#28).
+
+## 2026-10-08 · D-036 · Director · Standing figure height is 56 px at 1x
+Why: chosen from review_p35/review_p55 and the 2x crops (#28).
+Changes: nothing yet; rig follow-up.
+
+## 2026-10-08 · D-035 · Director · Any art containing mixels is an automatic failure and must be fixed: one texel size per image or view
+Why: director rule (#28). `contact_sheet.py` and the review sheets now draw text at the art's zoom; the 1x strip is a separate image.
+Changes: `tools/pipeline/` (#28).
+
 ## 2026-10-08 · D-034 · Lead (pending) · Sprite normal maps: `normal_image`, camera-facing tangent space, OpenGL convention
 Why: the factory and the engine must agree on one normal format (#26).
 Changes: lit sprites, `stage_light` suite.
