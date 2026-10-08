@@ -71,7 +71,7 @@
     "fill_grey": 0.86,
     "outline_grey": 0.12,
     "walk_speed_m_s": 1.4,
-    "path_xz": [-16, 2, -1, 2, 2, 4, 16, 2, 16, 6, -16, 6]
+    "path_xz": [-7, -0.5, 3.5, -0.5, 6.5, 0.5, 6.5, 2.5, -7, 2.5]
   },
   "pixel": {
     "logical_width_px": 640,

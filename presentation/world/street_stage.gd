@@ -30,13 +30,13 @@ const ITEM_DOOR := 4
 const HALF := 2.0
 
 ## Camera pitch below the horizon, in degrees. Applies at once when changed.
-@export var pitch_degrees: float = 35.0:
+@export var pitch_degrees: float = 55.0:
 	set = set_pitch_degrees
 ## How the 3D world reaches the window; see the class comment.
 @export var pixel_mode: PixelMode = PixelMode.WHOLE_SCREEN
 ## On-screen figure height in logical pixels (the factory's char_height_px); the
 ## texel size and the rail distance follow from it.
-@export var sprite_height_px: int = 48
+@export var sprite_height_px: int = 56
 ## DAY: warm key and flat grey sky. RAIN_NIGHT: dim cool key, a torch by the well, rain,
 ## and the unshaded sprite tinted to match (data "rain_night").
 @export var lighting: Lighting = Lighting.DAY

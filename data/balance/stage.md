@@ -42,7 +42,7 @@ Used when the stage's `lighting` export is RAIN_NIGHT (sample set 2, spec §4); 
 - `texture_width_px`: width of the generated capsule texture; its height is the exported sprite height.
 - `fill_grey`, `outline_grey`: the capsule's fill and 1-px outline grey levels.
 - `walk_speed_m_s`: how fast the placeholder walks its loop.
-- `path_xz`: the walk loop as x, z pairs in metres; the loop closes back to the first point.
+- `path_xz`: the walk loop as x, z pairs in metres; the loop closes back to the first point. Laid out for the director's 55° / 56 px camera (2026-10-08), which sees about x −7…7 and z −6…3 of the street: the merc passes behind the well (z −0.5), round its right side and back in front of it (z 2.5).
 
 ## pixel
 - `logical_width_px`, `logical_height_px`: the whole-screen mode SubViewport size (640 × 360).
