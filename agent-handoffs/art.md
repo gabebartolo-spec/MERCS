@@ -4,7 +4,7 @@ Instructions come from the lead session "Claude2: MERCS Lead" (director's standi
 
 ## State: awaiting director
 ## Task
-P1-ART-PROPORTIONS: average_m rest pose in three proportions (A realistic, B heroic, C B/W-like) at
+P1-ART-PROPORTIONS: average_m rest pose in three proportions (A realistic, B heroic, C B/W-like, D 3.5 heads) at
 48/56/64 px and pitch 35/55, plus a lit-sprite normal pass (C, 56 px, both pitches) for the stage.
 ## Branch and commit
 claude/art-proportions, worktree ../MERCS-wt/art-proportions, PR (see `gh pr list`).
@@ -27,7 +27,8 @@ sample), redo the frame/pivot and validator feet tolerance for the chosen pitch,
 - Cell 96, then 112: hands, then toes clipped at 64 px / 55 degrees. Samples use 128x128, pivot 64,108.
 - Frozen rest pose (A-pose) reads as a hunch at 55 degrees; samples aim arms and forearms down (pose, not rig).
 ## Open decisions
-- Director: proportion A/B/C, figure size, camera pitch (questions asked with the review sheets).
+- Director answered 2026-10-08: figure 56 px, pitch 55 degrees, proportion 'C pushed further' -> D (3.5 heads)
+  rendered; asked C vs D. After the pick: rig camera to 55/56, body build with the bone scales, retune validator.
 - Mixamo clips need the director's Adobe account (Art cannot sign in). Needed before sample set 1.
 - Pose-bone scale must survive clips: strip scale curves on clip import, or apply the scale after the action.
 ## Running jobs

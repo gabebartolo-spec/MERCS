@@ -238,7 +238,7 @@ def apply_proportions(rig: bpy.types.Object, path: str, name: str, height_m: flo
     cfg = json.loads(Path(path).read_text(encoding="utf-8"))
     spec = cfg["variants"][name]
     scales = spec["bone_scale"]
-    aim = cfg.get("pose", {}).get("bone_direction", {})
+    aim = {**cfg.get("pose", {}).get("bone_direction", {}), **spec.get("bone_direction", {})}
     if not scales and not aim:
         return {"variant": name, "rig_scale": 1.0, "height_m": None}
     rig.data.pose_position = "POSE"

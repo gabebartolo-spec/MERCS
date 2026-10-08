@@ -68,9 +68,12 @@ def blender(exe: str, camera: Path, variant: str, out: Path, render_pass: str, a
 
 
 def jobs(cfg: dict):
+    only = cfg.get("_only_variants")
     for pitch in cfg["pitches_deg"]:
         for size in cfg["sizes_px"]:
             for variant in cfg["variants"]:
+                if only and variant not in only:
+                    continue
                 normal = variant == cfg["normal_pass"]["variant"] and size == cfg["normal_pass"]["size_px"]
                 yield pitch, size, variant, normal
 
@@ -188,8 +191,11 @@ def main(argv: list[str]) -> int:
     p.add_argument("--renders", required=True, type=Path, help="4x render folder (the vault, not the repo)")
     p.add_argument("--out", required=True, type=Path)
     p.add_argument("--only", choices=("render", "pack", "review"), default=None)
+    p.add_argument("--variants", default="", help="comma-separated variants to render and pack (default all)")
     a = p.parse_args(argv)
     cfg = json.loads(CONFIG.read_text(encoding="utf-8"))
+    if a.variants:
+        cfg["_only_variants"] = a.variants.split(",")
     out = a.out.resolve()
     if a.only in (None, "render"):
         render_all(cfg, a.blender, a.renders.resolve(), out)

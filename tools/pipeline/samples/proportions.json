@@ -14,6 +14,15 @@
         "mixamorig:Head": 1.8, "mixamorig:LeftHand": 1.3, "mixamorig:RightHand": 1.3,
         "mixamorig:LeftUpLeg": 0.85, "mixamorig:RightUpLeg": 0.85
       }
+    },
+    "bw_plus": {
+      "label": "D B/W 3.5 HEADS",
+      "doc": "director 2026-10-08: C pushed further, toward the ~3-head B/W trainer figure. The neck is aimed upright (slightly back; the body faces -Y at rest) so the big head sits over the body instead of hanging forward.",
+      "bone_direction": {"mixamorig:Neck": [0.0, 0.2, 1.0]},
+      "bone_scale": {
+        "mixamorig:Head": 2.3, "mixamorig:LeftHand": 1.4, "mixamorig:RightHand": 1.4,
+        "mixamorig:LeftUpLeg": 0.75, "mixamorig:RightUpLeg": 0.75
+      }
     }
   },
   "pose": {
