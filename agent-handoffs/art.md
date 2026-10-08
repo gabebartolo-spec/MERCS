@@ -1,25 +1,35 @@
-# Art Factory handoff, 2026-10-08 05:10 AEDT
+# Art Factory handoff, 2026-10-08 20:30 AEDT
 Start from this file, CLAUDE.md, your brief (`agent-briefs/ART_AGENT.md`), and the current phase section of `docs/08_ROADMAP.md` only (`docs/STATUS.md` names the phase).
+Instructions come from the lead session "Claude2: MERCS Lead" (director's standing order, 2026-10-08).
 
 ## State: awaiting director
 ## Task
-Phase 1 item 1 — rig freeze: MPFB `average_m` (male) at 1.78 m, Mixamo-named skeleton, six sockets, rest-pose hash in `tools/pipeline/rig_contract.json`.
+P1-ART-PROPORTIONS: average_m rest pose in three proportions (A realistic, B heroic, C B/W-like) at
+48/56/64 px and pitch 35/55, plus a lit-sprite normal pass (C, 56 px, both pitches) for the stage.
 ## Branch and commit
-claude/art-p1-rig-freeze, worktree ../MERCS-wt/art-p1, PR (see PR list).
+claude/art-proportions, worktree ../MERCS-wt/art-proportions, PR (see `gh pr list`).
 ## Files I own right now
-`tools/pipeline/build_body.py`, `tools/pipeline/rig_sockets.json`, `tools/pipeline/rig_contract.json`,
-`tools/pipeline/bodies/bodies.json`, `tools/pipeline/bodies/average_m.blend` (LFS), `docs/audits/rig_freeze_average_m.png`.
+`tools/pipeline/samples/` (proportions.json, proportion_samples.py), `docs/audits/proportion_samples/`,
+and the sample options in render_character.py, pixelate.py (--normals), pack_sheets.py (--camera,
+--normal-dir, --stem), validate_sheet.py (--camera=), contact_sheet.py (single texel size, 1x strip separate). Defaults are unchanged (self-test rebuild is byte-identical).
 ## Unfinished changes
-None in this PR. Next for Art after merge: the female `average_f` body on the same skeleton (director: men and women,
-two bodies); sample set 1 needs the Dev Lead's grey-box street and a Mixamo walk clip in the vault.
+None in the PR. Waiting on: the director's answers (proportion, size, pitch) and the lead's stage
+captures at both pitches. After the answers: fold the chosen bone scales into a body build (not a
+sample), redo the frame/pivot and validator feet tolerance for the chosen pitch, then average_f.
 ## Evidence so far
-- Three independent builds give rest_pose_sha256 `17b2aa42…1f43cc5`; `--check` prints RIG_CONTRACT_OK.
-- Height 1.7798 m (target 1.78 ± 0.002), 52 bones (cap 65), left = +X asserted by the script.
-- Review sheet: rest and bent poses deform cleanly (`docs/audits/rig_freeze_average_m.png`).
+- 18 colour sheets + 2 normal strips, mercs.sheet/1. 35 degrees: 9/9 validate. 55 degrees: only SHEET-PIVOT
+  (toes 14 px below pivot; the 7 px tolerance is 35-degree only, retune after the pitch decision).
+- Director rule 2026-10-08: mixels = automatic fail. Review sheets and contact_sheet.py now draw text at the art's zoom.
+- Normal axes measured on the 4x render: screen-right side R > 128, head top G > 128, B > 128 overall.
+- 4x renders and the batch log are in the vault: D:\MERCS-vault\renders\proportions_2026-10-08\, logs\.
 ## Attempts (for the fix-loop rule)
-- Height fit 1: measured base vertex coords, so shape-key targets were invisible. Fixed by measuring the evaluated mesh.
+- Normal pass 1: Blender's shader camera space has Z away from the viewer (B averaged 48). Fixed by negating Z.
+- Cell 96, then 112: hands, then toes clipped at 64 px / 55 degrees. Samples use 128x128, pivot 64,108.
+- Frozen rest pose (A-pose) reads as a hunch at 55 degrees; samples aim arms and forearms down (pose, not rig).
 ## Open decisions
+- Director: proportion A/B/C, figure size, camera pitch (questions asked with the review sheets).
 - Mixamo clips need the director's Adobe account (Art cannot sign in). Needed before sample set 1.
+- Pose-bone scale must survive clips: strip scale curves on clip import, or apply the scale after the action.
 ## Running jobs
 None.
 ## Rules learnt the hard way (keep under 10 lines)
@@ -28,3 +38,5 @@ None.
 - Set `filepaths.save_version = 0` or Blender leaves `.blend1` backups beside assets.
 - Only Merge & CI edits STATUS.md and DECISIONS.md (D-026): put state and decisions in the PR body.
 - Civitai is region-blocked from this machine; do not route around it.
+- The body rig's origin is at hip height (z 0.82): refit height by measuring, then shift by the feet's z.
+- Normal passes need view transform Raw and dither 0, or the data is tone-mapped and noisy.

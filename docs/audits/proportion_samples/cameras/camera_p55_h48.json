@@ -1,0 +1,37 @@
+{
+  "_doc": "SAMPLE camera derived from camera_rig.json by proportion_samples.py; not the game rig. Fixed sprite camera (06_STYLE_ART.md section 3, 07 section 2.4). Orthographic, one pitch for every facing. The camera never moves between facings; the character turns on the spot. Scale rule: px_per_m_1x = char_height_px / (reference_height_m * cos(pitch_deg)), so a standing reference body seen at this pitch projects to char_height_px at 1x; the render is render_scale times larger, and pixelate.py reduces it by exactly render_scale. pitch_deg and char_height_px are open director decisions ([D] in 06; spec section 3 samples 30/35/40 and 40/48/56).",
+  "schema": "mercs.camera_rig/1",
+  "projection": "orthographic",
+  "pitch_deg": 55.0,
+  "pitch_doc": "degrees below horizontal; the same pitch as the game camera",
+  "char_height_px": 48,
+  "reference_height_m": 1.78,
+  "reference_doc": "average_m standing height (bodies/bodies.json); giant and slight bodies use the same px_per_m so a giant is taller on screen",
+  "render_scale": 4,
+  "frame_px": 128,
+  "frame_doc": "square cell at 1x (64 for average; giant will need 72, a later decision)",
+  "pivot_px": [
+    64,
+    108
+  ],
+  "pivot_doc": "feet centre (world origin) in 1x cell pixels, x from the left, y from the top; the camera is aimed so the origin lands on this pixel. 8 px of headroom is left below the pivot because a foot nearer the camera projects up to 6 px below it at 35 degrees (measured on average_m, facings S, E, W)",
+  "camera_distance_m": 20.0,
+  "distance_doc": "orthographic, so distance only has to clear the body; it does not change scale",
+  "clip_start_m": 0.1,
+  "clip_end_m": 100.0,
+  "facings": {
+    "count": 8,
+    "step_deg": 45.0,
+    "order": [
+      "S",
+      "SE",
+      "E",
+      "NE",
+      "N",
+      "NW",
+      "W",
+      "SW"
+    ],
+    "order_doc": "facing k turns the character k * step_deg counter-clockwise seen from above. S (k=0) faces the camera; SE (k=1) faces the camera turned towards screen right; N (k=4) shows the back. Names are screen directions with S = towards the viewer."
+  }
+}

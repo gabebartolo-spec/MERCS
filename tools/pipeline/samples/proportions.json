@@ -1,0 +1,32 @@
+{
+  "_doc": "Proportion samples for the director's look gate (P1-ART-PROPORTIONS, 2026-10-08). Samples only: nothing here changes the frozen rig (rig_contract.json) or the committed camera rig. Each variant scales existing pose bones (uniform scale, no bone added or renamed, so Mixamo clips still drive the skeleton); render_character.py then refits the deformed figure to the reference height (1.78 m) with its feet on the ground. Sizes are the on-screen standing height in 1x pixels under camera_rig.json's scale rule (px_per_m = height_px / (1.78 * cos(pitch))). Frame and pivot are larger than the committed 64x64 cell so a 64 px figure at 55 degrees fits: toes nearer the camera project up to 13 px below the pivot at that pitch.",
+  "schema": "mercs.proportion_samples/1",
+  "body": "average_m",
+  "variants": {
+    "realistic": {"label": "A REALISTIC", "bone_scale": {}},
+    "heroic": {
+      "label": "B HEROIC",
+      "bone_scale": {"mixamorig:Head": 1.3, "mixamorig:LeftHand": 1.2, "mixamorig:RightHand": 1.2}
+    },
+    "bw": {
+      "label": "C B/W-LIKE",
+      "bone_scale": {
+        "mixamorig:Head": 1.8, "mixamorig:LeftHand": 1.3, "mixamorig:RightHand": 1.3,
+        "mixamorig:LeftUpLeg": 0.85, "mixamorig:RightUpLeg": 0.85
+      }
+    }
+  },
+  "pose": {
+    "doc": "Sample stance, not the rig: the frozen rest pose holds the arms out and down, which reads as a hunch from a steep camera and hides the proportions. Upper arms hang 12 degrees off vertical and forearms 6 degrees (world directions; left = +X). A rotation like any clip's; no bone changes.",
+    "bone_direction": {
+      "mixamorig:LeftArm": [0.21, 0.0, -0.98], "mixamorig:RightArm": [-0.21, 0.0, -0.98],
+      "mixamorig:LeftForeArm": [0.1, 0.0, -1.0], "mixamorig:RightForeArm": [-0.1, 0.0, -1.0]
+    }
+  },
+  "sizes_px": [48, 56, 64],
+  "pitches_deg": [35.0, 55.0],
+  "frame_px": 128,
+  "pivot_px": [64, 108],
+  "normal_pass": {"variant": "bw", "size_px": 56, "doc": "one proportion and size, at both pitches, for the stage's lit-sprite test"},
+  "review": {"facings": ["S", "SE"], "zoom": 3, "zoom_doc": "640x360 whole-screen pixel mode shown x3 on a 1080p monitor"}
+}
