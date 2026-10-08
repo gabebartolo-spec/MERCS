@@ -3,10 +3,12 @@
 Run headless (Blender 5.2; no add-ons needed, the body .blend carries the mesh and rig):
   blender -b --factory-startup -P tools/pipeline/render_character.py -- --body average_m --out <dir>
 
-Sample options (defaults reproduce the committed rig exactly): --camera <json> swaps in another
-camera rig file; --proportions <json> --variant <name> scales pose bones (no bone is added or
-renamed) and refits the figure to the reference height; --pass normal writes camera-space normals
-(OpenGL: R = screen right, G = screen up, B = toward camera, encoded n * 0.5 + 0.5) instead of colour.
+The figure proportion and rest stance come from proportions.json (the director's pick): pose-bone
+scales and aims only (no bone is added or renamed), then the figure is refitted to the reference
+height. --pass normal writes camera-space normals instead of colour (OpenGL: R = screen right,
+G = screen up, B = toward camera, encoded n * 0.5 + 0.5); a sheet ships both passes.
+Sample options: --camera <json> swaps in another camera rig file; --proportions <json> --variant
+<name> picks another proportion file or variant (tools/pipeline/samples/).
 
 Writes <out>/facing_<k>_<name>.png (frame_px * render_scale square, RGBA 8-bit) for each facing
 and <out>/render_meta.json (input and output hashes, Blender version). Camera and light rigs come
@@ -29,6 +31,7 @@ from mathutils import Euler, Matrix, Vector
 PIPELINE = Path(__file__).resolve().parent
 CAMERA_FILE = PIPELINE / "camera_rig.json"
 LIGHT_FILE = PIPELINE / "light_rig.json"
+PROPORTIONS_FILE = PIPELINE / "proportions.json"
 BODIES_DIR = PIPELINE / "bodies"
 SRGB_LINEAR_BREAK = 0.04045
 NORMAL_VIEW_TRANSFORM = "Raw"  # normals are data: written as computed, never tone-mapped
@@ -41,8 +44,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--out", required=True)
     p.add_argument("--facings", default="all", help="'all' or comma-separated facing indices")
     p.add_argument("--camera", default=str(CAMERA_FILE), help="camera rig json (default: the committed rig)")
-    p.add_argument("--proportions", default="", help="proportion variants json (samples only)")
-    p.add_argument("--variant", default="", help="variant name in --proportions")
+    p.add_argument("--proportions", default=str(PROPORTIONS_FILE), help="proportion variants json")
+    p.add_argument("--variant", default="", help="variant in --proportions (default: its 'default')")
     p.add_argument("--pass", dest="render_pass", choices=("color", "normal"), default="color")
     return p.parse_args(argv)
 
@@ -236,6 +239,7 @@ def aim_bones(rig: bpy.types.Object, targets: dict) -> None:
 def apply_proportions(rig: bpy.types.Object, path: str, name: str, height_m: float) -> dict:
     """Pose and scale bones for a sample variant, then refit the figure to height_m with feet on z = 0."""
     cfg = json.loads(Path(path).read_text(encoding="utf-8"))
+    name = name or cfg["default"]
     spec = cfg["variants"][name]
     scales = spec["bone_scale"]
     aim = {**cfg.get("pose", {}).get("bone_direction", {}), **spec.get("bone_direction", {})}
@@ -285,9 +289,7 @@ def main() -> None:
     else:
         apply_material(light["body_material"])
     rig = body_rig()
-    proportion = None
-    if args.proportions:
-        proportion = apply_proportions(rig, args.proportions, args.variant, cam["reference_height_m"])
+    proportion = apply_proportions(rig, args.proportions, args.variant, cam["reference_height_m"])
     add_camera(cam)
     add_lights(light)
 
@@ -322,10 +324,9 @@ def main() -> None:
     }
     if args.render_pass != "color":
         meta["pass"] = args.render_pass
-    if proportion is not None:
-        prop_file = Path(args.proportions).resolve()
-        meta["inputs"]["proportions"] = {"file": rel_path(prop_file), "sha256": sha256(prop_file)}
-        meta["proportion"] = proportion
+    prop_file = Path(args.proportions).resolve()
+    meta["inputs"]["proportions"] = {"file": rel_path(prop_file), "sha256": sha256(prop_file)}
+    meta["proportion"] = proportion
     (out / "render_meta.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8", newline="\n")
     print("RENDER_OK " + str(len(outputs)))
 

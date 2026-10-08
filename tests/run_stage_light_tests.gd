@@ -93,8 +93,9 @@ func _check_unlit() -> void:
 	await _despawn(stage)
 
 
-## Writes a copy of the good sheet's manifest naming a flat normal map (and one naming a
-## missing file) into user://, then loads both.
+## Writes copies of the good sheet's manifest into user://: one naming a flat normal map, one
+## naming a missing file, and one with no normal_image (the good sheet itself ships one), then
+## loads all three.
 func _check_lit_sheet() -> void:
 	var lit_manifest := _write_lit_sheet("lit.json", "flat_normal.png")
 	var broken_manifest := _write_lit_sheet("broken.json", "missing_normal.png")
@@ -109,7 +110,7 @@ func _check_lit_sheet() -> void:
 		not stage.use_sheet(broken_manifest, "S"),
 		"a sheet whose normal_image is missing is refused"
 	)
-	var plain := stage.use_sheet(GOOD_SHEET, "S")
+	var plain := stage.use_sheet(_write_lit_sheet("plain.json", ""), "S")
 	check(
 		plain and stage.merc().material_override == null,
 		"a sheet with no normal_image falls back to unshaded"
@@ -128,7 +129,10 @@ func _write_lit_sheet(name: String, normal_name: String) -> String:
 	flat.fill(FLAT_NORMAL)
 	flat.save_png(LIT_DIR.path_join("flat_normal.png"))
 	manifest["image"] = "sheet.png"
-	manifest["normal_image"] = normal_name
+	if normal_name.is_empty():
+		manifest.erase("normal_image")
+	else:
+		manifest["normal_image"] = normal_name
 	var path := LIT_DIR.path_join(name)
 	var file := FileAccess.open(path, FileAccess.WRITE)
 	file.store_string(JSON.stringify(manifest))

@@ -1,0 +1,21 @@
+{
+  "_doc": "Frozen figure proportion (director, 2026-10-08: proportion C 'B/W-like', 56 px, pitch 55; chosen from docs/audits/proportion_samples/). render_character.py applies it by default. Pose bones only: uniform bone scales (no bone added or renamed, so the frozen skeleton in rig_contract.json and Mixamo clips still apply), then the deformed figure is refitted to the reference height (camera_rig.json reference_height_m) with its feet on the ground. Clips must not key bone scale (strip scale curves on import) or they would undo it. The stance block is the rest-pose stance only: the frozen A-pose reads as a hunch at 55 degrees, so the upper arms and forearms are aimed down; clips supply their own rotations.",
+  "schema": "mercs.proportions/1",
+  "default": "bw",
+  "variants": {
+    "bw": {
+      "label": "C B/W-LIKE",
+      "bone_scale": {
+        "mixamorig:Head": 1.8, "mixamorig:LeftHand": 1.3, "mixamorig:RightHand": 1.3,
+        "mixamorig:LeftUpLeg": 0.85, "mixamorig:RightUpLeg": 0.85
+      }
+    }
+  },
+  "pose": {
+    "doc": "rest stance: world directions with the body facing -Y and left = +X; upper arms 12 degrees off vertical, forearms 6",
+    "bone_direction": {
+      "mixamorig:LeftArm": [0.21, 0.0, -0.98], "mixamorig:RightArm": [-0.21, 0.0, -0.98],
+      "mixamorig:LeftForeArm": [0.1, 0.0, -1.0], "mixamorig:RightForeArm": [-0.1, 0.0, -1.0]
+    }
+  }
+}
