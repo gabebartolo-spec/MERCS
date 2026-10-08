@@ -23,6 +23,14 @@ and `tools/capture/capture_stage.gd`. Spec: `docs/specs/phase1_visual_proof.md` 
 - `color_rgb`, `energy`: warm white key colour and strength.
 - `ambient_grey`, `ambient_energy`: the flat ambient sky colour and strength.
 
+## rain_night
+Used when the stage's `lighting` export is RAIN_NIGHT (sample set 2, spec §4); DAY uses `light` and `shades.sky`.
+- `light`: the moonlight key and ambient, as in `light` above, but `ambient_rgb` is a colour (cool blue) instead of a grey.
+- `sky_rgb`: the flat night background colour.
+- `sprite_tint_rgb`: the sprite is unshaded, so night darkens it by this modulate colour instead of by light; without it the merc glows like day.
+- `torch`: one warm `OmniLight3D` by the well: `position_m`, `color_rgb`, `energy`, `range_m`. Geometry only; the unshaded sprite does not pick it up.
+- `rain`: falling streaks (`GPUParticles3D`): `amount`, the emission box `centre_m` and `area_m` (full size, metres), `fall_m_s`, `lifetime_s`, `streak_m` (quad width × height), `color_rgb`, and the fixed particle `seed` so captures repeat.
+
 ## camera
 - `fov_degrees`: perspective field of view (35°).
 - (no distance knob) the rail's distance from the look-at point is derived by `StreetStage.rail_distance_m()` so one sprite texel covers one logical pixel there: `merc_height_m × cos(pitch) / sprite_height_px × logical_height_px / (2 × tan(fov / 2))`, about 17.3 m at 35° and 48 px. It follows the pitch and height under test, matching `tools/pipeline/camera_rig.json`.

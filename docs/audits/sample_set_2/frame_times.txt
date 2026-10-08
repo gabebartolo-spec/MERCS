@@ -1,0 +1,4 @@
+whole day frame_time_ms 0.597 over 300 frames
+whole rain_night frame_time_ms 0.524 over 300 frames
+crisp day frame_time_ms 0.684 over 300 frames
+crisp rain_night frame_time_ms 0.714 over 300 frames

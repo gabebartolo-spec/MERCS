@@ -34,10 +34,19 @@ does not: MERCS builds its own assets by design.
 - Forward+ renderer, 1920×1080 target, integer pixel scale.
 - Characters are `Sprite3D` billboards (Y-axis) inside real low-poly 3D geometry; the perspective
   camera pitch matches the pitch the sprites were rendered at.
-- Pixel stability is solved in Phase 1 with one of two documented options, chosen by the director
-  from labelled captures: (a) the whole scene rendered through a low-resolution `SubViewport`
-  (everything crunchy, like Octopath), or (b) crisp 3D with pixel characters and snapped sprite
-  positions. Phase 1 is not done until this is chosen.
+- Pixel stability: **whole-screen pixel mode** (director, 2026-10-08, from sample set 2,
+  `docs/audits/sample_set_2/`; PR #25). The 3D world renders into a `SubViewport` of 640 × 360
+  inside a `SubViewportContainer` with `stretch = true`, `stretch_shrink = 3` and
+  `texture_filter = NEAREST`, filling the 1920 × 1080 window; the camera is current in that
+  viewport. Sprites are `Sprite3D`, `BILLBOARD_FIXED_Y`, nearest filter, alpha-cut discard,
+  unshaded, no cast shadow; their feet are snapped each step to a whole pixel of the 640 × 360
+  viewport (moved along the view ray, depth kept). Reference: `presentation/world/street_stage.gd`
+  (`PixelMode.WHOLE_SCREEN`).
+- Sprite scale: **constant** (director, 2026-10-08, same sheet). One sprite texel is one logical
+  pixel wherever the merc stands: `pixel_size = merc_height × cos(pitch) / height_px`, scaled by
+  the merc's view depth over the look-at depth, with the Y stretch (`1 / cos(pitch)` at the
+  look-at point) corrected for the view angle at the merc. The camera rail distance is derived so
+  the look-at point is 1:1. Sprites never resample; distance shows by screen position only.
 
 ## Export and distribution
 
