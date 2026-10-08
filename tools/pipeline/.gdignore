@@ -1,0 +1,3 @@
+# Godot skips this folder: it holds the Python/Blender art pipeline, and a headless import
+# of bodies/*.blend fails without a Blender path (CI). Godot code still reads
+# camera_rig.json here with FileAccess.
