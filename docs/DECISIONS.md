@@ -4,6 +4,10 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
+## 2026-10-08 · D-041 · Director · Authorisation: the Dev Lead may do what it thinks is best on making the re-rendered good fixture the stage's default merc
+Why: the director said "go", then "do what you think is best" (recorded in #39). Scope is that item only; it is not a general authorisation for look or design calls.
+Changes: captures default to the good sheet (#39).
+
 ## 2026-10-08 · D-040 · Lead (pending) · Sprites are camera-facing billboards, not Y-axis billboards
 Why: upright Y billboards lean at the 55 degree pitch, which produces mixels (D-035).
 Changes: the stage; `01_ENGINE_DECISION.md` (#36).
