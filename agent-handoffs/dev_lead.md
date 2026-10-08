@@ -32,7 +32,7 @@ held and can expire when sessions run in different permission modes; the directo
   rain, tint), `depth_scale` (CONSTANT default; texel rescaled by depth, view-angle-corrected Y),
   `stand_at`; `StageData`, `StageWeather`; `tools/capture/sample_set_2.sh` + `sample_sheet.py`
   rebuild `docs/audits/sample_set_2/`. Stage defaults WHOLE_SCREEN and CONSTANT.
-- #26 OPEN (claude/p1-lit-sprites, synced with main at 838606e, green): lit sprites. Frames with a normal map draw with a shaded,
+- #26 MERGED (squash 2f74d8a): lit sprites. Frames with a normal map draw with a shaded,
   normal-mapped `StandardMaterial3D` (nearest, alpha scissor, Y billboard keeping scale, matte).
   Manifest key `"normal_image"`: same size as the sheet, camera-facing tangent space, OpenGL
   convention (R right, G up, B toward camera), n × 0.5 + 0.5. Suite `stage_light` (8).
@@ -41,12 +41,10 @@ held and can expire when sessions run in different permission modes; the directo
   -PIVOT, -NORMAL); each rule rejects a planted-bad copy written to user:// at run time. Pixel
   rules stay in `tools/pipeline/validate_sheet.py` (Art's). Engine half of spec §6 "Engine";
   `assets.yml` (CI wiring) stays Art item 5. Built before decision 5; no more suites until a milestone.
-## Merge order and expected conflicts
-#26 and this PR both add a suite on the same lines of `tools/run_tests.sh` (ALL_SUITES),
-`tools/ci_shards.txt`, `tests/expected_checks.txt`, `tests/README.md`. Whichever merges second
-needs a sync: merge origin/main into it and keep BOTH suites (stage_light 8, assets 8). No force
-push (denied by D-030 settings); merging main is fine because the repo squash-merges. No stacking:
-branch from origin/main (rule in #27).
+## Merging
+This PR is synced with main after #26 (both suites registered: stage_light 8, assets 8). No force
+push (denied by D-030 settings); sync by merging main, then run the suites before pushing. No
+stacking: branch from origin/main (rule in #27).
 ## Delegated
 - Art Factory ("MERCS art agent setup"), item P1-ART-PROPORTIONS: DELIVERED as PR #28 (branch
   claude/art-proportions): 18 sheets `docs/audits/proportion_samples/sheets/average_m_<realistic|
