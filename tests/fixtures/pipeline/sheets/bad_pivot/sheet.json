@@ -4,9 +4,9 @@
   "layer": "body",
   "clip": "rest",
   "image": "sheet.png",
-  "image_pixel_sha256": "cb08385fbd042248834f79d2f74112eb14079e66e7c73df0af0fc5b538b755d0",
-  "frame_w": 64,
-  "frame_h": 64,
+  "image_pixel_sha256": "3ee4f9af7e2971967e8fc18345b518bfbc42d0b9cf38af03b91f916c34f31a7b",
+  "frame_w": 96,
+  "frame_h": 96,
   "frame_count": 8,
   "frames_per_facing": 1,
   "facings": [
@@ -25,69 +25,69 @@
       "index": 0,
       "x": 0,
       "y": 0,
-      "w": 64,
-      "h": 64
+      "w": 96,
+      "h": 96
     },
     {
       "facing": "SE",
       "index": 1,
-      "x": 64,
+      "x": 96,
       "y": 0,
-      "w": 64,
-      "h": 64
+      "w": 96,
+      "h": 96
     },
     {
       "facing": "E",
       "index": 2,
-      "x": 128,
+      "x": 192,
       "y": 0,
-      "w": 64,
-      "h": 64
+      "w": 96,
+      "h": 96
     },
     {
       "facing": "NE",
       "index": 3,
-      "x": 192,
+      "x": 288,
       "y": 0,
-      "w": 64,
-      "h": 64
+      "w": 96,
+      "h": 96
     },
     {
       "facing": "N",
       "index": 4,
-      "x": 256,
+      "x": 384,
       "y": 0,
-      "w": 64,
-      "h": 64
+      "w": 96,
+      "h": 96
     },
     {
       "facing": "NW",
       "index": 5,
-      "x": 320,
+      "x": 480,
       "y": 0,
-      "w": 64,
-      "h": 64
+      "w": 96,
+      "h": 96
     },
     {
       "facing": "W",
       "index": 6,
-      "x": 384,
+      "x": 576,
       "y": 0,
-      "w": 64,
-      "h": 64
+      "w": 96,
+      "h": 96
     },
     {
       "facing": "SW",
       "index": 7,
-      "x": 448,
+      "x": 672,
       "y": 0,
-      "w": 64,
-      "h": 64
+      "w": 96,
+      "h": 96
     }
   ],
   "pivot": {
-    "x": 32,
-    "y": 40,
+    "x": 48,
+    "y": 64,
     "doc": "feet centre in frame pixels, the same in every frame"
   },
   "palette": {
@@ -101,42 +101,42 @@
       {
         "file": "facing_0_S.png",
         "kind": "render_4x",
-        "sha256": "92f44a5384c4fcdb2db2ad2a5200fd12f0bf1ae012997ee4a1a9a32c70d6a093"
+        "sha256": "f8bf5468bd5cb30110d0b0ed631de0d0cf9708410c35240351ac64a8ef57226e"
       },
       {
         "file": "facing_1_SE.png",
         "kind": "render_4x",
-        "sha256": "7e9c9a0194719c62b91f4ec5d0b3a235aa333d064d9750c61d5815ee5d244695"
+        "sha256": "606c41635b9af86ccb1ba59dd7f01942658ef5aafcb638f99c88ea2bb2d0d0db"
       },
       {
         "file": "facing_2_E.png",
         "kind": "render_4x",
-        "sha256": "437444e6851cb39792d9d3fbe818830155836031780e228786cb2714fbb6ce93"
+        "sha256": "dc877578fe157b9f514d52e57b4ac6076d62b470d6cf2c59d14bc5a32dc81900"
       },
       {
         "file": "facing_3_NE.png",
         "kind": "render_4x",
-        "sha256": "0f159037e3bad63b60eb639c226dc80c7938355a9ddc279ae01660e6854376ae"
+        "sha256": "db94abc41bfa57035b89fe74406ad05c3cc4b15e41f25b594d749e6abe1c8f60"
       },
       {
         "file": "facing_4_N.png",
         "kind": "render_4x",
-        "sha256": "a59721425ccfad6494938eb952133e0814b2d1f80adc8e4f7c78ba1a37cbb964"
+        "sha256": "f80d6a02b4f9abdc31efdb9a4cfa48f04387faaa3a7af3391fd3bfcb31c073be"
       },
       {
         "file": "facing_5_NW.png",
         "kind": "render_4x",
-        "sha256": "0b59ee0d0de1ab78ffd33de541d3e2d0bcad91aa8dfb7938d1111709b4f374c0"
+        "sha256": "d827891ea1e1a1c37dcfc101a743cac30876b9eee3eb7300298008d81046d3de"
       },
       {
         "file": "facing_6_W.png",
         "kind": "render_4x",
-        "sha256": "f26e5a529185ee23eecf26a6834e955748989b17970ad31416b149d524d0b0a0"
+        "sha256": "9e40c0c450b2de305cd123786fa4cc59a82581c309162cc2c974206bece4d9df"
       },
       {
         "file": "facing_7_SW.png",
         "kind": "render_4x",
-        "sha256": "46b98fe11bc07081665fed1032257468c46a627c38a399e8b8dda8fbed3e9a39"
+        "sha256": "ceec52398c00fdfea596fe0917768e421c144719e7f44134c7091d7ead3d2900"
       }
     ],
     "inputs": {
@@ -146,7 +146,7 @@
       },
       "camera_rig": {
         "file": "tools/pipeline/camera_rig.json",
-        "sha256": "c6c0fea28aecf5fa19bde5426852f57b3c3a7b09e59d3ffb5f4cd301591651ba"
+        "sha256": "b3ed7bbc6fd2ae4760b23b046adc11793ad8daa88496b4b114e014f04e4de4b7"
       },
       "light_rig": {
         "file": "tools/pipeline/light_rig.json",
@@ -154,7 +154,11 @@
       },
       "render_script": {
         "file": "tools/pipeline/render_character.py",
-        "sha256": "2a54a5ab7e2c699cd4ff8c8443e49f3142e40678cb11d4ebfa90d130c115112b"
+        "sha256": "150524579507120a7f836a3732ae273ec277d9f352a39ed6ffeff433535633ce"
+      },
+      "proportions": {
+        "file": "tools/pipeline/proportions.json",
+        "sha256": "0a8775ccf36941675e0f6784209dfe273ae1fafbc501c7388dcb2288d3196bc3"
       },
       "pixelate_config": {
         "file": "tools/pipeline/pixelate.json",
@@ -167,8 +171,8 @@
       "scripts": {
         "pngio.py": "c97d8df63884ddc60bfeb5ff6464c46b913c40f53939b6dcc7db856cffc6438c",
         "palette_lib.py": "f22644e8a13658cb3543f958ed0d15c4521242dbf05ae06829ccba14cce085a0",
-        "pixelate.py": "1436619a5cfab5a636f312e4c9e4c0e493f82c9d5c843abdbd6b650f9bc37eab",
-        "pack_sheets.py": "dda1e4f1e6af14be8908c53468c273fbffeb857df0a20ac5e3dbc2fe7987b615"
+        "pixelate.py": "e8e6fc4da4fbc2275fb204c1c2c86d7bd1dcde03441cee876724f30313e802c4",
+        "pack_sheets.py": "039780aa67ead7a246f285a1029f4055d01c1b064941383fb1c0bc8093df9e43"
       }
     },
     "licence_rows": [
@@ -176,5 +180,8 @@
       "MPFB (MakeHuman Plugin for Blender)",
       "Python, Pillow, NumPy"
     ]
-  }
+  },
+  "normal_image": "normal.png",
+  "normal_image_pixel_sha256": "f50776aec0a952159be9fd83bcc6aec8e1e91e494350c744425d1ee3753e88fe",
+  "normal_doc": "camera-facing tangent space, OpenGL: R = screen right, G = screen up, B = toward camera, encoded n * 0.5 + 0.5; alpha copied from the colour frame"
 }

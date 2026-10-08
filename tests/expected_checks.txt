@@ -3,4 +3,7 @@
 # up (04_GUARDRAILS.md B6). A suite with no line here fails until one is added.
 data 88
 smoke 24
-stage 39
+stage 43
+stage_scale 11
+stage_light 8
+assets 8

@@ -1,0 +1,86 @@
+{
+  "schema": "mercs.render_meta/1",
+  "body": "average_m",
+  "pose": "rest",
+  "inputs": {
+    "body_blend": {
+      "file": "tools/pipeline/bodies/average_m.blend",
+      "sha256": "aa9da1d3b091ba89a52779a3b9571897c8a5c89c3ea1c620822666c18df47f94"
+    },
+    "camera_rig": {
+      "file": "tools/pipeline/camera_rig.json",
+      "sha256": "b3ed7bbc6fd2ae4760b23b046adc11793ad8daa88496b4b114e014f04e4de4b7"
+    },
+    "light_rig": {
+      "file": "tools/pipeline/light_rig.json",
+      "sha256": "c246e0a0750c346e72d157f94127d301898fdb47e488b8db81d938b3626212b3"
+    },
+    "render_script": {
+      "file": "tools/pipeline/render_character.py",
+      "sha256": "150524579507120a7f836a3732ae273ec277d9f352a39ed6ffeff433535633ce"
+    },
+    "proportions": {
+      "file": "tools/pipeline/proportions.json",
+      "sha256": "0a8775ccf36941675e0f6784209dfe273ae1fafbc501c7388dcb2288d3196bc3"
+    }
+  },
+  "tools": {
+    "blender": "5.2.2 LTS"
+  },
+  "outputs": [
+    {
+      "facing": 0,
+      "name": "S",
+      "file": "facing_0_S.png",
+      "sha256": "59fef2c6b5cd27635a145c8e4d3b2f6267660158923833fcc8e8e857a2161180"
+    },
+    {
+      "facing": 1,
+      "name": "SE",
+      "file": "facing_1_SE.png",
+      "sha256": "9122742c4645f2a99936978b1250bd96e98bd5e4ec43ebb8a4881df30ab6265f"
+    },
+    {
+      "facing": 2,
+      "name": "E",
+      "file": "facing_2_E.png",
+      "sha256": "28285064e338157110376a9ccd6f8693d350f8ca87318b567dfb1551e3e5e63f"
+    },
+    {
+      "facing": 3,
+      "name": "NE",
+      "file": "facing_3_NE.png",
+      "sha256": "47c27296f2acd68130eaaee71ece221f7c93d5fff06a33546351472a6810491b"
+    },
+    {
+      "facing": 4,
+      "name": "N",
+      "file": "facing_4_N.png",
+      "sha256": "e49eb7443577eea031fb9a02529833cefb3ecc4bb71e5c5e8dab851cff87fcd7"
+    },
+    {
+      "facing": 5,
+      "name": "NW",
+      "file": "facing_5_NW.png",
+      "sha256": "0e69cdc0e8988209b98deb80e5e3c6e88ae402a288ddc98b2e32d5d84f512a3f"
+    },
+    {
+      "facing": 6,
+      "name": "W",
+      "file": "facing_6_W.png",
+      "sha256": "be29459eaaee37015fedd2debfc1130a67887832efc5825ac9178c012b5cbb09"
+    },
+    {
+      "facing": 7,
+      "name": "SW",
+      "file": "facing_7_SW.png",
+      "sha256": "e900234115c12beee80996f0d6078576d7297407a5039da100a0df4c5649a010"
+    }
+  ],
+  "pass": "normal",
+  "proportion": {
+    "variant": "bw",
+    "rig_scale": 0.986429,
+    "height_m": 1.78
+  }
+}

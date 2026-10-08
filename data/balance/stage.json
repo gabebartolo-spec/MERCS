@@ -31,9 +31,36 @@
     "ambient_grey": 0.55,
     "ambient_energy": 0.6
   },
+  "rain_night": {
+    "light": {
+      "elevation_degrees": 50,
+      "azimuth_degrees": -35,
+      "color_rgb": [0.55, 0.63, 0.85],
+      "energy": 0.3,
+      "ambient_rgb": [0.16, 0.19, 0.3],
+      "ambient_energy": 0.5
+    },
+    "sky_rgb": [0.05, 0.06, 0.1],
+    "sprite_tint_rgb": [0.42, 0.47, 0.66],
+    "torch": {
+      "position_m": [5.6, 1.8, 1.4],
+      "color_rgb": [1.0, 0.62, 0.3],
+      "energy": 2.5,
+      "range_m": 7
+    },
+    "rain": {
+      "amount": 1200,
+      "centre_m": [0, 5, 2],
+      "area_m": [34, 10, 18],
+      "fall_m_s": 9,
+      "lifetime_s": 1.2,
+      "streak_m": [0.03, 0.45],
+      "color_rgb": [0.62, 0.67, 0.8],
+      "seed": 7
+    }
+  },
   "camera": {
     "fov_degrees": 35,
-    "distance_m": 12,
     "look_at_height_m": 1.0,
     "near_m": 0.1,
     "far_m": 200
@@ -44,7 +71,7 @@
     "fill_grey": 0.86,
     "outline_grey": 0.12,
     "walk_speed_m_s": 1.4,
-    "path_xz": [-16, 2, -1, 2, 2, 4, 16, 2, 16, 6, -16, 6]
+    "path_xz": [-7, -0.5, 3.5, -0.5, 6.5, 0.5, 6.5, 2.5, -7, 2.5]
   },
   "pixel": {
     "logical_width_px": 640,
@@ -55,8 +82,8 @@
     "settle_frames": 4,
     "clip_seconds": 3,
     "clip_fps": 30,
-    "crop_width_px": 160,
-    "crop_height_px": 90,
+    "crop_width_px": 320,
+    "crop_height_px": 180,
     "crop_scale": 2
   }
 }

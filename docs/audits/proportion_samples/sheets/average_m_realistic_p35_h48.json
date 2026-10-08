@@ -1,0 +1,184 @@
+{
+  "schema": "mercs.sheet/1",
+  "body": "average_m",
+  "layer": "body",
+  "clip": "rest",
+  "image": "average_m_realistic_p35_h48.png",
+  "image_pixel_sha256": "7025d63bcd8cf00af994176c1273a8e174dc2a17f6d0fc18f7ae7ab7b5129c4e",
+  "frame_w": 128,
+  "frame_h": 128,
+  "frame_count": 8,
+  "frames_per_facing": 1,
+  "facings": [
+    "S",
+    "SE",
+    "E",
+    "NE",
+    "N",
+    "NW",
+    "W",
+    "SW"
+  ],
+  "frames": [
+    {
+      "facing": "S",
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "w": 128,
+      "h": 128
+    },
+    {
+      "facing": "SE",
+      "index": 1,
+      "x": 128,
+      "y": 0,
+      "w": 128,
+      "h": 128
+    },
+    {
+      "facing": "E",
+      "index": 2,
+      "x": 256,
+      "y": 0,
+      "w": 128,
+      "h": 128
+    },
+    {
+      "facing": "NE",
+      "index": 3,
+      "x": 384,
+      "y": 0,
+      "w": 128,
+      "h": 128
+    },
+    {
+      "facing": "N",
+      "index": 4,
+      "x": 512,
+      "y": 0,
+      "w": 128,
+      "h": 128
+    },
+    {
+      "facing": "NW",
+      "index": 5,
+      "x": 640,
+      "y": 0,
+      "w": 128,
+      "h": 128
+    },
+    {
+      "facing": "W",
+      "index": 6,
+      "x": 768,
+      "y": 0,
+      "w": 128,
+      "h": 128
+    },
+    {
+      "facing": "SW",
+      "index": 7,
+      "x": 896,
+      "y": 0,
+      "w": 128,
+      "h": 128
+    }
+  ],
+  "pivot": {
+    "x": 64,
+    "y": 108,
+    "doc": "feet centre in frame pixels, the same in every frame"
+  },
+  "palette": {
+    "id": "master_draft",
+    "file": "tools/pipeline/palette/master_draft.json",
+    "sha256": "767b261e300cbe8962ace5dddb7337748f0752b0f067c2a826c578ffe23fcf3a",
+    "status": "DRAFT"
+  },
+  "provenance": {
+    "sources": [
+      {
+        "file": "facing_0_S.png",
+        "kind": "render_4x",
+        "sha256": "54de03cb7d605bedd45a6f716dba83f09a6baf719f6f82c595ba7691d18459fd"
+      },
+      {
+        "file": "facing_1_SE.png",
+        "kind": "render_4x",
+        "sha256": "d839429a875da6d7443154e5bb1e8bc465b5471c1911998efab7be6f8c69bfd1"
+      },
+      {
+        "file": "facing_2_E.png",
+        "kind": "render_4x",
+        "sha256": "6b2dd6a1ffcf3bb28f7aff2a5d0fe5dc88f4e2247727984bef98f6d3d1bc5a88"
+      },
+      {
+        "file": "facing_3_NE.png",
+        "kind": "render_4x",
+        "sha256": "92b11232b8dc325eafff4db47376361b8afc5e280b1384951640be8ad25502ca"
+      },
+      {
+        "file": "facing_4_N.png",
+        "kind": "render_4x",
+        "sha256": "14094dfe5660efba1fcca6bb3851f83eee986086367f85b1a5a5516f692ca409"
+      },
+      {
+        "file": "facing_5_NW.png",
+        "kind": "render_4x",
+        "sha256": "2a96546fef9ef51ca86e7748fb0979ed0fe2eaa8d70de718735f49260b76cbb3"
+      },
+      {
+        "file": "facing_6_W.png",
+        "kind": "render_4x",
+        "sha256": "17671b8e45a493193058f55bea66e24ab925b427055a17d768bd325e4b5fb4a2"
+      },
+      {
+        "file": "facing_7_SW.png",
+        "kind": "render_4x",
+        "sha256": "7f82a40d7f78e67f7e925a25f60c787361cefa299fd55d6fece7a0ad79305f62"
+      }
+    ],
+    "inputs": {
+      "body_blend": {
+        "file": "tools/pipeline/bodies/average_m.blend",
+        "sha256": "aa9da1d3b091ba89a52779a3b9571897c8a5c89c3ea1c620822666c18df47f94"
+      },
+      "camera_rig": {
+        "file": "docs/audits/proportion_samples/cameras/camera_p35_h48.json",
+        "sha256": "4914e13caef4b508bf9eb318dce6b8c9f96ea65bd3f0c0d1b41f2adb7752c2f8"
+      },
+      "light_rig": {
+        "file": "tools/pipeline/light_rig.json",
+        "sha256": "c246e0a0750c346e72d157f94127d301898fdb47e488b8db81d938b3626212b3"
+      },
+      "render_script": {
+        "file": "tools/pipeline/render_character.py",
+        "sha256": "20bb3b2afa3a44b7e4e85d76131386ec1b50e014b3c782d619784e332ba89a3c"
+      },
+      "proportions": {
+        "file": "tools/pipeline/samples/proportions.json",
+        "sha256": "cd03e48da2be39cba420e1197bc8f4bab19e7ff5f1d2111d21370ddba2475965"
+      },
+      "pixelate_config": {
+        "file": "tools/pipeline/pixelate.json",
+        "sha256": "356dda9ced2ba4177d0f80e9bbcde55786585d2165529561d41016da4f0b4699"
+      }
+    },
+    "tools": {
+      "blender": "5.2.2 LTS",
+      "python": "3.14.7",
+      "scripts": {
+        "pngio.py": "c97d8df63884ddc60bfeb5ff6464c46b913c40f53939b6dcc7db856cffc6438c",
+        "palette_lib.py": "f22644e8a13658cb3543f958ed0d15c4521242dbf05ae06829ccba14cce085a0",
+        "pixelate.py": "e8e6fc4da4fbc2275fb204c1c2c86d7bd1dcde03441cee876724f30313e802c4",
+        "pack_sheets.py": "039780aa67ead7a246f285a1029f4055d01c1b064941383fb1c0bc8093df9e43"
+      }
+    },
+    "licence_rows": [
+      "Blender",
+      "MPFB (MakeHuman Plugin for Blender)",
+      "Python, Pillow, NumPy"
+    ]
+  }
+}

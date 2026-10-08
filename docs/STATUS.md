@@ -10,10 +10,10 @@ Current phase: **1 — Visual and factory proof** (Phase 0 gate PASS WITH NOTES,
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | awaiting merge | Phase 1 item 6 lints: PR #21 green | claude/p1-lint-limits | 2026-10-08 |
-| Merge & CI (Sonnet 5.5) | available | standing merge pass (D-030); board PR after each merge | — | 2026-10-08 |
-| Art Factory (Opus 5.5) | awaiting director | Phase 1 item 1 rig freeze merged (#13); Mixamo clips need the director's sign-in (D-029); sample set 1 waits on the grey-box street (#19) | — | 2026-10-08 |
-| Concept Lead (Fable 5.1) | working | merge workflow audit (D-030); render pipeline skeleton via subagent (relaunched); next: Phase 1 sample review | claude/merge-workflow-audit, claude/p1-render-pipeline | 2026-10-08 |
+| Dev Lead (Opus 5.5) | available | stage defaults 55 degrees / 56 px (#31), handoff refresh (#33) and crowd with occlusion (#36) merged; next: Art's re-frozen good fixture as the stage's default merc | — | 2026-10-08 |
+| Merge & CI (Sonnet 5.5) | working | standing merge pass (D-030); board PR after each merge | — | 2026-10-08 |
+| Art Factory (Opus 5.5) | available | P1-ART-PROPORTIONS (#28) and P1-ART-FREEZE-C55 (#34: proportion C, 56 px, 55 degrees frozen into `camera_rig.json` and `proportions.json`) merged; next is average_f (needs assigning); Mixamo clips need the director's sign-in (D-029) | — | 2026-10-08 |
+| Concept Lead (Fable 5.1) | available | merge workflow audit merged (#20, D-028..D-030); render pipeline skeleton merged (#22); next: Phase 1 sample review | — | 2026-10-08 |
 
 States: working · running a check · awaiting director · blocked · available.
 
@@ -40,17 +40,25 @@ States: working · running a check · awaiting director · blocked · available.
 ### Phase 1 (gate PASS WITH NOTES, D-027)
 1. Art Factory: rig freeze (`average_m`, Mixamo skeleton, sockets, contract hash). DONE (#13).
 2. Dev Lead: grey-box street capture stage, stage suite, capture tool. DONE (#19).
-3. Concept Lead (subagent): render pipeline skeleton (camera/light rigs, render, pixelate, palette draft, pack, validators). In progress, branch claude/p1-render-pipeline.
+3. Concept Lead (subagent): render pipeline skeleton (camera/light rigs, render, pixelate, palette draft, pack, validators). DONE (#22).
 4. Art Factory: fourteen Mixamo clips to `D:\MERCS-vault\clips` (needs D-029 sign-in), then sample set 1 (pitch × height) and sample set 2 (pixel mode, palette, fonts) as labelled sheets per `docs/specs/phase1_visual_proof.md`.
 5. Art Factory: `assets.yml` (validators + Godot assets fixture + contact-sheet artefact).
-6. Dev Lead: Phase 1 LOW: lint precision gaps listed by PR #5; function-length and complexity project lint. PR #21.
+6. Dev Lead: Phase 1 LOW: lint precision gaps listed by PR #5; function-length and complexity project lint. DONE (#21).
+
+7. Dev Lead: stage scale contract (texel = logical pixel, derived rail, sheet on stage). DONE (#24).
+8. Dev Lead: sample set 2, pixel mode and depth scale (spec §4). DONE (#25; director answered, D-031, D-032).
+9. Dev Lead: lit sprites (normal-mapped frames lit by scene lights, `stage_light` suite). DONE (#26).
+10. Art Factory: P1-ART-PROPORTIONS, proportion samples and a normal pass sample. DONE (#28; director chose C, 56 px, 55 degrees: D-036..D-038).
+11. Dev Lead: assets suite (`assets` suite, floor 8). DONE (#29).
+12. Art Factory: P1-ART-FREEZE-C55, the look frozen into the rig. DONE (#34).
+13. Dev Lead: stage defaults 55 degrees / 56 px (#31); crowd, occlusion and camera-facing sprites in the street. DONE (#36).
 
 ## Waiting on the director
 - Sign in to mixamo.com in a browser the Art chat can use, so the fourteen clips can be downloaded (D-029).
 - Restart the Merge & CI chat in the repo folder with the one-line kickoff in `agent-briefs/KICKOFF_PROMPTS.md` once this PR merges, so the new `.claude/settings.json` and brief load.
 
 ## Merge queue
-- #21 Phase 1 item 6 lints: green for 4536b39, no gate, eligible.
+(empty)
 
 ## GPU jobs
 (none)
@@ -59,10 +67,11 @@ States: working · running a check · awaiting director · blocked · available.
 0 / 10 GiB.
 
 ## Live worktrees
-2 / 4: `.claude/worktrees/mercs-dev-lead-setup-0b99b1` (PR #4 merged, stale: prune), `.claude/worktrees/mercs-github-issue-21b87e` (Merge & CI; its unpushed `docs/board-after-13` branch is superseded by this PR: delete).
+4 / 4: `.claude/worktrees/dual-desktop-instances-a78d20`, `../MERCS-wt/art-proportions` (branch claude/art-freeze-c55), `../MERCS-wt/p1-stage-scale` (branch claude/p1-stage-55), `../MERCS-wt/board2` (this board PR).
 
 ## Logged for later (not assigned)
 - Phase 1, LOW, lint precision (Concept Lead review of #5): `strings.py` flags names in
   `add_to_group`, `get_node` paths, `OS.get_name` and `$Anim.play`; `magic_numbers.py` accepts
   `-100` and `+1` and does not exempt `sim/core/rng.gd`; `layering.py` misses `Timer.new()`-style
   node construction in sim.
+- Look direction (director, 2026-10-08, NOT a ruling): mercs read like Pokémon Black/White trainer sprites with more detail and slightly bigger; steep top-down 3/4 camera (about 50-60 degrees), big-headed short figures, dense detailed pixel environments; grim Westeros setting. `06_STYLE_ART.md` and spec §3's 30-40 degree pitch range need revisiting from the proportion samples (#28).

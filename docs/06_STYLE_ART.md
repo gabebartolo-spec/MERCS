@@ -48,15 +48,18 @@ the same file.
 | Base body | MakeHuman/MPFB CC0 mesh, three builds: `slight`, `average`, `giant` **[D]** | one rig, three proportions |
 | Skeleton | Mixamo-compatible naming (so the free Mixamo library retargets cleanly), 65 bones max | frozen in Phase 1; never regenerated |
 | Sockets | `hand_r`, `hand_l`, `back`, `hip_l`, `head`, `chest_badge` | every equipment mesh attaches here |
-| Camera | orthographic, pitch **35°** **[D: 30/35/40 samples]**, 8 facings at 45° steps, facing 0 = toward camera | same pitch as the game camera |
-| Character height | **48 px** at 1× for `average` (slight 44, giant 56) **[D: 40/48/56 samples]** | world units: 1 m ≈ 27 px (48 px / 1.78 m); the figure follows the chosen height |
+| Camera | orthographic, pitch **55°** (director, 2026-10-08), 8 facings at 45° steps, facing 0 = toward camera | same pitch as the game camera; `tools/pipeline/camera_rig.json` |
+| Character height | **56 px** standing at 1× for `average` (director, 2026-10-08); slight and giant follow the same scale | scale: 56 / (1.78 m × cos 55°) ≈ 55 px per metre on the image plane |
+| Proportion | **C, "B/W-like"** (director, 2026-10-08): head 1.8×, hands 1.3×, thighs 0.85×, refitted to 1.78 m (about 4½ heads) | pose-bone scales only, so the frozen skeleton and clips still apply; `tools/pipeline/proportions.json` |
 | Render size | 4× (192 px tall) then integer downscale | downscale is nearest after a 2-px-equivalent pre-blur, then quantise to palette |
 | Lighting | one key (sun, 45° elevation, from camera-left), one fill at 20 %, no cast shadows on the sprite | shadows are a separate blob sprite in-engine |
 | Outline | 1-px `soot` outline added in post, inner-line only where the silhouette would merge | deterministic script |
-| Frame size | 64×64 cell for average, 72×72 giant; pivot at feet centre, recorded per strip | packer enforces no clipping |
+| Frame size | 96×96 cell for average, pivot (48, 80) at feet centre, recorded per strip; giant later | packer and validator enforce no clipping; toes may sit up to 12 px below the pivot at 55° |
 | Animation set, Phase 1 | idle (4f), walk (8f), attack_1h (6f), hit (3f), death (6f), down (1f) per facing | from the Mixamo library, retargeted in Blender, cleaned by script |
 | Layers | body, hair/head, torso, legs, helmet, weapon, offhand, injury_overlay, cloak/insignia | each layer rendered separately with the same camera and frame timing, so they align by construction |
 | Skin | rendered in a fixed neutral skin ramp, recoloured by shader to one of six skin ramps | palette indices, never free colour |
+| Normal map | every sheet ships a normal strip (`normal_image`): camera-facing, OpenGL (R right, G up, B toward camera), same reduction and alpha as the colour frame, not quantised | scene lights (torches, moon) shade the sprite in-engine |
+| Pixel size | one texel size per view: no mixels, ever (director, 2026-10-08) | review sheets draw labels at the art's zoom |
 
 ## 4. Injury and gore overlays
 
@@ -84,7 +87,7 @@ the same file.
 
 ## 6. Environment contract
 
-- Low-poly 3D, textures at the sprite's pixels-per-metre (≈ 27 at 48 px) texel density, painted from
+- Low-poly 3D, textures at the sprite's pixels-per-metre (≈ 55 at 56 px and 55°) texel density, painted from
   the master palette (textures are quantised at export).
 - Modular kit per biome: ground tiles, walls, roofs, doors, props, foliage cards. One `GridMap`
   mesh library per biome.

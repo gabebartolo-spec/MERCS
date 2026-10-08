@@ -33,6 +33,17 @@ C. Eligible: `gh pr merge <n> --squash --match-head-commit <full sha> --delete-b
    Not eligible: one comment on the PR naming the reason (failing job and run id, or the exact
    conflicting files, or the missing section), one line to the owner, move on. Never push to
    another agent's branch; the owner syncs and repairs it.
+C2. Predict before you merge (squash-only repo: a PR stacked on a squashed base always conflicts).
+   Before merging anything, list stacks: for each pair of open PRs, `git merge-base --is-ancestor
+   <A head> <B head>` (or B's body says "stacked on"). Then dry-run every other open PR against
+   the planned result: `git merge-tree --write-tree --name-only origin/main <head>` (after the
+   base merges, re-run it against the new main). For a stack, in the same step as the merge,
+   tell the dependent's owner at once to merge `origin/main` into the branch (no force push,
+   D-030) and keep the branch side on conflicts; the squash flattens the merge commits. Merge
+   the stack bottom-up, one PR at a time, each on green.
+   Cheapest of all: ask owners not to stack; branch from `origin/main` and open the dependent
+   as a draft until the base merges. Report a surprise conflict as a bug in this step, not as
+   bad luck.
 D. Board PR after merges: branch `docs/board-after-<n>` from `origin/main`; apply every merged
    PR's "Board and log" to `docs/STATUS.md` (agent rows, item DONE marks, merge queue, worktrees)
    and append each decision to `docs/DECISIONS.md` with the next free `D-NNN`, replacing the

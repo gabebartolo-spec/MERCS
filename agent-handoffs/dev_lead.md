@@ -1,47 +1,74 @@
-# Dev Lead handoff, 2026-10-08 23:12 AEDT
-Start from this file, CLAUDE.md, your brief (`agent-briefs/DEV_LEAD_OPUS.md`), and `docs/08_ROADMAP.md` §Phase 1 only,
-plus `docs/specs/phase1_visual_proof.md` §2 and §4.
+# Dev Lead handoff, 2026-10-08 (second Claude account, "Claude2: MERCS Lead")
+Start from this file, CLAUDE.md, your brief (`agent-briefs/DEV_LEAD_OPUS.md`), `docs/08_ROADMAP.md`
+§Phase 1 only, `docs/specs/phase1_visual_proof.md`, and `docs/01_ENGINE_DECISION.md` "Rendering plan".
+Then `gh pr list` and `docs/STATUS.md`: PR states below are as of writing.
 
-## State: working (supervising two subagents)
-## Task
-The director said "go with your gut" for the next item, then "assign your cloud team tasks".
-The STATUS lint-precision LOW item had already been fixed in #21, so I picked the remaining Dev parts of
-sample set 2 (spec §4) and gave them to two Sonnet 5.5 cloud sessions (brief: at most two):
-1. session_01NTHHy4PUyNqfaSsEbK3xep → branch `claude/p1-crisp-snap`: CRISP mode snaps the sprite to
-   whole multiples of integer_scale window pixels (spec says texels land on screen pixels), fail-first
-   stage checks, stage floor raised. Reports texels-per-pixel at the well and at both path ends; does not
-   change pixel_size (director's Q4–Q6).
-2. session_014RfFNQ279Tcmc3yNdR9nwy → branch `claude/p1-frame-time`: `--frametime=<frames>` in
-   `tools/capture/capture_stage.gd`, writes a CPU/GPU ms JSON per mode. Container numbers are not
-   representative; the sheet numbers come from the director's PC.
-Neither opens a PR. Next: review both branches (re-run suites and lints), then ask the director before
-opening PRs and hand them to Merge & CI. A check-in fires at 12:52Z (trigger trig_01SVochZpNNz5ztogFjY3WYU).
-Not assigned to anyone: the rain-night stage variant that §4 also wants. Its look is visual, so ask the
-Art agent and the director first.
-## Branch and commit
-This file on `main-xlcsi2` (cloud session branch). Main at 3a12d1b.
-## Where my worktrees live
-None. The cloud container is at /home/user/MERCS, with Godot 4.7.2 downloaded to /tmp/claude-0/godot
-(reclaimed with the container).
-## Files I own right now
-None open. Subagents touch street_stage.gd, run_stage_tests.gd, expected_checks.txt, capture_stage.gd,
-data/balance/stage.json.
-## Unfinished changes
-None.
-## Evidence so far
-Main 3a12d1b in the cloud: data 88 / 0, smoke 24 / 0, stage 39 / 0, harness self-test passed;
-run_all.sh 9 of 9 PASS.
-## Attempts (for the fix-loop rule)
-None open.
-## Open decisions
-- STATUS still shows the Dev Lead "awaiting merge" on #21, which has merged. Merge & CI should update the row.
-- Spec §4 Mode B wants "exact 3×" texels, which a perspective camera gives only at one depth. Wait for
-  subagent 1's measurement, then raise it with the Concept Lead if it matters.
-## Running jobs
-Two cloud sessions (above). No local Godot process.
+## State: available. All Dev Lead PRs merged (#24, #25, #26, #29, #31); this PR carries a test fix.
+## Who did this
+The director ran this session from a second Claude account with no Concept Lead, so it acted as
+lead AND Dev Lead under the original account's rules. Peers in that account: "MERCS merge and CI
+agent" (merges, board PRs) and "MERCS art agent setup" (Art Factory). Cross-session messages are
+held and can expire when sessions run in different permission modes; the director approves them.
+## Director decisions this session (2026-10-08; Merge & CI logs them from PR bodies)
+1. Pixel mode **A, whole screen** (640 × 360 SubViewport ×3; node setup in `01_ENGINE_DECISION.md`).
+2. Sprite scale **constant**: one texel = one logical pixel anywhere; distance shows by position.
+3. Mercs read like Pokémon Black/White trainer sprites, more detailed, a bit bigger. Picked from
+   Art's samples (#28): **proportion C** (head 1.8×, hands 1.3×, thighs 0.85×, about 4½ heads),
+   **56 px** figure, **55° pitch**. Grim Westeros palette (mud, stone, timber, overcast). References
+   were fan art, mood only, never in the repo.
+4. "A lot of weather and particle effects, beautiful lighting."
+5. The Dev Lead works on development and coding; art goes to the Art agent.
+6. **Testing cadence:** "avoid major testing or audits until milestones are reached at regular
+   intervals". Per PR: run the existing suites and lints, attach one capture. New exhaustive
+   suites, planted-defect rounds and audits happen at milestones (phase gates or a director-named
+   checkpoint). Narrows CLAUDE.md rule 9's amount of proof, not the rule.
+7. Mixels are an automatic fail, in assets and in captures: never put a 2× crop beside a 1× view.
+## Shipped (all merged)
+- #24 stage scale contract: rail distance derived (texel = 1.78 × cos(pitch) / height_px, sprite
+  Y-stretch 1/cos(pitch)), so 1 texel = 1 logical px at the look-at point, matching
+  `tools/pipeline/camera_rig.json`. `SheetFrame` shows `mercs.sheet/1` frames, pivot on the ground.
+- #25 sample set 2: stage exports `lighting` (DAY / RAIN_NIGHT: moon, torch, fixed-seed rain),
+  `depth_scale` (CONSTANT default; texel rescaled by depth, view-angle-corrected Y), `stand_at`;
+  `StageData`, `StageWeather`; `tools/capture/sample_set_2.sh` + `sample_sheet.py`.
+- #26 lit sprites: a frame with a normal map draws with a shaded, normal-mapped
+  `StandardMaterial3D` (nearest, alpha scissor, Y billboard keeping scale, matte). Manifest key
+  `"normal_image"`: same size as the sheet, camera-facing tangent space, OpenGL convention
+  (R right, G up, B toward camera), n × 0.5 + 0.5. Unlit frames keep the night tint.
+- #29 suite `assets`: every sheet under `assets/` plus the good fixture passes engine-side rules in
+  `tests/lib/sheet_check.gd` (ENGINE-LOAD, -FACINGS, -FRAME, -PIVOT, -NORMAL), read against
+  `camera_rig.json`. Pixel rules stay in `tools/pipeline/validate_sheet.py` (Art's).
+- #31 stage defaults to 55° / 56 px; walk loop re-laid inside the 55° view (behind the well and back).
+- This PR: the assets suite's planted copies also copy the good fixture's normal map, so the suite
+  stays green when Art's rig freeze adds `normal_image` to the good fixture.
+## Suites (floors)
+data 88, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 8.
+## In flight elsewhere
+- Art: rig freeze for C / 56 / 55 on `claude/art-freeze-c55` (draft): `camera_rig.json` at 55° /
+  56 px, cell 96, pivot (48,80); C's bone scales and the arms-down stance in the render step; the
+  validator's feet tolerance; `06_STYLE_ART.md` §3; good fixture re-rendered with a normal pass.
+  It edits `tests/run_stage_light_tests.gd` so the "no normal_image falls back" check uses a copy
+  with the key removed (the director-approved plan; floor unchanged). Then `average_f`.
+## Next for the Dev Lead, in order
+1. When Art's freeze lands: make the re-rendered good fixture (C, 56 px, 55°, lit) the stage's
+   default merc instead of the capsule, so every capture shows the chosen look.
+2. Street spec §6 "Street": a merc walking behind the well is occluded; two mercs crossing sort
+   correctly (needs a second merc; alpha-scissor sprites depth-test, so verify). Light proof only.
+3. The grey-box props are sparse at 55°; the real modular street kit (spec step 8) is Art + Dev.
+4. Weather: the director wants much more. Phase 1 caps are rain + night + torch; the full
+   catalogue (fog, snow, wind, storm, embers, light shafts) is a world-phase item. Ask before
+   pulling it forward.
+5. Sample set 1 is superseded by the director's 55° / 56 px pick; the Mixamo walk clip (D-029
+   sign-in) is still needed for walking sprites.
+## Worktrees
+`../MERCS-wt/p1-stage-scale` is the Dev Lead's one worktree (branch changes per PR); remove it when
+idle. Others: `.claude/worktrees/dual-desktop-instances-a78d20` (not mine), Art's under `../MERCS-wt/`.
 ## Rules learnt the hard way (keep under 10 lines)
-- A failed `cd` in a multi-line Bash call does not stop it: `cd X || exit 1`, or absolute paths.
-- Godot 4.7 flags int()/float() of a Variant as an unsafe call argument: assign to a typed local.
-- Prove compile failures with `--check-only` in a separate process.
-- Count checks per rule, not per file or entry.
-- Cloud containers can download Godot 4.7.2 from GitHub releases and run all suites headless.
+- Sprite3D rebuilds its mesh and AABB on the next frame: `await process_frame` before measuring.
+- gdformat writes CRLF here: normalise to LF after it. gdtoolkit is in ~/AppData/Roaming/Python/*/Scripts.
+- A suite that extends a script failing to parse HANGS: run with `SUITE_TIMEOUT=120`; kill by PID.
+- Typed GDScript: assign a Variant to a typed local before `int()`/`float()` or a Dictionary cast.
+- `docs/**/*.png` are plain git, not LFS. Commit the `.gd.uid` of each new script.
+- Python on this PC cannot see Git Bash's /tmp: pass `$(cygpath -m path)`.
+- A merge from main can silently restore lines without a conflict: run the suites before pushing.
+- Check `gh pr view <n> --json state` before pushing to a PR branch: pushing to a merged, deleted
+  branch recreates it on the remote.

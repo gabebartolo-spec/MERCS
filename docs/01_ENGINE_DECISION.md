@@ -32,12 +32,25 @@ does not: MERCS builds its own assets by design.
 ## Rendering plan (confirmed in Phase 1, not before)
 
 - Forward+ renderer, 1920×1080 target, integer pixel scale.
-- Characters are `Sprite3D` billboards (Y-axis) inside real low-poly 3D geometry; the perspective
-  camera pitch matches the pitch the sprites were rendered at.
-- Pixel stability is solved in Phase 1 with one of two documented options, chosen by the director
-  from labelled captures: (a) the whole scene rendered through a low-resolution `SubViewport`
-  (everything crunchy, like Octopath), or (b) crisp 3D with pixel characters and snapped sprite
-  positions. Phase 1 is not done until this is chosen.
+- Characters are camera-facing `Sprite3D` billboards inside real low-poly 3D geometry; the
+  perspective camera pitch matches the pitch the sprites were rendered at (55°, director
+  2026-10-08). Camera-facing, not Y-axis: a quad parallel to the image projects at one uniform
+  scale, so sprites never lean or shear near the screen edges at a steep pitch (an upright Y
+  billboard did, which is a mixel fail).
+- Pixel stability: **whole-screen pixel mode** (director, 2026-10-08, from sample set 2,
+  `docs/audits/sample_set_2/`; PR #25). The 3D world renders into a `SubViewport` of 640 × 360
+  inside a `SubViewportContainer` with `stretch = true`, `stretch_shrink = 3` and
+  `texture_filter = NEAREST`, filling the 1920 × 1080 window; the camera is current in that
+  viewport. Sprites are `Sprite3D`, `BILLBOARD_ENABLED`, nearest filter, alpha-cut discard,
+  unshaded, no cast shadow; their feet are snapped each step to a whole pixel of the 640 × 360
+  viewport (moved along the view ray, depth kept). Reference: `presentation/world/street_stage.gd`
+  (`PixelMode.WHOLE_SCREEN`).
+- Sprite scale: **constant** (director, 2026-10-08, same sheet). One sprite texel is one logical
+  pixel wherever the merc stands: `pixel_size = merc_height × cos(pitch) / height_px` (the factory
+  renders the figure foreshortened at the same pitch), scaled by the sprite's view depth over the
+  rail distance; no Y stretch. The camera rail distance is derived so the look-at depth is 1:1.
+  Sprites never resample; distance shows by screen position only. Occlusion by walls and sorting
+  between mercs come from the depth buffer (alpha-cut sprites write depth).
 
 ## Export and distribution
 

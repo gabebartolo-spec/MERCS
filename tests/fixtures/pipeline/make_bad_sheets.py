@@ -3,13 +3,18 @@
 How the fixtures were made (Blender 5.2, one process):
   blender -b --factory-startup -P tools/pipeline/render_character.py -- --body average_m --out <r>
   copy <r>/facing_*.png and <r>/render_meta.json to tests/fixtures/pipeline/render_4x/
+  blender ... render_character.py -- --body average_m --pass normal --out <n>
+  copy <n>/facing_*.png to tests/fixtures/pipeline/render_4x_normal/
   python tools/pipeline/pixelate.py --in tests/fixtures/pipeline/render_4x --out <p>
+  python tools/pipeline/pixelate.py --normals --in tests/fixtures/pipeline/render_4x_normal --mask <p> --out <q>
   python tools/pipeline/pack_sheets.py --body average_m --render-dir tests/fixtures/pipeline/render_4x \
-      --pixel-dir <p> --out tests/fixtures/pipeline/sheets/good
+      --pixel-dir <p> --normal-dir <q> --out tests/fixtures/pipeline/sheets/good
   python tests/fixtures/pipeline/make_bad_sheets.py
 
 This script derives one planted-bad sheet per validator rule from sheets/good/, each in its own
-folder with sheet.json, sheet.png and expected.txt (the rules validate_sheet.py must report).
+folder with sheet.json, sheet.png, normal.png and expected.txt (the rules validate_sheet.py must
+report). Each case's normal strip takes its alpha from that case's colour strip, so only the
+normal_alpha case trips SHEET-NORMAL.
 """
 from __future__ import annotations
 
@@ -37,12 +42,29 @@ def first_opaque(img, x0: int, w: int) -> tuple[int, int]:
     raise SystemExit("good sheet has an empty frame")
 
 
-def write_case(name: str, manifest: dict, img, rules: list[str], png_bytes: bytes | None = None) -> None:
+def normal_matching(normal, img):
+    """The good normal strip with its alpha replaced by img's, so the two line up exactly."""
+    out = copy.deepcopy(normal)
+    for i in range(3, len(out.rgba), 4):
+        out.rgba[i] = img.rgba[i]
+        if img.rgba[i] == 0:
+            out.rgba[i - 3:i] = bytes(3)
+    return out
+
+
+def write_case(name: str, manifest: dict, img, rules: list[str], png_bytes: bytes | None = None,
+               normal=None) -> None:
     folder = HERE / "sheets" / name
     if folder.exists():
         shutil.rmtree(folder)
     folder.mkdir(parents=True)
     manifest = dict(manifest, image="sheet.png")
+    if "normal_image" in manifest:
+        good_normal = read_png(GOOD / manifest["normal_image"])
+        manifest["normal_image"] = "normal.png"
+        if normal is None:
+            normal = normal_matching(good_normal, img) if png_bytes is None else good_normal
+        write_png(folder / "normal.png", normal)
     (folder / "sheet.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8", newline="\n")
     if png_bytes is not None:
         (folder / "sheet.png").write_bytes(png_bytes)
@@ -106,6 +128,12 @@ def main() -> int:
     write_case("palette_changed", m, base, ["SHEET-PALETTE"])
 
     write_case("not_png", good, base, ["SHEET-PNG"], png_bytes=b"this is not a png\n")
+
+    normal = normal_matching(read_png(GOOD / good["normal_image"]), base)
+    x, y = first_opaque(base, 0, fw)
+    i = (y * normal.width + x) * 4
+    normal.rgba[i:i + 4] = bytes(4)
+    write_case("normal_alpha", good, base, ["SHEET-NORMAL"], normal=normal)
     print("bad sheets written")
     return 0
 

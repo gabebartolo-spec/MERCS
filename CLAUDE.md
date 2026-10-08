@@ -80,3 +80,16 @@ AI-generated fantasy RPG? If the latter, it is not done.
 - Aim for 50–100k tokens of context on routine work. Past 150k, hand off.
 - Say which state you are in when you report: working, running a check, awaiting director,
   blocked, available. Waiting is valid; invented busywork is not.
+
+## Skills improve over time (director, 2026-10-08, all projects, both accounts)
+
+- **Learnings, with an evidence bar.** Any agent may add a finding to a skill's
+  `references/learnings.md`, but only once it has proved effective: a quality-check method that
+  caught or prevented a real defect; a recurring failure whose fix was verified afterwards by a
+  test, capture or green CI; or a measured time saving. Each entry names the date, project,
+  evidence (PR, commit, run or capture) and the general lesson. No hunches or untested ideas. If a
+  finding contradicts the skill, correct the skill itself instead of appending a note. A lesson
+  that keeps holding true is promoted into the skill's main text.
+- **Project spin-off skills.** An agent may create a project-specific skill in this repo, named
+  `mercs-<topic>`, when a general skill needs project-only detail. It says which general skill it
+  extends, and general lessons still go back into the general skill so other projects benefit.
