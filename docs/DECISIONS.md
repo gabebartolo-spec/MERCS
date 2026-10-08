@@ -4,6 +4,22 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
+## 2026-10-08 · D-034 · Lead (pending) · Sprite normal maps: `normal_image`, camera-facing tangent space, OpenGL convention
+Why: the factory and the engine must agree on one normal format (#26).
+Changes: lit sprites, `stage_light` suite.
+
+## 2026-10-08 · D-033 · Dev Lead as lead (pending) · The stage's rail distance is derived from pitch and figure height so one texel is one logical pixel at the look-at point
+Why: a fixed rail stretched the sprite about 1.5x. Supersedes the spec's fixed 12 m rail and 160 x 90 crop; `docs/specs/phase1_visual_proof.md` §2 should say so (spec owner's edit).
+Changes: `street_stage.gd`, `data/balance/stage.json` (#24).
+
+## 2026-10-08 · D-032 · Director · Sprite scale is constant: one texel is one logical pixel anywhere; sprites never resample; distance shows by position
+Why: answered from the sample set 2 depth sheet and clips.
+Changes: stage default `depth_scale` (#25).
+
+## 2026-10-08 · D-031 · Director · Pixel mode is A, whole screen: 640 x 360 SubViewport x3, sprites snapped
+Why: answered from the sample set 2 pixel-mode sheet and clips.
+Changes: node setup in `01_ENGINE_DECISION.md` (#25).
+
 ## 2026-10-08 · D-030 · Director · Merge & CI is autonomous for routine repository administration
 Why: the director was being asked to run routine git and GitHub commands, and the merge brief contradicted itself on branch ownership, board commits and permissions, so a green, eligible PR (#19) sat unmerged. Rulings: (1) green + eligible = merge, without asking; (2) a routine git or GitHub permission refusal is a configuration bug fixed in `.claude/settings.json` by PR, never a command handed to the director; (3) the branch owner syncs and repairs their own branch, Merge & CI names the exact conflict once and never pushes to another agent's branch; (4) `docs/STATUS.md` and `docs/DECISIONS.md` change only through a docs-only board PR by Merge & CI after each merge (`main` is protected for admins too, so there is no direct commit); (5) GitHub settings match the docs: squash only, no merge commits, no rebase merges, no auto-merge; (6) routine merge-agent messages are one line. The director is reached only for look and design gates, spend, credentials and sign-ins, destructive recovery with real risk, permissions GitHub reserves for a human, and genuinely ambiguous policy.
 Changes: `agent-briefs/MERGE_CI_AGENT.md` rewritten; `.claude/settings.json` (routine git allowed; force push, hard reset, forced branch deletion, admin merge and protection edits denied); `CLAUDE.md`; `03_TEAM_WORKFLOW.md`; `04_GUARDRAILS.md` C3, C5; `09_REPO_AND_HOSTING.md`; `mercs-pr`, `mercs-handoff`; PR template gains "Board and log". Amends D-021: a feature PR no longer writes `D-TBD` into `DECISIONS.md`; the decision text travels in the PR body.
