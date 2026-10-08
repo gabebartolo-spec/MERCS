@@ -15,7 +15,8 @@ extends Node
 ##
 ## pixel_mode WHOLE_SCREEN renders the 3D world through a 640 × 360 SubViewport scaled
 ## 3× with nearest filtering, and snaps the sprite to that viewport's pixel grid each
-## step. CRISP renders the world at window resolution with the sprite unsnapped.
+## step. CRISP renders the world at window resolution and snaps the sprite to whole
+## multiples of pixel.integer_scale window pixels, so its texels land on screen pixels.
 
 enum PixelMode { CRISP, WHOLE_SCREEN }
 enum Lighting { DAY, RAIN_NIGHT }
@@ -343,16 +344,15 @@ func _place_merc() -> void:
 
 
 func _place_sprite(sprite: Sprite3D, feet: Vector3) -> void:
-	if pixel_mode == PixelMode.WHOLE_SCREEN:
-		feet = _snap_to_pixel_grid(feet)
-	sprite.global_position = feet
+	var step := 1.0 if pixel_mode == PixelMode.WHOLE_SCREEN else _data.num("pixel", "integer_scale")
+	sprite.global_position = _snap_to_pixel_grid(feet, step)
 	_apply_texel(sprite)
 
 
-## Moves a world point along the camera's view so it lands on a whole pixel of the
-## camera's viewport, keeping its depth.
-func _snap_to_pixel_grid(point: Vector3) -> Vector3:
+## Moves a world point along the camera's view so it lands on a whole multiple of step
+## pixels of the camera's viewport, keeping its depth.
+func _snap_to_pixel_grid(point: Vector3, step: float) -> Vector3:
 	var forward: Vector3 = -_camera.global_transform.basis.z
 	var depth: float = (point - _camera.global_position).dot(forward)
 	var screen: Vector2 = _camera.unproject_position(point)
-	return _camera.project_position(screen.round(), depth)
+	return _camera.project_position((screen / step).round() * step, depth)

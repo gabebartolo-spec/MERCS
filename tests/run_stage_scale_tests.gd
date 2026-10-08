@@ -125,7 +125,7 @@ func _pivot_on_ground(merc: Sprite3D, frame: Vector2, pivot: Vector2) -> bool:
 	return (
 		not merc.centered
 		and merc.offset.is_equal_approx(expected)
-		and absf(merc.global_position.y) < EPSILON
+		and absf(merc.global_position.y) < SNAP_TOLERANCE_M
 	)
 
 

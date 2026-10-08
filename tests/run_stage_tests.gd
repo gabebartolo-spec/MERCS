@@ -16,6 +16,11 @@ const PITCH_PROBE := 40.0
 const HEIGHT_PROBE := 56
 const HALF := 2.0
 const SNAP_SAMPLES := 40
+## How far CRISP's snap to a 3 px window grid may move the feet: half a cell's diagonal
+## at the test pitch is about 0.02 m, so this bounds position checks, not the snap itself.
+const SNAP_TOLERANCE_M := 0.03
+## A handful of fixed steps; one step can sit inside a single 3 px snap cell.
+const MOVE_PROBE_STEPS := 10
 ## Odd deltas, none a multiple of the others, so the walker lands between pixels.
 const ODD_DELTAS: Array[float] = [0.0137, 0.0291, 0.0053, 0.0419]
 
@@ -35,6 +40,16 @@ func run_checks() -> void:
 	await _check_pixel_modes()
 	await _check_path_loop()
 	await _check_lighting()
+
+
+## A headless --script window is 64 × 64; CRISP snaps to the window's pixel grid, so give
+## it the real window size (logical size × integer scale, project.godot's 1920 × 1080).
+func _size_window() -> void:
+	var scale := int(_knob("pixel", "integer_scale"))
+	root.size = Vector2i(
+		int(_knob("pixel", "logical_width_px")) * scale,
+		int(_knob("pixel", "logical_height_px")) * scale
+	)
 
 
 func _load_stage_data() -> Dictionary:
@@ -64,6 +79,7 @@ func _knob_list(section: String, key: String) -> Array:
 ## Depth scale is PERSPECTIVE so the texel measured at the look-at point is the reference
 ## texel wherever the walker stands; CONSTANT is checked on its own in the scale suite.
 func _spawn(mode: StreetStage.PixelMode, height_px: int, pitch: float) -> StreetStage:
+	_size_window()
 	var packed: PackedScene = load(STAGE_SCENE) as PackedScene
 	var stage: StreetStage = packed.instantiate() as StreetStage
 	stage.pixel_mode = mode
@@ -282,6 +298,11 @@ func _check_whole_screen_mode() -> void:
 		whole.camera().get_viewport() == viewport and whole.camera().current,
 		"WHOLE_SCREEN mode's camera renders the SubViewport"
 	)
+	_check_whole_screen_snap(whole)
+	await _despawn(whole)
+
+
+func _check_whole_screen_snap(whole: StreetStage) -> void:
 	whole.step(FIXED_DELTA)
 	var screen: Vector2 = whole.merc_screen_position()
 	check(
@@ -297,7 +318,6 @@ func _check_whole_screen_mode() -> void:
 		not _off_grid(samples, _knob("pixel", "integer_scale")).is_empty(),
 		"WHOLE_SCREEN snaps to single pixels, not to multiples of the scale"
 	)
-	await _despawn(whole)
 
 
 ## The merc's screen position after each of SNAP_SAMPLES steps at the odd deltas.
@@ -340,11 +360,12 @@ func _check_path_loop() -> void:
 	var expected_x: float = points[0]
 	var expected_z: float = points[1]
 	check(
-		absf(start.x - expected_x) < EPSILON and absf(start.z - expected_z) < EPSILON,
+		absf(start.x - expected_x) < SNAP_TOLERANCE_M and absf(start.z - expected_z) < SNAP_TOLERANCE_M,
 		"the sprite starts at the first path point"
 	)
-	stage.step(FIXED_DELTA)
-	check(merc.global_position.distance_to(start) > 0.0, "one step moves the sprite")
+	for _i: int in MOVE_PROBE_STEPS:
+		stage.step(FIXED_DELTA)
+	check(merc.global_position.distance_to(start) > 0.0, "a few steps move the sprite")
 	var steps := int(ceilf(seconds / FIXED_DELTA)) + 1
 	for _i: int in steps:
 		stage.step(FIXED_DELTA)
@@ -353,13 +374,13 @@ func _check_path_loop() -> void:
 		"stepping one loop's worth of time completes exactly one lap, not %d" % stage.laps_completed
 	)
 	var speed := _knob("sprite", "walk_speed_m_s")
-	var overshoot: float = (steps + 1) * FIXED_DELTA * speed - seconds * speed
+	var overshoot: float = (steps + MOVE_PROBE_STEPS) * FIXED_DELTA * speed - seconds * speed
 	check(
 		(
 			merc.global_position.distance_to(
 				Vector3(expected_x, merc.global_position.y, expected_z)
 			)
-			<= overshoot + EPSILON
+			<= overshoot + SNAP_TOLERANCE_M
 		),
 		"after one lap the sprite is back near the first path point"
 	)
