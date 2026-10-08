@@ -13,8 +13,9 @@ extends SceneTree
 ##     [--lighting=day|rain_night] [--depth=perspective|constant] [--at=x,z]
 ##     [--frametime=<frames>] [--region=x,y,w,h] [--unlit] [--capsule] [--extra=x,z;x,z]
 ##
-## --walk is the seconds the sprite has walked before the still (default puts it beside
-## the well); --sequence=<seconds> writes <out stem>/frame_000.png … at --fps instead.
+## --walk is the seconds the sprite has walked before the still (default 14 puts it in
+## front of and left of the well, in view at 55 degrees); --sequence=<seconds> writes
+## <out stem>/frame_000.png … at --fps instead.
 ## The merc is DEFAULT_SHEET (the director's look) unless --sheet names another factory
 ## sheet (mercs.sheet/1, rendered at the capture's pitch and height) or --capsule asks for
 ## the grey placeholder. --at holds the merc's feet at
@@ -27,7 +28,7 @@ extends SceneTree
 const STAGE_SCENE := "res://presentation/world/street_stage.tscn"
 const STAGE_DATA := "res://data/balance/stage.json"
 const DEFAULT_OUT := "docs/audits/stage_samples/capture.png"
-const DEFAULT_WALK_SECONDS := 10.0
+const DEFAULT_WALK_SECONDS := 14.0
 ## The merc a capture shows unless --sheet or --capsule says otherwise: the pipeline's good
 ## fixture, rendered at the director's look (proportion C, 56 px, 55 degrees).
 const DEFAULT_SHEET := "res://tests/fixtures/pipeline/sheets/good/average_m_body_rest.json"
