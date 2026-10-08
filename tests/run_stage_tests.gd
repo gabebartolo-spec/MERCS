@@ -65,6 +65,7 @@ func _spawn(mode: StreetStage.PixelMode, height_px: int, pitch: float) -> Street
 	var stage: StreetStage = packed.instantiate() as StreetStage
 	stage.pixel_mode = mode
 	stage.depth_scale = StreetStage.DepthScale.PERSPECTIVE
+	stage.lit_sprites = false
 	stage.sprite_height_px = height_px
 	stage.pitch_degrees = pitch
 	stage.auto_walk = false
@@ -333,6 +334,7 @@ func _check_lighting() -> void:
 	var packed: PackedScene = load(STAGE_SCENE) as PackedScene
 	var night: StreetStage = packed.instantiate() as StreetStage
 	night.lighting = StreetStage.Lighting.RAIN_NIGHT
+	night.lit_sprites = false
 	night.auto_walk = false
 	root.add_child(night)
 	await process_frame

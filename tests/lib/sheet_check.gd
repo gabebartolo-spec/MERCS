@@ -28,7 +28,10 @@ static func check(manifest_path: String) -> PackedStringArray:
 	_check_facings(manifest, rig, problems)
 	_check_frames(manifest, rig, image.get_size(), problems)
 	_check_pivot(manifest, rig, problems)
+	var before_normal := problems.size()
 	_check_normal(manifest_path, manifest, image.get_size(), problems)
+	if problems.size() > before_normal:
+		return problems  # SheetFrame refuses a bad normal map; ENGINE-NORMAL already says why.
 	for facing: Variant in _list(manifest, "facings"):
 		if SHEET_FRAME.from_manifest(manifest_path, str(facing)) == null:
 			problems.append("ENGINE-LOAD: SheetFrame refuses facing %s" % facing)
