@@ -9,10 +9,12 @@ extends SceneTree
 ##   APPDATA=<scratch> godot --path . --resolution 1920x1080 \
 ##     --script tools/capture/capture_stage.gd -- --pitch=35 --height=48 \
 ##     --mode=crisp|whole --out=docs/audits/stage_samples/crisp_p35_h48.png \
-##     [--walk=10] [--sequence=3] [--fps=30]
+##     [--walk=10] [--sequence=3] [--fps=30] [--sheet=<manifest.json> [--facing=S]]
 ##
 ## --walk is the seconds the sprite has walked before the still (default puts it beside
 ## the well); --sequence=<seconds> writes <out stem>/frame_000.png … at --fps instead.
+## --sheet shows one facing of a factory sheet (mercs.sheet/1) instead of the capsule;
+## render it at the same pitch and height as the capture.
 
 const STAGE_SCENE := "res://presentation/world/street_stage.tscn"
 const STAGE_DATA := "res://data/balance/stage.json"
@@ -38,6 +40,13 @@ func _run() -> void:
 	_stage = _spawn_stage()
 	root.add_child(_stage)
 	await process_frame
+	if (
+		_args.has("sheet")
+		and not _stage.use_sheet(_arg_string("sheet", ""), _arg_string("facing", "S"))
+	):
+		push_error("could not show sheet %s" % _arg_string("sheet", ""))
+		quit(1)
+		return
 	_stage.step(_arg_float("walk", DEFAULT_WALK_SECONDS))
 	for _frame: int in int(_knob("settle_frames")):
 		await process_frame
@@ -103,7 +112,7 @@ func _render_frame() -> Image:
 ## sprite's viewport pixels scale up by the integer scale.
 func _crop_around_merc(frame: Image) -> Image:
 	var size := Vector2i(int(_knob("crop_width_px")), int(_knob("crop_height_px")))
-	var centre: Vector2 = _stage.merc_screen_position()
+	var centre: Vector2 = _stage.merc_centre_screen_position()
 	if _stage.pixel_mode == StreetStage.PixelMode.WHOLE_SCREEN:
 		centre *= _integer_scale()
 	var origin := Vector2i(centre.round()) - size / 2
