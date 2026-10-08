@@ -5,5 +5,5 @@
 # skip CI. Put a new suite in the shortest shard; add a shard when one passes about
 # ten minutes of suite time, and say so in the PR.
 #
-# Phase 0: two quick suites, one shard. Phase 1 adds stage and stage_scale (seconds, same shard).
-1: data smoke stage stage_scale
+# Phase 0: two quick suites, one shard. Phase 1 adds stage, stage_scale and assets (seconds, same shard).
+1: data smoke stage stage_scale assets
