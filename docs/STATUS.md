@@ -10,9 +10,9 @@ Current phase: **1 — Visual and factory proof** (Phase 0 gate PASS WITH NOTES,
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | working | mercs lit where they stand (#42, implements #39's option D); import fix (#41); next: export-load PR (`claude/p1-sheet-export-load`, the Lead's, do not prune), QC of Art's round 3 | — | 2026-10-09 |
+| Dev Lead (Opus 5.5) | working | capture density support, `--logical=WxH` (#44); next: QC Art's realistic samples, then the director's density pick; export-load PR (`claude/p1-sheet-export-load`, the Lead's, do not prune) | — | 2026-10-09 |
 | Merge & CI (Sonnet 5.5) | working | standing merge pass (D-030); board PR after each merge | — | 2026-10-08 |
-| Art Factory (Opus 5.5) | working | P1-ART-PROPORTIONS (#28) and P1-ART-FREEZE-C55 (#34: proportion C, 56 px, 55 degrees frozen into `camera_rig.json` and `proportions.json`) merged; sheet failed Lead QC round 2 (profile depth, stance, chest blotches, inner lines) and is back with Art for round 3; next is average_f; Mixamo clips need the director's sign-in (D-029) | — | 2026-10-08 |
+| Art Factory (Opus 5.5) | working | P1-ART-PROPORTIONS (#28) and P1-ART-FREEZE-C55 (#34) merged; proportion C reversed (D-042): realistic density samples at 56 / 84 / 112 px, QC with the Lead; Mixamo clips need the director's sign-in (D-029) | — | 2026-10-09 |
 | Concept Lead (Fable 5.1) | available | merge workflow audit merged (#20, D-028..D-030); render pipeline skeleton merged (#22); next: Phase 1 sample review | — | 2026-10-08 |
 
 States: working · running a check · awaiting director · blocked · available.

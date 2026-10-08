@@ -4,6 +4,10 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
+## 2026-10-09 · D-042 · Director · Proportion C is reversed: realistic proportions, a 4k pixel art look; pixel density stays open until the director picks from samples
+Why: the director said "I don't like the big head, lets go for a realistic, 4k pixel art look." Supersedes D-038 (proportion C) and reopens D-036 (56 px standing height): the merc density candidates are 56, 84 or 112 px, picked from samples. D-037 (55 degree pitch) is not touched by this entry.
+Changes: capture support `--logical=WxH` (#44); Art renders realistic density samples at 56 / 84 / 112 px; `06_STYLE_ART.md` follows the pick.
+
 ## 2026-10-08 · D-041 · Director · Authorisation: the Dev Lead may do what it thinks is best on making the re-rendered good fixture the stage's default merc
 Why: the director said "go", then "do what you think is best" (recorded in #39). Scope is that item only; it is not a general authorisation for look or design calls.
 Changes: captures default to the good sheet (#39).
