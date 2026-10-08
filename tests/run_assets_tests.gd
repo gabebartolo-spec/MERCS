@@ -128,14 +128,16 @@ func _copy_normal(manifest: Dictionary, dir: String) -> void:
 ## SheetFrame.from_manifest finds a sheet that exists only inside a pack.
 func _check_exported_load() -> void:
 	var manifest := _manifest(GOOD_SHEET)
-	var names: Array[String] = [str(manifest.get("image", "")), str(manifest.get("normal_image", ""))]
+	var names: Array[String] = [
+		str(manifest.get("image", "")), str(manifest.get("normal_image", ""))
+	]
 	var imported_ok := true
 	for image_name: String in names:
 		var path := GOOD_SHEET.get_base_dir().path_join(image_name)
 		var file_image := Image.load_from_file(ProjectSettings.globalize_path(path))
 		imported_ok = imported_ok and _same_pixels(_texture_image(path), file_image)
 	check(imported_ok, "imported sheet and normal textures keep every visible pixel of their PNGs")
-	var pack_manifest := _pack_sheet(manifest, names)
+	var pack_manifest := _pack_sheet(names)
 	var frame := SheetFrame.from_manifest(pack_manifest, FACING)
 	check(frame != null, "SheetFrame loads a sheet that exists only inside a .pck")
 	var loaded_ok := frame != null
@@ -159,7 +161,7 @@ func _texture_image(path: String) -> Image:
 
 ## Packs the sheet the way an export does: manifest as is, each PNG replaced by a .remap to
 ## its imported texture, no PNG. Mounts the pack and returns the manifest's pack path.
-func _pack_sheet(manifest: Dictionary, names: Array[String]) -> String:
+func _pack_sheet(names: Array[String]) -> String:
 	DirAccess.make_dir_recursive_absolute(PLANT_DIR)
 	var packer := PCKPacker.new()
 	packer.pck_start(PACK_FILE)
