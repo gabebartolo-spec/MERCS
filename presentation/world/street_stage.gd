@@ -44,6 +44,9 @@ const HALF := 2.0
 ## pixel only at the look-at depth. CONSTANT: the texel is rescaled by depth so it is one
 ## logical pixel wherever the merc stands; only screen position shows distance.
 @export var depth_scale: DepthScale = DepthScale.CONSTANT
+## When true, a frame with a normal map is drawn shaded, lit by the scene's lights; a
+## frame without one (or with this off) is unshaded and tinted at night.
+@export var lit_sprites: bool = true
 ## When false the walker only moves through step(), which captures and tests call.
 @export var auto_walk: bool = true
 
@@ -294,6 +297,11 @@ func _show_frame(frame: SheetFrame) -> void:
 	_merc.region_rect = frame.region
 	_merc.centered = false
 	_merc.offset = Vector2(-frame.pivot.x, frame.pivot.y - frame.region.size.y)
+	var lit := lit_sprites and frame.normal != null
+	_merc.material_override = frame.lit_material() if lit else null
+	_merc.modulate = Color.WHITE
+	if not lit and lighting == Lighting.RAIN_NIGHT:
+		_merc.modulate = _data.rgb("rain_night", "sprite_tint_rgb")
 
 
 func _setup_path() -> void:
@@ -315,12 +323,9 @@ func _setup_merc() -> void:
 	_merc_height_m = _data.num("sprite", "merc_height_m")
 	var width := int(_data.num("sprite", "texture_width_px"))
 	var fill := _data.grey("sprite", "fill_grey")
-	_show_frame(
-		SheetFrame.capsule(width, sprite_height_px, fill, _data.grey("sprite", "outline_grey"))
-	)
+	var outline := _data.grey("sprite", "outline_grey")
+	_show_frame(SheetFrame.capsule(width, sprite_height_px, fill, outline, lit_sprites))
 	_apply_texel()
-	if lighting == Lighting.RAIN_NIGHT:
-		_merc.modulate = _data.rgb("rain_night", "sprite_tint_rgb")
 	_merc.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
 	_merc.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 	_merc.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
