@@ -84,6 +84,9 @@
     "clip_fps": 30,
     "crop_width_px": 320,
     "crop_height_px": 180,
-    "crop_scale": 2
+    "crop_scale": 2,
+    "frametime_frames": 120,
+    "percentile_median": 50,
+    "percentile_high": 95
   }
 }

@@ -52,3 +52,5 @@ Used when the stage's `lighting` export is RAIN_NIGHT (sample set 2, spec §4); 
 - `settle_frames`: frames rendered before a still is saved.
 - `clip_seconds`, `clip_fps`: the image-sequence length and rate.
 - `crop_width_px`, `crop_height_px`, `crop_scale`: the window-pixel region centred on the standing figure that is also saved, and its upscale. 320 × 180 (the spec's 160 × 90 predates the derived rail and cut a 48 px figure, 144 window px tall, in half).
+- `frametime_frames`: rendered frames `--frametime` measures when given no count, stepped at `1 / clip_fps` after the settle frames.
+- `percentile_median`, `percentile_high`: the percentiles (nearest rank) the frame-time report prints as p50 and p95.
