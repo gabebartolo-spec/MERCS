@@ -33,7 +33,6 @@
   },
   "camera": {
     "fov_degrees": 35,
-    "distance_m": 12,
     "look_at_height_m": 1.0,
     "near_m": 0.1,
     "far_m": 200
@@ -55,8 +54,8 @@
     "settle_frames": 4,
     "clip_seconds": 3,
     "clip_fps": 30,
-    "crop_width_px": 160,
-    "crop_height_px": 90,
+    "crop_width_px": 320,
+    "crop_height_px": 180,
     "crop_scale": 2
   }
 }

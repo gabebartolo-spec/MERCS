@@ -2,9 +2,15 @@ class_name StreetStage
 extends Node
 ## Phase 1 grey-box capture stage (docs/specs/phase1_visual_proof.md §1 step 2, §2).
 ## A 40 × 20 m street of placeholder boxes in a GridMap, one warm key light with flat
-## ambient, a perspective camera on a rail 12 m from the street centre line, and one
-## Sprite3D capsule that walks a loop past the well. Every number that is not an
-## exported var comes from data/balance/stage.json (stage.md explains each knob).
+## ambient, a perspective camera on a rail above the street centre line, and one
+## Sprite3D (a capsule, or a factory sheet frame via use_sheet) that walks a loop past
+## the well. Every number that is not an exported var comes from
+## data/balance/stage.json (stage.md explains each knob).
+##
+## Scale contract (tools/pipeline/camera_rig.json): a texel is
+## merc_height_m × cos(pitch) / sprite_height_px of the image plane, the sprite is
+## stretched 1 / cos(pitch) on Y so the figure stands merc_height_m tall, and the rail
+## distance is derived so one texel covers one logical pixel at the look-at point.
 ## The scene is presentation only: nothing here decides an outcome, and nothing is random.
 ##
 ## pixel_mode WHOLE_SCREEN renders the 3D world through a 640 × 360 SubViewport scaled
@@ -26,7 +32,8 @@ const HALF := 2.0
 	set = set_pitch_degrees
 ## How the 3D world reaches the window; see the class comment.
 @export var pixel_mode: PixelMode = PixelMode.CRISP
-## Texture height of the placeholder merc; pixel_size follows from it.
+## On-screen figure height in logical pixels (the factory's char_height_px); the
+## texel size and the rail distance follow from it.
 @export var sprite_height_px: int = 48
 ## When false the walker only moves through step(), which captures and tests call.
 @export var auto_walk: bool = true
@@ -107,10 +114,15 @@ func street() -> GridMap:
 	return _street
 
 
-## The sprite's centre in the pixels of the viewport the camera renders to (the
+## The sprite's feet in the pixels of the viewport the camera renders to (the
 ## 640 × 360 logical viewport in WHOLE_SCREEN, the window in CRISP).
 func merc_screen_position() -> Vector2:
 	return _camera.unproject_position(_merc.global_position)
+
+
+## The middle of the standing figure, in the same pixels as merc_screen_position().
+func merc_centre_screen_position() -> Vector2:
+	return _camera.unproject_position(_merc.global_position + Vector3.UP * _merc_height_m / HALF)
 
 
 func _load_data() -> Dictionary:
@@ -241,13 +253,57 @@ func _setup_camera() -> void:
 	_apply_pitch()
 
 
-## The rail sits on the look-at point; the camera hangs distance_m away along a ray
-## pitched pitch_degrees below the horizon, looking back at the rail.
+## Metres of the camera's image plane one sprite texel covers.
+func texel_m() -> float:
+	if sprite_height_px <= 0:
+		return 0.0
+	return _num("sprite", "merc_height_m") * cos(deg_to_rad(pitch_degrees)) / sprite_height_px
+
+
+## The rail distance at which one texel covers one logical pixel at the look-at point:
+## the logical viewport spans 2 × distance × tan(fov / 2) of the image plane.
+func rail_distance_m() -> float:
+	var half_fov := deg_to_rad(_num("camera", "fov_degrees")) / HALF
+	return texel_m() * _num("pixel", "logical_height_px") / (HALF * tan(half_fov))
+
+
+## The rail sits on the look-at point; the camera hangs rail_distance_m() away along a
+## ray pitched pitch_degrees below the horizon, looking back at the rail. The sprite's
+## texel and stretch follow the pitch.
 func _apply_pitch() -> void:
-	var distance := _num("camera", "distance_m")
+	var distance := rail_distance_m()
 	var pitch := deg_to_rad(pitch_degrees)
 	_camera.position = Vector3(0.0, distance * sin(pitch), distance * cos(pitch))
 	_camera.rotation_degrees = Vector3(-pitch_degrees, 0.0, 0.0)
+	if _merc.texture != null:
+		_apply_texel()
+
+
+func _apply_texel() -> void:
+	_merc.pixel_size = texel_m()
+	_merc.scale = Vector3(1.0, 1.0 / cos(deg_to_rad(pitch_degrees)), 1.0)
+
+
+## Shows one frame of a factory sheet (tools/pipeline, schema mercs.sheet/1) with its
+## pivot on the ground. Returns false, changing nothing, for an unknown facing or a
+## sheet that does not load. The sheet must be rendered at this stage's pitch and height.
+func use_sheet(manifest_path: String, facing: String) -> bool:
+	var frame := SheetFrame.from_manifest(manifest_path, facing)
+	if frame == null:
+		return false
+	_show_frame(frame)
+	_place_merc()
+	return true
+
+
+## Shows a frame with its pivot texel (x from the left, y from the top) on the node's
+## origin, so the node's position is the merc's feet. Sprite3D draws y up from offset.y.
+func _show_frame(frame: SheetFrame) -> void:
+	_merc.texture = frame.texture
+	_merc.region_enabled = true
+	_merc.region_rect = frame.region
+	_merc.centered = false
+	_merc.offset = Vector2(-frame.pivot.x, frame.pivot.y - frame.region.size.y)
 
 
 func _setup_path() -> void:
@@ -268,35 +324,17 @@ func _setup_path() -> void:
 func _setup_merc() -> void:
 	_merc_height_m = _num("sprite", "merc_height_m")
 	var width := int(_num("sprite", "texture_width_px"))
-	_merc.texture = _make_capsule_texture(width, sprite_height_px)
-	_merc.pixel_size = _merc_height_m / float(sprite_height_px)
+	var fill := _grey_of("sprite", "fill_grey")
+	_show_frame(
+		SheetFrame.capsule(width, sprite_height_px, fill, _grey_of("sprite", "outline_grey"))
+	)
+	_apply_texel()
 	_merc.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
 	_merc.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 	_merc.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
 	_merc.shaded = false
 	_merc.double_sided = false
 	_merc.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-
-
-## A solid capsule with a 1-px outline on a transparent field; deterministic.
-func _make_capsule_texture(width: int, height: int) -> ImageTexture:
-	var image := Image.create(width, height, false, Image.FORMAT_RGBA8)
-	image.fill(Color(0.0, 0.0, 0.0, 0.0))
-	var fill := _grey_of("sprite", "fill_grey")
-	var outline := _grey_of("sprite", "outline_grey")
-	var radius := width / HALF
-	var centre_x := radius - 1.0 / HALF
-	var top := radius
-	var bottom := height - radius
-	for y: int in height:
-		for x: int in width:
-			var axis_y: float = clampf(y, top, bottom)
-			var distance := Vector2(x - centre_x, y - axis_y).length()
-			if distance <= radius - 1.0 - 1.0 / HALF:
-				image.set_pixel(x, y, fill)
-			elif distance <= radius - 1.0 / HALF:
-				image.set_pixel(x, y, outline)
-	return ImageTexture.create_from_image(image)
 
 
 func _grey_of(section: String, key: String) -> Color:
@@ -332,10 +370,10 @@ func _apply_pixel_mode() -> void:
 
 
 func _place_merc() -> void:
-	var centre: Vector3 = _walker.global_position + Vector3(0.0, _merc_height_m / HALF, 0.0)
+	var feet: Vector3 = _walker.global_position
 	if pixel_mode == PixelMode.WHOLE_SCREEN:
-		centre = _snap_to_pixel_grid(centre)
-	_merc.global_position = centre
+		feet = _snap_to_pixel_grid(feet)
+	_merc.global_position = feet
 
 
 ## Moves a world point along the camera's view so it lands on a whole pixel of the

@@ -311,4 +311,3 @@ func _check_path_loop() -> void:
 		"after one lap the sprite is back near the first path point"
 	)
 	await _despawn(stage)
-

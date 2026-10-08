@@ -25,12 +25,12 @@ and `tools/capture/capture_stage.gd`. Spec: `docs/specs/phase1_visual_proof.md` 
 
 ## camera
 - `fov_degrees`: perspective field of view (35°).
-- `distance_m`: the rail's distance from the look-at point on the street centre line (12 m).
+- (no distance knob) the rail's distance from the look-at point is derived by `StreetStage.rail_distance_m()` so one sprite texel covers one logical pixel there: `merc_height_m × cos(pitch) / sprite_height_px × logical_height_px / (2 × tan(fov / 2))`, about 17.3 m at 35° and 48 px. It follows the pitch and height under test, matching `tools/pipeline/camera_rig.json`.
 - `look_at_height_m`: the camera looks at a point this high above the ground (1 m).
 - `near_m`, `far_m`: clip planes.
 
 ## sprite
-- `merc_height_m`: the body height the sprite's pixel height represents (1.78 m; pixel_size = merc_height_m / sprite_height_px).
+- `merc_height_m`: the standing body height (1.78 m, `reference_height_m` in the camera rig). One texel (pixel_size) is `merc_height_m × cos(pitch) / sprite_height_px` of the image plane, and the sprite is stretched by `1 / cos(pitch)` on Y so the figure stands this tall in the world and foreshortens back to `sprite_height_px` on screen.
 - `texture_width_px`: width of the generated capsule texture; its height is the exported sprite height.
 - `fill_grey`, `outline_grey`: the capsule's fill and 1-px outline grey levels.
 - `walk_speed_m_s`: how fast the placeholder walks its loop.
@@ -43,4 +43,4 @@ and `tools/capture/capture_stage.gd`. Spec: `docs/specs/phase1_visual_proof.md` 
 ## capture
 - `settle_frames`: frames rendered before a still is saved.
 - `clip_seconds`, `clip_fps`: the image-sequence length and rate.
-- `crop_width_px`, `crop_height_px`, `crop_scale`: the region centred on the sprite that is also saved, and its upscale.
+- `crop_width_px`, `crop_height_px`, `crop_scale`: the window-pixel region centred on the standing figure that is also saved, and its upscale. 320 × 180 (the spec's 160 × 90 predates the derived rail and cut a 48 px figure, 144 window px tall, in half).

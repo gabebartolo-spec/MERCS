@@ -81,7 +81,9 @@ func _texel_span_px(pitch: float, height_px: int) -> Vector2:
 	var right: Vector3 = camera.global_transform.basis.x
 	var origin: Vector2 = camera.unproject_position(anchor)
 	var across: Vector2 = camera.unproject_position(anchor + right * merc.pixel_size * merc.scale.x)
-	var up: Vector2 = camera.unproject_position(anchor + Vector3.UP * merc.pixel_size * merc.scale.y)
+	var up: Vector2 = camera.unproject_position(
+		anchor + Vector3.UP * merc.pixel_size * merc.scale.y
+	)
 	await _despawn(stage)
 	return Vector2(across.distance_to(origin), up.distance_to(origin))
 
@@ -144,10 +146,15 @@ func _check_sheet() -> void:
 		"facing S of the good sheet shows one %s frame, not %s" % [frame, merc.region_rect.size]
 	)
 	stage.step(FIXED_DELTA)
+	await process_frame  # Sprite3D rebuilds its mesh (and AABB) on the next frame.
 	var drop := (frame.y - _json_num(pivot, "y")) * merc.pixel_size * merc.scale.y
+	var bottom := _sprite_bottom_y(merc)
 	check(
-		loaded and absf(_sprite_bottom_y(merc) + drop) < EPSILON,
-		"the sheet's pivot row stands on the ground: the frame bottom sits %s m below y 0" % drop
+		loaded and absf(bottom + drop) < EPSILON,
+		(
+			"the sheet's pivot row stands on the ground: the frame bottom sits %s m below y 0, not %s"
+			% [drop, -bottom]
+		)
 	)
 	var accepted := true
 	if can_load:
