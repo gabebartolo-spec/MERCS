@@ -31,6 +31,7 @@ func run_checks() -> void:
 	await _check_sprite_pixel_size()
 	await _check_pixel_modes()
 	await _check_path_loop()
+	await _check_lighting()
 
 
 func _load_stage_data() -> Dictionary:
@@ -311,3 +312,45 @@ func _check_path_loop() -> void:
 		"after one lap the sprite is back near the first path point"
 	)
 	await _despawn(stage)
+
+
+## DAY has no torch or rain and an untinted sprite; RAIN_NIGHT adds the torch and rain
+## (fixed particle seed, so captures repeat), dims the key and tints the unshaded sprite.
+func _check_lighting() -> void:
+	var day: StreetStage = await _spawn(StreetStage.PixelMode.CRISP, 48, 35.0)
+	check(
+		(
+			day.find_child("Torch", true, false) == null
+			and day.find_child("Rain", true, false) == null
+		),
+		"DAY lighting adds no torch and no rain"
+	)
+	check(day.merc().modulate == Color.WHITE, "DAY lighting leaves the sprite untinted")
+	await _despawn(day)
+	var packed: PackedScene = load(STAGE_SCENE) as PackedScene
+	var night: StreetStage = packed.instantiate() as StreetStage
+	night.lighting = StreetStage.Lighting.RAIN_NIGHT
+	night.auto_walk = false
+	root.add_child(night)
+	await process_frame
+	var night_data: Dictionary = _stage_data.get("rain_night", {})
+	var rain_data: Dictionary = night_data.get("rain", {})
+	var rain: GPUParticles3D = night.find_child("Rain", true, false) as GPUParticles3D
+	var seed_value: float = rain_data.get("seed", -1.0)
+	check(
+		(
+			night.find_child("Torch", true, false) is OmniLight3D
+			and rain != null
+			and rain.use_fixed_seed
+			and rain.seed == int(seed_value)
+		),
+		"RAIN_NIGHT adds the torch and rain with the data's fixed seed"
+	)
+	var light: DirectionalLight3D = night.get_node("%KeyLight") as DirectionalLight3D
+	var light_data: Dictionary = night_data.get("light", {})
+	var energy: float = light_data.get("energy", -1.0)
+	check(
+		is_equal_approx(light.light_energy, energy) and night.merc().modulate != Color.WHITE,
+		"RAIN_NIGHT dims the key to the data's energy and tints the unshaded sprite"
+	)
+	await _despawn(night)

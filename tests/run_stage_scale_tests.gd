@@ -12,6 +12,9 @@ const GOOD_SHEET := "res://tests/fixtures/pipeline/sheets/good/average_m_body_re
 const TEXEL_TOLERANCE_PX := 0.01
 const SAMPLE_PITCHES: Array[float] = [30.0, 35.0, 40.0]
 const SAMPLE_HEIGHTS: Array[int] = [40, 48, 56]
+## Feet positions nearer to and further from the camera than the look-at point.
+const DEPTH_PROBES: Array[Vector3] = [Vector3(-3.0, 0.0, 6.0), Vector3(3.0, 0.0, -6.0)]
+const PERSPECTIVE_GROWTH := 1.05
 
 
 func suite_name() -> String:
@@ -24,6 +27,7 @@ func run_checks() -> void:
 	await _check_rig_contract()
 	await _check_feet_on_ground()
 	await _check_sheet()
+	await _check_depth_scale()
 
 
 func _load_json(path: String) -> Dictionary:
@@ -160,4 +164,59 @@ func _check_sheet() -> void:
 	if can_load:
 		accepted = stage.call("use_sheet", GOOD_SHEET, "Q")
 	check(not accepted, "use_sheet refuses an unknown facing")
+	await _despawn(stage)
+
+
+## Logical pixels one texel covers at the merc's own depth (measured at the look-at
+## height above its feet), (across, up).
+func _span_at_merc(stage: StreetStage) -> Vector2:
+	var camera: Camera3D = stage.camera()
+	var merc: Sprite3D = stage.merc()
+	var anchor: Vector3 = merc.global_position + Vector3.UP * _knob("camera", "look_at_height_m")
+	var right: Vector3 = camera.global_transform.basis.x
+	var origin: Vector2 = camera.unproject_position(anchor)
+	var across: Vector2 = camera.unproject_position(anchor + right * merc.pixel_size * merc.scale.x)
+	var up: Vector2 = camera.unproject_position(
+		anchor + Vector3.UP * merc.pixel_size * merc.scale.y
+	)
+	return Vector2(across.distance_to(origin), up.distance_to(origin))
+
+
+## CONSTANT depth scale keeps one texel on one logical pixel nearer and further than the
+## look-at point; PERSPECTIVE lets a nearer merc grow (the look question this exposes);
+## stand_at holds the feet where it put them.
+func _check_depth_scale() -> void:
+	var stage: StreetStage = await _spawn(StreetStage.PixelMode.WHOLE_SCREEN, 48, 35.0)
+	var worst := 0.0
+	stage.depth_scale = StreetStage.DepthScale.CONSTANT
+	for probe: Vector3 in DEPTH_PROBES:
+		stage.stand_at(probe)
+		var error := (_span_at_merc(stage) - Vector2.ONE).abs()
+		worst = maxf(worst, maxf(error.x, error.y))
+	check(
+		worst < TEXEL_TOLERANCE_PX,
+		(
+			"CONSTANT depth scale keeps a texel within %s px of one pixel off the look-at depth, worst %s"
+			% [TEXEL_TOLERANCE_PX, worst]
+		)
+	)
+	stage.depth_scale = StreetStage.DepthScale.PERSPECTIVE
+	stage.stand_at(DEPTH_PROBES[0])
+	var near := _span_at_merc(stage)
+	check(
+		near.x > PERSPECTIVE_GROWTH,
+		(
+			"PERSPECTIVE depth scale lets a merc 6 m nearer grow past %s px per texel, not %s"
+			% [PERSPECTIVE_GROWTH, near.x]
+		)
+	)
+	stage.step(FIXED_DELTA)
+	var moved: Vector3 = stage.merc().global_position
+	check(
+		(
+			absf(moved.x - DEPTH_PROBES[0].x) < TEXEL_TOLERANCE_PX
+			and absf(moved.z - DEPTH_PROBES[0].z) < TEXEL_TOLERANCE_PX
+		),
+		"stand_at holds the feet at %s after a step, not %s" % [DEPTH_PROBES[0], moved]
+	)
 	await _despawn(stage)
