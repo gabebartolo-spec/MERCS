@@ -79,13 +79,17 @@ func _spawn_stage() -> StreetStage:
 	stage.sprite_height_px = int(_arg_float("height", stage.sprite_height_px))
 	if _arg_string("lighting", "day") == "rain_night":
 		stage.lighting = StreetStage.Lighting.RAIN_NIGHT
-	if _arg_string("depth", "perspective") == "constant":
-		stage.depth_scale = StreetStage.DepthScale.CONSTANT
-	var mode := _arg_string("mode", "crisp")
-	if mode == "whole":
-		stage.pixel_mode = StreetStage.PixelMode.WHOLE_SCREEN
-	else:
-		stage.pixel_mode = StreetStage.PixelMode.CRISP
+	# Without --depth or --mode the stage's defaults apply (constant, whole screen).
+	if _args.has("depth"):
+		var constant := _arg_string("depth", "") == "constant"
+		stage.depth_scale = (
+			StreetStage.DepthScale.CONSTANT if constant else StreetStage.DepthScale.PERSPECTIVE
+		)
+	if _args.has("mode"):
+		var whole := _arg_string("mode", "") == "whole"
+		stage.pixel_mode = (
+			StreetStage.PixelMode.WHOLE_SCREEN if whole else StreetStage.PixelMode.CRISP
+		)
 	return stage
 
 

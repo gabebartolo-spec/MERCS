@@ -33,7 +33,7 @@ const HALF := 2.0
 @export var pitch_degrees: float = 35.0:
 	set = set_pitch_degrees
 ## How the 3D world reaches the window; see the class comment.
-@export var pixel_mode: PixelMode = PixelMode.CRISP
+@export var pixel_mode: PixelMode = PixelMode.WHOLE_SCREEN
 ## On-screen figure height in logical pixels (the factory's char_height_px); the
 ## texel size and the rail distance follow from it.
 @export var sprite_height_px: int = 48
@@ -43,7 +43,7 @@ const HALF := 2.0
 ## PERSPECTIVE: the sprite is sized by the camera like the world, so a texel is one logical
 ## pixel only at the look-at depth. CONSTANT: the texel is rescaled by depth so it is one
 ## logical pixel wherever the merc stands; only screen position shows distance.
-@export var depth_scale: DepthScale = DepthScale.PERSPECTIVE
+@export var depth_scale: DepthScale = DepthScale.CONSTANT
 ## When false the walker only moves through step(), which captures and tests call.
 @export var auto_walk: bool = true
 

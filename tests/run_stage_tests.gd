@@ -58,10 +58,13 @@ func _knob_list(section: String, key: String) -> Array:
 
 
 ## Instantiates the stage with the given exports and waits one frame so _ready ran.
+## Depth scale is PERSPECTIVE so the texel measured at the look-at point is the reference
+## texel wherever the walker stands; CONSTANT is checked on its own in the scale suite.
 func _spawn(mode: StreetStage.PixelMode, height_px: int, pitch: float) -> StreetStage:
 	var packed: PackedScene = load(STAGE_SCENE) as PackedScene
 	var stage: StreetStage = packed.instantiate() as StreetStage
 	stage.pixel_mode = mode
+	stage.depth_scale = StreetStage.DepthScale.PERSPECTIVE
 	stage.sprite_height_px = height_px
 	stage.pitch_degrees = pitch
 	stage.auto_walk = false
