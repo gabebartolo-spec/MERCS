@@ -10,9 +10,9 @@ Current phase: **1 — Visual and factory proof** (Phase 0 gate PASS WITH NOTES,
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | available | stage defaults 55 degrees / 56 px (#31) and handoff refresh with assets test fix (#33) merged; next: Art's re-frozen good fixture as the stage's default merc | — | 2026-10-08 |
+| Dev Lead (Opus 5.5) | available | stage defaults 55 degrees / 56 px (#31), handoff refresh (#33) and crowd with occlusion (#36) merged; next: Art's re-frozen good fixture as the stage's default merc | — | 2026-10-08 |
 | Merge & CI (Sonnet 5.5) | working | standing merge pass (D-030); board PR after each merge | — | 2026-10-08 |
-| Art Factory (Opus 5.5) | working | P1-ART-PROPORTIONS merged (#28): C, 56 px, 55 degrees chosen; now freezing the look into the rig (camera 55/56, body build with C's scales, validator feet tolerance); Mixamo clips need the director's sign-in (D-029) | claude/art-freeze-c55 | 2026-10-08 |
+| Art Factory (Opus 5.5) | available | P1-ART-PROPORTIONS (#28) and P1-ART-FREEZE-C55 (#34: proportion C, 56 px, 55 degrees frozen into `camera_rig.json` and `proportions.json`) merged; next is average_f (needs assigning); Mixamo clips need the director's sign-in (D-029) | — | 2026-10-08 |
 | Concept Lead (Fable 5.1) | available | merge workflow audit merged (#20, D-028..D-030); render pipeline skeleton merged (#22); next: Phase 1 sample review | — | 2026-10-08 |
 
 States: working · running a check · awaiting director · blocked · available.
@@ -50,13 +50,15 @@ States: working · running a check · awaiting director · blocked · available.
 9. Dev Lead: lit sprites (normal-mapped frames lit by scene lights, `stage_light` suite). DONE (#26).
 10. Art Factory: P1-ART-PROPORTIONS, proportion samples and a normal pass sample. DONE (#28; director chose C, 56 px, 55 degrees: D-036..D-038).
 11. Dev Lead: assets suite (`assets` suite, floor 8). DONE (#29).
+12. Art Factory: P1-ART-FREEZE-C55, the look frozen into the rig. DONE (#34).
+13. Dev Lead: stage defaults 55 degrees / 56 px (#31); crowd, occlusion and camera-facing sprites in the street. DONE (#36).
 
 ## Waiting on the director
 - Sign in to mixamo.com in a browser the Art chat can use, so the fourteen clips can be downloaded (D-029).
 - Restart the Merge & CI chat in the repo folder with the one-line kickoff in `agent-briefs/KICKOFF_PROMPTS.md` once this PR merges, so the new `.claude/settings.json` and brief load.
 
 ## Merge queue
-#34 (Art, draft: P1-ART-FREEZE-C55; syncs with main after #33).
+(empty)
 
 ## GPU jobs
 (none)

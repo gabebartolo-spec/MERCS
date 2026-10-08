@@ -4,6 +4,10 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
+## 2026-10-08 · D-040 · Lead (pending) · Sprites are camera-facing billboards, not Y-axis billboards
+Why: upright Y billboards lean at the 55 degree pitch, which produces mixels (D-035).
+Changes: the stage; `01_ENGINE_DECISION.md` (#36).
+
 ## 2026-10-08 · D-039 · Director · Testing cadence: major testing and audits only at milestones
 Why: avoid heavy testing and audits between milestones. Per PR: run the existing suites and lints with one capture; new exhaustive suites, planted-defect rounds and audits wait for milestones. Narrows the amount of proof under `CLAUDE.md` rule 9, not the rule (#29; its suite was built before this).
 
