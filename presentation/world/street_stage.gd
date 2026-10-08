@@ -1,16 +1,16 @@
 class_name StreetStage
 extends Node
 ## Phase 1 grey-box capture stage (docs/specs/phase1_visual_proof.md §1 step 2, §2).
-## A 40 × 20 m street of placeholder boxes in a GridMap, one warm key light with flat
-## ambient, a perspective camera on a rail above the street centre line, and one
-## Sprite3D (a capsule, or a factory sheet frame via use_sheet) that walks a loop past
-## the well. Every number that is not an exported var comes from
-## data/balance/stage.json (stage.md explains each knob).
+## A 40 × 20 m street of placeholder boxes in a GridMap (StreetGrid), one warm key light
+## with flat ambient, a perspective camera on a rail above the street centre line, one
+## Sprite3D merc (a capsule, or a factory sheet frame via use_sheet) that walks a loop past
+## the well, and any standing mercs added with add_merc. Every number that is not an
+## exported var comes from data/balance/stage.json (stage.md explains each knob).
 ##
 ## Scale contract (tools/pipeline/camera_rig.json): a texel is
-## merc_height_m × cos(pitch) / sprite_height_px of the image plane, the sprite is
-## stretched 1 / cos(pitch) on Y so the figure stands merc_height_m tall, and the rail
-## distance is derived so one texel covers one logical pixel at the look-at point.
+## merc_height_m × cos(pitch) / sprite_height_px of the image plane (the factory renders
+## the figure foreshortened at the same pitch), the sprite faces the camera, and the rail
+## distance is derived so one texel covers one logical pixel at the look-at depth.
 ## The scene is presentation only: nothing here decides an outcome, and nothing is random.
 ##
 ## pixel_mode WHOLE_SCREEN renders the 3D world through a 640 × 360 SubViewport scaled
@@ -22,11 +22,6 @@ enum Lighting { DAY, RAIN_NIGHT }
 enum DepthScale { PERSPECTIVE, CONSTANT }
 
 const STAGE_DATA_PATH := "res://data/balance/stage.json"
-const ITEM_GROUND := 0
-const ITEM_HOUSE := 1
-const ITEM_WELL := 2
-const ITEM_CART := 3
-const ITEM_DOOR := 4
 const HALF := 2.0
 
 ## Camera pitch below the horizon, in degrees. Applies at once when changed.
@@ -59,6 +54,9 @@ var _walk_speed: float = 0.0
 var _merc_height_m: float = 0.0
 var _standing := false
 var _stand_point := Vector3.ZERO
+var _frame: SheetFrame = null
+var _extras: Array[Sprite3D] = []
+var _extra_points: Array[Vector3] = []
 
 @onready var _world: Node3D = %World
 @onready var _street: GridMap = %Street
@@ -73,7 +71,7 @@ var _stand_point := Vector3.ZERO
 
 func _ready() -> void:
 	_data = StageData.load_file(STAGE_DATA_PATH)
-	_build_street()
+	StreetGrid.build(_street, _data)
 	_setup_light()
 	_setup_camera()
 	_setup_path()
@@ -140,63 +138,6 @@ func merc_centre_screen_position() -> Vector2:
 	return _camera.unproject_position((_merc.global_transform * _merc.get_aabb()).get_center())
 
 
-func _build_street() -> void:
-	var cell := _data.num("street", "cell_size_m")
-	var library := MeshLibrary.new()
-	var thickness := _data.num("street", "ground_thickness_m")
-	_add_box_item(
-		library, ITEM_GROUND, Vector3(cell, thickness, cell), _data.grey("shades", "ground")
-	)
-	# Ground tiles sit one layer down with their top face at y = 0, so props above
-	# never replace a tile in its cell.
-	library.set_item_mesh_transform(
-		ITEM_GROUND, Transform3D(Basis(), Vector3(0.0, cell - thickness / HALF, 0.0))
-	)
-	_add_box_item(
-		library, ITEM_HOUSE, _data.vec3("street", "house_size_m"), _data.grey("shades", "house")
-	)
-	_add_box_item(
-		library, ITEM_WELL, _data.vec3("street", "well_size_m"), _data.grey("shades", "well")
-	)
-	_add_box_item(
-		library, ITEM_CART, _data.vec3("street", "cart_size_m"), _data.grey("shades", "cart")
-	)
-	var door_size := _data.vec3("street", "door_size_m")
-	_add_box_item(library, ITEM_DOOR, door_size, _data.grey("shades", "door"))
-	var door_lift := Vector3(0.0, door_size.y / HALF, _data.num("street", "door_offset_z_m"))
-	library.set_item_mesh_transform(ITEM_DOOR, Transform3D(Basis(), door_lift))
-	_street.mesh_library = library
-	_street.cell_size = Vector3(cell, cell, cell)
-	_street.cell_center_y = false
-	_fill_cells(cell)
-
-
-## A box item whose base sits on the cell floor (mesh origin lifted by half its height).
-func _add_box_item(library: MeshLibrary, id: int, size: Vector3, shade: Color) -> void:
-	var mesh := BoxMesh.new()
-	mesh.size = size
-	var material := StandardMaterial3D.new()
-	material.albedo_color = shade
-	mesh.material = material
-	library.create_item(id)
-	library.set_item_mesh(id, mesh)
-	library.set_item_mesh_transform(id, Transform3D(Basis(), Vector3(0.0, size.y / HALF, 0.0)))
-
-
-func _fill_cells(cell: float) -> void:
-	var half_w := int(_data.num("street", "width_m") / cell / HALF)
-	var half_d := int(_data.num("street", "depth_m") / cell / HALF)
-	for x: int in range(-half_w, half_w):
-		for z: int in range(-half_d, half_d):
-			_street.set_cell_item(Vector3i(x, -1, z), ITEM_GROUND)
-	var houses := _data.floats("street", "house_cells_xz")
-	for i: int in range(0, houses.size() - 1, 2):
-		_street.set_cell_item(Vector3i(int(houses[i]), 0, int(houses[i + 1])), ITEM_HOUSE)
-	_street.set_cell_item(_data.cell("street", "well_cell"), ITEM_WELL)
-	_street.set_cell_item(_data.cell("street", "cart_cell"), ITEM_CART)
-	_street.set_cell_item(_data.cell("street", "door_cell"), ITEM_DOOR)
-
-
 func _setup_light() -> void:
 	var light := "light" if lighting == Lighting.DAY else "rain_night/light"
 	_key_light.rotation_degrees = Vector3(
@@ -251,30 +192,24 @@ func _apply_pitch() -> void:
 	var pitch := deg_to_rad(pitch_degrees)
 	_camera.position = Vector3(0.0, distance * sin(pitch), distance * cos(pitch))
 	_camera.rotation_degrees = Vector3(-pitch_degrees, 0.0, 0.0)
-	if _merc.texture != null:
-		_apply_texel()
+	if _frame != null:
+		for sprite: Sprite3D in _all_mercs():
+			_apply_texel(sprite)
 
 
-## In CONSTANT depth scale the texel grows with the merc's depth relative to the
-## look-at point (measured at the look-at height above its feet), and the Y stretch is
-## corrected for the steeper or shallower view there, so a texel stays one pixel square.
-func _apply_texel() -> void:
-	var stretch := 1.0 / cos(deg_to_rad(pitch_degrees))
-	_merc.pixel_size = texel_m()
-	_merc.scale = Vector3(1.0, stretch, 1.0)
+## Sprites face the camera fully (BILLBOARD_ENABLED), so each lies in a plane parallel to
+## the image and projects at one uniform scale: no lean or shear at the screen edges. A
+## texel is texel_m() of the image plane; in CONSTANT depth scale it grows with the
+## sprite's depth over the rail distance, so it is one logical pixel wherever the merc
+## stands.
+func _apply_texel(sprite: Sprite3D) -> void:
+	sprite.pixel_size = texel_m()
+	sprite.scale = Vector3.ONE
 	if depth_scale != DepthScale.CONSTANT or rail_distance_m() <= 0.0:
 		return
-	var probe := _merc.global_position + Vector3.UP * _data.num("camera", "look_at_height_m")
 	var forward: Vector3 = -_camera.global_transform.basis.z
-	_merc.pixel_size *= (probe - _camera.global_position).dot(forward) / rail_distance_m()
-	var origin := _camera.unproject_position(probe)
-	var across := _camera.unproject_position(
-		probe + _camera.global_transform.basis.x * _merc.pixel_size
-	)
-	var up := _camera.unproject_position(probe + Vector3.UP * _merc.pixel_size * stretch)
-	var span_up := up.distance_to(origin)
-	if span_up > 0.0:
-		_merc.scale.y = stretch * across.distance_to(origin) / span_up
+	var depth := (sprite.global_position - _camera.global_position).dot(forward)
+	sprite.pixel_size *= depth / rail_distance_m()
 
 
 ## Shows one frame of a factory sheet (tools/pipeline, schema mercs.sheet/1) with its
@@ -284,24 +219,26 @@ func use_sheet(manifest_path: String, facing: String) -> bool:
 	var frame := SheetFrame.from_manifest(manifest_path, facing)
 	if frame == null:
 		return false
-	_show_frame(frame)
+	_frame = frame
+	for sprite: Sprite3D in _all_mercs():
+		_show_frame(sprite, frame)
 	_place_merc()
 	return true
 
 
 ## Shows a frame with its pivot texel (x from the left, y from the top) on the node's
 ## origin, so the node's position is the merc's feet. Sprite3D draws y up from offset.y.
-func _show_frame(frame: SheetFrame) -> void:
-	_merc.texture = frame.texture
-	_merc.region_enabled = true
-	_merc.region_rect = frame.region
-	_merc.centered = false
-	_merc.offset = Vector2(-frame.pivot.x, frame.pivot.y - frame.region.size.y)
+func _show_frame(sprite: Sprite3D, frame: SheetFrame) -> void:
+	sprite.texture = frame.texture
+	sprite.region_enabled = true
+	sprite.region_rect = frame.region
+	sprite.centered = false
+	sprite.offset = Vector2(-frame.pivot.x, frame.pivot.y - frame.region.size.y)
 	var lit := lit_sprites and frame.normal != null
-	_merc.material_override = frame.lit_material() if lit else null
-	_merc.modulate = Color.WHITE
+	sprite.material_override = frame.lit_material() if lit else null
+	sprite.modulate = Color.WHITE
 	if not lit and lighting == Lighting.RAIN_NIGHT:
-		_merc.modulate = _data.rgb("rain_night", "sprite_tint_rgb")
+		sprite.modulate = _data.rgb("rain_night", "sprite_tint_rgb")
 
 
 func _setup_path() -> void:
@@ -324,14 +261,43 @@ func _setup_merc() -> void:
 	var width := int(_data.num("sprite", "texture_width_px"))
 	var fill := _data.grey("sprite", "fill_grey")
 	var outline := _data.grey("sprite", "outline_grey")
-	_show_frame(SheetFrame.capsule(width, sprite_height_px, fill, outline, lit_sprites))
-	_apply_texel()
-	_merc.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
-	_merc.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-	_merc.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
-	_merc.shaded = false
-	_merc.double_sided = false
-	_merc.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_frame = SheetFrame.capsule(width, sprite_height_px, fill, outline, lit_sprites)
+	_configure(_merc)
+	_apply_texel(_merc)
+
+
+## Another merc standing at a world point, drawn with the current frame and the same
+## placement, snapping and depth-scale rules as the walker (crowd, occlusion and sorting).
+func add_merc(point: Vector3) -> Sprite3D:
+	var sprite := Sprite3D.new()
+	_world.add_child(sprite)
+	_configure(sprite)
+	_extras.append(sprite)
+	_extra_points.append(point)
+	_place_merc()
+	return sprite
+
+
+func extra_mercs() -> Array[Sprite3D]:
+	return _extras
+
+
+func _all_mercs() -> Array[Sprite3D]:
+	var all: Array[Sprite3D] = [_merc]
+	all.append_array(_extras)
+	return all
+
+
+## Depth-tested, alpha-cut, nearest, camera-facing: occlusion by walls and sorting between
+## mercs come from the depth buffer, not from draw order.
+func _configure(sprite: Sprite3D) -> void:
+	_show_frame(sprite, _frame)
+	sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
+	sprite.shaded = false
+	sprite.double_sided = false
+	sprite.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 
 func _apply_pixel_mode() -> void:
@@ -371,10 +337,16 @@ func stand_at(point: Vector3) -> void:
 
 func _place_merc() -> void:
 	var feet: Vector3 = _stand_point if _standing else _walker.global_position
+	_place_sprite(_merc, feet)
+	for i: int in _extras.size():
+		_place_sprite(_extras[i], _extra_points[i])
+
+
+func _place_sprite(sprite: Sprite3D, feet: Vector3) -> void:
 	if pixel_mode == PixelMode.WHOLE_SCREEN:
 		feet = _snap_to_pixel_grid(feet)
-	_merc.global_position = feet
-	_apply_texel()
+	sprite.global_position = feet
+	_apply_texel(sprite)
 
 
 ## Moves a world point along the camera's view so it lands on a whole pixel of the

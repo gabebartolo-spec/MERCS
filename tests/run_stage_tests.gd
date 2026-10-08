@@ -130,7 +130,7 @@ func _check_camera_and_light(stage: StreetStage) -> void:
 
 
 func _check_merc_material(merc: Sprite3D) -> void:
-	check(merc.billboard == BaseMaterial3D.BILLBOARD_FIXED_Y, "the sprite billboards on Y only")
+	check(merc.billboard == BaseMaterial3D.BILLBOARD_ENABLED, "the sprite faces the camera")
 	check(
 		merc.texture_filter == BaseMaterial3D.TEXTURE_FILTER_NEAREST, "the sprite filters nearest"
 	)

@@ -52,7 +52,7 @@ static func from_manifest(manifest_path: String, facing: String) -> SheetFrame:
 
 
 ## A shaded material for this frame's sprite (needs a normal map): nearest texels, alpha
-## scissor, Y billboard keeping the sprite's scale, matte with no specular glint.
+## scissor, camera-facing billboard keeping the sprite's scale, matte with no specular glint.
 func lit_material() -> StandardMaterial3D:
 	var material := StandardMaterial3D.new()
 	material.albedo_texture = texture
@@ -61,7 +61,7 @@ func lit_material() -> StandardMaterial3D:
 	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
 	material.alpha_scissor_threshold = ALPHA_SCISSOR
-	material.billboard_mode = BaseMaterial3D.BILLBOARD_FIXED_Y
+	material.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
 	material.billboard_keep_scale = true
 	material.roughness = MATTE_ROUGHNESS
 	material.metallic_specular = NO_SPECULAR
