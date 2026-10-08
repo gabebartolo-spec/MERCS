@@ -62,7 +62,7 @@ def build(manifest_path: Path, zoom: int) -> Image:
     lines = [
         (f"{m['body']} {m['layer']} {m['clip']}  {len(m['frames'])} facings", INK),
         (f"pitch {cam['pitch_deg']:g}°  {cam['char_height_px']} px  x{zoom}", INK),
-        (f"palette {m['palette'].get('status', '')}, no outline", WARN),
+        (f"base body, no head or hair layer. palette {m['palette'].get('status', '')}", WARN),
     ]
     header_h = len(lines) * (GLYPH_H * title_scale + LINE_GAP)
     grid_w = COLUMNS * cell_w + (COLUMNS - 1) * GAP

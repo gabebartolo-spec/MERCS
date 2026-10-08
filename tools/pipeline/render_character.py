@@ -236,6 +236,46 @@ def aim_bones(rig: bpy.types.Object, targets: dict) -> None:
     bpy.context.view_layer.update()
 
 
+def group_centroid(rig: bpy.types.Object, group: str, min_weight: float) -> Vector:
+    """World centroid of the deformed vertices weighted to a vertex group (the head mesh, say)."""
+    bpy.context.view_layer.update()
+    deps = bpy.context.evaluated_depsgraph_get()
+    total, n = Vector((0.0, 0.0, 0.0)), 0
+    for obj in rig.children:
+        if obj.type != "MESH" or group not in obj.vertex_groups:
+            continue
+        gi = obj.vertex_groups[group].index
+        ev = obj.evaluated_get(deps)
+        mesh = ev.to_mesh()
+        for v in mesh.vertices:
+            if any(g.group == gi and g.weight >= min_weight for g in v.groups):
+                total += ev.matrix_world @ v.co
+                n += 1
+        ev.to_mesh_clear()
+    if not n:
+        raise SystemExit(f"recentre: no vertices weighted to {group}")
+    return total / n
+
+
+def recentre_bones(rig: bpy.types.Object, specs: dict) -> None:
+    """Shift a bone (pose only) so its mesh centroid's horizontal offset from another bone's head
+    shrinks to keep_offset of what it was, then lift it.
+
+    Scaling the head 1.8x about its joint multiplies the face's natural forward offset by 1.8;
+    keep_offset 1/1.8 restores the natural offset (0 would sit the head's centre on the spine,
+    which pushes it behind the neck: measured side-on, 2026-10-09). Metres, before the refit.
+    """
+    world_inv = rig.matrix_world.inverted()
+    for bone, spec in specs.items():
+        pb = rig.pose.bones[bone]
+        centre = group_centroid(rig, bone, spec["min_weight"])
+        anchor = rig.matrix_world @ rig.pose.bones[spec["over"]].head
+        pull = 1.0 - spec["keep_offset"]
+        delta = Vector(((anchor.x - centre.x) * pull, (anchor.y - centre.y) * pull, spec["lift_m"]))
+        pb.matrix = world_inv @ (Matrix.Translation(delta) @ (rig.matrix_world @ pb.matrix))
+    bpy.context.view_layer.update()
+
+
 def apply_proportions(rig: bpy.types.Object, path: str, name: str, height_m: float) -> dict:
     """Pose and scale bones for a sample variant, then refit the figure to height_m with feet on z = 0."""
     cfg = json.loads(Path(path).read_text(encoding="utf-8"))
@@ -252,6 +292,7 @@ def apply_proportions(rig: bpy.types.Object, path: str, name: str, height_m: flo
         if pb is None:
             raise SystemExit(f"variant {name}: no bone {bone}; bones are never added or renamed")
         pb.scale = (factor, factor, factor)
+    recentre_bones(rig, spec.get("recentre", {}))
     lo, hi = figure_extent_z(rig)
     s = height_m / (hi - lo)
     rig.scale = (s, s, s)

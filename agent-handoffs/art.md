@@ -1,39 +1,40 @@
-# Art Factory handoff, 2026-10-08 22:00 AEDT
+# Art Factory handoff, 2026-10-09 AEDT
 Start from this file, CLAUDE.md, your brief (`agent-briefs/ART_AGENT.md`), and the current phase section of `docs/08_ROADMAP.md` only (`docs/STATUS.md` names the phase).
-Instructions come from the lead session "Claude2: MERCS Lead" (director's standing order, 2026-10-08).
+Instructions come from the lead session ("Claude2: MERCS Lead" / "MERCS BOSS"). Director rule 2026-10-08:
+every sheet goes to the Lead for QC first; only passing sheets reach the director (Lead presents).
 
-## State: awaiting merge (then average_f)
+## State: awaiting Lead QC
 ## Task
-P1-ART-FREEZE-C55: freeze the director's pick (proportion C, 56 px, pitch 55) into the contract: camera_rig.json
-(55 / 56 / cell 96 / pivot 48,80 / feet tolerance), tools/pipeline/proportions.json applied by default in
-render_character.py, validator SHEET-NORMAL, good + bad fixtures re-rendered with normal strips, 06 section 3.
+P1-ART-QC-C55: fix the Lead's six QC points on the frozen C/56/55 average_m rest sheet, then (#39) publish
+the passing sheet + normal map under assets/ with its licensing-register row so the stage build can use it.
 ## Branch and commit
-claude/art-freeze-c55 (stacked on claude/art-proportions = PR #28), worktree ../MERCS-wt/art-proportions,
-draft PR (see `gh pr list`). No stacking (#27): when #28 merges, merge origin/main in, rerun suites, mark ready.
+claude/art-qc-c55 (from main after #34/#36/#37), worktree ../MERCS-wt/art-qc, local WIP commit, not pushed, no PR yet.
 ## Files I own right now
-tools/pipeline/ (camera_rig.json, proportions.json, render_character.py, validate_sheet.py, test_pipeline.py),
-tests/fixtures/pipeline/ (all), tests/run_stage_light_tests.gd (one check, lead-approved), docs/06_STYLE_ART.md section 3.
+tools/pipeline/ (proportions.json, render_character.py recentre_bones, pixelate.py despeckle + outline,
+pixelate.json, contact_sheet.py label), docs/audits/qc_c55/ (review images sent to the Lead).
 ## Unfinished changes
-None in the PR. After merge: tell the lead the new good fixture is on main (they make it the stage default merc).
-Then average_f on the same skeleton and proportions.json (bodies.json entry, build_body.py, rig hash must match).
+On a Lead pass: regenerate tests/fixtures/pipeline (render_4x, render_4x_normal, sheets/good, make_bad_sheets.py),
+contact sheet in docs/audits/render_samples, run test_pipeline + SUITES_ONLY + lints + one capture, publish under
+assets/characters/ (manifest, strip, normal, provenance) + register row, PR with Board and log. Drop docs/audits/qc_c55/sheet.
 ## Evidence so far
-- Suites (SUITES_ONLY): data 88, smoke 24, stage 43, stage_scale 11, stage_light 8, all pass; lints 9/9; pipeline 15/15.
-- Good fixture: measured extents at 55/56 = 64 px above pivot, 10 below, +-16 wide; validates clean.
-- Capture: docs/audits/render_samples/freeze_p55_h56_rain_night_lit(.png, _crop.png), lit by the stage.
+- Measured: feet planted (ankle z equal, knees 6.4 deg both); stance was 0.37 m wide -> far foot 16 px higher at 55.
+- Side-on 0 deg render: full recentre put the head behind the spine and tore the neck; keep_offset 1/1.8 + 1.5 cm lift fixed it.
+- QC sheet validates clean; rig_scale 0.9756, height 1.7800.
 ## Attempts (for the fix-loop rule)
-- Normal pass 1: Blender's shader camera space has Z away from the viewer (B averaged 48). Fixed by negating Z.
-- Sample cells 96 then 112 clipped at 64 px / 55; the frozen 56 px figure fits 96 with pivot 48,80.
+- Head forward: (1) recentre centroid onto neck = over-corrected; (2) neck aim upright = no visible change. Then
+  gathered side-on evidence; (3) partial recentre keep_offset 1/1.8 = correct.
 ## Open decisions
-- Mixamo clips need the director's Adobe account (Art cannot sign in). Needed before sample set 1.
-- Clips must not key bone scale (strip scale curves on import) or C's proportions are undone.
+- Lead/director: fuller torso (MPFB body-shape targets) for the side views; placeholder head/hair layer (Lead asks the director).
+- Interior outline lines (06 "inner-line where the silhouette would merge") not implemented.
 ## Running jobs
-None.
+None. Mixamo: 10 clips in D:\MERCS-vault\clips\mixamo\ with SOURCES.md (director's yes 2026-10-08); not yet retargeted.
 ## Rules learnt the hard way (keep under 10 lines)
 - MPFB targets are shape keys: always measure `evaluated_get(depsgraph)`, never `mesh.vertices`.
-- `read_factory_settings` unloads MPFB; clear objects instead.
-- Set `filepaths.save_version = 0` or Blender leaves `.blend1` backups beside assets.
+- `read_factory_settings` unloads MPFB; clear objects instead. Set `filepaths.save_version = 0`.
 - Only Merge & CI edits STATUS.md and DECISIONS.md (D-026): put state and decisions in the PR body.
-- The body rig's origin is at hip height (z 0.82): refit height by measuring, then shift by the feet's z.
 - Normal passes need view transform Raw and dither 0, or the data is tone-mapped and noisy.
-- Director: mixels are an automatic fail; every image and view uses one texel size.
+- Director: mixels are an automatic fail; every image and view uses one texel size; send 1x and 4x as separate files.
 - Godot runs leave tools/lint/node_classes.gd.uid and .import churn: delete/revert before staging.
+- A child pose bone inherits its parent's scale: compensate (hands 1.3/0.85).
+- Judge a pose fix side-on at 0 degrees before the 55-degree sprite; the steep view hides over-correction.
+- Mixamo export links expire in 300 s and the monitor can return the previous job: export one clip per call and download at once.

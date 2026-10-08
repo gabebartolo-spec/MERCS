@@ -131,15 +131,76 @@ def normals_dir(src_dir: Path, mask_dir: Path, out_dir: Path, cfg: dict) -> list
     return results
 
 
+NEIGHBOURS_4 = ((1, 0), (-1, 0), (0, 1), (0, -1))
+NEIGHBOURS_8 = NEIGHBOURS_4 + ((1, 1), (1, -1), (-1, 1), (-1, -1))
+
+
+def luma(rgb) -> int:
+    return 299 * rgb[0] + 587 * rgb[1] + 114 * rgb[2]
+
+
+def despeckle(img: Image) -> Image:
+    """Replace isolated dark pixels inside the figure with their neighbours' most common colour.
+
+    A pixel is a speckle when all four neighbours are opaque, none of its eight neighbours shares
+    its colour, and it is darker than every four-neighbour (block-mean noise, not a drawn line).
+    Decided on the input image only, so the result does not depend on scan order.
+    """
+    out = Image.blank(img.width, img.height)
+    out.rgba[:] = img.rgba
+    for y in range(1, img.height - 1):
+        for x in range(1, img.width - 1):
+            px = img.get(x, y)
+            if px[3] == 0:
+                continue
+            n4 = [img.get(x + dx, y + dy) for dx, dy in NEIGHBOURS_4]
+            if any(n[3] == 0 for n in n4):
+                continue
+            if any(img.get(x + dx, y + dy)[:3] == px[:3] for dx, dy in NEIGHBOURS_8):
+                continue
+            if not all(luma(px) < luma(n) for n in n4):
+                continue
+            counts: dict = {}
+            for n in n4:
+                counts[n[:3]] = counts.get(n[:3], 0) + 1
+            best = max(sorted(counts), key=lambda c: counts[c])  # ties: lowest colour wins
+            out.put(x, y, (*best, OPAQUE))
+    return out
+
+
+def outline(img: Image, colour: tuple[int, int, int]) -> Image:
+    """06 section 3 outline: every opaque pixel with a transparent 4-neighbour (or on the image
+    edge) becomes the outline colour. Drawn on the figure's own edge pixels, so the silhouette,
+    the pivot and the alpha the normal map copies do not change."""
+    out = Image.blank(img.width, img.height)
+    out.rgba[:] = img.rgba
+    for y in range(img.height):
+        for x in range(img.width):
+            if img.get(x, y)[3] == 0:
+                continue
+            for dx, dy in NEIGHBOURS_4:
+                nx, ny = x + dx, y + dy
+                if not (0 <= nx < img.width and 0 <= ny < img.height) or img.get(nx, ny)[3] == 0:
+                    out.put(x, y, (*colour, OPAQUE))
+                    break
+    return out
+
+
 def pixelate_dir(src_dir: Path, out_dir: Path, layer: str, cfg: dict) -> list[tuple[str, str]]:
     pal: Palette = load_palette(REPO / cfg["palette"])
     quant = Quantiser(pal.ramp_colours(cfg["ramps_by_layer"].get(layer)))
+    line = cfg.get("outline", {})
+    line_colour = pal.ramp_colours([line["ramp"]])[line["step"]] if layer in line.get("layers", []) else None
     frames = sorted(src_dir.glob("facing_*.png"))
     if not frames:
         raise SystemExit(f"no facing_*.png in {src_dir}")
     results = []
     for path in frames:
         img = reduce_image(read_png(path), cfg, quant)
+        if layer in cfg.get("despeckle_layers", []):
+            img = despeckle(img)
+        if line_colour is not None:
+            img = outline(img, line_colour)
         write_png(out_dir / path.name, img)
         results.append((path.name, img.pixel_sha256()))
     return results
