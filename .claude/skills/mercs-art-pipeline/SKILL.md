@@ -85,3 +85,8 @@ how anything looks stays a prototype until the director has seen it, with labell
 message as the question (`agent-briefs/DIRECTOR_QUESTION_PROTOCOL.md`), contact sheet beside the golden
 image in `assets/golden/`. A golden image changes only by a decision in `docs/DECISIONS.md` (`06` section 8).
 The test: cover the title; if it could be any AI-generated fantasy RPG, it is not done (`06` section 9).
+
+## Learnings
+
+Proven findings for this project live in `references/learnings.md`. Read it before using this
+skill; add to it only what proved effective, with evidence.
