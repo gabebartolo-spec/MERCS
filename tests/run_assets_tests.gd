@@ -14,6 +14,9 @@ const PLANT_DIR := "user://assets_suite"
 const WRONG_FRAME_PX := 48
 const WRONG_PIVOT_Y := 50
 const SMALL_NORMAL_PX := 32
+const PACK_FILE := "user://assets_suite/exported_sheet.pck"
+const PACK_ROOT := "res://exported_sheet"
+const FACING := "S"
 
 
 func suite_name() -> String:
@@ -43,6 +46,7 @@ func run_checks() -> void:
 	_check_rule("ENGINE-FRAME", _plant("frame", {"frame_w": WRONG_FRAME_PX}))
 	_check_rule("ENGINE-PIVOT", _plant("pivot", {"pivot_y": WRONG_PIVOT_Y}))
 	_check_rule("ENGINE-NORMAL", _plant("normal", {"small_normal": true}))
+	_check_exported_load()
 	await process_frame
 
 
@@ -117,3 +121,77 @@ func _copy_normal(manifest: Dictionary, dir: String) -> void:
 	var normal := Image.load_from_file(ProjectSettings.globalize_path(source))
 	if normal != null:
 		normal.save_png(dir.path_join(normal_name))
+
+
+## The Phase 1 gate runs from an export, where res:// is a .pck holding imported textures and
+## no PNG files. The sheet's pixels must still reach the screen: imported textures load, and
+## SheetFrame.from_manifest finds a sheet that exists only inside a pack.
+func _check_exported_load() -> void:
+	var manifest := _manifest(GOOD_SHEET)
+	var names: Array[String] = [str(manifest.get("image", "")), str(manifest.get("normal_image", ""))]
+	var imported_ok := true
+	for image_name: String in names:
+		var path := GOOD_SHEET.get_base_dir().path_join(image_name)
+		var file_image := Image.load_from_file(ProjectSettings.globalize_path(path))
+		imported_ok = imported_ok and _same_pixels(_texture_image(path), file_image)
+	check(imported_ok, "imported sheet and normal textures keep every visible pixel of their PNGs")
+	var pack_manifest := _pack_sheet(manifest, names)
+	var frame := SheetFrame.from_manifest(pack_manifest, FACING)
+	check(frame != null, "SheetFrame loads a sheet that exists only inside a .pck")
+	var loaded_ok := frame != null
+	if frame != null:
+		var sheet := Image.load_from_file(
+			ProjectSettings.globalize_path(GOOD_SHEET.get_base_dir().path_join(names[0]))
+		)
+		loaded_ok = _same_pixels(frame.texture.get_image(), sheet)
+	check(loaded_ok, "the sheet loaded from the .pck has the PNG's visible pixels")
+
+
+func _manifest(path: String) -> Dictionary:
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	return parsed if parsed is Dictionary else {}
+
+
+func _texture_image(path: String) -> Image:
+	var texture := load(path) as Texture2D
+	return texture.get_image() if texture != null else null
+
+
+## Packs the sheet the way an export does: manifest as is, each PNG replaced by a .remap to
+## its imported texture, no PNG. Mounts the pack and returns the manifest's pack path.
+func _pack_sheet(manifest: Dictionary, names: Array[String]) -> String:
+	DirAccess.make_dir_recursive_absolute(PLANT_DIR)
+	var packer := PCKPacker.new()
+	packer.pck_start(PACK_FILE)
+	var manifest_path := PACK_ROOT.path_join(GOOD_SHEET.get_file())
+	packer.add_file(manifest_path, ProjectSettings.globalize_path(GOOD_SHEET))
+	for image_name: String in names:
+		var source := GOOD_SHEET.get_base_dir().path_join(image_name)
+		var config := ConfigFile.new()
+		config.load(source + ".import")
+		var texture_path := str(config.get_value("remap", "path", ""))
+		var remap_path := PLANT_DIR.path_join(image_name + ".remap")
+		var remap := FileAccess.open(remap_path, FileAccess.WRITE)
+		remap.store_string('[remap]\n\npath="%s"\n' % texture_path)
+		remap.close()
+		packer.add_file(PACK_ROOT.path_join(image_name) + ".remap", remap_path)
+		packer.add_file(texture_path, ProjectSettings.globalize_path(texture_path))
+	packer.flush()
+	ProjectSettings.load_resource_pack(PACK_FILE)
+	return manifest_path
+
+
+## Same size and same pixels wherever the sheet is visible: Godot's import may rewrite the
+## colour under fully transparent pixels (fix_alpha_border), which no player can see.
+func _same_pixels(a: Image, b: Image) -> bool:
+	if a == null or b == null or a.get_size() != b.get_size():
+		return false
+	a.convert(Image.FORMAT_RGBA8)
+	b.convert(Image.FORMAT_RGBA8)
+	for y: int in a.get_height():
+		for x: int in a.get_width():
+			var pixel_a := a.get_pixel(x, y)
+			var pixel_b := b.get_pixel(x, y)
+			if pixel_a.a != pixel_b.a or (pixel_a.a > 0.0 and pixel_a != pixel_b):
+				return false
+	return true
