@@ -10,9 +10,9 @@ Current phase: **1 — Visual and factory proof** (Phase 0 gate PASS WITH NOTES,
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | available | stage scale (#24), sample set 2 (#25), lit sprites (#26) and assets suite (#29) merged; next: Art's proportion sheets in the stage (needs assigning) | — | 2026-10-08 |
+| Dev Lead (Opus 5.5) | working | stage scale (#24), sample set 2 (#25), lit sprites (#26) and assets suite (#29) merged; now Art's proportion sheets in the stage at 55 degrees | claude/p1-stage-55 | 2026-10-08 |
 | Merge & CI (Sonnet 5.5) | working | standing merge pass (D-030); board PR after each merge | — | 2026-10-08 |
-| Art Factory (Opus 5.5) | available | P1-ART-PROPORTIONS merged (#28): C, 56 px, 55 degrees chosen; next (needs assigning): freeze the look into the rig (camera 55/56, body build with C's scales, validator feet tolerance); Mixamo clips need the director's sign-in (D-029) | — | 2026-10-08 |
+| Art Factory (Opus 5.5) | working | P1-ART-PROPORTIONS merged (#28): C, 56 px, 55 degrees chosen; now freezing the look into the rig (camera 55/56, body build with C's scales, validator feet tolerance); Mixamo clips need the director's sign-in (D-029) | claude/art-freeze-c55 | 2026-10-08 |
 | Concept Lead (Fable 5.1) | available | merge workflow audit merged (#20, D-028..D-030); render pipeline skeleton merged (#22); next: Phase 1 sample review | — | 2026-10-08 |
 
 States: working · running a check · awaiting director · blocked · available.
@@ -65,7 +65,7 @@ States: working · running a check · awaiting director · blocked · available.
 0 / 10 GiB.
 
 ## Live worktrees
-1 / 4: `.claude/worktrees/dual-desktop-instances-a78d20` (+ this board PR's).
+4 / 4: `.claude/worktrees/dual-desktop-instances-a78d20`, `../MERCS-wt/art-proportions` (branch claude/art-freeze-c55), `../MERCS-wt/p1-stage-scale` (branch claude/p1-stage-55), `../MERCS-wt/board2` (this board PR).
 
 ## Logged for later (not assigned)
 - Phase 1, LOW, lint precision (Concept Lead review of #5): `strings.py` flags names in
