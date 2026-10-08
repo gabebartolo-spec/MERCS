@@ -28,11 +28,11 @@ held and can expire when sessions run in different permission modes; the directo
   / height_px, sprite Y-stretch 1/cos(pitch), so 1 texel = 1 logical px at the look-at point,
   matching `tools/pipeline/camera_rig.json`. `SheetFrame` shows `mercs.sheet/1` frames with pivot
   on the ground. Suite `stage_scale`.
-- #25 MERGED: sample set 2. Stage exports `lighting` (DAY / RAIN_NIGHT: moon, torch, fixed-seed
+- #25 MERGED (squash 447316c): sample set 2. Stage exports `lighting` (DAY / RAIN_NIGHT: moon, torch, fixed-seed
   rain, tint), `depth_scale` (CONSTANT default; texel rescaled by depth, view-angle-corrected Y),
   `stand_at`; `StageData`, `StageWeather`; `tools/capture/sample_set_2.sh` + `sample_sheet.py`
   rebuild `docs/audits/sample_set_2/`. Stage defaults WHOLE_SCREEN and CONSTANT.
-- #26 OPEN (claude/p1-lit-sprites): lit sprites. Frames with a normal map draw with a shaded,
+- #26 OPEN (claude/p1-lit-sprites, synced with main at 838606e, green): lit sprites. Frames with a normal map draw with a shaded,
   normal-mapped `StandardMaterial3D` (nearest, alpha scissor, Y billboard keeping scale, matte).
   Manifest key `"normal_image"`: same size as the sheet, camera-facing tangent space, OpenGL
   convention (R right, G up, B toward camera), n × 0.5 + 0.5. Suite `stage_light` (8).
@@ -48,14 +48,21 @@ needs a sync: merge origin/main into it and keep BOTH suites (stage_light 8, ass
 push (denied by D-030 settings); merging main is fine because the repo squash-merges. No stacking:
 branch from origin/main (rule in #27).
 ## Delegated
-- Art Factory ("MERCS art agent setup"), item P1-ART-PROPORTIONS: proportion samples (realistic /
-  heroic / B/W-like × 48/56/64 px × pitch 35° and 55°, facings S and SE, pose-bone scaling only),
-  plus one normal pass in the format above; labelled sheet to the director; manifest paths to the
-  Dev Lead. Its worktree: `../MERCS-wt/art-proportions`.
+- Art Factory ("MERCS art agent setup"), item P1-ART-PROPORTIONS: DELIVERED as PR #28 (branch
+  claude/art-proportions): 18 sheets `docs/audits/proportion_samples/sheets/average_m_<realistic|
+  heroic|bw>_p<35|55>_h<48|56|64>.json`, all 8 facings, 128 × 128 cell, pivot (64,108); bw p35/p55
+  h56 carry `normal_image`. Art is putting proportion, size and pitch questions to the director.
+  Director rule (via Art): mixels are an automatic fail; never put a 2× crop beside a 1× view.
+- Dev Lead placed them in the stage (on the #26 branch): all load and stand correctly; the lit bw
+  p55 h56 sample is clearly better than unlit (torch warms one side). At 55° the derived camera
+  sees only a narrow strip around the well; the grey-box street was laid out for 35°.
+- Contract to settle after the director picks: `camera_rig.json` frame_px 64 / pivot (32,56) vs
+  Art's 128 / (64,108); the `assets` suite and Art's validator follow the rig. Art's validator's
+  SHEET-PIVOT tolerance needs retuning at 55° (toes 14 px below the pivot).
 ## Next for the Dev Lead, in order
-1. When Art delivers manifests: place each in the stage at its pitch and height
-   (`capture_stage.gd --sheet=<manifest> --pitch=<deg> --height=<px>`), lit and unlit, and give
-   the director stage captures beside Art's sheets.
+1. After the director's proportion/size/pitch answer: set the stage's default pitch and height to
+   it, re-lay the grey-box street for that pitch (at 55° widen what the camera sees or move props
+   in), and make the chosen sheet the stage's default merc.
 2. Street spec §6 "Street": a merc walking behind the well is occluded; two mercs crossing sort
    correctly (needs a second merc in the stage; alpha-scissor sprites depth-test, so verify).
 3. Weather: the director wants much more. Phase 1 caps are rain + night + torch; the full
@@ -74,3 +81,5 @@ this PR merge. Others live: `.claude/worktrees/dual-desktop-instances-a78d20` (n
 - `docs/**/*.png` are plain git, not LFS. Commit the `.gd.uid` of each new script.
 - Typed GDScript: assign a Variant to a typed local before `int()`/`float()` or a Dictionary cast.
 - Python on this PC cannot see Git Bash's /tmp: pass `$(cygpath -m path)`.
+- Syncing with `git merge -X ours` still lets non-conflicting hunks from main back in: run the suites
+  before pushing (a resurrected night-tint line broke stage_light once).
