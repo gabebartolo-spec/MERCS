@@ -1,9 +1,9 @@
 extends "res://tests/run_stage_tests.gd"
 ## Stage light suite: lit sprites. A frame with a normal map (mercs.sheet/1
-## "normal_image", or the capsule's generated one) is drawn with a shaded material so the
-## scene's lights light it; without one, or with lit_sprites off, it stays unshaded and
-## takes the night tint. The capsule's normal map faces the camera at its centre, right
-## at its right edge and up at its top (OpenGL convention).
+## "normal_image", or the capsule's generated one) is drawn with the lit upright-sprite
+## shader so the scene's lights light it; without one, or with lit_sprites off, it uses
+## the unlit one and takes the night tint. The capsule's normal map faces the camera at its
+## centre, right at its right edge and up at its top (OpenGL convention).
 ## Seeded by design: no randomness; generated images are deterministic.
 ##   godot --headless --path . --script tests/run_stage_light_tests.gd
 
@@ -38,26 +38,27 @@ func _spawn_lit(lit: bool, night: bool) -> StreetStage:
 
 func _check_lit_capsule() -> void:
 	var stage: StreetStage = await _spawn_lit(true, true)
-	var material := stage.merc().material_override as StandardMaterial3D
+	var normal := _lit_normal(stage.merc())
+	var albedo: Variant = null
+	var scissor := -1.0
+	if normal != null:
+		var material := stage.merc().material_override as ShaderMaterial
+		albedo = material.get_shader_parameter(&"albedo_texture")
+		scissor = material.get_shader_parameter(&"alpha_scissor")
 	check(
 		(
-			material != null
-			and material.normal_enabled
-			and material.normal_texture != null
-			and material.shading_mode != BaseMaterial3D.SHADING_MODE_UNSHADED
-			and material.billboard_mode == BaseMaterial3D.BILLBOARD_ENABLED
-			and material.billboard_keep_scale
-			and material.texture_filter == BaseMaterial3D.TEXTURE_FILTER_NEAREST
-			and material.transparency == BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+			normal != null
+			and albedo is Texture2D
+			and is_equal_approx(scissor, SheetFrame.ALPHA_SCISSOR)
 		),
-		"a lit capsule draws with a shaded, normal-mapped, nearest, camera-facing material"
+		"a lit capsule draws with the shaded, normal-mapped, alpha-scissor upright shader"
 	)
 	check(
 		stage.merc().modulate == Color.WHITE,
 		"a lit sprite at night is not tinted: the scene's lights darken it"
 	)
-	if material != null and material.normal_texture != null:
-		_check_capsule_normals(material.normal_texture.get_image())
+	if normal != null:
+		_check_capsule_normals(normal.get_image())
 	else:
 		check(false, "the capsule normal map faces camera, right and up where it should")
 	await _despawn(stage)
@@ -86,8 +87,8 @@ func _check_capsule_normals(image: Image) -> void:
 func _check_unlit() -> void:
 	var stage: StreetStage = await _spawn_lit(false, true)
 	check(
-		stage.merc().material_override == null and not stage.merc().shaded,
-		"with lit_sprites off the sprite is unshaded with no material override"
+		_is_unlit(stage.merc()) and not stage.merc().shaded,
+		"with lit_sprites off the sprite draws with the unshaded upright shader"
 	)
 	check(stage.merc().modulate != Color.WHITE, "an unlit sprite at night takes the night tint")
 	await _despawn(stage)
@@ -101,21 +102,28 @@ func _check_lit_sheet() -> void:
 	var broken_manifest := _write_lit_sheet("broken.json", "missing_normal.png")
 	var stage: StreetStage = await _spawn_lit(true, false)
 	var shown := stage.use_sheet(lit_manifest, "S")
-	var material := stage.merc().material_override as StandardMaterial3D
-	check(
-		shown and material != null and material.normal_texture != null,
-		"a sheet naming a normal_image is drawn lit"
-	)
+	check(shown and _lit_normal(stage.merc()) != null, "a sheet naming a normal_image is drawn lit")
 	check(
 		not stage.use_sheet(broken_manifest, "S"),
 		"a sheet whose normal_image is missing is refused"
 	)
 	var plain := stage.use_sheet(_write_lit_sheet("plain.json", ""), "S")
-	check(
-		plain and stage.merc().material_override == null,
-		"a sheet with no normal_image falls back to unshaded"
-	)
+	check(plain and _is_unlit(stage.merc()), "a sheet with no normal_image falls back to unshaded")
 	await _despawn(stage)
+
+
+## The normal map of a sprite drawn with the lit upright shader, or null when it is not.
+func _lit_normal(sprite: Sprite3D) -> Texture2D:
+	var material := sprite.material_override as ShaderMaterial
+	if material == null or material.shader != SheetFrame.LIT_SHADER:
+		return null
+	var normal: Variant = material.get_shader_parameter(&"normal_texture")
+	return normal if normal is Texture2D else null
+
+
+func _is_unlit(sprite: Sprite3D) -> bool:
+	var material := sprite.material_override as ShaderMaterial
+	return material != null and material.shader == SheetFrame.UNLIT_SHADER
 
 
 func _write_lit_sheet(name: String, normal_name: String) -> String:

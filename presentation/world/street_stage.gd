@@ -235,7 +235,7 @@ func _show_frame(sprite: Sprite3D, frame: SheetFrame) -> void:
 	sprite.centered = false
 	sprite.offset = Vector2(-frame.pivot.x, frame.pivot.y - frame.region.size.y)
 	var lit := lit_sprites and frame.normal != null
-	sprite.material_override = frame.lit_material() if lit else null
+	sprite.material_override = frame.lit_material() if lit else frame.unlit_material()
 	sprite.modulate = Color.WHITE
 	if not lit and lighting == Lighting.RAIN_NIGHT:
 		sprite.modulate = _data.rgb("rain_night", "sprite_tint_rgb")
@@ -289,7 +289,9 @@ func _all_mercs() -> Array[Sprite3D]:
 
 
 ## Depth-tested, alpha-cut, nearest, camera-facing: occlusion by walls and sorting between
-## mercs come from the depth buffer, not from draw order.
+## mercs come from the depth buffer, not from draw order. The material override
+## (SheetFrame, upright_sprite.gdshaderinc) writes depth as if the figure stood upright at
+## its feet, so a quad leaning back with the camera pitch never sinks into what is behind.
 func _configure(sprite: Sprite3D) -> void:
 	_show_frame(sprite, _frame)
 	sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
