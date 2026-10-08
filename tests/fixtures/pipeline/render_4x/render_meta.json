@@ -9,7 +9,7 @@
     },
     "camera_rig": {
       "file": "tools/pipeline/camera_rig.json",
-      "sha256": "c6c0fea28aecf5fa19bde5426852f57b3c3a7b09e59d3ffb5f4cd301591651ba"
+      "sha256": "b3ed7bbc6fd2ae4760b23b046adc11793ad8daa88496b4b114e014f04e4de4b7"
     },
     "light_rig": {
       "file": "tools/pipeline/light_rig.json",
@@ -17,7 +17,11 @@
     },
     "render_script": {
       "file": "tools/pipeline/render_character.py",
-      "sha256": "2a54a5ab7e2c699cd4ff8c8443e49f3142e40678cb11d4ebfa90d130c115112b"
+      "sha256": "150524579507120a7f836a3732ae273ec277d9f352a39ed6ffeff433535633ce"
+    },
+    "proportions": {
+      "file": "tools/pipeline/proportions.json",
+      "sha256": "0a8775ccf36941675e0f6784209dfe273ae1fafbc501c7388dcb2288d3196bc3"
     }
   },
   "tools": {
@@ -28,49 +32,54 @@
       "facing": 0,
       "name": "S",
       "file": "facing_0_S.png",
-      "sha256": "92f44a5384c4fcdb2db2ad2a5200fd12f0bf1ae012997ee4a1a9a32c70d6a093"
+      "sha256": "f8bf5468bd5cb30110d0b0ed631de0d0cf9708410c35240351ac64a8ef57226e"
     },
     {
       "facing": 1,
       "name": "SE",
       "file": "facing_1_SE.png",
-      "sha256": "7e9c9a0194719c62b91f4ec5d0b3a235aa333d064d9750c61d5815ee5d244695"
+      "sha256": "606c41635b9af86ccb1ba59dd7f01942658ef5aafcb638f99c88ea2bb2d0d0db"
     },
     {
       "facing": 2,
       "name": "E",
       "file": "facing_2_E.png",
-      "sha256": "437444e6851cb39792d9d3fbe818830155836031780e228786cb2714fbb6ce93"
+      "sha256": "dc877578fe157b9f514d52e57b4ac6076d62b470d6cf2c59d14bc5a32dc81900"
     },
     {
       "facing": 3,
       "name": "NE",
       "file": "facing_3_NE.png",
-      "sha256": "0f159037e3bad63b60eb639c226dc80c7938355a9ddc279ae01660e6854376ae"
+      "sha256": "db94abc41bfa57035b89fe74406ad05c3cc4b15e41f25b594d749e6abe1c8f60"
     },
     {
       "facing": 4,
       "name": "N",
       "file": "facing_4_N.png",
-      "sha256": "a59721425ccfad6494938eb952133e0814b2d1f80adc8e4f7c78ba1a37cbb964"
+      "sha256": "f80d6a02b4f9abdc31efdb9a4cfa48f04387faaa3a7af3391fd3bfcb31c073be"
     },
     {
       "facing": 5,
       "name": "NW",
       "file": "facing_5_NW.png",
-      "sha256": "0b59ee0d0de1ab78ffd33de541d3e2d0bcad91aa8dfb7938d1111709b4f374c0"
+      "sha256": "d827891ea1e1a1c37dcfc101a743cac30876b9eee3eb7300298008d81046d3de"
     },
     {
       "facing": 6,
       "name": "W",
       "file": "facing_6_W.png",
-      "sha256": "f26e5a529185ee23eecf26a6834e955748989b17970ad31416b149d524d0b0a0"
+      "sha256": "9e40c0c450b2de305cd123786fa4cc59a82581c309162cc2c974206bece4d9df"
     },
     {
       "facing": 7,
       "name": "SW",
       "file": "facing_7_SW.png",
-      "sha256": "46b98fe11bc07081665fed1032257468c46a627c38a399e8b8dda8fbed3e9a39"
+      "sha256": "ceec52398c00fdfea596fe0917768e421c144719e7f44134c7091d7ead3d2900"
     }
-  ]
+  ],
+  "proportion": {
+    "variant": "bw",
+    "rig_scale": 0.986429,
+    "height_m": 1.78
+  }
 }

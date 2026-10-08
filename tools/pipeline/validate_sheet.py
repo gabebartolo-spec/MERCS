@@ -15,6 +15,10 @@ Each manifest (`mercs.sheet/1`, written by pack_sheets.py) and the PNG it names 
                  at the pivot, or the pivot column misses the figure
   SHEET-CLIP     an opaque pixel touches a frame edge (the figure is cut off)
   SHEET-EMPTY    a frame has no opaque pixel
+  SHEET-NORMAL   the manifest names a normal_image that is missing, unreadable, a different size
+                 from the colour image, or whose alpha differs from the colour image's anywhere
+
+Pixel sizes, the pivot and the feet tolerance come from camera_rig.json (or --camera=<rig.json>).
 
 Findings print as `<manifest>:0: <RULE> <message>`; exit 1 if any. The palette is resolved as
 <repo>/<palette.file>, so a manifest always names a palette committed in the repo.
@@ -34,8 +38,6 @@ REPO = PIPELINE.parents[1]
 CAMERA_FILE = PIPELINE / "camera_rig.json"
 SHEET_SCHEMA = "mercs.sheet/1"
 SHA = re.compile(r"^[0-9a-f]{64}$")
-FEET_ABOVE_PIVOT_PX = 2  # lowest opaque row may sit this far above the pivot (heels at N facing)
-FEET_BELOW_PIVOT_PX = 7  # or this far below it (a foot nearer the camera at 35 degrees)
 MAX_PIXEL_FINDINGS = 3  # per rule per frame, so one bad sheet does not flood the log
 
 REQUIRED = {
@@ -117,7 +119,25 @@ def check_sizes(m: dict, img, frame_px: int, f: Findings) -> bool:
     return ok
 
 
-def check_pixels(m: dict, img, colours: set, f: Findings) -> None:
+def check_normal(m: dict, img, base: Path, f: Findings) -> None:
+    """The normal strip lines up with the colour strip: same size, alpha identical pixel for pixel."""
+    name = m.get("normal_image")
+    if name is None:
+        return
+    try:
+        nrm = read_png(base / name)
+    except (OSError, PngError, ValueError) as exc:
+        f.add("SHEET-NORMAL", f"cannot read normal_image {name}: {exc}")
+        return
+    if (nrm.width, nrm.height) != (img.width, img.height):
+        f.add("SHEET-NORMAL", f"normal_image is {nrm.width}x{nrm.height}, colour image is {img.width}x{img.height}")
+        return
+    misses = sum(1 for i in range(3, len(img.rgba), 4) if img.rgba[i] != nrm.rgba[i])
+    if misses:
+        f.add("SHEET-NORMAL", f"normal_image alpha differs from the colour image at {misses} pixels")
+
+
+def check_pixels(m: dict, img, colours: set, feet_tol: dict, f: Findings) -> None:
     px, py = m["pivot"]["x"], m["pivot"]["y"]
     if not (0 <= px < m["frame_w"] and 0 <= py < m["frame_h"]):
         f.add("SHEET-PIVOT", f"pivot ({px}, {py}) is outside the {m['frame_w']}x{m['frame_h']} frame")
@@ -151,7 +171,7 @@ def check_pixels(m: dict, img, colours: set, f: Findings) -> None:
         if py is None:
             continue
         feet = max(rows)
-        if not (py - FEET_ABOVE_PIVOT_PX <= feet <= py + FEET_BELOW_PIVOT_PX):
+        if not (py - feet_tol["above"] <= feet <= py + feet_tol["below"]):
             f.add("SHEET-PIVOT", f"frame {fr['facing']} feet at row {feet}, pivot row is {py}")
         if not (min(cols) <= px <= max(cols)):
             f.add("SHEET-PIVOT", f"frame {fr['facing']} pivot column {px} misses the figure ({min(cols)}..{max(cols)})")
@@ -171,8 +191,8 @@ def validate(manifest_path: Path, camera_file: Path = CAMERA_FILE) -> list[str]:
     except (OSError, PngError, ValueError) as exc:
         f.add("SHEET-PNG", f"cannot read {m['image']}: {exc}")
         return f.lines
-    frame_px = json.loads(camera_file.read_text(encoding="utf-8"))["frame_px"]
-    if not check_sizes(m, img, frame_px, f):
+    cam = json.loads(camera_file.read_text(encoding="utf-8"))
+    if not check_sizes(m, img, cam["frame_px"], f):
         return f.lines
     pal_path = REPO / m["palette"]["file"]
     try:
@@ -182,7 +202,8 @@ def validate(manifest_path: Path, camera_file: Path = CAMERA_FILE) -> list[str]:
         return f.lines
     if pal.sha256 != m["palette"]["sha256"] or pal.id != m["palette"]["id"]:
         f.add("SHEET-PALETTE", f"palette {m['palette']['file']} differs from the one the sheet was made with")
-    check_pixels(m, img, set(pal.colours), f)
+    check_pixels(m, img, set(pal.colours), cam["feet_tolerance_px"], f)
+    check_normal(m, img, manifest_path.parent, f)
     return f.lines
 
 
