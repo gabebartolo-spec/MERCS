@@ -15,6 +15,9 @@ const EPSILON := 0.001
 const PITCH_PROBE := 40.0
 const HEIGHT_PROBE := 56
 const HALF := 2.0
+const SNAP_SAMPLES := 40
+## Odd deltas, none a multiple of the others, so the walker lands between pixels.
+const ODD_DELTAS: Array[float] = [0.0137, 0.0291, 0.0053, 0.0419]
 
 var _stage_data: Dictionary = {}
 
@@ -234,6 +237,16 @@ func _check_crisp_mode() -> void:
 	)
 	check(crisp.world().get_parent() == crisp, "CRISP mode keeps the world under the stage root")
 	check(crisp.camera().current, "CRISP mode's camera is current")
+	var samples := _walk_screen_positions(crisp)
+	var step := _knob("pixel", "integer_scale")
+	check(
+		_off_grid(samples, step).is_empty(),
+		(
+			"CRISP snaps the sprite to whole multiples of %s window pixels; %d of %d off, first %s"
+			% [step, _off_grid(samples, step).size(), samples.size(), samples[0]]
+		)
+	)
+	check(_distinct(samples) > 1, "the CRISP sprite still walks across the screen")
 	await _despawn(crisp)
 
 
@@ -275,7 +288,42 @@ func _check_whole_screen_mode() -> void:
 		screen.distance_to(screen.round()) < EPSILON,
 		"the sprite's origin snaps to a whole SubViewport pixel, at %s" % screen
 	)
+	var samples := _walk_screen_positions(whole)
+	check(
+		_off_grid(samples, 1.0).is_empty(),
+		"WHOLE_SCREEN still snaps to whole SubViewport pixels; %d off" % _off_grid(samples, 1.0).size()
+	)
+	check(
+		not _off_grid(samples, _knob("pixel", "integer_scale")).is_empty(),
+		"WHOLE_SCREEN snaps to single pixels, not to multiples of the scale"
+	)
 	await _despawn(whole)
+
+
+## The merc's screen position after each of SNAP_SAMPLES steps at the odd deltas.
+func _walk_screen_positions(stage: StreetStage) -> Array[Vector2]:
+	var positions: Array[Vector2] = []
+	for i: int in SNAP_SAMPLES:
+		stage.step(ODD_DELTAS[i % ODD_DELTAS.size()])
+		positions.append(stage.merc_screen_position())
+	return positions
+
+
+## The positions that are not a whole multiple of step on both axes.
+func _off_grid(positions: Array[Vector2], step: float) -> Array[Vector2]:
+	var off: Array[Vector2] = []
+	for position: Vector2 in positions:
+		var cell := position / step
+		if cell.distance_to(cell.round()) > EPSILON / step:
+			off.append(position)
+	return off
+
+
+func _distinct(positions: Array[Vector2]) -> int:
+	var seen := {}
+	for position: Vector2 in positions:
+		seen[position.round()] = true
+	return seen.size()
 
 
 func _check_path_loop() -> void:
