@@ -38,9 +38,9 @@ C2. Predict before you merge (squash-only repo: a PR stacked on a squashed base 
    <A head> <B head>` (or B's body says "stacked on"). Then dry-run every other open PR against
    the planned result: `git merge-tree --write-tree --name-only origin/main <head>` (after the
    base merges, re-run it against the new main). For a stack, in the same step as the merge,
-   message the dependent's owner the exact repair, and do not wait for the conflict to show:
-   `git fetch origin && git rebase --onto origin/main <old base head sha> <branch> &&
-   git push --force-with-lease`. Merge the stack bottom-up, one PR at a time, each on green.
+   tell the dependent's owner at once to merge `origin/main` into the branch (no force push,
+   D-030) and keep the branch side on conflicts; the squash flattens the merge commits. Merge
+   the stack bottom-up, one PR at a time, each on green.
    Cheapest of all: ask owners not to stack; branch from `origin/main` and open the dependent
    as a draft until the base merges. Report a surprise conflict as a bug in this step, not as
    bad luck.
