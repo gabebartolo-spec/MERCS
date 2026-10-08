@@ -44,6 +44,11 @@ const HALF := 2.0
 @export var lit_sprites: bool = true
 ## When false the walker only moves through step(), which captures and tests call.
 @export var auto_walk: bool = true
+## Logical (pixel-art) resolution in WHOLE_SCREEN; zero takes data "pixel". Set before the
+## stage enters the tree. Captures use it to compare pixel densities.
+@export var logical_size_px: Vector2i = Vector2i.ZERO
+## Integer upscale of the logical viewport; zero takes data "pixel" "integer_scale".
+@export var integer_scale: int = 0
 
 ## Times the walker has wrapped past the end of its loop since the stage was ready.
 var laps_completed: int = 0
@@ -181,7 +186,21 @@ func texel_m() -> float:
 ## the logical viewport spans 2 × distance × tan(fov / 2) of the image plane.
 func rail_distance_m() -> float:
 	var half_fov := deg_to_rad(_data.num("camera", "fov_degrees")) / HALF
-	return texel_m() * _data.num("pixel", "logical_height_px") / (HALF * tan(half_fov))
+	return texel_m() * logical_size().y / (HALF * tan(half_fov))
+
+
+## The logical viewport size: logical_size_px, or data "pixel" when that is zero.
+func logical_size() -> Vector2i:
+	if logical_size_px != Vector2i.ZERO:
+		return logical_size_px
+	return Vector2i(
+		int(_data.num("pixel", "logical_width_px")), int(_data.num("pixel", "logical_height_px"))
+	)
+
+
+## The integer upscale from logical pixels to the window: integer_scale, or the data's.
+func screen_scale() -> int:
+	return integer_scale if integer_scale > 0 else int(_data.num("pixel", "integer_scale"))
 
 
 ## The rail sits on the look-at point; the camera hangs rail_distance_m() away along a
@@ -307,10 +326,8 @@ func _apply_pixel_mode() -> void:
 	if pixel_mode != PixelMode.WHOLE_SCREEN:
 		_camera.current = true
 		return
-	var scale := int(_data.num("pixel", "integer_scale"))
-	var logical := Vector2i(
-		int(_data.num("pixel", "logical_width_px")), int(_data.num("pixel", "logical_height_px"))
-	)
+	var scale := screen_scale()
+	var logical := logical_size()
 	var container := SubViewportContainer.new()
 	container.name = &"PixelScreen"
 	# Sized from the data, not the window, so the logical viewport is 640 × 360 even

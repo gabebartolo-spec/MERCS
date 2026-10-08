@@ -12,6 +12,7 @@ extends SceneTree
 ##     [--walk=10] [--sequence=3] [--fps=30] [--sheet=<manifest.json> [--facing=S]]
 ##     [--lighting=day|rain_night] [--depth=perspective|constant] [--at=x,z]
 ##     [--frametime=<frames>] [--region=x,y,w,h] [--unlit] [--capsule] [--extra=x,z;x,z]
+##     [--logical=WxH]
 ##
 ## --walk is the seconds the sprite has walked before the still (default 14 puts it in
 ## front of and left of the well, in view at 55 degrees); --sequence=<seconds> writes
@@ -24,6 +25,9 @@ extends SceneTree
 ## every --sequence frame to that window-pixel rectangle. --unlit draws the sprite unshaded
 ## (night tint) even when it has a normal map.
 ## --extra adds a standing merc at each x,z (same frame and rules as the walker).
+## --logical=WxH renders at that logical resolution (pair it with --height so the merc
+## keeps its share of the screen), upscaled by the largest integer that fits the window,
+## and saves the still at logical size (one file pixel per art pixel; no crop file).
 
 const STAGE_SCENE := "res://presentation/world/street_stage.tscn"
 const STAGE_DATA := "res://data/balance/stage.json"
@@ -96,6 +100,11 @@ func _spawn_stage() -> StreetStage:
 		stage.depth_scale = (
 			StreetStage.DepthScale.CONSTANT if constant else StreetStage.DepthScale.PERSPECTIVE
 		)
+	var logical := _arg_string("logical", "").split_floats("x")
+	if logical.size() >= 2:
+		var size := Vector2i(int(logical[0]), int(logical[1]))
+		stage.logical_size_px = size
+		stage.integer_scale = maxi(1, DisplayServer.window_get_size().y / size.y)
 	if _args.has("mode"):
 		var whole := _arg_string("mode", "") == "whole"
 		stage.pixel_mode = (
@@ -120,6 +129,11 @@ func _save_still(out: String) -> bool:
 	var frame := await _render_frame()
 	if frame == null:
 		return false
+	if _stage.logical_size_px != Vector2i.ZERO:
+		var size := _stage.logical_size()
+		frame = frame.get_region(Rect2i(Vector2i.ZERO, size * _stage.screen_scale()))
+		frame.resize(size.x, size.y, Image.INTERPOLATE_NEAREST)
+		return _save(frame, out)
 	var ok := _save(frame, out)
 	var crop := _crop_around_merc(frame)
 	ok = _save(crop, out.get_basename() + "_crop.png") and ok
@@ -166,24 +180,13 @@ func _crop_around_merc(frame: Image) -> Image:
 	var size := Vector2i(int(_knob("crop_width_px")), int(_knob("crop_height_px")))
 	var centre: Vector2 = _stage.merc_centre_screen_position()
 	if _stage.pixel_mode == StreetStage.PixelMode.WHOLE_SCREEN:
-		centre *= _integer_scale()
+		centre *= _stage.screen_scale()
 	var origin := Vector2i(centre.round()) - size / 2
 	origin = origin.clamp(Vector2i.ZERO, Vector2i(frame.get_width(), frame.get_height()) - size)
 	var crop := frame.get_region(Rect2i(origin, size))
 	var scale := int(_knob("crop_scale"))
 	crop.resize(size.x * scale, size.y * scale, Image.INTERPOLATE_NEAREST)
 	return crop
-
-
-func _integer_scale() -> float:
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(STAGE_DATA))
-	if parsed is Dictionary:
-		var data: Dictionary = parsed
-		var pixel: Dictionary = data.get("pixel", {})
-		var value: Variant = pixel.get("integer_scale", 1.0)
-		if value is float or value is int:
-			return value
-	return 1.0
 
 
 func _save(image: Image, path: String) -> bool:

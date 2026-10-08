@@ -1,17 +1,19 @@
-# Dev Lead handoff, 2026-10-09 (desktop, second Claude account, "MERCS BOSS")
+# Dev Lead handoff, 2026-10-09 later (desktop, second Claude account, "MERCS BOSS")
 Start from this file, CLAUDE.md, your brief (`agent-briefs/DEV_LEAD_OPUS.md`), `docs/08_ROADMAP.md`
 §Phase 1 only, `docs/specs/phase1_visual_proof.md`, and `docs/01_ENGINE_DECISION.md` "Rendering plan".
 Run `git fetch`, then `gh pr list` and `docs/STATUS.md`: PR states below are as of writing.
 
-## State: working (this PR open; awaiting Art's QC round 3)
+## State: working (this PR open; Art rendering realistic density samples for lead QC)
 ## Who does what
 This account has no Concept Lead: the session acts as lead AND Dev Lead under the original
 account's rules. Peers (desktop sessions): "MERCS SUPPORT" = Merge & CI (merges, board PRs);
 "MERCS ART FACTORY" = Art. Cloud sessions are fine for bounded Linux jobs only (no GPU, no Blender,
 can push only their own branch, cannot reach desktop peers); the director moved Dev Lead back here.
 ## Director decisions (all logged or in PR bodies)
-Pixel mode A whole screen; constant sprite scale; proportion C / 56 px / 55° (B/W-trainer-like,
-more detail); grim Westeros palette; lots of weather, particles, beautiful lighting; Dev Lead codes,
+Pixel mode A whole screen; constant sprite scale; 55° pitch. **2026-10-09: proportion C is
+REVERSED** ("I don't like the big head, let's go for a realistic, 4k pixel art look"): realistic
+proportions, and the pixel density (56 / 84 / 112 px merc) is open until the director picks from
+samples; grim Westeros palette; lots of weather, particles, beautiful lighting; Dev Lead codes,
 Art does art; mixels are an automatic fail (captures too: never a 2× crop beside a 1× view);
 testing cadence: per PR existing suites + lints + one capture, heavy audits only at milestones;
 "do what you think is best" (autonomy, #39).
@@ -29,29 +31,29 @@ Only passing work goes to the director, as one decision with labelled images and
 - After it passes: Art publishes average_m rest + normal under `assets/` with a register row;
   then make it the stage's default merc (presentation may not reference `tests/`). Ask the
   director whether to add a placeholder head/hair layer (Art flagged it as a director question).
-## This PR (`claude/p1-lit-upright`): mercs are lit where they stand
-#39 made the depth of camera-facing sprites upright, but lighting still read the leaning quad.
-A merc in front of a wall drew nearly black (lit and shadowed from inside the wall), and the
-ground cut off the toes (main too). `upright_sprite.gdshaderinc` now cuts each view ray with the
-upright plane through the feet, or with the ground plane where that is nearer. Depth is exact per
-pixel (`DEPTH`, with a Compatibility-renderer branch), and lighting uses that point per corner
-(`skip_vertex_transform`). Evidence: `docs/audits/lit_upright/lit_upright_sheet.png`.
+## Realistic density sample set (in flight)
+Art renders the realistic body (round-2 fixes carried over) at pitch 55 and 56 / 84 / 112 px, in
+`../MERCS-wt/art-qc/docs/audits/realistic_density/` (local, unpushed). This PR adds
+`capture_stage.gd --logical=WxH` (stage `logical_size_px` / `integer_scale`): pair 960x540 with
+`--height=84` and 1280x720 with `--height=112` and the merc keeps its share of the screen. 84 px
+(960x540) is integer at 1080p (x2) and 4K (x4); 112 px (1280x720) mixels at 1080p (x1.5). Next:
+QC Art's strips, capture each in the street, then ONE director question with labelled 4K images.
+## Merged since the last handoff
+#41 `.gdignore` import fix; #42 mercs lit where they stand (upright depth and light, toes show).
 ## Other open work
-- #41 `claude/p1-import-gdignore`: `tools/pipeline/.gdignore`, so a headless import without
-  Blender (Linux CI) stops failing on `average_m.blend` and importing no PNGs.
 - `claude/p1-sheet-export-load` (d520808, cloud subagent; reviewed, no PR yet): SheetFrame loads
-  imported res:// PNGs so sheets work from an exported .pck. Once #41 merges: merge main in,
+  imported res:// PNGs so sheets work from an exported .pck. #41 has merged: merge main in,
   run assets (floor 8 → 11), open the PR. It edits `sheet_frame.gd` (light conflict possible).
 ## Suites (floors)
 data 88, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 8.
 ## Next for the Dev Lead, in order
-1. This PR, then #41 merged; export-load PR.
-2. QC Art's round 3; when it passes, the default merc from `assets/`; one director question with
-   labelled images (the look, plus the head/hair-layer question).
-3. Street spec §6 occlusion/sorting fixture (crowd capture: `--extra=x,z;x,z`).
-4. Weather catalogue only if the director pulls it forward (Phase 1 caps: rain, night, torch).
+1. QC Art's realistic density samples; director picks the density (labelled 4K images).
+2. Freeze the pick (Art: camera_rig/proportions; Dev: stage.json pixel block), default merc from
+   `assets/`, head/hair-layer question. 3. Export-load PR.
+4. Street spec §6 occlusion/sorting fixture (crowd capture: `--extra=x,z;x,z`).
+5. Weather catalogue only if the director pulls it forward (Phase 1 caps: rain, night, torch).
 ## Worktrees
-Mine: `../MERCS-wt/p1-dev` (#41) and `../MERCS-wt/p1-lit` (this PR); remove each when it merges.
+Mine: `../MERCS-wt/p1-res` (this PR); remove it when it merges.
 Art: `../MERCS-wt/art-qc`. Not mine: `.claude/worktrees/dual-desktop-instances-a78d20`.
 ## Rules learnt the hard way (keep under 10 lines)
 - `git fetch` and read `git log origin/main` before choosing or briefing any work.
