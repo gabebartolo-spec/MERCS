@@ -7,7 +7,10 @@
       "height_m": 1.78,
       "macros": {"gender": 1.0, "age": 0.5, "muscle": 0.5, "weight": 0.5, "proportions": 0.5,
                  "cupsize": 0.5, "firmness": 0.5,
-                 "race": {"asian": 0.33, "caucasian": 0.33, "african": 0.33}}
+                 "race": {"asian": 0.33, "caucasian": 0.33, "african": 0.33}},
+      "contour_targets": {"torso-scale-depth-incr": 0.3, "hip-scale-depth-incr": 0.3,
+                          "buttocks-volume-incr": 0.5, "stomach-pregnant-incr": 0.1},
+      "contour_doc": "Lead QC 2026-10-09: the E/W profile read as a straight column under the big head. The torso was already 0.224 m deep (12-13 px at 56 px and 55 deg, measured), so these add curve (chest, belly, buttocks) more than depth. Applied after the rig is hashed: flesh only, no bone moves."
     }
   }
 }

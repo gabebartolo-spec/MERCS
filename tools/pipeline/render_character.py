@@ -46,7 +46,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--camera", default=str(CAMERA_FILE), help="camera rig json (default: the committed rig)")
     p.add_argument("--proportions", default=str(PROPORTIONS_FILE), help="proportion variants json")
     p.add_argument("--variant", default="", help="variant in --proportions (default: its 'default')")
-    p.add_argument("--pass", dest="render_pass", choices=("color", "normal"), default="color")
+    p.add_argument("--pass", dest="render_pass", choices=("color", "normal", "parts"), default="color")
     return p.parse_args(argv)
 
 
@@ -199,6 +199,48 @@ def apply_normal_pass() -> None:
     scene.render.dither_intensity = 0.0
 
 
+PART_GROUPS = {  # flat emission colour -> bones whose summed vertex weight marks the part
+    (1.0, 0.0, 0.0): ("mixamorig:LeftArm", "mixamorig:LeftForeArm", "mixamorig:LeftHand"),
+    (0.0, 1.0, 0.0): ("mixamorig:RightArm", "mixamorig:RightForeArm", "mixamorig:RightHand"),
+}
+PART_BODY = (0.0, 0.0, 1.0)
+PART_WEIGHT = 0.5
+
+
+def apply_parts_pass() -> None:
+    """Flat colour per body part (left arm red, right arm green, the rest blue) for the pixel post's
+    inner lines (06 section 3: a line only where the silhouette would merge). Finger and hand
+    groups count towards their arm by name prefix. Raw view, no dither: labels, not colour."""
+    mat = bpy.data.materials.new("mercs_parts_pass")
+    if mat.node_tree is None:
+        mat.use_nodes = True
+    nodes, links = mat.node_tree.nodes, mat.node_tree.links
+    nodes.clear()
+    attr = nodes.new("ShaderNodeVertexColor")
+    attr.layer_name = "mercs_parts"
+    emit = nodes.new("ShaderNodeEmission")
+    out = nodes.new("ShaderNodeOutputMaterial")
+    links.new(attr.outputs["Color"], emit.inputs["Color"])
+    links.new(emit.outputs["Emission"], out.inputs["Surface"])
+    for obj in bpy.data.objects:
+        if obj.type != "MESH":
+            continue
+        layer = obj.data.color_attributes.new("mercs_parts", "FLOAT_COLOR", "POINT")
+        index_of = {g.index: g.name for g in obj.vertex_groups}
+        for v in obj.data.vertices:
+            colour = PART_BODY
+            for rgb, bones in PART_GROUPS.items():
+                w = sum(g.weight for g in v.groups if index_of[g.group].startswith(bones))
+                if w >= PART_WEIGHT:
+                    colour = rgb
+            layer.data[v.index].color = (*colour, 1.0)
+        obj.data.materials.clear()
+        obj.data.materials.append(mat)
+    scene = bpy.context.scene
+    scene.view_settings.view_transform = NORMAL_VIEW_TRANSFORM
+    scene.render.dither_intensity = 0.0
+
+
 def figure_extent_z(rig: bpy.types.Object) -> tuple[float, float]:
     """World z range of the deformed body (shape keys and pose evaluated, never base vertices)."""
     bpy.context.view_layer.update()
@@ -327,6 +369,8 @@ def main() -> None:
     setup_render(cam, light)
     if args.render_pass == "normal":
         apply_normal_pass()
+    elif args.render_pass == "parts":
+        apply_parts_pass()
     else:
         apply_material(light["body_material"])
     rig = body_rig()

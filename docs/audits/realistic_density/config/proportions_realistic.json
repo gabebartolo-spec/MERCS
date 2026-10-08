@@ -1,0 +1,66 @@
+{
+  "_doc": "SAMPLE (director 2026-10-09: realistic proportions, more pixels per merc). Realistic body: no bone scale; the same rest stance as the frozen file (arms down, ankles about 0.2 m apart, soft knees, toes out). Not the game default.",
+  "schema": "mercs.proportions/1",
+  "default": "realistic",
+  "variants": {
+    "realistic": {
+      "label": "REALISTIC",
+      "bone_scale": {}
+    }
+  },
+  "pose": {
+    "doc": "rest stance: world directions with the body facing -Y and left = +X; upper arms 12 degrees off vertical, forearms 6, legs nearly vertical",
+    "bone_direction": {
+      "mixamorig:LeftArm": [
+        0.21,
+        0.0,
+        -0.98
+      ],
+      "mixamorig:RightArm": [
+        -0.21,
+        0.0,
+        -0.98
+      ],
+      "mixamorig:LeftForeArm": [
+        0.1,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:RightForeArm": [
+        -0.1,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:LeftUpLeg": [
+        -0.012,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:RightUpLeg": [
+        0.012,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:LeftLeg": [
+        0.0,
+        0.07,
+        -1.0
+      ],
+      "mixamorig:RightLeg": [
+        0.0,
+        0.07,
+        -1.0
+      ],
+      "mixamorig:LeftFoot": [
+        0.017,
+        -0.122,
+        -0.032
+      ],
+      "mixamorig:RightFoot": [
+        -0.017,
+        -0.122,
+        -0.032
+      ]
+    }
+  }
+}

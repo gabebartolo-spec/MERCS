@@ -49,9 +49,9 @@ def blit(dst: Image, src: Image, sx: int, sy: int, w: int, h: int, dx: int, dy: 
                     dst.put(dx + x * zoom + zx, dy + y * zoom + zy, px)
 
 
-def build(manifest_path: Path, zoom: int) -> Image:
+def build(manifest_path: Path, zoom: int, camera_file: Path = CAMERA_FILE) -> Image:
     m = json.loads(manifest_path.read_text(encoding="utf-8"))
-    cam = json.loads(CAMERA_FILE.read_text(encoding="utf-8"))
+    cam = json.loads(camera_file.read_text(encoding="utf-8"))
     strip = read_png(manifest_path.parent / m["image"])
     fw, fh = m["frame_w"], m["frame_h"]
     cell_w, cell_h = fw * zoom, fh * zoom
@@ -102,8 +102,9 @@ def main(argv: list[str]) -> int:
     p.add_argument("manifest", type=Path)
     p.add_argument("out", type=Path)
     p.add_argument("--zoom", type=int, default=4)
+    p.add_argument("--camera", type=Path, default=CAMERA_FILE, help="the rig the sheet was rendered with")
     a = p.parse_args(argv)
-    write_png(a.out, build(a.manifest, a.zoom))
+    write_png(a.out, build(a.manifest, a.zoom, a.camera))
     strip_out = a.out.with_name(a.out.stem + "_1x.png")
     write_png(strip_out, game_scale_strip(a.manifest))
     print(f"CONTACT_SHEET {a.out} {strip_out}")

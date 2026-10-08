@@ -5,29 +5,33 @@ every sheet goes to the Lead for QC first; only passing sheets reach the directo
 
 ## State: awaiting Lead QC
 ## Task
-P1-ART-QC-C55: fix the Lead's six QC points on the frozen C/56/55 average_m rest sheet, then (#39) publish
-the passing sheet + normal map under assets/ with its licensing-register row so the stage build can use it.
+Director 2026-10-09: proportion C (big head) DROPPED; realistic proportions, "4k" = more pixels per merc.
+P1-ART-REALISTIC-DENSITY: realistic average_m rest at pitch 55 in three densities (56 / 84 / 112 px), with the
+round-2 general fixes, as samples for the Lead's 4K street QC, then the director.
 ## Branch and commit
-claude/art-qc-c55 (from main after #34/#36/#37), worktree ../MERCS-wt/art-qc, local WIP commit, not pushed, no PR yet.
+claude/art-qc-c55, worktree ../MERCS-wt/art-qc, local commits only, not pushed, no PR. Samples are local files.
 ## Files I own right now
-tools/pipeline/ (proportions.json, render_character.py recentre_bones, pixelate.py despeckle + outline,
-pixelate.json, contact_sheet.py label), docs/audits/qc_c55/ (review images sent to the Lead).
+tools/pipeline/ (build_body.py contour after rig hash; bodies.json contour_targets; average_m.blend rebuilt, rig hash
+unchanged 17b2aa42; render_character.py parts pass + recentre; pixelate.py despeckle clusters, outline, inner lines,
+skin-only body quantise; contact_sheet.py --camera + label); docs/audits/realistic_density/ (config, sheets, review).
+tools/pipeline/proportions.json still holds C (the shared default); replace with realistic only on a director pick.
 ## Unfinished changes
-On a Lead pass: regenerate tests/fixtures/pipeline (render_4x, render_4x_normal, sheets/good, make_bad_sheets.py),
-contact sheet in docs/audits/render_samples, run test_pipeline + SUITES_ONLY + lints + one capture, publish under
-assets/characters/ (manifest, strip, normal, provenance) + register row, PR with Board and log. Drop docs/audits/qc_c55/sheet.
+After the Lead/director pick a density (and maybe sprite pitch): camera_rig.json + proportions.json to the pick,
+regenerate tests/fixtures/pipeline (render_4x, _normal, NEW render_4x_parts for the rebuild test, sheets/good,
+make_bad_sheets.py), suites, capture, then #39: publish under assets/ with a register row. PR with Board and log.
+docs/audits/qc_c55/ is obsolete C evidence: delete before the PR.
 ## Evidence so far
-- Measured: feet planted (ankle z equal, knees 6.4 deg both); stance was 0.37 m wide -> far foot 16 px higher at 55.
-- Side-on 0 deg render: full recentre put the head behind the spine and tore the neck; keep_offset 1/1.8 + 1.5 cm lift fixed it.
-- QC sheet validates clean; rig_scale 0.9756, height 1.7800.
+- build_body --check with contour targets: RIG_CONTRACT_OK, height 1.7798 unchanged.
+- Stance measured: ankles 0.208 m, knees 4.1 deg, toes out 8 deg. Mud source: body quantised to soot (grey); now skin only.
+- Realistic side-on 0 deg: upright natural posture; the 55 deg "hunch" is camera foreshortening, raised to the Lead.
+- test_pipeline rebuild fails until fixtures are regenerated (expected; outline/despeckle change output).
 ## Attempts (for the fix-loop rule)
-- Head forward: (1) recentre centroid onto neck = over-corrected; (2) neck aim upright = no visible change. Then
-  gathered side-on evidence; (3) partial recentre keep_offset 1/1.8 = correct.
+- C head: recentre full = over-correct; neck aim = no change; keep_offset 1/1.8 = correct (C now dropped).
 ## Open decisions
-- Lead/director: fuller torso (MPFB body-shape targets) for the side views; placeholder head/hair layer (Lead asks the director).
-- Interior outline lines (06 "inner-line where the silhouette would merge") not implemented.
+- Lead/director: density 56 / 84 / 112; accept 55 deg head foreshortening or shallower sprite pitch; buttocks 0.5 vs 0.3.
+- Placeholder head/hair layer (Lead asks the director).
 ## Running jobs
-None. Mixamo: 10 clips in D:\MERCS-vault\clips\mixamo\ with SOURCES.md (director's yes 2026-10-08); not yet retargeted.
+None. Mixamo: 10 clips in D:\MERCS-vault\clips\mixamo\ with SOURCES.md; not yet retargeted.
 ## Rules learnt the hard way (keep under 10 lines)
 - MPFB targets are shape keys: always measure `evaluated_get(depsgraph)`, never `mesh.vertices`.
 - `read_factory_settings` unloads MPFB; clear objects instead. Set `filepaths.save_version = 0`.
