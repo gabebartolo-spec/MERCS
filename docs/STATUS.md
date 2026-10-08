@@ -10,7 +10,7 @@ Current phase: **1 — Visual and factory proof** (Phase 0 gate PASS WITH NOTES,
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | available | stage defaults 55 degrees / 56 px (#31), handoff refresh (#33) and crowd with occlusion (#36) merged; next: Art's re-frozen good fixture as the stage's default merc | — | 2026-10-08 |
+| Dev Lead (Opus 5.5) | working | captures default to the good sheet (#39) merged; now lighting from the upright point (option D) to fix the near-black merc and toe cut-off, then a `tools/pipeline/.gdignore` PR; `claude/p1-sheet-export-load` (sheet loading from a .pck) is the Lead's, do not prune | — | 2026-10-08 |
 | Merge & CI (Sonnet 5.5) | working | standing merge pass (D-030); board PR after each merge | — | 2026-10-08 |
 | Art Factory (Opus 5.5) | available | P1-ART-PROPORTIONS (#28) and P1-ART-FREEZE-C55 (#34: proportion C, 56 px, 55 degrees frozen into `camera_rig.json` and `proportions.json`) merged; next is average_f (needs assigning); Mixamo clips need the director's sign-in (D-029) | — | 2026-10-08 |
 | Concept Lead (Fable 5.1) | available | merge workflow audit merged (#20, D-028..D-030); render pipeline skeleton merged (#22); next: Phase 1 sample review | — | 2026-10-08 |
@@ -75,3 +75,6 @@ States: working · running a check · awaiting director · blocked · available.
   `-100` and `+1` and does not exempt `sim/core/rng.gd`; `layering.py` misses `Timer.new()`-style
   node construction in sim.
 - Look direction (director, 2026-10-08, NOT a ruling): mercs read like Pokémon Black/White trainer sprites with more detail and slightly bigger; steep top-down 3/4 camera (about 50-60 degrees), big-headed short figures, dense detailed pixel environments; grim Westeros setting. `06_STYLE_ART.md` and spec §3's 30-40 degree pitch range need revisiting from the proportion samples (#28).
+- QC defect (Lead, on #39's evidence sheet): sprite lean at 55 degrees. #39's option B fixes the main bug (a merc 0.2 m in front of the well lost everything above the shins) but the merc then draws nearly black, because lighting still reads the leaning quad inside the well's shadow. The Dev Lead's follow-up moves lighting to the upright point (option D), which also stops the ground cutting off the toes. #39's `dev_lead.md` "awaiting director" state is superseded.
+- Art Factory request (from #39, needs assigning): publish the good sheet (average_m body rest, C/56/55, with its normal map) under `assets/` with its licensing-register row, so the stage can default to it in the build.
+- Merge & CI: `claude/p1-crisp-snap` and `claude/p1-frame-time` (unmerged, no PR, superseded by #25 and D-031) were to be deleted; the delete was refused by the permission classifier, so they stay until the director allows it. Tips for recovery if ever wanted: 664434c, 7236cdc.
