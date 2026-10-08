@@ -11,7 +11,7 @@ extends SceneTree
 ##     --mode=crisp|whole --out=docs/audits/stage_samples/crisp_p35_h48.png \
 ##     [--walk=10] [--sequence=3] [--fps=30] [--sheet=<manifest.json> [--facing=S]]
 ##     [--lighting=day|rain_night] [--depth=perspective|constant] [--at=x,z]
-##     [--frametime=<frames>] [--region=x,y,w,h]
+##     [--frametime=<frames>] [--region=x,y,w,h] [--unlit]
 ##
 ## --walk is the seconds the sprite has walked before the still (default puts it beside
 ## the well); --sequence=<seconds> writes <out stem>/frame_000.png … at --fps instead.
@@ -19,7 +19,8 @@ extends SceneTree
 ## render it at the same pitch and height as the capture. --at holds the merc's feet at
 ## world x, z. --frametime renders that many extra frames with vsync off first and prints
 ## "frame_time_ms <mean>" (wall clock: a measurement tool, never a test). --region crops
-## every --sequence frame to that window-pixel rectangle.
+## every --sequence frame to that window-pixel rectangle. --unlit draws the sprite unshaded
+## (night tint) even when it has a normal map.
 
 const STAGE_SCENE := "res://presentation/world/street_stage.tscn"
 const STAGE_DATA := "res://data/balance/stage.json"
@@ -77,6 +78,8 @@ func _spawn_stage() -> StreetStage:
 	stage.auto_walk = false
 	stage.pitch_degrees = _arg_float("pitch", stage.pitch_degrees)
 	stage.sprite_height_px = int(_arg_float("height", stage.sprite_height_px))
+	if _args.has("unlit"):
+		stage.lit_sprites = false
 	if _arg_string("lighting", "day") == "rain_night":
 		stage.lighting = StreetStage.Lighting.RAIN_NIGHT
 	# Without --depth or --mode the stage's defaults apply (constant, whole screen).
