@@ -54,8 +54,8 @@ static func from_manifest(manifest_path: String, facing: String) -> SheetFrame:
 
 
 ## A shaded material for this frame's sprite (needs a normal map): nearest texels, alpha
-## scissor, camera-facing billboard keeping the sprite's scale, depth written as if the
-## figure stood upright at its feet, matte with no specular glint.
+## scissor, camera-facing billboard keeping the sprite's scale, depth and light taken where
+## the figure stands upright at its feet, matte with no specular glint.
 func lit_material() -> ShaderMaterial:
 	var material := _upright_material(LIT_SHADER)
 	material.set_shader_parameter(&"normal_texture", normal)

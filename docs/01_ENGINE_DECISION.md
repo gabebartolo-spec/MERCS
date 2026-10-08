@@ -36,7 +36,9 @@ does not: MERCS builds its own assets by design.
   perspective camera pitch matches the pitch the sprites were rendered at (55°, director
   2026-10-08). Camera-facing, not Y-axis: a quad parallel to the image projects at one uniform
   scale, so sprites never lean or shear near the screen edges at a steep pitch (an upright Y
-  billboard did, which is a mixel fail).
+  billboard did, which is a mixel fail). Depth and light are taken where the figure really
+  stands (the upright plane through its feet, or the ground in front of them): a merc against a
+  wall is neither swallowed by it nor shaded from inside it, and its toes show.
 - Pixel stability: **whole-screen pixel mode** (director, 2026-10-08, from sample set 2,
   `docs/audits/sample_set_2/`; PR #25). The 3D world renders into a `SubViewport` of 640 × 360
   inside a `SubViewportContainer` with `stretch = true`, `stretch_shrink = 3` and

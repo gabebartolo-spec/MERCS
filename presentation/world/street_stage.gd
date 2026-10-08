@@ -290,8 +290,9 @@ func _all_mercs() -> Array[Sprite3D]:
 
 ## Depth-tested, alpha-cut, nearest, camera-facing: occlusion by walls and sorting between
 ## mercs come from the depth buffer, not from draw order. The material override
-## (SheetFrame, upright_sprite.gdshaderinc) writes depth as if the figure stood upright at
-## its feet, so a quad leaning back with the camera pitch never sinks into what is behind.
+## (SheetFrame, upright_sprite.gdshaderinc) takes depth and light where the figure stands
+## upright at its feet, so a quad leaning back with the camera pitch never sinks into, or
+## is shadowed by, what is behind it.
 func _configure(sprite: Sprite3D) -> void:
 	_show_frame(sprite, _frame)
 	sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
