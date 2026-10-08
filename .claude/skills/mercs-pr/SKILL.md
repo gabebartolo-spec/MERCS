@@ -96,3 +96,8 @@ Say which state you are in. Waiting on a result or an approval is a valid state;
 look busy. Never ask another agent to do something your own session was refused permission for. A
 routine git or GitHub refusal is a bug in `.claude/settings.json`: fix it by PR and restart; only an
 unsafe-by-design refusal goes to the director (guardrail C5, D-030).
+
+## Learnings
+
+Proven findings for this project live in `references/learnings.md`. Read it before using this
+skill; add to it only what proved effective, with evidence.

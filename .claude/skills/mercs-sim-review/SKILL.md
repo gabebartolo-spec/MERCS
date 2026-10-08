@@ -60,3 +60,8 @@ Name what you did not check. Tell the PR's owner in one line (PR number, commit,
 the PR yourself; open a fix PR only when the owner asks. If the PR has already merged, a defect goes
 straight to a small fix PR whose test is the reproduction. Keep it short: the owner needs decisions and
 repros, not a retelling of the diff.
+
+## Learnings
+
+Proven findings for this project live in `references/learnings.md`. Read it before using this
+skill; add to it only what proved effective, with evidence.

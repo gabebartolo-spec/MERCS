@@ -52,3 +52,8 @@ head commit?) and that the branch tip is the sha written there. Carry on from "U
 something you need is missing, ask its owner, or the director in protocol format
 (`agent-briefs/DIRECTOR_QUESTION_PROTOCOL.md`); do not guess. Report your state at the end of your turn.
 With nothing assigned, say "available" and wait; do not invent work (guardrail C4).
+
+## Learnings
+
+Proven findings for this project live in `references/learnings.md`. Read it before using this
+skill; add to it only what proved effective, with evidence.
