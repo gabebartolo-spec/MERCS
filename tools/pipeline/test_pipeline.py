@@ -8,6 +8,8 @@
    packed twice into separate temp folders. Both runs must be byte-identical (frames, strip and
    manifest), the strip's pixel hash must equal the committed good sheet's, and the packed sheet
    must pass the validator.
+3. Normals: a synthetic 4x normal render reduces to unit-length encoded normals, takes its alpha
+   from the colour mask exactly, and is byte-identical across runs.
 
 Usage: python tools/pipeline/test_pipeline.py        (exit 1 on any failure)
 """
@@ -94,12 +96,39 @@ def case_rebuild() -> list[str]:
     return problems
 
 
+def case_normals() -> list[str]:
+    sys.path.insert(0, str(PIPELINE))
+    from pixelate import FLAT_NORMAL, reduce_normals
+    from pngio import Image
+
+    cfg = {"scale": 4, "alpha_threshold": 128}
+    src, mask = Image.blank(8, 8), Image.blank(2, 2)
+    for y in range(8):
+        for x in range(4):  # left block: +X and +Z samples mixed, a 45-degree normal after renormalising
+            src.put(x, y, (255, 128, 128, 255) if (x + y) % 2 else (128, 128, 255, 255))
+    mask.put(0, 0, (1, 2, 3, 255))
+    mask.put(0, 1, (1, 2, 3, 255))
+    mask.put(1, 1, (1, 2, 3, 255))  # opaque in the mask with no normal samples: falls back to flat
+    a, b = reduce_normals(src, mask, cfg), reduce_normals(src, mask, cfg)
+    problems = []
+    if a.rgba != b.rgba:
+        problems.append("normal reduction is not deterministic")
+    r, g, bl, al = a.get(0, 0)
+    vec = [(c / 255.0) * 2.0 - 1.0 for c in (r, g, bl)]
+    if abs(sum(v * v for v in vec) ** 0.5 - 1.0) > 0.02 or not (r > 200 and bl > 200 and 120 <= g <= 136):
+        problems.append(f"mixed +X/+Z block encoded {r, g, bl}, expected a unit 45-degree normal")
+    if a.get(1, 1)[:3] != FLAT_NORMAL or a.get(1, 0)[3] != 0 or al != 255:
+        problems.append("alpha does not follow the colour mask, or the flat fallback is wrong")
+    return problems
+
+
 def main() -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     results = [(f"sheet/{d.name}", case_sheet(d))
                for d in sorted((FIXTURES / "sheets").iterdir()) if d.is_dir()]
     results.append(("rebuild/byte-identical", case_rebuild()))
+    results.append(("normals/reduce", case_normals()))
     width = max(len(label) for label, _ in results)
     for label, problems in results:
         if problems:

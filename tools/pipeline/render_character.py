@@ -3,6 +3,11 @@
 Run headless (Blender 5.2; no add-ons needed, the body .blend carries the mesh and rig):
   blender -b --factory-startup -P tools/pipeline/render_character.py -- --body average_m --out <dir>
 
+Sample options (defaults reproduce the committed rig exactly): --camera <json> swaps in another
+camera rig file; --proportions <json> --variant <name> scales pose bones (no bone is added or
+renamed) and refits the figure to the reference height; --pass normal writes camera-space normals
+(OpenGL: R = screen right, G = screen up, B = toward camera, encoded n * 0.5 + 0.5) instead of colour.
+
 Writes <out>/facing_<k>_<name>.png (frame_px * render_scale square, RGBA 8-bit) for each facing
 and <out>/render_meta.json (input and output hashes, Blender version). Camera and light rigs come
 from camera_rig.json and light_rig.json; nothing visual is set in this file. No Mixamo clips yet
@@ -19,13 +24,14 @@ import sys
 from pathlib import Path
 
 import bpy
-from mathutils import Euler, Vector
+from mathutils import Euler, Matrix, Vector
 
 PIPELINE = Path(__file__).resolve().parent
 CAMERA_FILE = PIPELINE / "camera_rig.json"
 LIGHT_FILE = PIPELINE / "light_rig.json"
 BODIES_DIR = PIPELINE / "bodies"
 SRGB_LINEAR_BREAK = 0.04045
+NORMAL_VIEW_TRANSFORM = "Raw"  # normals are data: written as computed, never tone-mapped
 
 
 def parse_args() -> argparse.Namespace:
@@ -34,11 +40,22 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--body", required=True)
     p.add_argument("--out", required=True)
     p.add_argument("--facings", default="all", help="'all' or comma-separated facing indices")
+    p.add_argument("--camera", default=str(CAMERA_FILE), help="camera rig json (default: the committed rig)")
+    p.add_argument("--proportions", default="", help="proportion variants json (samples only)")
+    p.add_argument("--variant", default="", help="variant name in --proportions")
+    p.add_argument("--pass", dest="render_pass", choices=("color", "normal"), default="color")
     return p.parse_args(argv)
 
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def rel_path(path: Path) -> str:
+    try:
+        return path.relative_to(PIPELINE.parents[1]).as_posix()
+    except ValueError:
+        return path.name
 
 
 def srgb_to_linear(hex_colour: str) -> tuple[float, float, float, float]:
@@ -144,6 +161,103 @@ def apply_material(spec: dict) -> None:
             obj.data.materials.append(mat)
 
 
+def apply_normal_pass() -> None:
+    """Emit the shading normal in camera space, encoded n * 0.5 + 0.5, with no colour transform.
+
+    Blender's shader camera space has X = screen right, Y = screen up and Z = away from the viewer
+    (measured: a body facing the camera encoded blue < 0.5), so Z is negated to give the OpenGL
+    convention the stage reads (B = toward camera).
+    """
+    mat = bpy.data.materials.new("mercs_normal_pass")
+    if mat.node_tree is None:
+        mat.use_nodes = True
+    nodes, links = mat.node_tree.nodes, mat.node_tree.links
+    nodes.clear()
+    geo = nodes.new("ShaderNodeNewGeometry")
+    xform = nodes.new("ShaderNodeVectorTransform")
+    xform.vector_type, xform.convert_from, xform.convert_to = "NORMAL", "WORLD", "CAMERA"
+    enc = nodes.new("ShaderNodeVectorMath")
+    enc.operation = "MULTIPLY_ADD"
+    enc.inputs[1].default_value = (0.5, 0.5, -0.5)
+    enc.inputs[2].default_value = (0.5, 0.5, 0.5)
+    emit = nodes.new("ShaderNodeEmission")
+    emit.inputs["Strength"].default_value = 1.0
+    out = nodes.new("ShaderNodeOutputMaterial")
+    links.new(geo.outputs["Normal"], xform.inputs["Vector"])
+    links.new(xform.outputs["Vector"], enc.inputs[0])
+    links.new(enc.outputs["Vector"], emit.inputs["Color"])
+    links.new(emit.outputs["Emission"], out.inputs["Surface"])
+    for obj in bpy.data.objects:
+        if obj.type == "MESH":
+            obj.data.materials.clear()
+            obj.data.materials.append(mat)
+    scene = bpy.context.scene
+    scene.view_settings.view_transform = NORMAL_VIEW_TRANSFORM
+    scene.render.dither_intensity = 0.0
+
+
+def figure_extent_z(rig: bpy.types.Object) -> tuple[float, float]:
+    """World z range of the deformed body (shape keys and pose evaluated, never base vertices)."""
+    bpy.context.view_layer.update()
+    deps = bpy.context.evaluated_depsgraph_get()
+    lo, hi = math.inf, -math.inf
+    for obj in rig.children:
+        if obj.type != "MESH":
+            continue
+        ev = obj.evaluated_get(deps)
+        mesh = ev.to_mesh()
+        mw = ev.matrix_world
+        for v in mesh.vertices:
+            z = (mw @ v.co).z
+            lo, hi = min(lo, z), max(hi, z)
+        ev.to_mesh_clear()
+    return lo, hi
+
+
+def aim_bones(rig: bpy.types.Object, targets: dict) -> None:
+    """Turn each named bone, in order, about its head so it points along a world direction.
+
+    Works in posed space, so a child listed after its parent follows the parent's new pose.
+    """
+    world_inv = rig.matrix_world.inverted()
+    for bone, direction in targets.items():
+        pb = rig.pose.bones.get(bone)
+        if pb is None:
+            raise SystemExit(f"pose: no bone {bone}")
+        bpy.context.view_layer.update()
+        m = rig.matrix_world @ pb.matrix
+        current = (m.to_3x3() @ Vector((0.0, 1.0, 0.0))).normalized()
+        turn = current.rotation_difference(Vector(direction).normalized()).to_matrix().to_4x4()
+        head = Matrix.Translation(m.translation)
+        pb.matrix = world_inv @ (head @ turn @ head.inverted() @ m)
+    bpy.context.view_layer.update()
+
+
+def apply_proportions(rig: bpy.types.Object, path: str, name: str, height_m: float) -> dict:
+    """Pose and scale bones for a sample variant, then refit the figure to height_m with feet on z = 0."""
+    cfg = json.loads(Path(path).read_text(encoding="utf-8"))
+    spec = cfg["variants"][name]
+    scales = spec["bone_scale"]
+    aim = {**cfg.get("pose", {}).get("bone_direction", {}), **spec.get("bone_direction", {})}
+    if not scales and not aim:
+        return {"variant": name, "rig_scale": 1.0, "height_m": None}
+    rig.data.pose_position = "POSE"
+    aim_bones(rig, aim)
+    for bone, factor in scales.items():
+        pb = rig.pose.bones.get(bone)
+        if pb is None:
+            raise SystemExit(f"variant {name}: no bone {bone}; bones are never added or renamed")
+        pb.scale = (factor, factor, factor)
+    lo, hi = figure_extent_z(rig)
+    s = height_m / (hi - lo)
+    rig.scale = (s, s, s)
+    lo, hi = figure_extent_z(rig)
+    rig.location.z -= lo
+    lo, hi = figure_extent_z(rig)
+    print(f"PROPORTION {name} rig_scale {s:.4f} height {hi - lo:.4f} feet {lo:.4f}")
+    return {"variant": name, "rig_scale": round(s, 6), "height_m": round(hi - lo, 4)}
+
+
 def body_rig() -> bpy.types.Object:
     rigs = [o for o in bpy.data.objects if o.type == "ARMATURE" and o.parent is None]
     if len(rigs) != 1:
@@ -157,7 +271,8 @@ def body_rig() -> bpy.types.Object:
 
 def main() -> None:
     args = parse_args()
-    cam = json.loads(CAMERA_FILE.read_text(encoding="utf-8"))
+    camera_file = Path(args.camera).resolve()
+    cam = json.loads(camera_file.read_text(encoding="utf-8"))
     light = json.loads(LIGHT_FILE.read_text(encoding="utf-8"))
     blend = BODIES_DIR / f"{args.body}.blend"
     bpy.ops.wm.open_mainfile(filepath=str(blend))
@@ -165,8 +280,14 @@ def main() -> None:
         if obj.type in ("CAMERA", "LIGHT"):
             bpy.data.objects.remove(obj, do_unlink=True)
     setup_render(cam, light)
-    apply_material(light["body_material"])
+    if args.render_pass == "normal":
+        apply_normal_pass()
+    else:
+        apply_material(light["body_material"])
     rig = body_rig()
+    proportion = None
+    if args.proportions:
+        proportion = apply_proportions(rig, args.proportions, args.variant, cam["reference_height_m"])
     add_camera(cam)
     add_lights(light)
 
@@ -192,13 +313,19 @@ def main() -> None:
         "pose": "rest",
         "inputs": {
             "body_blend": {"file": f"tools/pipeline/bodies/{blend.name}", "sha256": sha256(blend)},
-            "camera_rig": {"file": "tools/pipeline/camera_rig.json", "sha256": sha256(CAMERA_FILE)},
+            "camera_rig": {"file": rel_path(camera_file), "sha256": sha256(camera_file)},
             "light_rig": {"file": "tools/pipeline/light_rig.json", "sha256": sha256(LIGHT_FILE)},
             "render_script": {"file": "tools/pipeline/render_character.py", "sha256": sha256(Path(__file__))},
         },
         "tools": {"blender": bpy.app.version_string},
         "outputs": outputs,
     }
+    if args.render_pass != "color":
+        meta["pass"] = args.render_pass
+    if proportion is not None:
+        prop_file = Path(args.proportions).resolve()
+        meta["inputs"]["proportions"] = {"file": rel_path(prop_file), "sha256": sha256(prop_file)}
+        meta["proportion"] = proportion
     (out / "render_meta.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8", newline="\n")
     print("RENDER_OK " + str(len(outputs)))
 

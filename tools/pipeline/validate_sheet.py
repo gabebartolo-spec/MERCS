@@ -157,7 +157,7 @@ def check_pixels(m: dict, img, colours: set, f: Findings) -> None:
             f.add("SHEET-PIVOT", f"frame {fr['facing']} pivot column {px} misses the figure ({min(cols)}..{max(cols)})")
 
 
-def validate(manifest_path: Path) -> list[str]:
+def validate(manifest_path: Path, camera_file: Path = CAMERA_FILE) -> list[str]:
     f = Findings(manifest_path.as_posix())
     try:
         m = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -171,7 +171,7 @@ def validate(manifest_path: Path) -> list[str]:
     except (OSError, PngError, ValueError) as exc:
         f.add("SHEET-PNG", f"cannot read {m['image']}: {exc}")
         return f.lines
-    frame_px = json.loads(CAMERA_FILE.read_text(encoding="utf-8"))["frame_px"]
+    frame_px = json.loads(camera_file.read_text(encoding="utf-8"))["frame_px"]
     if not check_sizes(m, img, frame_px, f):
         return f.lines
     pal_path = REPO / m["palette"]["file"]
@@ -190,11 +190,15 @@ def main(argv: list[str]) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     if not argv:
-        print("usage: validate_sheet.py <manifest.json> [...]")
+        print("usage: validate_sheet.py [--camera=<rig.json>] <manifest.json> [...]")
         return 2
+    camera_file = CAMERA_FILE  # samples rendered with another camera rig name it here
+    for arg in [a for a in argv if a.startswith("--camera=")]:
+        camera_file = Path(arg.split("=", 1)[1])
+        argv = [a for a in argv if a != arg]
     bad = 0
     for arg in argv:
-        lines = validate(Path(arg))
+        lines = validate(Path(arg), camera_file)
         for line in lines:
             print(line)
         bad += bool(lines)
