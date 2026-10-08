@@ -11,12 +11,14 @@ extends SceneTree
 ##     --mode=crisp|whole --out=docs/audits/stage_samples/crisp_p35_h48.png \
 ##     [--walk=10] [--sequence=3] [--fps=30] [--sheet=<manifest.json> [--facing=S]]
 ##     [--lighting=day|rain_night] [--depth=perspective|constant] [--at=x,z]
-##     [--frametime=<frames>] [--region=x,y,w,h] [--unlit] [--extra=x,z;x,z]
+##     [--frametime=<frames>] [--region=x,y,w,h] [--unlit] [--capsule] [--extra=x,z;x,z]
 ##
-## --walk is the seconds the sprite has walked before the still (default puts it beside
-## the well); --sequence=<seconds> writes <out stem>/frame_000.png … at --fps instead.
-## --sheet shows one facing of a factory sheet (mercs.sheet/1) instead of the capsule;
-## render it at the same pitch and height as the capture. --at holds the merc's feet at
+## --walk is the seconds the sprite has walked before the still (default 14 puts it in
+## front of and left of the well, in view at 55 degrees); --sequence=<seconds> writes
+## <out stem>/frame_000.png … at --fps instead.
+## The merc is DEFAULT_SHEET (the director's look) unless --sheet names another factory
+## sheet (mercs.sheet/1, rendered at the capture's pitch and height) or --capsule asks for
+## the grey placeholder. --at holds the merc's feet at
 ## world x, z. --frametime renders that many extra frames with vsync off first and prints
 ## "frame_time_ms <mean>" (wall clock: a measurement tool, never a test). --region crops
 ## every --sequence frame to that window-pixel rectangle. --unlit draws the sprite unshaded
@@ -26,7 +28,10 @@ extends SceneTree
 const STAGE_SCENE := "res://presentation/world/street_stage.tscn"
 const STAGE_DATA := "res://data/balance/stage.json"
 const DEFAULT_OUT := "docs/audits/stage_samples/capture.png"
-const DEFAULT_WALK_SECONDS := 10.0
+const DEFAULT_WALK_SECONDS := 14.0
+## The merc a capture shows unless --sheet or --capsule says otherwise: the pipeline's good
+## fixture, rendered at the director's look (proportion C, 56 px, 55 degrees).
+const DEFAULT_SHEET := "res://tests/fixtures/pipeline/sheets/good/average_m_body_rest.json"
 const SEQUENCE_FRAME_PATTERN := "frame_%03d.png"
 const USEC_PER_MS := 1000.0
 
@@ -48,11 +53,9 @@ func _run() -> void:
 	_stage = _spawn_stage()
 	root.add_child(_stage)
 	await process_frame
-	if (
-		_args.has("sheet")
-		and not _stage.use_sheet(_arg_string("sheet", ""), _arg_string("facing", "S"))
-	):
-		push_error("could not show sheet %s" % _arg_string("sheet", ""))
+	var sheet := "" if _args.has("capsule") else _arg_string("sheet", DEFAULT_SHEET)
+	if not sheet.is_empty() and not _stage.use_sheet(sheet, _arg_string("facing", "S")):
+		push_error("could not show sheet %s" % sheet)
 		quit(1)
 		return
 	_stage.step(_arg_float("walk", DEFAULT_WALK_SECONDS))

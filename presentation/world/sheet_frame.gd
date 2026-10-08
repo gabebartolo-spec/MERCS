@@ -11,6 +11,8 @@ extends RefCounted
 ## Godot lights (torch, moon, lightning) light the sprite instead of a flat tint.
 
 const HALF := 2.0
+const LIT_SHADER := preload("res://presentation/world/upright_sprite_lit.gdshader")
+const UNLIT_SHADER := preload("res://presentation/world/upright_sprite_unlit.gdshader")
 const ALPHA_SCISSOR := 0.5
 const MATTE_ROUGHNESS := 1.0
 const NO_SPECULAR := 0.0
@@ -52,19 +54,27 @@ static func from_manifest(manifest_path: String, facing: String) -> SheetFrame:
 
 
 ## A shaded material for this frame's sprite (needs a normal map): nearest texels, alpha
-## scissor, camera-facing billboard keeping the sprite's scale, matte with no specular glint.
-func lit_material() -> StandardMaterial3D:
-	var material := StandardMaterial3D.new()
-	material.albedo_texture = texture
-	material.normal_enabled = true
-	material.normal_texture = normal
-	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
-	material.alpha_scissor_threshold = ALPHA_SCISSOR
-	material.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
-	material.billboard_keep_scale = true
-	material.roughness = MATTE_ROUGHNESS
-	material.metallic_specular = NO_SPECULAR
+## scissor, camera-facing billboard keeping the sprite's scale, depth written as if the
+## figure stood upright at its feet, matte with no specular glint.
+func lit_material() -> ShaderMaterial:
+	var material := _upright_material(LIT_SHADER)
+	material.set_shader_parameter(&"normal_texture", normal)
+	material.set_shader_parameter(&"roughness", MATTE_ROUGHNESS)
+	material.set_shader_parameter(&"specular", NO_SPECULAR)
+	return material
+
+
+## The unshaded material: as lit_material() without lighting, tinted by the sprite's
+## modulate (the night tint).
+func unlit_material() -> ShaderMaterial:
+	return _upright_material(UNLIT_SHADER)
+
+
+func _upright_material(shader: Shader) -> ShaderMaterial:
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	material.set_shader_parameter(&"albedo_texture", texture)
+	material.set_shader_parameter(&"alpha_scissor", ALPHA_SCISSOR)
 	return material
 
 
