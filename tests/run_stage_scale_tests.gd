@@ -86,7 +86,7 @@ func _texel_span_px(pitch: float, height_px: int) -> Vector2:
 	var origin: Vector2 = camera.unproject_position(anchor)
 	var across: Vector2 = camera.unproject_position(anchor + right * merc.pixel_size * merc.scale.x)
 	var up: Vector2 = camera.unproject_position(
-		anchor + Vector3.UP * merc.pixel_size * merc.scale.y
+		anchor + camera.global_transform.basis.y * merc.pixel_size * merc.scale.y
 	)
 	await _despawn(stage)
 	return Vector2(across.distance_to(origin), up.distance_to(origin))
@@ -117,17 +117,26 @@ func _check_rig_contract() -> void:
 
 
 ## The sprite's lowest world point, after its transform (scale included).
-func _sprite_bottom_y(merc: Sprite3D) -> float:
-	return (merc.global_transform * merc.get_aabb()).position.y
+## The pivot texel sits on the sprite's origin (Sprite3D draws y up from offset.y) and the
+## origin is on the ground. Camera-facing sprites report an oversized AABB, so the anchor is
+## checked through the offset rather than the bounds.
+func _pivot_on_ground(merc: Sprite3D, frame: Vector2, pivot: Vector2) -> bool:
+	var expected := Vector2(-pivot.x, pivot.y - frame.y)
+	return (
+		not merc.centered
+		and merc.offset.is_equal_approx(expected)
+		and absf(merc.global_position.y) < EPSILON
+	)
 
 
 func _check_feet_on_ground() -> void:
 	var stage: StreetStage = await _spawn(StreetStage.PixelMode.CRISP, 48, 35.0)
 	stage.step(FIXED_DELTA)
-	var bottom := _sprite_bottom_y(stage.merc())
+	var merc := stage.merc()
+	var size := merc.region_rect.size
 	check(
-		absf(bottom) < EPSILON,
-		"the capsule's bottom row stands on the ground at y 0, not %s" % bottom
+		_pivot_on_ground(merc, size, Vector2(size.x / HALF, size.y)),
+		"the capsule's bottom-centre texel is its origin, on the ground (offset %s)" % merc.offset
 	)
 	await _despawn(stage)
 
@@ -150,14 +159,12 @@ func _check_sheet() -> void:
 		"facing S of the good sheet shows one %s frame, not %s" % [frame, merc.region_rect.size]
 	)
 	stage.step(FIXED_DELTA)
-	await process_frame  # Sprite3D rebuilds its mesh (and AABB) on the next frame.
-	var drop := (frame.y - _json_num(pivot, "y")) * merc.pixel_size * merc.scale.y
-	var bottom := _sprite_bottom_y(merc)
+	var pivot_px := Vector2(_json_num(pivot, "x"), _json_num(pivot, "y"))
 	check(
-		loaded and absf(bottom + drop) < EPSILON,
+		loaded and _pivot_on_ground(merc, frame, pivot_px),
 		(
-			"the sheet's pivot row stands on the ground: the frame bottom sits %s m below y 0, not %s"
-			% [drop, -bottom]
+			"the sheet's pivot %s is the sprite's origin, on the ground (offset %s)"
+			% [pivot_px, merc.offset]
 		)
 	)
 	var accepted := true
@@ -172,12 +179,12 @@ func _check_sheet() -> void:
 func _span_at_merc(stage: StreetStage) -> Vector2:
 	var camera: Camera3D = stage.camera()
 	var merc: Sprite3D = stage.merc()
-	var anchor: Vector3 = merc.global_position + Vector3.UP * _knob("camera", "look_at_height_m")
+	var anchor: Vector3 = merc.global_position
 	var right: Vector3 = camera.global_transform.basis.x
 	var origin: Vector2 = camera.unproject_position(anchor)
 	var across: Vector2 = camera.unproject_position(anchor + right * merc.pixel_size * merc.scale.x)
 	var up: Vector2 = camera.unproject_position(
-		anchor + Vector3.UP * merc.pixel_size * merc.scale.y
+		anchor + camera.global_transform.basis.y * merc.pixel_size * merc.scale.y
 	)
 	return Vector2(across.distance_to(origin), up.distance_to(origin))
 

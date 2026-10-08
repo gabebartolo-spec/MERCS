@@ -11,7 +11,7 @@ extends SceneTree
 ##     --mode=crisp|whole --out=docs/audits/stage_samples/crisp_p35_h48.png \
 ##     [--walk=10] [--sequence=3] [--fps=30] [--sheet=<manifest.json> [--facing=S]]
 ##     [--lighting=day|rain_night] [--depth=perspective|constant] [--at=x,z]
-##     [--frametime=<frames>] [--region=x,y,w,h] [--unlit]
+##     [--frametime=<frames>] [--region=x,y,w,h] [--unlit] [--extra=x,z;x,z]
 ##
 ## --walk is the seconds the sprite has walked before the still (default puts it beside
 ## the well); --sequence=<seconds> writes <out stem>/frame_000.png … at --fps instead.
@@ -21,6 +21,7 @@ extends SceneTree
 ## "frame_time_ms <mean>" (wall clock: a measurement tool, never a test). --region crops
 ## every --sequence frame to that window-pixel rectangle. --unlit draws the sprite unshaded
 ## (night tint) even when it has a normal map.
+## --extra adds a standing merc at each x,z (same frame and rules as the walker).
 
 const STAGE_SCENE := "res://presentation/world/street_stage.tscn"
 const STAGE_DATA := "res://data/balance/stage.json"
@@ -55,6 +56,10 @@ func _run() -> void:
 		quit(1)
 		return
 	_stage.step(_arg_float("walk", DEFAULT_WALK_SECONDS))
+	for spot: String in _arg_string("extra", "").split(";", false):
+		var xz := spot.split_floats(",")
+		if xz.size() >= 2:
+			_stage.add_merc(Vector3(xz[0], 0.0, xz[1]))
 	if _args.has("at"):
 		var xz := _arg_string("at", "0,0").split_floats(",")
 		if xz.size() >= 2:
