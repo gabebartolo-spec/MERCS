@@ -4,3 +4,4 @@
 data 88
 smoke 24
 stage 39
+stage_scale 8

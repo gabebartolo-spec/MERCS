@@ -4,6 +4,7 @@ extends "res://tests/lib/runner.gd"
 ## the camera pitch export moves the camera; the sprite's pixel_size follows its height;
 ## both pixel modes instantiate (WHOLE_SCREEN through a 640 × 360 SubViewport scaled 3×
 ## with nearest filtering, sprite snapped to its pixel grid); and the walk loop completes.
+## The scale contract (texel = logical pixel, sheets) is the stage_scale suite.
 ## Seeded by design: the stage has no randomness; the walker is stepped with a fixed delta.
 ##   godot --headless --path . --script tests/run_stage_tests.gd
 
@@ -13,6 +14,7 @@ const FIXED_DELTA := 1.0 / 60.0
 const EPSILON := 0.001
 const PITCH_PROBE := 40.0
 const HEIGHT_PROBE := 56
+const HALF := 2.0
 
 var _stage_data: Dictionary = {}
 
@@ -135,11 +137,20 @@ func _check_merc_material(merc: Sprite3D) -> void:
 	)
 
 
+## The rail distance that puts one texel on one logical pixel at the look-at point:
+## a texel spans merc_height_m × cos(pitch) / height_px of the image plane, and the
+## logical viewport spans 2 × distance × tan(fov / 2) of it over logical_height_px.
+func _expected_distance(pitch: float, height_px: int) -> float:
+	var texel := _knob("sprite", "merc_height_m") * cos(deg_to_rad(pitch)) / float(height_px)
+	var half_fov := deg_to_rad(_knob("camera", "fov_degrees")) / HALF
+	return texel * _knob("pixel", "logical_height_px") / (HALF * tan(half_fov))
+
+
 func _check_camera_pitch() -> void:
 	var stage: StreetStage = await _spawn(StreetStage.PixelMode.CRISP, 48, 35.0)
 	var camera: Camera3D = stage.camera()
 	var rail: Node3D = stage.get_node("%CameraRail") as Node3D
-	var distance := _knob("camera", "distance_m")
+	var distance := _expected_distance(35.0, 48)
 	check(
 		is_equal_approx(camera.rotation_degrees.x, -35.0),
 		"default pitch 35 tilts the camera to -35°, not %s" % camera.rotation_degrees.x
@@ -157,20 +168,27 @@ func _check_camera_pitch() -> void:
 		is_equal_approx(camera.rotation_degrees.x, -PITCH_PROBE),
 		"setting pitch_degrees to %s tilts the camera to -%s°" % [PITCH_PROBE, PITCH_PROBE]
 	)
-	var expected_height := distance * sin(deg_to_rad(PITCH_PROBE))
+	var probe_distance := _expected_distance(PITCH_PROBE, 48)
+	var expected_height := probe_distance * sin(deg_to_rad(PITCH_PROBE))
 	check(
 		absf(camera.position.y - expected_height) < EPSILON,
 		"the camera rises to distance × sin(pitch) above the rail"
 	)
 	check(
-		absf(camera.position.length() - distance) < EPSILON,
-		"the camera keeps its distance after a pitch change"
+		absf(camera.position.length() - probe_distance) < EPSILON,
+		(
+			"after a pitch change the camera re-derives its distance, %s m, not %s"
+			% [probe_distance, camera.position.length()]
+		)
 	)
 	await _despawn(stage)
 
 
+## pixel_size is one texel of the image plane (merc_height_m × cos(pitch) / height px);
+## the sprite stretches by 1 / cos(pitch) on Y so the standing figure is merc_height_m
+## tall in the world and foreshortens back to height px on screen.
 func _check_sprite_pixel_size() -> void:
-	var height := _knob("sprite", "merc_height_m")
+	var height := _knob("sprite", "merc_height_m") * cos(deg_to_rad(35.0))
 	var stage: StreetStage = await _spawn(StreetStage.PixelMode.CRISP, 48, 35.0)
 	var merc: Sprite3D = stage.merc()
 	check(
@@ -250,7 +268,7 @@ func _check_whole_screen_mode() -> void:
 	var screen: Vector2 = whole.merc_screen_position()
 	check(
 		screen.distance_to(screen.round()) < EPSILON,
-		"the sprite centre snaps to a whole SubViewport pixel, at %s" % screen
+		"the sprite's origin snaps to a whole SubViewport pixel, at %s" % screen
 	)
 	await _despawn(whole)
 
@@ -293,3 +311,4 @@ func _check_path_loop() -> void:
 		"after one lap the sprite is back near the first path point"
 	)
 	await _despawn(stage)
+
