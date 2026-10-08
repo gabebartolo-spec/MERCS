@@ -4,6 +4,7 @@ extends "res://tests/lib/runner.gd"
 ## the camera pitch export moves the camera; the sprite's pixel_size follows its height;
 ## both pixel modes instantiate (WHOLE_SCREEN through a 640 × 360 SubViewport scaled 3×
 ## with nearest filtering, sprite snapped to its pixel grid); and the walk loop completes.
+## The scale contract (texel = logical pixel, sheets) is the stage_scale suite.
 ## Seeded by design: the stage has no randomness; the walker is stepped with a fixed delta.
 ##   godot --headless --path . --script tests/run_stage_tests.gd
 
@@ -13,6 +14,7 @@ const FIXED_DELTA := 1.0 / 60.0
 const EPSILON := 0.001
 const PITCH_PROBE := 40.0
 const HEIGHT_PROBE := 56
+const HALF := 2.0
 
 var _stage_data: Dictionary = {}
 
@@ -29,6 +31,7 @@ func run_checks() -> void:
 	await _check_sprite_pixel_size()
 	await _check_pixel_modes()
 	await _check_path_loop()
+	await _check_lighting()
 
 
 func _load_stage_data() -> Dictionary:
@@ -55,10 +58,14 @@ func _knob_list(section: String, key: String) -> Array:
 
 
 ## Instantiates the stage with the given exports and waits one frame so _ready ran.
+## Depth scale is PERSPECTIVE so the texel measured at the look-at point is the reference
+## texel wherever the walker stands; CONSTANT is checked on its own in the scale suite.
 func _spawn(mode: StreetStage.PixelMode, height_px: int, pitch: float) -> StreetStage:
 	var packed: PackedScene = load(STAGE_SCENE) as PackedScene
 	var stage: StreetStage = packed.instantiate() as StreetStage
 	stage.pixel_mode = mode
+	stage.depth_scale = StreetStage.DepthScale.PERSPECTIVE
+	stage.lit_sprites = false
 	stage.sprite_height_px = height_px
 	stage.pitch_degrees = pitch
 	stage.auto_walk = false
@@ -135,11 +142,20 @@ func _check_merc_material(merc: Sprite3D) -> void:
 	)
 
 
+## The rail distance that puts one texel on one logical pixel at the look-at point:
+## a texel spans merc_height_m × cos(pitch) / height_px of the image plane, and the
+## logical viewport spans 2 × distance × tan(fov / 2) of it over logical_height_px.
+func _expected_distance(pitch: float, height_px: int) -> float:
+	var texel := _knob("sprite", "merc_height_m") * cos(deg_to_rad(pitch)) / float(height_px)
+	var half_fov := deg_to_rad(_knob("camera", "fov_degrees")) / HALF
+	return texel * _knob("pixel", "logical_height_px") / (HALF * tan(half_fov))
+
+
 func _check_camera_pitch() -> void:
 	var stage: StreetStage = await _spawn(StreetStage.PixelMode.CRISP, 48, 35.0)
 	var camera: Camera3D = stage.camera()
 	var rail: Node3D = stage.get_node("%CameraRail") as Node3D
-	var distance := _knob("camera", "distance_m")
+	var distance := _expected_distance(35.0, 48)
 	check(
 		is_equal_approx(camera.rotation_degrees.x, -35.0),
 		"default pitch 35 tilts the camera to -35°, not %s" % camera.rotation_degrees.x
@@ -157,20 +173,27 @@ func _check_camera_pitch() -> void:
 		is_equal_approx(camera.rotation_degrees.x, -PITCH_PROBE),
 		"setting pitch_degrees to %s tilts the camera to -%s°" % [PITCH_PROBE, PITCH_PROBE]
 	)
-	var expected_height := distance * sin(deg_to_rad(PITCH_PROBE))
+	var probe_distance := _expected_distance(PITCH_PROBE, 48)
+	var expected_height := probe_distance * sin(deg_to_rad(PITCH_PROBE))
 	check(
 		absf(camera.position.y - expected_height) < EPSILON,
 		"the camera rises to distance × sin(pitch) above the rail"
 	)
 	check(
-		absf(camera.position.length() - distance) < EPSILON,
-		"the camera keeps its distance after a pitch change"
+		absf(camera.position.length() - probe_distance) < EPSILON,
+		(
+			"after a pitch change the camera re-derives its distance, %s m, not %s"
+			% [probe_distance, camera.position.length()]
+		)
 	)
 	await _despawn(stage)
 
 
+## pixel_size is one texel of the image plane (merc_height_m × cos(pitch) / height px);
+## the sprite stretches by 1 / cos(pitch) on Y so the standing figure is merc_height_m
+## tall in the world and foreshortens back to height px on screen.
 func _check_sprite_pixel_size() -> void:
-	var height := _knob("sprite", "merc_height_m")
+	var height := _knob("sprite", "merc_height_m") * cos(deg_to_rad(35.0))
 	var stage: StreetStage = await _spawn(StreetStage.PixelMode.CRISP, 48, 35.0)
 	var merc: Sprite3D = stage.merc()
 	check(
@@ -250,7 +273,7 @@ func _check_whole_screen_mode() -> void:
 	var screen: Vector2 = whole.merc_screen_position()
 	check(
 		screen.distance_to(screen.round()) < EPSILON,
-		"the sprite centre snaps to a whole SubViewport pixel, at %s" % screen
+		"the sprite's origin snaps to a whole SubViewport pixel, at %s" % screen
 	)
 	await _despawn(whole)
 
@@ -293,3 +316,46 @@ func _check_path_loop() -> void:
 		"after one lap the sprite is back near the first path point"
 	)
 	await _despawn(stage)
+
+
+## DAY has no torch or rain and an untinted sprite; RAIN_NIGHT adds the torch and rain
+## (fixed particle seed, so captures repeat), dims the key and tints the unshaded sprite.
+func _check_lighting() -> void:
+	var day: StreetStage = await _spawn(StreetStage.PixelMode.CRISP, 48, 35.0)
+	check(
+		(
+			day.find_child("Torch", true, false) == null
+			and day.find_child("Rain", true, false) == null
+		),
+		"DAY lighting adds no torch and no rain"
+	)
+	check(day.merc().modulate == Color.WHITE, "DAY lighting leaves the sprite untinted")
+	await _despawn(day)
+	var packed: PackedScene = load(STAGE_SCENE) as PackedScene
+	var night: StreetStage = packed.instantiate() as StreetStage
+	night.lighting = StreetStage.Lighting.RAIN_NIGHT
+	night.lit_sprites = false
+	night.auto_walk = false
+	root.add_child(night)
+	await process_frame
+	var night_data: Dictionary = _stage_data.get("rain_night", {})
+	var rain_data: Dictionary = night_data.get("rain", {})
+	var rain: GPUParticles3D = night.find_child("Rain", true, false) as GPUParticles3D
+	var seed_value: float = rain_data.get("seed", -1.0)
+	check(
+		(
+			night.find_child("Torch", true, false) is OmniLight3D
+			and rain != null
+			and rain.use_fixed_seed
+			and rain.seed == int(seed_value)
+		),
+		"RAIN_NIGHT adds the torch and rain with the data's fixed seed"
+	)
+	var light: DirectionalLight3D = night.get_node("%KeyLight") as DirectionalLight3D
+	var light_data: Dictionary = night_data.get("light", {})
+	var energy: float = light_data.get("energy", -1.0)
+	check(
+		is_equal_approx(light.light_energy, energy) and night.merc().modulate != Color.WHITE,
+		"RAIN_NIGHT dims the key to the data's energy and tints the unshaded sprite"
+	)
+	await _despawn(night)

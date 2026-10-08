@@ -9,16 +9,25 @@ extends SceneTree
 ##   APPDATA=<scratch> godot --path . --resolution 1920x1080 \
 ##     --script tools/capture/capture_stage.gd -- --pitch=35 --height=48 \
 ##     --mode=crisp|whole --out=docs/audits/stage_samples/crisp_p35_h48.png \
-##     [--walk=10] [--sequence=3] [--fps=30]
+##     [--walk=10] [--sequence=3] [--fps=30] [--sheet=<manifest.json> [--facing=S]]
+##     [--lighting=day|rain_night] [--depth=perspective|constant] [--at=x,z]
+##     [--frametime=<frames>] [--region=x,y,w,h] [--unlit]
 ##
 ## --walk is the seconds the sprite has walked before the still (default puts it beside
 ## the well); --sequence=<seconds> writes <out stem>/frame_000.png … at --fps instead.
+## --sheet shows one facing of a factory sheet (mercs.sheet/1) instead of the capsule;
+## render it at the same pitch and height as the capture. --at holds the merc's feet at
+## world x, z. --frametime renders that many extra frames with vsync off first and prints
+## "frame_time_ms <mean>" (wall clock: a measurement tool, never a test). --region crops
+## every --sequence frame to that window-pixel rectangle. --unlit draws the sprite unshaded
+## (night tint) even when it has a normal map.
 
 const STAGE_SCENE := "res://presentation/world/street_stage.tscn"
 const STAGE_DATA := "res://data/balance/stage.json"
 const DEFAULT_OUT := "docs/audits/stage_samples/capture.png"
 const DEFAULT_WALK_SECONDS := 10.0
 const SEQUENCE_FRAME_PATTERN := "frame_%03d.png"
+const USEC_PER_MS := 1000.0
 
 var _args: Dictionary = {}
 var _capture: Dictionary = {}
@@ -38,7 +47,20 @@ func _run() -> void:
 	_stage = _spawn_stage()
 	root.add_child(_stage)
 	await process_frame
+	if (
+		_args.has("sheet")
+		and not _stage.use_sheet(_arg_string("sheet", ""), _arg_string("facing", "S"))
+	):
+		push_error("could not show sheet %s" % _arg_string("sheet", ""))
+		quit(1)
+		return
 	_stage.step(_arg_float("walk", DEFAULT_WALK_SECONDS))
+	if _args.has("at"):
+		var xz := _arg_string("at", "0,0").split_floats(",")
+		if xz.size() >= 2:
+			_stage.stand_at(Vector3(xz[0], 0.0, xz[1]))
+	if _args.has("frametime"):
+		await _measure_frame_time(int(_arg_float("frametime", 0.0)))
 	for _frame: int in int(_knob("settle_frames")):
 		await process_frame
 	var out := _arg_string("out", DEFAULT_OUT)
@@ -56,12 +78,34 @@ func _spawn_stage() -> StreetStage:
 	stage.auto_walk = false
 	stage.pitch_degrees = _arg_float("pitch", stage.pitch_degrees)
 	stage.sprite_height_px = int(_arg_float("height", stage.sprite_height_px))
-	var mode := _arg_string("mode", "crisp")
-	if mode == "whole":
-		stage.pixel_mode = StreetStage.PixelMode.WHOLE_SCREEN
-	else:
-		stage.pixel_mode = StreetStage.PixelMode.CRISP
+	if _args.has("unlit"):
+		stage.lit_sprites = false
+	if _arg_string("lighting", "day") == "rain_night":
+		stage.lighting = StreetStage.Lighting.RAIN_NIGHT
+	# Without --depth or --mode the stage's defaults apply (constant, whole screen).
+	if _args.has("depth"):
+		var constant := _arg_string("depth", "") == "constant"
+		stage.depth_scale = (
+			StreetStage.DepthScale.CONSTANT if constant else StreetStage.DepthScale.PERSPECTIVE
+		)
+	if _args.has("mode"):
+		var whole := _arg_string("mode", "") == "whole"
+		stage.pixel_mode = (
+			StreetStage.PixelMode.WHOLE_SCREEN if whole else StreetStage.PixelMode.CRISP
+		)
 	return stage
+
+
+func _measure_frame_time(frames: int) -> void:
+	if frames <= 0:
+		return
+	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+	await process_frame
+	var start := Time.get_ticks_usec()
+	for _frame: int in frames:
+		await RenderingServer.frame_post_draw
+	var mean_ms := float(Time.get_ticks_usec() - start) / frames / USEC_PER_MS
+	print("frame_time_ms %.3f over %d frames" % [mean_ms, frames])
 
 
 func _save_still(out: String) -> bool:
@@ -82,11 +126,20 @@ func _save_sequence(out: String) -> bool:
 	var count := int(roundf(seconds * fps))
 	for index: int in count:
 		var frame := await _render_frame()
+		if frame != null and _args.has("region"):
+			frame = frame.get_region(_region())
 		if frame == null or not _save(frame, dir.path_join(SEQUENCE_FRAME_PATTERN % index)):
 			return false
 		_stage.step(1.0 / fps)
 	print("saved %d frames to %s" % [count, dir])
 	return true
+
+
+func _region() -> Rect2i:
+	var v := _arg_string("region", "").split_floats(",")
+	if v.size() < 4:
+		return Rect2i()
+	return Rect2i(int(v[0]), int(v[1]), int(v[2]), int(v[3]))
 
 
 func _render_frame() -> Image:
@@ -103,7 +156,7 @@ func _render_frame() -> Image:
 ## sprite's viewport pixels scale up by the integer scale.
 func _crop_around_merc(frame: Image) -> Image:
 	var size := Vector2i(int(_knob("crop_width_px")), int(_knob("crop_height_px")))
-	var centre: Vector2 = _stage.merc_screen_position()
+	var centre: Vector2 = _stage.merc_centre_screen_position()
 	if _stage.pixel_mode == StreetStage.PixelMode.WHOLE_SCREEN:
 		centre *= _integer_scale()
 	var origin := Vector2i(centre.round()) - size / 2
