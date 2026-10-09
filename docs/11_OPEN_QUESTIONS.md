@@ -91,6 +91,41 @@ sitting captain (D-024). Kept below for the record.
 - Create the captain. Stronger ownership, but it quietly recreates a protagonist the player will
   never risk.
 
+## Raised by the vision revision (director, 2026-10-09)
+
+From `docs/brainstorms/2026-10-09-merc-roster.md`. Where the director stated a lean it is listed
+first; otherwise the Concept Lead adds a recommendation before the question is asked.
+
+**Q15. Sandbox or guided story?** Leaning: a sandbox campaign with large crises, like Battle
+Brothers, where the story emerges from play and feels unique to each run. Alternative: a guided
+narrative spine with sandbox stretches.
+
+**Q16. Does the Vampyr get a last-ditch escape** (bat or shadow form to dodge a killing blow)?
+Director: only if it is thematic, true to his identity, and proves balanced and fun. Options:
+his own version of surviving being downed; a separate move; cut.
+
+**Q17. How is a moveset changed** outside level-ups? Trainers, potions, or another in-game
+mechanism.
+
+**Q18. Which income systems ship first?** Contracts, trade, crafting, gladiator events, looting
+and banditry are all wanted; each needs its own rules, UI and balancing.
+
+**Q19. How do earned epithets and identity branches (One-Eye, Oathbreaker) sit alongside the
+fixed three-stage promotion line?** Branches inside a stage, cosmetic and storylet-only, or
+replaced by the promotion line.
+
+**Q20. What sits beside the four learnt moves in battle?** Basic weapon actions, an item slot, or
+nothing. And does equipment physics (plate resists cuts, axes break shields) still apply inside
+each merc's gear line?
+
+**Q21. With a fixed cast of 25, how does recruitment stay a discovery, and where do prisoners
+fit?** Phase 6 currently recruits surrendered enemies and Phase 7 has regional recruitment pools.
+Options include: cast members can appear as enemies and be won over; cast members are found in
+the world (taverns, story gates); captured enemies are ransomed or released but never recruited.
+
+**Q22. How many of the 25 are in the vertical slice?** The slice roster cap is 12. Art cost is
+about 3 stage looks per merc plus personal-detail variants for a returning playstyle.
+
 ## Design questions the Dev Lead will raise during their phases
 
 - Phase 3: how much of the enemy's equipment should be visible before a fight begins (it changes
