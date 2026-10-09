@@ -3,7 +3,7 @@ Start from this file, CLAUDE.md, your brief (`agent-briefs/DEV_LEAD_OPUS.md`), `
 §Phase 1 only, `docs/specs/phase1_visual_proof.md`, and `docs/01_ENGINE_DECISION.md` "Rendering plan".
 Run `git fetch`, then `gh pr list` and `docs/STATUS.md`: PR states below are as of writing.
 
-## State: working (M5 sim core PR open: Rng + sketch battle; walk clip back with Art for a shoulder fix)
+## State: working (M5 cast + check PR open; #63 vision revision open, director's; Art paused for refocus)
 ## THE GOAL (director, 2026-10-09)
 "A playable vertical slice that I can test and assess the art direction before we develop bulk
 assets and content." Spec: `docs/specs/art_direction_slice.md` (the playable Phase 1 gate build:
@@ -88,6 +88,18 @@ flow state machine, then presentation (battle on the street grid, panels).
 ## Lead QC: walk clip FAILED round 1
 NW/SE F0-3 the far shoulder rises to ear height and reads as a second head; S/N arms swing out
 sideways. Cause: clavicle lift in the T/A-pose retarget. Sent back; idle reviewed after the fix.
+## Vision revised (PR #63, director-instructed, open at writing)
+Hand-made cast of 25 mercs (no procedural recruits), grim grounded fantasy WITH magic (orcs, a
+Vampyr), no type chart (counters from combat roles; themed resolve per merc), art pipeline paused
+for P1-ART-REFOCUS (base body work stops). Dev Lead may continue M5 where it does not depend on the
+base body; slice M4 (looks) waits; nothing of Phase 2 MercGen starts.
+## M5 cast + check PR (`claude/slice-m5-cast-check`)
+`battle.json` "fighters": the director's reference pair (orc: charge = walk + attack in one turn;
+Vampyr: blood price = pay hp, never the last, for +attack/+damage on one attack) plus bandit and
+bandit chief; "gate": the lookout talk-down check. `sim/story/checks.gd` (Checks.attempt / best:
+visible d20 + skill vs difficulty, roll shown). Names in en.json are placeholders ("The Orc",
+"The Vampyr"): the director names the cast. battle floor 10 -> 14. Next: loop flow state machine
+(recruit card -> contract -> travel -> gate -> battle -> aftermath -> camp), then presentation.
 ## Sprite sheets are plain git (Lead, 2026-10-09)
 Art's #55 (rest sheet under assets/) went red on CI: `*.png` is LFS and CI checks out without LFS,
 so Godot read pointer files. `.gitattributes` now makes `assets/sprites/**/*.png` plain git (like

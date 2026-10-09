@@ -29,6 +29,9 @@ func run_checks() -> void:
 	_check_attacks()
 	_check_morale_and_surrender()
 	_check_ai_sight()
+	_check_charge()
+	_check_blood_price()
+	_check_checks()
 	await process_frame
 
 
@@ -209,4 +212,101 @@ func _check_ai_sight() -> void:
 			and str(seeing.get("type")) == Battle.ACTION_MOVE
 		),
 		"the enemy waits when it sees no one and closes in when it does (not psychic)"
+	)
+
+
+func _data() -> Dictionary:
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(BATTLE_DATA))
+	return parsed if parsed is Dictionary else {}
+
+
+func _fighter(kind: String, unit_id: String, side: int, at: Vector2i) -> BattleUnit:
+	var fighters: Dictionary = _data().get("fighters", {})
+	var stats: Dictionary = fighters.get(kind, {})
+	return BattleUnit.make(unit_id, side, at, stats)
+
+
+func _duel(attacker: BattleUnit, defender: BattleUnit) -> Battle:
+	var battle := Battle.new()
+	attacker.initiative = SURE_HIT
+	var pair: Array[BattleUnit] = [attacker, defender]
+	battle.setup(_rules(), {"size": GRID}, pair, Rng.from_seed(SEED))
+	return battle
+
+
+func _check_charge() -> void:
+	var orc := _fighter("orc", "orc", BattleUnit.COMPANY, Vector2i(1, 1))
+	var bandit := _fighter("bandit", "b", BattleUnit.ENEMY, Vector2i(4, 1))
+	var battle := _duel(orc, bandit)
+	var landing := Vector2i(3, 1)
+	var events := battle.apply({"type": Battle.ACTION_CHARGE, "to": landing, "target": "b"})
+	var kinds: Array = events.map(func(e: Dictionary) -> String: return str(e.get("type", "")))
+	var vampyr := _fighter("vampyr", "v", BattleUnit.COMPANY, Vector2i(1, 1))
+	var other := _duel(vampyr, _fighter("bandit", "b", BattleUnit.ENEMY, Vector2i(4, 1)))
+	var refused := other.apply({"type": Battle.ACTION_CHARGE, "to": landing, "target": "b"})
+	check(
+		(
+			orc.can_charge
+			and orc.cell == landing
+			and kinds.has("move")
+			and kinds.has("attack")
+			and refused.is_empty()
+		),
+		(
+			"the orc charges: walks and attacks in one turn; a merc without the ability cannot (%s)"
+			% [kinds]
+		)
+	)
+
+
+func _check_blood_price() -> void:
+	var rules := _rules()
+	var cost: int = rules.get("blood_price_hp", 0)
+	var bonus: int = rules.get("blood_price_attack", 0)
+	var vampyr := _fighter("vampyr", "v", BattleUnit.COMPANY, Vector2i(1, 1))
+	var bandit := _fighter("bandit", "b", BattleUnit.ENEMY, Vector2i(2, 1))
+	var battle := _duel(vampyr, bandit)
+	var start := vampyr.hp
+	var plain_need: int = rules.get("hit_base", 0) + bandit.defense - vampyr.attack
+	var events := battle.apply({"type": Battle.ACTION_BLOOD_PRICE, "target": "b"})
+	var attack: Dictionary = {}
+	for event: Dictionary in events:
+		if event.get("type") == Battle.ACTION_ATTACK:
+			attack = event
+	var need: int = attack.get("need", plain_need)
+	check(
+		vampyr.hp == start - cost and need == plain_need - bonus and vampyr.next_attack_bonus == 0,
+		"the Vampyr's blood price costs %d hp and adds %d to that one attack" % [cost, bonus]
+	)
+	var spent := _fighter("vampyr", "v", BattleUnit.COMPANY, Vector2i(1, 1))
+	spent.hp = cost
+	var last := _duel(spent, _fighter("bandit", "b", BattleUnit.ENEMY, Vector2i(2, 1)))
+	check(
+		(
+			last.apply({"type": Battle.ACTION_BLOOD_PRICE, "target": "b"}).is_empty()
+			and spent.hp == cost
+		),
+		"the blood price is refused when it would take his last hit point"
+	)
+
+
+func _check_checks() -> void:
+	var data := _data()
+	var gate: Dictionary = data.get("gate", {})
+	var sides: int = gate.get("die_sides", 0)
+	var difficulty: int = gate.get("talk_down_difficulty", 0)
+	var a := Checks.attempt(Rng.from_seed(SEED), sides, 4, difficulty)
+	var b := Checks.attempt(Rng.from_seed(SEED), sides, 4, difficulty)
+	var roll: int = a.get("roll", 0)
+	var need: int = a.get("need", 0)
+	var success: bool = a.get("success", false)
+	var pick := Checks.best({"orc": 1, "vampyr": 4, "zed": 4})
+	check(
+		(
+			str(a) == str(b)
+			and need == difficulty - 4
+			and success == (roll >= need)
+			and pick == "vampyr"
+		),
+		"a visible check shows roll and need, repeats from a seed; best() suggests the top skill"
 	)
