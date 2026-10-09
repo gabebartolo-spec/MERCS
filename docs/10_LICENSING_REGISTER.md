@@ -98,3 +98,9 @@ Found 2026-10-08 under `Data/Packages/ComfyUI/models/` on C:. Licence tags read 
 
 `validate_provenance.py` fails any asset whose `licence_rows` includes a row not marked CLEARED
 here, or whose `models` list names a BANNED file.
+
+## Shipped assets (one row per sheet; Art agent)
+
+| Asset | Made from (licence rows) | Status | Provenance | Notes |
+|-------|--------------------------|--------|------------|-------|
+| `assets/sprites/mercs/average_m/average_m_body_rest` (.json, .png, _normal.png) | Blender, MPFB (CC0 base mesh and targets), Python | CLEARED | `average_m_body_rest.provenance.json` beside it | rendered by the sprite pipeline (no generative model, no clip); director's look pick 2026-10-09 (realistic, 84 px, 45° sprites in a 55° world); palette `master_draft` is still DRAFT, so the sheet is re-rendered when the palette is approved |
