@@ -4,6 +4,54 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
+## 2026-10-09 · D-058 · Director · Economy
+Upkeep is in and streamlined; contracts, trade, crafting, gladiator events, looting and banditry should all be viable income.
+Changes: `00_VISION.md` and `CLAUDE.md` (#63).
+
+## 2026-10-09 · D-057 · Director · Role counters
+No type chart; counters come from combat roles; every merc has themed resolve; psychological warfare is a major theme.
+Changes: `00_VISION.md` and `CLAUDE.md` (#63).
+
+## 2026-10-09 · D-056 · Director · Downed survival
+Any merc can survive being downed; injuries and permanent injuries apply.
+Changes: `00_VISION.md` and `CLAUDE.md` (#63).
+
+## 2026-10-09 · D-055 · Director · Returning playstyle (hard rule 5)
+A dead merc stays dead. Their playstyle may return as a new, different-looking person with a fresh history. This is not a resurrection.
+Changes: `00_VISION.md` and `CLAUDE.md` (#63).
+
+## 2026-10-09 · D-054 · Director · Movesets
+Moves are learnt at set levels; up to 4 are taken into battle (Q17 is how they change).
+Changes: `00_VISION.md` and `CLAUDE.md` (#63).
+
+## 2026-10-09 · D-053 · Director · Gear lines
+Each merc has their own gear line; no general gear is shared between mercs.
+Changes: `00_VISION.md` and `CLAUDE.md` (#63).
+
+## 2026-10-09 · D-052 · Director · Promotion lines
+Three-stage line per merc (two promotions), one experience bar fed by combat and story; promotion raises wages and abilities; promoted looks stay recognisable.
+Changes: `00_VISION.md` and `CLAUDE.md` (#63).
+
+## 2026-10-09 · D-051 · Director · Art refocus
+The art pipeline is interrupted. Base-body, build, socket and shared-equipment work stops. Camera, light, pixel post, palette, packing and validators stand; the rule that diffusion never produces a sprite frame stands. Supersedes D-002 and the vision's "3D source characters" override. P1-ART-REFOCUS is assigned.
+Changes: `00_VISION.md` and `CLAUDE.md` (#63).
+
+## 2026-10-09 · D-050 · Director · CLAUDE.md wording
+The `CLAUDE.md` Philosophy line now reads "makes one of the hand-made mercs more memorable".
+Changes: `00_VISION.md` and `CLAUDE.md` (#63).
+
+## 2026-10-09 · D-049 · Director · Tone
+Grim, grounded feudal fantasy that contains magic. Non-humans such as orcs and vampyrs belong; tone and art direction make them fit. "Low fantasy" is withdrawn.
+Changes: `00_VISION.md` and `CLAUDE.md` (#63).
+
+## 2026-10-09 · D-048 · Director · Hand-made cast
+25 hand-made mercs at launch, each a unique person with a strong visual and gameplay identity; no class labels; appearance shows abilities; no near-duplicates; no rarity tiers. Only the map layout is randomised (Battle Brothers-style). Supersedes the procedural recruit generation in Phase 2; `MercGen` does not start.
+Changes: `00_VISION.md` and `CLAUDE.md` (#63).
+
+## 2026-10-09 · D-047 · Director · Vision revision
+The director replaces `00_VISION.md` with the hand-made-cast vision. The earlier procedural-recruit and low-fantasy framing misread the director's intent. Director, 2026-10-09: "the vision document is mistaken and misunderstood my intent, change it to our new vision"; "I never said the fantasy would be low, but it can still be grim and grounded and contain magic".
+Changes: `00_VISION.md` and `CLAUDE.md` (#63).
+
 ## 2026-10-09 · D-046 · Lead (technical, same game) · Engine sprite sheets under `assets/sprites/` are plain git, not LFS; large binaries stay in LFS
 Why: CI and the build check out without LFS, so LFS pointers were read as PNGs (#55's red CI). Sheets are small.
 Changes: `.gitattributes`, `build.yml` comment (#56).
