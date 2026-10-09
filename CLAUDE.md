@@ -83,8 +83,9 @@ AI-generated fantasy RPG? If the latter, it is not done.
 
 ## Skills improve over time (director, 2026-10-08, all projects, both accounts)
 
-- **Learnings, with an evidence bar.** Any agent may add a finding to a skill's
-  `references/learnings.md`, but only once it has proved effective: a quality-check method that
+- **Learnings, with an evidence bar.** Workers report findings to the lead ("Findings for the lead"
+  in their handoff); only the lead adds a finding to a skill's `references/learnings.md` or to
+  `~/.claude/memory-shared/co-lead-playbook.md` (director, 2026-10-10), but only once it has proved effective: a quality-check method that
   caught or prevented a real defect; a recurring failure whose fix was verified afterwards by a
   test, capture or green CI; or a measured time saving. Each entry names the date, project,
   evidence (PR, commit, run or capture) and the general lesson. No hunches or untested ideas. If a
