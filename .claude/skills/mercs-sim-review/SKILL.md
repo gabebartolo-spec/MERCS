@@ -1,6 +1,6 @@
 ---
 name: mercs-sim-review
-description: The review for changes that touch MERCS' save schema, world tick, injury, death, recruitment or memory systems - the review packet an author writes, the transitions and invariants a reviewer walks (versioned saves, defaults for new keys, migrations with old-save fixtures, save-reload-continue, determinism, mortality is final, the AI is not psychic) and how the verdict is recorded. Use it when asked to review such a PR, when you open one, or when a change you are making turns out to reach one of these areas, even if nobody said sim review.
+description: The review for changes that touch MERCS' save schema, world tick, injury, death, recruitment or memory systems - the review packet an author writes, the transitions and invariants a reviewer walks (versioned saves, defaults for new keys, migrations with old-save fixtures, save-reload-continue, determinism, mortality is final, the AI is not psychic) and how the verdict is recorded. Use it when asked to review such a PR, when you open one, or when a change you are making turns out to reach one of these areas, even if nobody said sim review. Extends the general game-architecture skill (its lifecycle review section) with this game's transitions.
 ---
 
 # Sim review

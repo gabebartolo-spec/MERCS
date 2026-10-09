@@ -1,6 +1,6 @@
 ---
 name: mercs-pr
-description: Opening, syncing and handing over a pull request the MERCS way - worktree and branch, the PR body sections and [MERGE NOTE], floors, director gates, who merges, the Board and log section, and how to report a PR to Merge & CI. Use it whenever you are about to open a PR, update one after main moved, resolve a conflict in tests/expected_checks.txt, write a commit message, or tell another agent about a PR or CI result.
+description: Opening, syncing and handing over a pull request the MERCS way - worktree and branch, the PR body sections and [MERGE NOTE], floors, director gates, who merges, the Board and log section, and how to report a PR to Merge & CI. Use it whenever you are about to open a PR, update one after main moved, resolve a conflict in tests/expected_checks.txt, write a commit message, or tell another agent about a PR or CI result. Extends the general github-hygiene skill (~/.claude/skills) with this repo's template, board rules and roles.
 ---
 
 # A PR the MERCS way
