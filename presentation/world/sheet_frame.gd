@@ -34,7 +34,7 @@ static func from_manifest(manifest_path: String, facing: String) -> SheetFrame:
 		return null
 	var image_name := str(manifest.get("image", ""))
 	var image_path := manifest_path.get_base_dir().path_join(image_name)
-	var image := Image.load_from_file(ProjectSettings.globalize_path(image_path))
+	var image := _load_image(image_path)
 	if image == null or image.is_empty():
 		return null
 	var pivot_value: Variant = manifest.get("pivot", {})
@@ -46,11 +46,21 @@ static func from_manifest(manifest_path: String, facing: String) -> SheetFrame:
 	var normal_name := str(manifest.get("normal_image", ""))
 	if not normal_name.is_empty():
 		var normal_path := manifest_path.get_base_dir().path_join(normal_name)
-		var normal_image := Image.load_from_file(ProjectSettings.globalize_path(normal_path))
+		var normal_image := _load_image(normal_path)
 		if normal_image == null or normal_image.get_size() != image.get_size():
 			return null
 		frame.normal = ImageTexture.create_from_image(normal_image)
 	return frame
+
+
+## The PNG at a path as an Image. An imported res:// PNG loads as its texture, the only form
+## that exists inside an exported .pck; any other file (a fixture written to user://) is read
+## from disk.
+static func _load_image(path: String) -> Image:
+	if ResourceLoader.exists(path):
+		var texture := load(path) as Texture2D
+		return texture.get_image() if texture != null else null
+	return Image.load_from_file(ProjectSettings.globalize_path(path))
 
 
 ## A shaded material for this frame's sprite (needs a normal map): nearest texels, alpha
