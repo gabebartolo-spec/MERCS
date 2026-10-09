@@ -10,9 +10,9 @@ Current phase: **1 — Visual and factory proof** (Phase 0 gate PASS WITH NOTES,
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | working | M5 core-loop skeleton where it does not depend on the base body (M5 sim core #60 merged; reference pair abilities #64 open); slice M4 "Looks" waits for P1-ART-REFOCUS; nothing from Phase 2 `MercGen` starts (D-048) | — | 2026-10-09 |
+| Dev Lead (Opus 5.5) | working | M5 reference pair abilities and visible checks merged (#64, battle floor 14); loop flow (#66) and loop on screen (#67) are drafts stacked on it; slice M4 "Looks" waits for the art route | — | 2026-10-09 |
 | Merge & CI (Sonnet 5.5) | working | standing merge pass (D-030); board PR after each merge | — | 2026-10-08 |
-| Art Factory (Opus 5.5) | interrupted by the director | walk and idle sheets stopped, no GPU jobs (D-051); assigned P1-ART-REFOCUS: a written proposal, no renders, for making the hand-made cast; needs the director's approval before any new art work | — | 2026-10-09 |
+| Art Factory (Opus 5.5) | working | art route A chosen (D-059); assigned P1-ART-SLICE-CAST: the orc and the Vampyr at stage 1 (clay, gait, geared sheets with the injury starter set), branch claude/art-slice-cast in the art-publish worktree | claude/art-slice-cast | 2026-10-09 |
 | Concept Lead (Fable 5.1) | working | rewrite roadmap Phases 1 (caps, deliverables, gate), 2 and 6 for the hand-made cast (D-048) and add recommendations to Q15-Q22, the art parts after P1-ART-REFOCUS is approved; Project Architect adoption awaits the director | — | 2026-10-09 |
 
 States: working · running a check · awaiting director · blocked · available.
@@ -59,6 +59,7 @@ States: working · running a check · awaiting director · blocked · available.
 
 17. Art Factory: P1-ART-REFOCUS, a written proposal (no renders) for making the hand-made cast: non-human builds, three stage looks per merc, bespoke gear lines, personal-detail variants for a returning playstyle, what of the current pipeline carries over, art cost for the slice and for 25 mercs; options with costs, to the director as a question; approval before any new art work. Assigned (D-051).
 18. Concept Lead: roadmap rewrite for the hand-made cast, Phases 1, 2 and 6, plus Q15-Q22 recommendations. Assigned (D-048).
+20. Art Factory: P1-ART-SLICE-CAST, the orc and the Vampyr at stage 1: clay, gait, geared sheets with the injury starter set (D-059..D-062). Assigned.
 19. Merge & CI: vision revision (#63, D-047..D-058) merged; #61 superseded. DONE.
 
 ## Waiting on the director
