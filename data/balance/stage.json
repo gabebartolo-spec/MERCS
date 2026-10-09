@@ -87,9 +87,9 @@
     "path_xz": [-7, -0.5, 3.5, -0.5, 6.5, 0.5, 6.5, 2.5, -7, 2.5]
   },
   "pixel": {
-    "logical_width_px": 640,
-    "logical_height_px": 360,
-    "integer_scale": 3
+    "logical_width_px": 960,
+    "logical_height_px": 540,
+    "integer_scale": 2
   },
   "capture": {
     "settle_frames": 4,

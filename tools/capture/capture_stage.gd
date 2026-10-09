@@ -34,7 +34,8 @@ const STAGE_DATA := "res://data/balance/stage.json"
 const DEFAULT_OUT := "docs/audits/stage_samples/capture.png"
 const DEFAULT_WALK_SECONDS := 14.0
 ## The merc a capture shows unless --sheet or --capsule says otherwise: the pipeline's good
-## fixture, rendered at the director's look (proportion C, 56 px, 55 degrees).
+## fixture, rendered at the director's look (realistic, 84 px, 45-degree sprites in the
+## 55-degree world).
 const DEFAULT_SHEET := "res://tests/fixtures/pipeline/sheets/good/average_m_body_rest.json"
 const SEQUENCE_FRAME_PATTERN := "frame_%03d.png"
 const USEC_PER_MS := 1000.0

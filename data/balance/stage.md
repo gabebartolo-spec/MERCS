@@ -52,8 +52,8 @@ Used when the stage's `lighting` export is RAIN_NIGHT (sample set 2, spec §4); 
 - `path_xz`: the walk loop as x, z pairs in metres; the loop closes back to the first point. Laid out for the director's 55° / 56 px camera (2026-10-08), which sees about x −7…7 and z −6…3 of the street: the merc passes behind the well (z −0.5), round its right side and back in front of it (z 2.5).
 
 ## pixel
-- `logical_width_px`, `logical_height_px`: the whole-screen mode SubViewport size (640 × 360).
-- `integer_scale`: the whole-screen scale to the 1920 × 1080 window (3).
+- `logical_width_px`, `logical_height_px`: the whole-screen mode SubViewport size (960 × 540, the director's density pick 2026-10-09; it was 640 × 360).
+- `integer_scale`: the whole-screen scale to the 1920 × 1080 window (2; the slice picks ×4 itself on a 4K window).
 
 ## capture
 - `settle_frames`: frames rendered before a still is saved.

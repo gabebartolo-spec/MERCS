@@ -4,8 +4,7 @@ One line per knob (docs/05_STYLE_CODE.md "Data"). Read by `presentation/world/sl
 Spec: `docs/specs/art_direction_slice.md`. Street geometry, lights and weather stay in `stage.json`.
 
 ## pixel
-- `logical_width_px`, `logical_height_px`: the logical screen (director, 2026-10-09: 960 × 540, ×2 at 1080p, ×4 at 4K). The integer scale is the largest whole number that fits the window.
-- `sprite_height_px`: the merc's height in logical pixels at the 55° world camera (84, the director's density pick; the sprites themselves are rendered at 45° with the same pixels per metre).
+The logical screen and the merc's height are the stage's (`stage.json` "pixel", 960 × 540, 84 px); the slice only picks the largest whole scale that fits the window (×2 at 1080p, ×4 at 4K).
 
 ## player
 - `start_cell_xz`: the street cell the merc starts on.

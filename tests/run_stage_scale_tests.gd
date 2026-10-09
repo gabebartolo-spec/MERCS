@@ -10,6 +10,9 @@ extends "res://tests/run_stage_tests.gd"
 const CAMERA_RIG := "res://tools/pipeline/camera_rig.json"
 const GOOD_SHEET := "res://tests/fixtures/pipeline/sheets/good/average_m_body_rest.json"
 const TEXEL_TOLERANCE_PX := 0.01
+## Snapping moves the feet along the view ray; on the ground that is up to this many texels
+## in z at a 35-degree pitch (1 / sin 35 is about 1.75, plus slack).
+const DEPTH_SNAP_TEXELS := 2.0
 const SAMPLE_PITCHES: Array[float] = [30.0, 35.0, 40.0]
 const SAMPLE_HEIGHTS: Array[int] = [40, 48, 56]
 ## Feet positions nearer to and further from the camera than the look-at point.
@@ -92,14 +95,15 @@ func _texel_span_px(pitch: float, height_px: int) -> Vector2:
 	return Vector2(across.distance_to(origin), up.distance_to(origin))
 
 
-## The stage and the sprite factory agree: at the camera rig's pitch and figure height,
-## one stage texel is 1 / px_per_m of tools/pipeline/camera_rig.json.
+## The stage and the sprite factory agree: at the rig's world pitch and world figure height
+## (the stage's defaults), one stage texel is 1 / px_per_m_1x of camera_rig.json, the scale
+## the factory renders at (its sprite camera may be flatter; the scale is what must match).
 func _check_rig_contract() -> void:
 	var rig := _load_json(CAMERA_RIG)
-	var pitch := _json_num(rig, "pitch_deg")
-	var height_px := int(_json_num(rig, "char_height_px"))
+	var pitch := _json_num(rig, "world_pitch_deg")
+	var height_px := int(_json_num(rig, "world_char_height_px"))
 	var reference_m := _json_num(rig, "reference_height_m")
-	var px_per_m := float(height_px) / (reference_m * cos(deg_to_rad(pitch)))
+	var px_per_m := _json_num(rig, "px_per_m_1x")
 	var stage: StreetStage = await _spawn(StreetStage.PixelMode.CRISP, height_px, pitch)
 	var texel: float = stage.merc().pixel_size
 	check(
@@ -190,8 +194,7 @@ func _span_at_merc(stage: StreetStage) -> Vector2:
 
 
 ## CONSTANT depth scale keeps one texel on one logical pixel nearer and further than the
-## look-at point; PERSPECTIVE lets a nearer merc grow (the look question this exposes);
-## stand_at holds the feet where it put them.
+## look-at point; PERSPECTIVE lets a nearer merc grow (the look question this exposes).
 func _check_depth_scale() -> void:
 	var stage: StreetStage = await _spawn(StreetStage.PixelMode.WHOLE_SCREEN, 48, 35.0)
 	var worst := 0.0
@@ -217,13 +220,25 @@ func _check_depth_scale() -> void:
 			% [PERSPECTIVE_GROWTH, near.x]
 		)
 	)
+	_check_stand_holds(stage)
+	await _despawn(stage)
+
+
+## stand_at holds the feet where it put them, through a step.
+func _check_stand_holds(stage: StreetStage) -> void:
+	# Whole-screen mode snaps the feet to the nearest logical pixel, so compare the feet
+	# before and after the step, not with the requested point.
+	var held: Vector3 = stage.merc().global_position
 	stage.step(FIXED_DELTA)
 	var moved: Vector3 = stage.merc().global_position
 	check(
 		(
-			absf(moved.x - DEPTH_PROBES[0].x) < TEXEL_TOLERANCE_PX
-			and absf(moved.z - DEPTH_PROBES[0].z) < TEXEL_TOLERANCE_PX
+			moved.is_equal_approx(held)
+			and absf(held.x - DEPTH_PROBES[0].x) < stage.texel_m()
+			and absf(held.z - DEPTH_PROBES[0].z) < stage.texel_m() * DEPTH_SNAP_TEXELS
 		),
-		"stand_at holds the feet at %s after a step, not %s" % [DEPTH_PROBES[0], moved]
+		(
+			"stand_at holds the feet at %s (snapped to %s) after a step, not %s"
+			% [DEPTH_PROBES[0], held, moved]
+		)
 	)
-	await _despawn(stage)

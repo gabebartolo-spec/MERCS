@@ -13,9 +13,10 @@ extends Node
 ## distance is derived so one texel covers one logical pixel at the look-at depth.
 ## The scene is presentation only: nothing here decides an outcome, and nothing is random.
 ##
-## pixel_mode WHOLE_SCREEN renders the 3D world through a 640 × 360 SubViewport scaled
-## 3× with nearest filtering, and snaps the sprite to that viewport's pixel grid each
-## step. CRISP renders the world at window resolution with the sprite unsnapped.
+## pixel_mode WHOLE_SCREEN renders the 3D world through a logical SubViewport (data
+## "pixel": 960 × 540, ×2 to the window) with nearest filtering, and snaps the sprite to
+## that viewport's pixel grid each step. CRISP renders the world at window resolution
+## with the sprite unsnapped.
 
 enum PixelMode { CRISP, WHOLE_SCREEN }
 enum Lighting { DAY, RAIN_NIGHT }
@@ -29,9 +30,9 @@ const HALF := 2.0
 	set = _set_pitch_degrees
 ## How the 3D world reaches the window; see the class comment.
 @export var pixel_mode: PixelMode = PixelMode.WHOLE_SCREEN
-## On-screen figure height in logical pixels (the factory's char_height_px); the
-## texel size and the rail distance follow from it.
-@export var sprite_height_px: int = 56
+## On-screen figure height in logical pixels at the world camera's pitch (camera_rig.json
+## world_char_height_px, the director's 84); the texel size and the rail distance follow.
+@export var sprite_height_px: int = 84
 ## DAY: warm key and flat grey sky. RAIN_NIGHT: dim cool key, a torch by the well, rain,
 ## and the unshaded sprite tinted to match (data "rain_night").
 @export var lighting: Lighting = Lighting.DAY
@@ -143,7 +144,7 @@ func street() -> GridMap:
 
 
 ## The sprite's feet in the pixels of the viewport the camera renders to (the
-## 640 × 360 logical viewport in WHOLE_SCREEN, the window in CRISP).
+## logical viewport in WHOLE_SCREEN, the window in CRISP).
 func merc_screen_position() -> Vector2:
 	return _camera.unproject_position(_merc.global_position)
 

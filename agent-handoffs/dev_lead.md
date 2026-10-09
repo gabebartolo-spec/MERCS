@@ -3,7 +3,7 @@ Start from this file, CLAUDE.md, your brief (`agent-briefs/DEV_LEAD_OPUS.md`), `
 §Phase 1 only, `docs/specs/phase1_visual_proof.md`, and `docs/01_ENGINE_DECISION.md` "Rendering plan".
 Run `git fetch`, then `gh pr list` and `docs/STATUS.md`: PR states below are as of writing.
 
-## State: working (open: #54 playback (this), #55 Art rest sheet, #57 stage freeze; next: M5 loop skeleton)
+## State: working (open: #57 stage freeze (this); next: M5 loop skeleton)
 ## THE GOAL (director, 2026-10-09)
 "A playable vertical slice that I can test and assess the art direction before we develop bulk
 assets and content." Spec: `docs/specs/art_direction_slice.md` (the playable Phase 1 gate build:
@@ -73,6 +73,11 @@ files `average_m_body_walk.json` / `_idle.json` beside the rest sheet. slice flo
 ("frame" 0..n-1), "fps", "loop", "ground_speed_mps"; a facing short of a frame is dropped. SliceGame
 plays walk while moving, idle while standing (rest fallback), crowd phase-offset 0.37 s, mercs move
 at the walk clip's ground speed (Art measured 1.1004 m/s). slice floor 11 -> 13.
+## Stage freeze #57 (`claude/stage-freeze-84`)
+stage.json pixel 960x540 x2, StreetStage.sprite_height_px 84, stage_scale's rig check reads
+world_pitch_deg / world_char_height_px / px_per_m_1x; slice drops its own pixel overrides (only
+picks the window's whole scale). Art's next cell change (frame 192, pivot 96,164 for stride toes)
+comes with the clips PR; the engine reads frame and pivot from each manifest.
 ## Sprite sheets are plain git (Lead, 2026-10-09)
 Art's #55 (rest sheet under assets/) went red on CI: `*.png` is LFS and CI checks out without LFS,
 so Godot read pointer files. `.gitattributes` now makes `assets/sprites/**/*.png` plain git (like

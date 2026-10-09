@@ -1,10 +1,5 @@
 {
   "_comment": "Art direction slice M1 (docs/specs/art_direction_slice.md): the playable street. Read by presentation/world/slice_game.gd; slice.md explains each knob.",
-  "pixel": {
-    "logical_width_px": 960,
-    "logical_height_px": 540,
-    "sprite_height_px": 84
-  },
   "player": {
     "start_cell_xz": [0, 1],
     "walk_speed_m_s": 2.2
