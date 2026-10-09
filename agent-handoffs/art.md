@@ -3,32 +3,31 @@ Start from this file, CLAUDE.md, your brief (`agent-briefs/ART_AGENT.md`), and t
 Instructions come from the lead session ("Claude2: MERCS Lead" / "MERCS BOSS"). Director rule 2026-10-08:
 every sheet goes to the Lead for QC first; only passing sheets reach the director (Lead presents).
 
-## State: awaiting merge (freeze PR), then publish + walk/idle
+## State: awaiting merge (publish PR); then walk + idle clips
 ## Task
-P1-ART-FREEZE-REALISTIC: freeze the director's pick (2026-10-09): realistic proportions, density B = 84 px in the
-55-degree world, sprites rendered at 45 degrees (D). camera_rig.json pins the scale (px_per_m_1x 82.275), proportions.json
-realistic, fixtures re-rendered (colour, normal, NEW parts), 06 section 3.
+P1-ART-PUBLISH-REST: publish the frozen average_m rest sheet (+ normal) at assets/sprites/mercs/average_m/ with a
+provenance manifest and a licensing-register row, so slice M1 (#53) and the build show the real body.
 ## Branch and commit
-claude/art-freeze-realistic (from claude/art-qc-c55 + origin/main merged), worktree ../MERCS-wt/art-qc, PR (gh pr list).
+claude/art-publish-rest from origin/main (after #52), worktree ../MERCS-wt/art-publish, PR (gh pr list).
 ## Files I own right now
-tools/pipeline/ (camera_rig.json, proportions.json, render_character.py, pixelate.py/.json, build_body.py, bodies/,
-contact_sheet.py, test_pipeline.py), tests/fixtures/pipeline/ (render_4x, render_4x_normal, render_4x_parts, sheets/),
-docs/06_STYLE_ART.md section 3, docs/audits/realistic_density/ (the pick's evidence), docs/audits/freeze_realistic/.
+assets/sprites/mercs/average_m/ (rest .json/.png/_normal.png/.provenance.json), docs/10_LICENSING_REGISTER.md
+"Shipped assets" section.
 ## Unfinished changes
-After the freeze merges (Lead order):
-1. Publish average_m rest + normal at assets/sprites/mercs/average_m/average_m_body_rest.json (+ .png, _normal.png)
-   with provenance and its licensing-register row (#39; the slice game M1 loads exactly that path).
-2. Walk and idle clips from D:\MERCS-vault\clips\mixamo\ (walk_standard / walk_sns, idle_standing / idle_sns):
-   retarget = align rest directions (X Bot T-pose vs our A-pose) then copy world orientation; COMPOSE the facing turn with
-   the FBX object's own rotation; fix the ~4 cm foot dip (hip height). Probe: scratchpad retarget_probe.py. Publish as
-   average_m_body_walk.json / _idle.json beside the rest sheet. Lead QC before the director.
-3. Then: three equipment looks + eye-patch, modular street kit, battle clips (spec PR #51 docs/specs/art_direction_slice.md).
+Next (Lead-approved plan, 2026-10-09): walk + idle sheets beside the rest sheet:
+- clips: walk = D:\MERCS-vault\clips\mixamo\walk_standard.fbx, idle = idle_standing.fbx (sword-and-shield set kept for battle).
+- 8 walk / 4 idle frames per facing, one loop; manifest keys "fps" (real timing, ~6.5 walk), "loop": true,
+  "ground_speed_mps" (walk; planted-foot travel); rows = facings in rig order, columns = frames; frames[] entries carry
+  "facing", "index" (facing index), "frame". Same cell 176 / pivot 88,152; normal + parts passes per frame.
+- render_character.py: --clip/--frames; retarget = align rest dirs (X Bot T vs our A) then copy world orientation; store
+  per-frame matrix_basis and rotate only our rig per facing; constant ground offset so the lowest contact = 0.
+  pack_sheets.py multi-frame layout; validate_sheet multi-frame + a clip fixture. Probe: scratchpad retarget_probe.py.
+- QC to Lead: 1x + x4 separate, plus a 3-second clip as frames (S, SE, E, N folders); checks: foot slide vs
+  ground_speed, arm swing opposing legs, loop seam 7 -> 0. "Jogging" is a later optional clip (not now).
 ## Evidence so far
-- Suites: data 88, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 11 all pass; lints 9/9; pipeline 15/15.
-- Fixture vs the picked sample: 21 of 19034 px differ (sample's height was rounded to 103.56; rig uses the exact formula).
-- Capture at logical 960x540: docs/audits/freeze_realistic/street_p55_h84_rain_night_lit.png.
-- Mixamo retarget probe: walk plays correctly side-on and front (all 52 bones, no scale keys).
+- #52 merged 2026-10-09 04:02 (freeze). Publish branch: assets 11, smoke 24 pass; lints 9/9; sheet validates; Godot imports it.
+- The published sheet is byte-identical to tests/fixtures/pipeline/sheets/good (same pipeline and inputs).
 ## Open decisions
+- Palette master_draft is DRAFT: the sheet is re-rendered when the director approves a palette.
 - Placeholder head/hair layer (Lead asks the director).
 ## Running jobs
 None.

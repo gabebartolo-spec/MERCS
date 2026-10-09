@@ -1,0 +1,29 @@
+{
+  "_doc": "Provenance manifest (docs/10_LICENSING_REGISTER.md 'Provenance manifest'): covers the three files of this sheet. Rendered by the sprite pipeline from the CC0 MPFB base body; no generative model touched it.",
+  "asset": "sprites/mercs/average_m/average_m_body_rest.json",
+  "files": {
+    "average_m_body_rest.json": "4b6c0e66c3e1c15fc6067422721fe8402997cebef713a9460782f6ccbddb274f",
+    "average_m_body_rest.png": "9ac6c96aa33aa11c5201b25f0f45c0057925b3d5322e199530f8312539bc2015",
+    "average_m_body_rest_normal.png": "5823a78a7f0db880378088f8f25325e45d9929d88c273bc5aff42bb2b168ca74"
+  },
+  "produced_by": "tools/pipeline/render_character.py, pixelate.py, pack_sheets.py @ 80b1dcd (main, PR #52)",
+  "inputs": {
+    "body_blend": "tools/pipeline/bodies/average_m.blend@95326b38dcd40621",
+    "camera_rig": "tools/pipeline/camera_rig.json@c67f2acbf9918073",
+    "light_rig": "tools/pipeline/light_rig.json@c246e0a0750c346e",
+    "pixelate_config": "tools/pipeline/pixelate.json@3f6f5ba7db17dbe8",
+    "proportions": "tools/pipeline/proportions.json@f0722e47bb29a532",
+    "render_script": "tools/pipeline/render_character.py@c673a4df1d639b59"
+  },
+  "clip": null,
+  "models": [],
+  "licence_rows": [
+    "Blender",
+    "MPFB (MakeHuman Plugin for Blender)",
+    "Python, Pillow, NumPy"
+  ],
+  "seed": null,
+  "palette_version": "master_draft (DRAFT)",
+  "created": "2026-10-09",
+  "identical_to": "tests/fixtures/pipeline/sheets/good/average_m_body_rest.json (same pipeline, same inputs)"
+}
