@@ -1,0 +1,13 @@
+{
+  "_comment": "The art direction slice's sketch battle (docs/specs/art_direction_slice.md section 2a). Read by sim/battle/battle.gd and battle_ai.gd; battle.md explains each knob. Phase 3 replaces these with the equipment type chart.",
+  "rules": {
+    "move_cells": 3,
+    "die_sides": 20,
+    "hit_base": 11,
+    "morale_start": 100,
+    "morale_loss_ally_down": 30,
+    "morale_loss_leader_down": 50,
+    "surrender_below": 35,
+    "sight_cells": 8
+  }
+}

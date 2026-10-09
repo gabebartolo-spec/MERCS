@@ -3,7 +3,7 @@ Start from this file, CLAUDE.md, your brief (`agent-briefs/DEV_LEAD_OPUS.md`), `
 §Phase 1 only, `docs/specs/phase1_visual_proof.md`, and `docs/01_ENGINE_DECISION.md` "Rendering plan".
 Run `git fetch`, then `gh pr list` and `docs/STATUS.md`: PR states below are as of writing.
 
-## State: working (open: #57 stage freeze (this); next: M5 loop skeleton)
+## State: working (M5 sim core PR open: Rng + sketch battle; walk clip back with Art for a shoulder fix)
 ## THE GOAL (director, 2026-10-09)
 "A playable vertical slice that I can test and assess the art direction before we develop bulk
 assets and content." Spec: `docs/specs/art_direction_slice.md` (the playable Phase 1 gate build:
@@ -78,6 +78,16 @@ stage.json pixel 960x540 x2, StreetStage.sprite_height_px 84, stage_scale's rig 
 world_pitch_deg / world_char_height_px / px_per_m_1x; slice drops its own pixel overrides (only
 picks the window's whole scale). Art's next cell change (frame 192, pivot 96,164 for stride toes)
 comes with the clips PR; the engine reads frame and pivot from each manifest.
+## M5 sim core (`claude/slice-m5-sim-core`)
+`sim/core/rng.gd` (Rng: named streams from the save seed, state()/restore()), `sim/battle/`
+(`BattleUnit`, `Battle`: grid, initiative order, move/attack/wait, d20 vs hit_base+defense, wound,
+down, morale loss (leader more), surrender below threshold; `BattleAi`: acts only on fighters within
+sight_cells). Numbers in `data/balance/battle.json`. Suite `battle` (10). Next M5 pieces: visible
+check (`sim/story/checks.gd`), recruit card + contract (thin, from data/backgrounds + traits), loop
+flow state machine, then presentation (battle on the street grid, panels).
+## Lead QC: walk clip FAILED round 1
+NW/SE F0-3 the far shoulder rises to ear height and reads as a second head; S/N arms swing out
+sideways. Cause: clavicle lift in the T/A-pose retarget. Sent back; idle reviewed after the fix.
 ## Sprite sheets are plain git (Lead, 2026-10-09)
 Art's #55 (rest sheet under assets/) went red on CI: `*.png` is LFS and CI checks out without LFS,
 so Godot read pointer files. `.gitattributes` now makes `assets/sprites/**/*.png` plain git (like
