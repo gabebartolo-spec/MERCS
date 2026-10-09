@@ -70,7 +70,8 @@ Deliverables
 - Pixel-stability result documented in `01_ENGINE_DECISION.md`.
 
 **Gate (Director):** walks the street with a merc in the build, sees three equipment looks and
-an eye-patch, and says "this is the game's look". Factory rebuilds from clean in under 30 minutes.
+an eye-patch, and says "this is the game's look". The playable build for this gate is specified in
+`specs/art_direction_slice.md` (director, 2026-10-09). Factory rebuilds from clean in under 30 minutes.
 Concept Lead confirms validators and contracts are committed.
 
 Forbidden after: new facings, new clip types beyond the Phase 2–3 lists, any diffusion frame.
