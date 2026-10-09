@@ -66,6 +66,11 @@ func morale(side: int) -> int:
 	return value
 
 
+## Lowers a side's morale before the fight starts (a band shaken by losing its lookout).
+func lower_morale(side: int, amount: int) -> void:
+	_morale[side] = maxi(0, morale(side) - amount)
+
+
 func unit(unit_id: String) -> BattleUnit:
 	for fighter: BattleUnit in units:
 		if fighter.id == unit_id:

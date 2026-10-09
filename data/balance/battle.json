@@ -47,10 +47,19 @@
       "damage": 5,
       "initiative": 3,
       "leader": true
+    },
+    "recruit_placeholder": {
+      "hp": 11,
+      "attack": 2,
+      "defense": 2,
+      "damage": 5,
+      "initiative": 3,
+      "presence": 2
     }
   },
   "gate": {
     "die_sides": 20,
-    "talk_down_difficulty": 15
+    "talk_down_difficulty": 15,
+    "shaken_morale": 30
   }
 }

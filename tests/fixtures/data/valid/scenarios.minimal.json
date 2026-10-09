@@ -1,0 +1,1 @@
+{"scenarios": [{"id": "scn_fixture", "company": ["orc"], "recruit": "bandit", "battle": {"grid": [4, 4], "company_cells": [[0, 0]], "enemies": [{"fighter": "bandit", "cell": [3, 3]}], "lookout": {"fighter": "bandit", "cell": [2, 2]}}, "aftermath_choices": ["spare"], "injury_keys": ["slice.injury.lost_eye"]}]}

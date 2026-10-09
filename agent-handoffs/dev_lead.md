@@ -3,7 +3,7 @@ Start from this file, CLAUDE.md, your brief (`agent-briefs/DEV_LEAD_OPUS.md`), `
 §Phase 1 only, `docs/specs/phase1_visual_proof.md`, and `docs/01_ENGINE_DECISION.md` "Rendering plan".
 Run `git fetch`, then `gh pr list` and `docs/STATUS.md`: PR states below are as of writing.
 
-## State: working (M5 cast + check PR open; #63 vision revision open, director's; Art paused for refocus)
+## State: working (#64 cast+check open; draft loop PR on top; Art writing P1-ART-REFOCUS; #63 merged)
 ## THE GOAL (director, 2026-10-09)
 "A playable vertical slice that I can test and assess the art direction before we develop bulk
 assets and content." Spec: `docs/specs/art_direction_slice.md` (the playable Phase 1 gate build:
@@ -93,6 +93,15 @@ Hand-made cast of 25 mercs (no procedural recruits), grim grounded fantasy WITH 
 Vampyr), no type chart (counters from combat roles; themed resolve per merc), art pipeline paused
 for P1-ART-REFOCUS (base body work stops). Dev Lead may continue M5 where it does not depend on the
 base body; slice M4 (looks) waits; nothing of Phase 2 MercGen starts.
+## M5 loop flow (draft `claude/slice-m5-loop`, after #64)
+`sim/story/slice_loop.gd` (SliceLoop): stages ARRIVE..DONE; hire/pass the recruit, contract,
+talk_down(speaker) (visible check; success: lookout slips away, band starts `shaken_morale` lower;
+failure/fight: lookout fights), battle (presentation drives Battle.apply), end_battle, fate choice
+only after a surrender, return (most-hurt wounded merc gets one injury line), camp. Content in
+`data/scenarios.json` (new collection + schema + fixtures; caps.json scenarios 1). Suite `loop` (4);
+data floor 88 -> 96 (per-fixture checks). Lead sketch calls to flag to the director: what a
+talked-down lookout gives; no recruiting the defeated (Q21); the recruit is a placeholder.
+Next: presentation of the loop (panels + battle on the street grid).
 ## M5 cast + check PR (`claude/slice-m5-cast-check`)
 `battle.json` "fighters": the director's reference pair (orc: charge = walk + attack in one turn;
 Vampyr: blood price = pay hp, never the last, for +attack/+damage on one attack) plus bandit and

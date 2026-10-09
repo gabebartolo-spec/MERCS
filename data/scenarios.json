@@ -1,0 +1,48 @@
+{
+  "_comment": "Authored scenarios, by id. The first is the art direction slice's one pass of the core loop (docs/specs/art_direction_slice.md section 2a), read by sim/story/slice_loop.gd. Its recruit is a placeholder until the director designs the cast; enemy recruitment waits on Q21, so the defeated cannot be hired there. Schema: data/schema/scenarios.schema.json.",
+  "scenarios": [
+    {
+      "id": "scn_slice_loop",
+      "company": [
+        "orc",
+        "vampyr"
+      ],
+      "recruit": "recruit_placeholder",
+      "battle": {
+        "grid": [12, 8],
+        "company_cells": [
+          [2, 3],
+          [2, 5],
+          [1, 4]
+        ],
+        "enemies": [
+          {
+            "fighter": "bandit_chief",
+            "cell": [9, 4]
+          },
+          {
+            "fighter": "bandit",
+            "cell": [8, 2]
+          },
+          {
+            "fighter": "bandit",
+            "cell": [8, 6]
+          }
+        ],
+        "lookout": {
+          "fighter": "bandit",
+          "cell": [7, 4]
+        }
+      },
+      "aftermath_choices": [
+        "spare",
+        "ransom",
+        "execute"
+      ],
+      "injury_keys": [
+        "slice.injury.lost_eye",
+        "slice.injury.scarred_face"
+      ]
+    }
+  ]
+}
