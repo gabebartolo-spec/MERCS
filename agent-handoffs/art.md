@@ -17,8 +17,8 @@ B: --pass layers (body clay, each kit group a flat label colour, DONE); 2x neare
   frames (clip.key_frames: foot forward L/R, right hand forward/back) for each facing. Crop script NOT written yet;
   outputs[].marks give the 1x pixel position of hands, hips and feet per frame.
 C: one line per prop in the QC note (claim -> result). D dropped (A measures it); kit docs must match the maths.
-E: a learnings entry in art-qa-critic once A or B has caught a real defect, with the run as evidence. A HAS caught them
-  (below), so write the entry when step 2 lands.
+E: findings go to the LEAD, never to a skill's learnings log (Lead, 2026-10-10: the Lead decides what goes to memory).
+  The step 2 report and this handoff both carry a "Findings for the lead" section (below), each item with evidence, or "none".
 ## Check A evidence so far (logs D:\MERCS-vault\logs\2026-10-10_gait_*_A_*.log)
 - Old axe (d2d8f93 kit): edge leads dot -0.345 FAIL, head forward -0.644 FAIL: the director's "held backwards" caught.
 - Vampyr sword: scabbard -6.0 cm into LeftLeg FAIL, tip-trails axis dot 0.696 (< 0.9) FAIL, hilt and crossguard 1.3-1.7 cm
@@ -35,6 +35,17 @@ E: a learnings entry in art-qa-critic once A or B has caught a real defect, with
    Runner: scratchpad run_gait.sh (pass --python-exit-code 1 to Blender or a traceback exits 0; use `read -r`).
 3. pixelate.py to 1x, GIFs at 1x and 2x (3 s, the clip's fps; E row travels at ground_speed_mps over 0.25 m ticks), the
    2x crops at the key frames, a QC note with one line per prop. Send to the Lead. Commit, rewrite this file, push, pause.
+## Findings for the lead (keep current; send with the step 2 report)
+- Caught a defect: check A's direction claims flagged the old axe as held backwards (edge dot -0.345, head-forward -0.644)
+  and the Vampyr scabbard tip leaning forward (axis dot 0.696 < 0.9). Evidence: logs 2026-10-10_gait_orc_color_A_orc_oldaxe,
+  _vampyr_color_A_vampyr_sword. Both were missed by eye by the art agent and the Lead in step 1.
+- Caught a defect: check A's clearance flagged the scabbard 6.0 cm inside the left leg (same vampyr log).
+- Earned its keep: two-bone leg IK onto the clip's ankles kept foot slide at 0.8 cm (orc) / 0.6 cm (Vampyr) while the hips
+  sway and drop; without it, hip changes drag planted feet (render_meta clip.foot_slide_m).
+- Tooling trap: Blender exits 0 on a Python traceback unless --python-exit-code 1; a failed check could pass a batch.
+- Tooling trap: Blender's 4D Vector.normalized() uses the xyz length only; it scaled bones up to 30x (probe3, this session).
+- Check A limit: a signed distance to the nearest surface misreads points beside an excluded contact part (the fist); it is
+  capped at 12 cm, and an open case (the axe haft) still needs a layers crop to confirm.
 ## Done (committed)
 render_character.py: --clip/--frames/--loop-window/--kit-keep/--pass layers; Mixamo retarget plus posture lean; gait layer
 from bodies.json "gait" (swing_scale, hip sway/bounce/drop, cadence, hold_stance grip); two-bone leg IK on the clip's
