@@ -3,7 +3,7 @@ Start from this file, CLAUDE.md, `~/.claude/memory-shared/MEMORY.md`, your brief
 (`agent-briefs/DEV_LEAD_OPUS.md`), `docs/00_VISION.md` (revised 2026-10-09, #63) and
 `docs/specs/art_direction_slice.md`. Run `git fetch`, then `gh pr list` and `docs/STATUS.md`.
 
-## State: paused by the director ("pause your team until i say"); team refreshed at the pause
+## State: working. Director resumed 2026-10-10 ("resume the team, kill and resurrect them"); Art on step 2
 
 ## Who does what
 This account has no Concept Lead: the session acts as lead AND Dev Lead under the original
@@ -12,10 +12,10 @@ account's rules. Peers (desktop sessions, message by session id):
 
 ## Team refresh (director, 2026-10-10: "periodically archive and resurrect the team")
 Rule: `.claude/skills/mercs-handoff` "The lead refreshes the team" + shared memory
-refresh-workers-at-task-boundaries. At the pause both peers were told to clear_session("self")
-(Art 246k, Support 338k context; handoffs pushed; nothing live). ON RESUME: send each the
-kick-off "You are <role>. Read your handoff and continue." Art first gets the lead's step-1 r2
-verdict. Refresh myself at my next task boundary or past 150k.
+refresh-workers-at-task-boundaries. Art cleared and got its kick-off (step 1 r2 PASS, step 2 gait).
+Support declined relayed instructions; it waits for the director to type "restart" in its chat,
+then fixes merge_ci.md (#70 merged), clears, and needs the kick-off "You are MERCS SUPPORT
+(Merge & CI). Read your handoff and continue." The lead cleared itself after this rewrite.
 
 ## THE GOAL (director /goal, 2026-10-09)
 "A playable vertical slice that I can test and assess the art direction before we develop bulk
@@ -32,14 +32,13 @@ slice, then the gate ("is this the look?").
 - "Permanent injuries must be considered for all spritework" -> injury layers.
 - Testing: smallest suites per PR, audits at milestones. Mixels fail automatically.
 
-## Art (P1-ART-SLICE-CAST, branch claude/art-slice-cast, d2d8f93, no PR)
-QC order: (1) clay + 45 deg silhouettes, (2) gait as a played 3 s loop, (3) geared sheets with
-injury layers per the layer contract. Step 1 r1 failed (7 fixes). Step 1 r2 is waiting for MY QC
-(art-qa-critic, 2x crops): images in Art's scratchpad
-`C:\Users\DANTE\AppData\Local\Temp\claude\C--Users-DANTE-Documents-GitHub-MERCS\71abc762-dc71-4892-a48a-8de29e6c4d82\scratchpad\slice\`
-(step1_side0_clay_r2, orc_head_r2, step1_45_stage1_{1x,x4}_r2, step1_45_silhouette_{1x,x4}_r2).
-Check: orc wrist at crotch, brow/jaw/tusks read at 1x, straight legs, head clears pauldrons N/NE/NW,
-axe headroom; Vampyr split cape shows legs. Vampyr Tripo head comes at 4x in step 3.
+## Art (P1-ART-SLICE-CAST, branch claude/art-slice-cast, no PR)
+QC order: (1) clay + 45 deg silhouettes: PASSED r2 (2026-10-10), (2) gait as a played 3 s loop
+(orc heavy and grounded, Vampyr controlled and predatory; bare bodies + weapon, no cape; S/SE/E/NE
+at 1x and 2x; no foot slide): IN PROGRESS, clips come to the lead, (3) geared sheets with injury
+layers per the layer contract. Step 3 must fix: orc tusks (front reads as flat plates; want
+tapered cones from the lower jaw) and Vampyr cape (stands off the shoulder like a tower shield
+in SE/SW/E/W; must hug back and shoulders). Vampyr Tripo head at 4x before full sheets.
 Lesson: judge motion as a PLAYED CLIP at game speed, not frame by frame.
 
 ## Sprite layers (#70, merged)
@@ -60,8 +59,8 @@ data 96, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 13, slice 15,
 ## Open PRs
 `claude/team-refresh`: docs-only, the refresh rule in mercs-handoff + this handoff. Merge & CI merges.
 
-## Next for the Dev Lead (on resume)
-1. Kick off both peers (above). 2. QC Art step 1 r2; pass or send concrete fixes.
+## Next for the Dev Lead
+1. Kick off Support after its restart (above). 2. QC Art's gait clips (art-qa-critic, played clip).
 3. Tell the director the F5 loop example is playable in the build.
 4. Load the cast's looks in SliceGame when Art publishes stage-1 sheets.
 5. Branches waiting on the director (deletes refused by settings): claude/p1-crisp-snap,
