@@ -5,7 +5,9 @@ extends Node
 ## by two keys) or by a click on the ground; the camera follows in whole logical pixels; a
 ## crowd walks fixed routes; T steps the time of day, R toggles rain, F1 the key help, F3
 ## the frame time; the door in the street leads to the one interior and back. Numbers come
-## from data/balance/slice.json and stage.json, text from data/text. Presentation only:
+## from data/balance/slice.json and stage.json, text from data/text. F5 starts (or restarts)
+## the loop example (LoopDirector): panels, then a battle on an open patch of street during
+## which the camera watches the fight and walking pauses. Presentation only:
 ## nothing here is random, and walking the hub decides no outcome.
 
 const STAGE_SCENE := preload("res://presentation/world/street_stage.tscn")
@@ -53,6 +55,7 @@ var _interior_exit := Vector2i.ZERO
 var _frame_ms := 0.0
 var _help: Label = null
 var _frame_label: Label = null
+var _loop: LoopDirector = null
 
 
 func _ready() -> void:
@@ -88,7 +91,7 @@ func _process(delta: float) -> void:
 ## Advances every walker by delta seconds and redraws. Deterministic for the same inputs.
 func step(delta: float) -> void:
 	_clock += delta
-	player.hold(_held_direction())
+	player.hold(Vector2i.ZERO if _loop != null else _held_direction())
 	player.advance(delta)
 	_use_doors()
 	for i: int in crowd.size():
@@ -107,9 +110,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	var click := event as InputEventMouseButton
 	if click != null and click.pressed and click.button_index == MOUSE_BUTTON_LEFT:
 		var cell := ground_cell_at(click.position)
-		if cell.has(&"cell"):
-			var target: Vector2i = cell[&"cell"]
+		if not cell.has(&"cell"):
+			return
+		var target: Vector2i = cell[&"cell"]
+		if _loop == null:
 			player.walk_to(target)
+		elif _loop.in_battle():
+			_loop.view.click_cell(target)
 
 
 ## The street cell under a window position, as {&"cell": Vector2i}, or {} off the ground.
@@ -143,6 +150,33 @@ func _on_key(key: InputEventKey) -> void:
 		_help.visible = not _help.visible
 	elif code == KEY_F3:
 		_frame_label.visible = not _frame_label.visible
+	elif code == KEY_F5:
+		start_loop()
+
+
+## Starts the loop example from its seed (slice.json "loop"), ending any pass in progress.
+func start_loop() -> void:
+	end_loop()
+	_loop = LoopDirector.new()
+	add_child(_loop)
+	var origin := _data.floats("loop", "battle_origin_xz")
+	_loop.begin(_stage, Vector2i(int(origin[0]), int(origin[1])), int(_data.num("loop", "seed")))
+	_loop.ended.connect(end_loop)
+
+
+func loop_director() -> LoopDirector:
+	return _loop
+
+
+func end_loop() -> void:
+	if _loop == null:
+		return
+	if _loop.view != null:
+		_loop.view.clear()
+	_loop.queue_free()
+	_loop = null
+	_stage.set_conditions(StageLighting.TimeOfDay.DAY, false)
+	_shown.clear()
 
 
 func _held_direction() -> Vector2i:
@@ -243,12 +277,16 @@ func _build_hud() -> void:
 
 ## Places every merc and the camera, and shows each merc's current facing.
 func _sync() -> void:
-	_stage.focus_on(_ground(player))
+	# From the fight on, the camera stays on the field and the street's walkers step aside.
+	var fighting := _loop != null and _loop.view != null
+	_stage.focus_on(_loop.view.centre() if fighting else _ground(player))
 	_stage.stand_at(_ground(player))
+	_stage.merc().visible = not fighting
 	_face(_stage.merc(), player, _clock)
-	var extras := _stage.extra_mercs()
+	var extras := _stage.extra_mercs
 	for i: int in crowd.size():
 		_stage.move_extra(i, _ground(crowd[i]))
+		extras[i].visible = not fighting
 		_face(extras[i], crowd[i], _clock - CROWD_PHASE_S * (i + 1))
 
 

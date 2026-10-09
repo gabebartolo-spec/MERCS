@@ -19,6 +19,8 @@ const CLICK_TARGET := Vector2i(-3, 0)
 const WELL_CELL := Vector2i(4, 1)
 const TEXEL_TOLERANCE := 1e-4
 const CLIP_DIR := "user://slice_clip"
+const LAYOUT_FRAMES := 3
+const WINDOW_SIZE := Vector2i(1920, 1080)
 const CLIP_CELL := 8
 const CLIP_FRAMES := 3
 const CLIP_FPS := 4.0
@@ -39,6 +41,7 @@ func run_checks() -> void:
 	await _check_conditions(game)
 	await _check_crowd_repeats(game)
 	_check_clip_playback()
+	await _check_loop_panels()
 
 
 func _spawn() -> SliceGame:
@@ -247,6 +250,53 @@ func _check_clip_playback() -> void:
 		),
 		"a facing missing a frame is dropped, the complete one kept"
 	)
+
+
+## F5 opens the loop example; real mouse clicks on its panel buttons walk it from the
+## arrival to the recruit card, hire, the contract and the road at dusk in the rain.
+func _check_loop_panels() -> void:
+	# The headless window is tiny; give it the game's size so the panel lies on screen.
+	root.size = WINDOW_SIZE
+	var game := await _spawn()
+	await _tap(KEY_F5)
+	var director := game.loop_director()
+	var opened := director != null and director.loop.stage == SliceLoop.Stage.ARRIVE
+	check(opened and director.panel.visible, "F5 opens the loop example on its arrival panel")
+	if not opened:
+		return
+	for choice: String in ["continue", "hire", "accept", "continue"]:
+		for _frame: int in LAYOUT_FRAMES:
+			await process_frame
+		await _click_button(director.panel.button_for(choice))
+	var loop := director.loop
+	check(
+		(
+			loop.stage == SliceLoop.Stage.GATE
+			and loop.company.has(loop.recruit)
+			and game.stage().time_of_day == StageLighting.TimeOfDay.DUSK
+			and game.stage().rain
+		),
+		"clicking through the panels hires, takes the contract, reaches the road at dusk in rain"
+	)
+	game.queue_free()
+
+
+func _click_button(button: Button) -> void:
+	# A freshly shown panel lays its buttons out over the next frames.
+	for _frame: int in LAYOUT_FRAMES:
+		await process_frame
+	if button == null or not is_instance_valid(button):
+		return
+	var at := button.get_global_rect().get_center()
+	for pressed: bool in [true, false]:
+		var click := InputEventMouseButton.new()
+		click.button_index = MOUSE_BUTTON_LEFT
+		click.position = at
+		click.global_position = at
+		click.pressed = pressed
+		Input.parse_input_event(click)
+		Input.flush_buffered_events()
+		await process_frame
 
 
 func _press_key(code: Key, pressed: bool) -> void:

@@ -10,7 +10,7 @@ Current phase: **1 — Visual and factory proof** (Phase 0 gate PASS WITH NOTES,
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | working | M5 reference pair abilities and visible checks merged (#64, battle floor 14); loop flow (#66) and loop on screen (#67) are drafts stacked on it; slice M4 "Looks" waits for the art route | — | 2026-10-09 |
+| Dev Lead (Opus 5.5) | working | M5 loop flow (#66) and loop on screen (#67) merged; the director's F5 checkpoint build is main's `build.yml`; next: sprite-layers PR, then loop presentation polish | — | 2026-10-09 |
 | Merge & CI (Sonnet 5.5) | working | standing merge pass (D-030); board PR after each merge | — | 2026-10-08 |
 | Art Factory (Opus 5.5) | working | art route A chosen (D-059); assigned P1-ART-SLICE-CAST: the orc and the Vampyr at stage 1 (clay, gait, geared sheets with the injury starter set), branch claude/art-slice-cast in the art-publish worktree | claude/art-slice-cast | 2026-10-09 |
 | Concept Lead (Fable 5.1) | working | rewrite roadmap Phases 1 (caps, deliverables, gate), 2 and 6 for the hand-made cast (D-048) and add recommendations to Q15-Q22, the art parts after P1-ART-REFOCUS is approved; Project Architect adoption awaits the director | — | 2026-10-09 |
@@ -63,6 +63,9 @@ States: working · running a check · awaiting director · blocked · available.
 19. Merge & CI: vision revision (#63, D-047..D-058) merged; #61 superseded. DONE.
 
 ## Waiting on the director
+- Confirm or change the Lead's reversible sketch calls in the slice loop (#66): a talked-down lookout slips away and the band starts shaken; a failed talk means he fights with them; the defeated cannot be recruited (pending Q21); the recruit is a placeholder until you design that cast member.
+- `data/caps.json` gains `scenarios: 1` for the slice's one scenario (#66, set by your slice goal); veto if wrong.
+- Tripo threshold (D-060): confirm in writing that the ask threshold rises from 500 to 2,000 credits per session; until then 500 stands.
 - Project Architect adoption (Concept Lead handoff).
 - Mixamo: 10 of 14 clips are in the vault (D-029 sign-in); the rest wait on the director's sign-in.
 - Allow or decline deleting the unmerged, superseded remote branches `claude/p1-crisp-snap` (664434c) and `claude/p1-frame-time` (7236cdc), and `claude/p1-sheet-export-load` (d520808, superseded by #49); the permission classifier refused the first two.
