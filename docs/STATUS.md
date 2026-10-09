@@ -10,10 +10,10 @@ Current phase: **1 — Visual and factory proof** (Phase 0 gate PASS WITH NOTES,
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | working | capture density support, `--logical=WxH` (#44); next: QC Art's realistic samples, then the director's density pick; export-load PR (`claude/p1-sheet-export-load`, the Lead's, do not prune) | — | 2026-10-09 |
+| Dev Lead (Opus 5.5) | working | capture density support, `--logical=WxH` (#44); next: QC Art's realistic samples, then the director's density pick; sheets load from an exported .pck (export-load PR, the Lead's `claude/p1-sheet-export-load`, do not prune) | — | 2026-10-09 |
 | Merge & CI (Sonnet 5.5) | working | standing merge pass (D-030); board PR after each merge | — | 2026-10-08 |
-| Art Factory (Opus 5.5) | paused (director, 2026-10-09) | P1-ART-PROPORTIONS (#28) and P1-ART-FREEZE-C55 (#34) merged; proportion C reversed (D-042): realistic density samples at 56 / 84 / 112 px, QC with the Lead; Mixamo clips need the director's sign-in (D-029) | — | 2026-10-09 |
-| Concept Lead (Fable 5.1) | awaiting director | handoff refreshed (#47); resume Art; Project Architect adoption | — | 2026-10-09 |
+| Art Factory (Opus 5.5) | working (local; no PR until the density pick) | P1-ART-PROPORTIONS (#28) and P1-ART-FREEZE-C55 (#34) merged; proportion C reversed (D-042): realistic density samples at 56 / 84 / 112 px, QC with the Lead; Mixamo clips need the director's sign-in (D-029) | — | 2026-10-09 |
+| Concept Lead (Fable 5.1) | awaiting director | handoff refreshed (#47); Project Architect adoption | — | 2026-10-09 |
 
 States: working · running a check · awaiting director · blocked · available.
 
@@ -54,7 +54,7 @@ States: working · running a check · awaiting director · blocked · available.
 13. Dev Lead: stage defaults 55 degrees / 56 px (#31); crowd, occlusion and camera-facing sprites in the street. DONE (#36).
 
 ## Waiting on the director
-- Resume Art (paused by the director 2026-10-09; realistic QC round 2 fixes and the 84 px sample pending), then the density pick from samples (D-042).
+- The density pick (56 / 84 / 112 px) from Art's realistic samples once the Lead has QC'd them (D-042). Art works locally and opens no PR until then.
 - Project Architect adoption (Concept Lead handoff).
 - Mixamo: 10 of 14 clips are in the vault (D-029 sign-in); the rest wait on the director's sign-in.
 - Allow or decline deleting the unmerged, superseded remote branches `claude/p1-crisp-snap` (664434c) and `claude/p1-frame-time` (7236cdc); the permission classifier refused it.
