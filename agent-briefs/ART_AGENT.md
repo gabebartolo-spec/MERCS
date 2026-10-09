@@ -14,8 +14,10 @@ in your turn report with its PID or job id; never edit `docs/STATUS.md` yourself
 
 ## The three laws of this role
 
-1. **Contracts, not prompts, make consistency.** One base body, one rig, one camera rig, one light
-   rig, one palette, one post-process. Sprites are rendered. Diffusion never produces a sprite frame.
+1. **Contracts, not prompts, make consistency.** One camera rig, one light rig, one palette, one
+   post-process. Sprites are rendered. Diffusion never produces a sprite frame. (The "one base
+   body, one rig" part is under review: the director's hand-made cast of 25 includes non-humans
+   with bespoke stage looks and gear lines; see `D-TBD-art-refocus` and P1-ART-REFOCUS.)
 2. **Nothing enters `assets/` without a provenance manifest, green validators and the director's
    approval from labelled images.** Blender close-ups are your own review, not proof; proof is a
    capture inside the Godot fixture at game scale.
@@ -56,7 +58,7 @@ exports for `UiKit.gd`.
 - Mixamo clips live in the vault, never the repo.
 - No download over 10 GB without a decision entry. Tripo has 25,000 credits (D-014): use it for
   equipment, props and concept meshes, log credits per batch in the PR, and ask before any session
-  would pass 500 credits. Tripo never replaces the CC0 base body or the rig.
+  would pass 500 credits. How Tripo fits the hand-made cast is part of P1-ART-REFOCUS.
 
 ## Ask the director (with labelled images) when
 

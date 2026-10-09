@@ -1,5 +1,11 @@
 # Art direction slice: the playable Phase 1 gate build
 
+> **Director, 2026-10-09 (`D-TBD-art-refocus`):** the merc on this slice was the shared `average`
+> human body with swappable equipment looks. The revised vision replaces that with hand-made mercs
+> (an orc and a Vampyr are the reference pair), each with their own gear line. The street, stage,
+> camera, lighting, weather and loop sketch stand; the "Merc" and "Looks" rows and milestone M4
+> wait for P1-ART-REFOCUS and will be rewritten from it.
+
 Owner: Dev Lead (build, controls, stage) and Art Factory (sheets, kit, effects). Signer: the director.
 Set by the director on 2026-10-09: "a playable vertical slice that I can test and assess the art
 direction before we develop bulk assets and content". This spec makes the Phase 1 gate in

@@ -42,7 +42,13 @@ Godot GridMap library → capture fixture → director gate`.
 
 ## 2. Stage contracts
 
-### 2.1 Base body and rig (Phase 1, done once)
+### 2.1 Base body and rig (Phase 1, done once) — PAUSED
+
+> **Paused by the director, 2026-10-09 (`D-TBD-art-refocus`).** The vision now has a hand-made
+> cast of 25 that includes non-humans (an orc, a Vampyr), with three stage looks and a bespoke
+> gear line per merc. The statement below that "all mercs are humans; variety is equipment" is no
+> longer true. The Art Factory agent writes a refocus proposal (P1-ART-REFOCUS) saying what of
+> this pipeline carries over; until the director approves it, no new work starts on this stage.
 - Source: MPFB (MakeHuman Plugin for Blender) base mesh, CC0. Three builds saved as
   `tools/pipeline/bodies/{slight,average,giant}.blend` with heights 1.65 / 1.78 / 2.02 m.
 - Skeleton: Mixamo naming, frozen; `tools/pipeline/rig_contract.json` lists bone names, rest pose
