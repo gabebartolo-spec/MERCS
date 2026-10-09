@@ -66,6 +66,11 @@ The general rule is in `~/.claude/memory-shared/refresh-workers-at-task-boundari
 - **How:** the worker calls `clear_session("self")`. The session id stays the same, so cross-session
   messages still reach it. The lead then sends a one-line kick-off: "You are <role>. Read your
   handoff and continue."
+- **Findings first (required, director 2026-10-10):** before the clear, the worker lists what helped
+  under "Findings for the lead" in its handoff. The lead records the worthwhile ones in
+  `~/.claude/memory-shared/co-lead-playbook.md` (shared with every project and both accounts) and
+  rejects the rest. Workers never write memory or the playbook. No refresh happens until the lead's
+  handoff says "playbook: updated" or "playbook: nothing new".
 - **Director pause:** everyone is at a boundary, so clear the team then and send the kick-off when
   work resumes. The lead refreshes itself last, the same way.
 
