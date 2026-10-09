@@ -3,7 +3,7 @@ Start from this file, CLAUDE.md, `~/.claude/memory-shared/MEMORY.md`, your brief
 (`agent-briefs/DEV_LEAD_OPUS.md`), `docs/00_VISION.md` (revised 2026-10-09, #63) and
 `docs/specs/art_direction_slice.md`. Run `git fetch`, then `gh pr list` and `docs/STATUS.md`.
 
-## State: PAUSED by the director (2026-10-10: "once you and the team have all been regenerated, pause development")
+## State: team PAUSED, except Art finishing step 2 (director 2026-10-10: "pause art when they complete the task")
 
 ## Who does what
 This account has no Concept Lead: the session acts as lead AND Dev Lead under the original
@@ -17,6 +17,19 @@ then told to PAUSE (commit WIP, rewrite art.md, push, stop). Support: NOT yet re
 refuses relayed director instructions and waits for the director to type "restart" in its chat
 (then it fixes merge_ci.md for #70, merges that, clears). After its clear send NO kick-off while
 paused. The lead regenerated itself after this rewrite. Nothing resumes until the director says.
+
+## Co-lead playbook (director 2026-10-10, global CLAUDE.md)
+`~/.claude/memory-shared/co-lead-playbook.md` is shared by every BOSS on every project and both
+accounts. Workers report "Findings for the lead". I curate them into the playbook before ANY refresh
+and write "playbook: updated" or "playbook: nothing new" here. playbook: updated (seeded 2026-10-10).
+The AFL boss was told; its message is queued. Open question to the director: may workers still write
+skill learnings.md directly (the CLAUDE.md rule), or only through the lead?
+
+## Art step 2 (gait) status
+QA failure: the director caught a backwards orc axe (rot_deg sign) and a Vampyr scabbard
+that reads as tendrils. I approved trimmed checks: A (clearance under 1 cm fails; prop
+orientation), B (flat-colour pass, 2x contact crops). Vampyr renders bare for the gait; the
+orc keeps the fixed axe if A passes. Then Art sends me the clips, writes its findings and pauses.
 
 ## THE GOAL (director /goal, 2026-10-09)
 "A playable vertical slice that I can test and assess the art direction before we develop bulk
