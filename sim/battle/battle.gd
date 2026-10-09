@@ -8,12 +8,19 @@ extends RefCounted
 ## for the leader); a side whose morale falls below surrender_below with fighters still up
 ## surrenders, which ends the fight with living enemies (vision pillar 4). Every outcome is a
 ## roll on the Rng "battle" stream, and apply() returns the events presentation draws.
+## Two abilities (the director's reference pair, 2026-10-09): "charge" walks and attacks in one
+## turn; "blood_price" pays hp (never the last point) to add to the attack and its damage.
 ## Seeded: the same setup, seed and actions give the same event log.
 
 const STREAM := "battle"
 const ACTION_MOVE := "move"
 const ACTION_ATTACK := "attack"
 const ACTION_WAIT := "wait"
+const ACTION_CHARGE := "charge"
+const ACTION_BLOOD_PRICE := "blood_price"
+const ACTIONS: Array[String] = [
+	ACTION_MOVE, ACTION_ATTACK, ACTION_WAIT, ACTION_CHARGE, ACTION_BLOOD_PRICE
+]
 
 var units: Array[BattleUnit] = []
 var winner := -1
@@ -93,17 +100,62 @@ func apply(action: Dictionary) -> Array[Dictionary]:
 	if is_over() or actor == null:
 		return events
 	var kind := str(action.get("type", ""))
-	if kind == ACTION_MOVE and not _move(actor, action, events):
-		return events
-	if kind == ACTION_ATTACK and not _attack(actor, action, events):
-		return events
-	if kind not in [ACTION_MOVE, ACTION_ATTACK, ACTION_WAIT]:
+	if kind not in ACTIONS or not _act(kind, actor, action, events):
 		return events
 	_check_end(events)
 	if not is_over():
 		_advance()
 		events.append({"type": "turn", "unit": current().id})
 	return events
+
+
+## Carries out one legal action; false (with no events) when it is not legal.
+func _act(kind: String, actor: BattleUnit, action: Dictionary, events: Array[Dictionary]) -> bool:
+	match kind:
+		ACTION_MOVE:
+			return _move(actor, action, events)
+		ACTION_ATTACK:
+			return _attack(actor, action, events)
+		ACTION_CHARGE:
+			return _charge(actor, action, events)
+		ACTION_BLOOD_PRICE:
+			return _blood_price(actor, action, events)
+	return true
+
+
+## Walk to "to", then attack "target" from there; refused whole unless both are legal.
+func _charge(actor: BattleUnit, action: Dictionary, events: Array[Dictionary]) -> bool:
+	var to: Variant = action.get("to", actor.cell)
+	var target := unit(str(action.get("target", "")))
+	if not actor.can_charge or not to is Vector2i or target == null:
+		return false
+	var landing: Vector2i = to
+	if landing != actor.cell and not reachable(actor).has(landing):
+		return false
+	if not _adjacent(landing, target.cell) or target.down or target.side == actor.side:
+		return false
+	if landing != actor.cell:
+		_move(actor, action, events)
+	return _attack(actor, action, events)
+
+
+## Pay blood_price_hp (never the last point), then attack with the blood bonuses.
+func _blood_price(actor: BattleUnit, action: Dictionary, events: Array[Dictionary]) -> bool:
+	var cost := _rule("blood_price_hp")
+	var target := unit(str(action.get("target", "")))
+	if not actor.can_blood_price or actor.hp <= cost or target == null:
+		return false
+	if target.down or target.side == actor.side or not _adjacent(actor.cell, target.cell):
+		return false
+	actor.hp -= cost
+	actor.next_attack_bonus = _rule("blood_price_attack")
+	actor.next_damage_bonus = _rule("blood_price_damage")
+	events.append({"type": ACTION_BLOOD_PRICE, "unit": actor.id, "cost": cost, "hp": actor.hp})
+	return _attack(actor, action, events)
+
+
+func _adjacent(a: Vector2i, b: Vector2i) -> bool:
+	return a != b and absi(a.x - b.x) <= 1 and absi(a.y - b.y) <= 1
 
 
 func _move(actor: BattleUnit, action: Dictionary, events: Array[Dictionary]) -> bool:
@@ -120,10 +172,13 @@ func _attack(actor: BattleUnit, action: Dictionary, events: Array[Dictionary]) -
 	var target := unit(str(action.get("target", "")))
 	if target == null or target.down or target.side == actor.side:
 		return false
-	if absi(target.cell.x - actor.cell.x) > 1 or absi(target.cell.y - actor.cell.y) > 1:
+	if not _adjacent(actor.cell, target.cell):
 		return false
 	var roll := _rng.roll(STREAM, 1, _rule("die_sides"))
-	var need := _rule("hit_base") + target.defense - actor.attack
+	var need := _rule("hit_base") + target.defense - actor.attack - actor.next_attack_bonus
+	var damage := actor.damage + actor.next_damage_bonus
+	actor.next_attack_bonus = 0
+	actor.next_damage_bonus = 0
 	var hit := roll >= need
 	events.append(
 		{
@@ -136,7 +191,7 @@ func _attack(actor: BattleUnit, action: Dictionary, events: Array[Dictionary]) -
 		}
 	)
 	if hit:
-		var amount := _rng.roll(STREAM, 1, actor.damage)
+		var amount := _rng.roll(STREAM, 1, damage)
 		target.hp = maxi(0, target.hp - amount)
 		target.wounded = true
 		events.append({"type": "damage", "unit": target.id, "amount": amount, "hp": target.hp})

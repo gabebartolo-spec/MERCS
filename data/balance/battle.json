@@ -1,5 +1,5 @@
 {
-  "_comment": "The art direction slice's sketch battle (docs/specs/art_direction_slice.md section 2a). Read by sim/battle/battle.gd and battle_ai.gd; battle.md explains each knob. Phase 3 replaces these with the equipment type chart.",
+  "_comment": "The art direction slice's sketch battle and loop (docs/specs/art_direction_slice.md section 2a). Read by sim/battle/ and sim/story/checks.gd; battle.md explains each knob. Counters come from combat roles and each merc's abilities, never a type chart (vision, 2026-10-09).",
   "rules": {
     "move_cells": 3,
     "die_sides": 20,
@@ -8,6 +8,49 @@
     "morale_loss_ally_down": 30,
     "morale_loss_leader_down": 50,
     "surrender_below": 35,
-    "sight_cells": 8
+    "sight_cells": 8,
+    "blood_price_hp": 3,
+    "blood_price_attack": 4,
+    "blood_price_damage": 3
+  },
+  "fighters": {
+    "orc": {
+      "hp": 16,
+      "attack": 2,
+      "defense": 3,
+      "damage": 6,
+      "initiative": 2,
+      "presence": 1,
+      "ability_charge": true,
+      "leader": true
+    },
+    "vampyr": {
+      "hp": 12,
+      "attack": 3,
+      "defense": 2,
+      "damage": 5,
+      "initiative": 4,
+      "presence": 4,
+      "ability_blood_price": true
+    },
+    "bandit": {
+      "hp": 8,
+      "attack": 1,
+      "defense": 1,
+      "damage": 4,
+      "initiative": 3
+    },
+    "bandit_chief": {
+      "hp": 10,
+      "attack": 2,
+      "defense": 2,
+      "damage": 5,
+      "initiative": 3,
+      "leader": true
+    }
+  },
+  "gate": {
+    "die_sides": 20,
+    "talk_down_difficulty": 15
   }
 }
