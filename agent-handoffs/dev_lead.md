@@ -1,9 +1,9 @@
-# Dev Lead handoff, 2026-10-09 later (desktop, second Claude account, "MERCS BOSS")
+# Dev Lead handoff, 2026-10-09 (resumed after a director pause) (desktop, second Claude account, "MERCS BOSS")
 Start from this file, CLAUDE.md, your brief (`agent-briefs/DEV_LEAD_OPUS.md`), `docs/08_ROADMAP.md`
 §Phase 1 only, `docs/specs/phase1_visual_proof.md`, and `docs/01_ENGINE_DECISION.md` "Rendering plan".
 Run `git fetch`, then `gh pr list` and `docs/STATUS.md`: PR states below are as of writing.
 
-## State: working (this PR open; Art rendering realistic density samples for lead QC)
+## State: working (this PR open: sheets load from an exported .pck; Art on realistic QC round 3)
 ## Who does what
 This account has no Concept Lead: the session acts as lead AND Dev Lead under the original
 account's rules. Peers (desktop sessions): "MERCS SUPPORT" = Merge & CI (merges, board PRs);
@@ -39,21 +39,23 @@ Art renders the realistic body (round-2 fixes carried over) at pitch 55 and 56 /
 (960x540) is integer at 1080p (x2) and 4K (x4); 112 px (1280x720) mixels at 1080p (x1.5). Next:
 QC Art's strips, capture each in the street, then ONE director question with labelled 4K images.
 ## Merged since the last handoff
-#41 `.gdignore` import fix; #42 mercs lit where they stand (upright depth and light, toes show).
-## Other open work
-- `claude/p1-sheet-export-load` (d520808, cloud subagent; reviewed, no PR yet): SheetFrame loads
-  imported res:// PNGs so sheets work from an exported .pck. #41 has merged: merge main in,
-  run assets (floor 8 → 11), open the PR. It edits `sheet_frame.gd` (light conflict possible).
+#41 `.gdignore` import fix; #42 mercs lit where they stand; #44 `--logical=WxH` density captures.
+## This PR (`claude/p1-sheet-pck-load`)
+The cloud subagent's `claude/p1-sheet-export-load` (c790e02 test-first, d520808 fix) merged onto main:
+`SheetFrame._load_image()` loads imported res:// PNGs through ResourceLoader, so sheets work from an
+exported .pck (the Phase 1 gate is played in the build). Three `assets` checks: imported textures keep
+every visible pixel, a sheet that exists only inside a .pck loads, and its pixels match. Floor 8 -> 11.
+Delete the old remote branch `claude/p1-sheet-export-load` after merge (superseded by this PR).
 ## Suites (floors)
-data 88, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 8.
+data 88, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 11 (this PR).
 ## Next for the Dev Lead, in order
 1. QC Art's realistic density samples; director picks the density (labelled 4K images).
 2. Freeze the pick (Art: camera_rig/proportions; Dev: stage.json pixel block), default merc from
-   `assets/`, head/hair-layer question. 3. Export-load PR.
+   `assets/`, head/hair-layer question. 3. (this PR) then idle on code until a pick.
 4. Street spec §6 occlusion/sorting fixture (crowd capture: `--extra=x,z;x,z`).
 5. Weather catalogue only if the director pulls it forward (Phase 1 caps: rain, night, torch).
 ## Worktrees
-Mine: `../MERCS-wt/p1-res` (this PR); remove it when it merges.
+Mine: `../MERCS-wt/p1-pck` (this PR); remove it when it merges.
 Art: `../MERCS-wt/art-qc`. Not mine: `.claude/worktrees/dual-desktop-instances-a78d20`.
 ## Rules learnt the hard way (keep under 10 lines)
 - `git fetch` and read `git log origin/main` before choosing or briefing any work.
