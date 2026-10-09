@@ -84,8 +84,10 @@ func walk_to(target: Vector2i) -> bool:
 	return true
 
 
+## True while walking, including the instant between two cells of a held direction, so a
+## walk clip never flickers to idle at a cell boundary.
 func is_moving() -> bool:
-	return _moving or not _path.is_empty()
+	return _moving or not _path.is_empty() or (_held != Vector2i.ZERO and _can_step(_held))
 
 
 ## Feet position in metres on the ground plane (x, z).

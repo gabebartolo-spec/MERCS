@@ -18,6 +18,10 @@ const HELD_CELLS := 2
 const CLICK_TARGET := Vector2i(-3, 0)
 const WELL_CELL := Vector2i(4, 1)
 const TEXEL_TOLERANCE := 1e-4
+const CLIP_DIR := "user://slice_clip"
+const CLIP_CELL := 8
+const CLIP_FRAMES := 3
+const CLIP_FPS := 4.0
 
 
 func suite_name() -> String:
@@ -34,6 +38,7 @@ func run_checks() -> void:
 	await _check_doors(game)
 	await _check_conditions(game)
 	await _check_crowd_repeats(game)
+	_check_clip_playback()
 
 
 func _spawn() -> SliceGame:
@@ -198,6 +203,50 @@ func _check_crowd_repeats(first: SliceGame) -> void:
 	check(moved and same, "the crowd walks its routes, the same way in two runs")
 	a.queue_free()
 	b.queue_free()
+
+
+## A planted walk sheet (2 facings x 3 frames, 4 fps, looping) in user://: frames come out
+## by facing and time, looping; a sheet missing a frame of a facing drops that facing.
+func _check_clip_playback() -> void:
+	DirAccess.make_dir_recursive_absolute(CLIP_DIR)
+	var image := Image.create(CLIP_CELL * CLIP_FRAMES, CLIP_CELL * 2, false, Image.FORMAT_RGBA8)
+	image.fill(Color.WHITE)
+	image.save_png(CLIP_DIR.path_join("walk.png"))
+	var frames: Array = []
+	for row: int in 2:
+		for column: int in CLIP_FRAMES:
+			var cell := {
+				"x": column * CLIP_CELL, "y": row * CLIP_CELL, "w": CLIP_CELL, "h": CLIP_CELL
+			}
+			cell["facing"] = "S" if row == 0 else "E"
+			cell["frame"] = column
+			frames.append(cell)
+	var manifest := {"image": "walk.png", "fps": CLIP_FPS, "loop": true, "frames": frames}
+	var path := CLIP_DIR.path_join("walk.json")
+	FileAccess.open(path, FileAccess.WRITE).store_string(JSON.stringify(manifest))
+	var clip := SheetClip.load_manifest(path)
+	var third := clip.frame_at("E", 2.0 / CLIP_FPS) if clip != null else null
+	var wrapped := clip.frame_at("E", (CLIP_FRAMES + 2.0) / CLIP_FPS) if clip != null else null
+	check(
+		(
+			third != null
+			and third.region.position == Vector2(2 * CLIP_CELL, CLIP_CELL)
+			and wrapped == third
+		),
+		"a walk sheet plays each facing's frames at its fps and loops"
+	)
+	frames.pop_back()
+	manifest["frames"] = frames
+	FileAccess.open(path, FileAccess.WRITE).store_string(JSON.stringify(manifest))
+	var partial := SheetClip.load_manifest(path)
+	check(
+		(
+			partial != null
+			and partial.frame_count("S") == CLIP_FRAMES
+			and partial.frame_count("E") == 0
+		),
+		"a facing missing a frame is dropped, the complete one kept"
+	)
 
 
 func _press_key(code: Key, pressed: bool) -> void:
