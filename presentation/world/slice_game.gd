@@ -10,9 +10,15 @@ extends Node
 
 const STAGE_SCENE := preload("res://presentation/world/street_stage.tscn")
 const SLICE_DATA := "res://data/balance/slice.json"
-## The merc sheet Art publishes (rest pose now, walk and idle clips next); without it the
-## stage's grey capsule stands in.
+## The merc sheets Art publishes: the rest pose, and the walk and idle clips beside it.
+## Moving mercs play walk, standing ones idle, falling back to the rest pose; with none of
+## them the stage's grey capsule stands in.
 const MERC_SHEET := "res://assets/sprites/mercs/average_m/average_m_body_rest.json"
+const WALK_SHEET := "res://assets/sprites/mercs/average_m/average_m_body_walk.json"
+const IDLE_SHEET := "res://assets/sprites/mercs/average_m/average_m_body_idle.json"
+## Crowd merc n starts its clips this many seconds later than merc n - 1, so they do not
+## step in unison.
+const CROWD_PHASE_S := 0.37
 const ROUTE_PREFIX := "route_"
 const MS_PER_S := 1000.0
 const DIRECTION_BY_KEY := {
@@ -34,7 +40,10 @@ var _stage: StreetStage = null
 var _data: StageData = null
 var _routes: Array[Array] = []
 var _route_step: Array[int] = []
-var _frames := {}
+var _rest: SheetClip = null
+var _walk: SheetClip = null
+var _idle: SheetClip = null
+var _clock := 0.0
 var _shown := {}
 var _held := {}
 var _door := Vector2i.ZERO
@@ -77,6 +86,7 @@ func _process(delta: float) -> void:
 
 ## Advances every walker by delta seconds and redraws. Deterministic for the same inputs.
 func step(delta: float) -> void:
+	_clock += delta
 	player.hold(_held_direction())
 	player.advance(delta)
 	_use_doors()
@@ -201,14 +211,20 @@ func _use_doors() -> void:
 
 
 func _load_frames() -> void:
-	if not FileAccess.file_exists(MERC_SHEET):
-		return
-	for facing: String in GridWalker.FACING_BY_STEP.values():
-		var frame := SheetFrame.from_manifest(MERC_SHEET, facing)
-		if frame != null:
-			_frames[facing] = frame
-	if not _frames.is_empty():
+	_rest = _clip(MERC_SHEET)
+	_walk = _clip(WALK_SHEET)
+	_idle = _clip(IDLE_SHEET)
+	if _rest != null:
 		_stage.use_sheet(MERC_SHEET, player.facing)
+	# Moving at the walk clip's own ground speed keeps the planted foot still.
+	if _walk != null and _walk.ground_speed_mps > 0.0:
+		player.speed_m_s = _walk.ground_speed_mps
+		for walker: GridWalker in crowd:
+			walker.speed_m_s = minf(walker.speed_m_s, _walk.ground_speed_mps)
+
+
+func _clip(path: String) -> SheetClip:
+	return SheetClip.load_manifest(path) if FileAccess.file_exists(path) else null
 
 
 func _build_hud() -> void:
@@ -228,19 +244,26 @@ func _build_hud() -> void:
 func _sync() -> void:
 	_stage.focus_on(_ground(player))
 	_stage.stand_at(_ground(player))
-	_face(_stage.merc(), player)
+	_face(_stage.merc(), player, _clock)
 	var extras := _stage.extra_mercs()
 	for i: int in crowd.size():
 		_stage.move_extra(i, _ground(crowd[i]))
-		_face(extras[i], crowd[i])
+		_face(extras[i], crowd[i], _clock - CROWD_PHASE_S * (i + 1))
 
 
-func _face(sprite: Sprite3D, walker: GridWalker) -> void:
-	if _frames.is_empty() or _shown.get(sprite) == walker.facing:
+## Shows the frame a merc should have now: its facing, from walk while it moves and idle
+## while it stands (the rest pose when a clip is missing).
+func _face(sprite: Sprite3D, walker: GridWalker, seconds: float) -> void:
+	var clip := _walk if walker.is_moving() else _idle
+	if clip == null or clip.frame_count(walker.facing) == 0:
+		clip = _rest
+	if clip == null:
 		return
-	var frame: SheetFrame = _frames.get(walker.facing, null)
+	var frame := clip.frame_at(walker.facing, seconds)
+	if frame == null or _shown.get(sprite) == frame:
+		return
 	_stage.show_frame_on(sprite, frame)
-	_shown[sprite] = walker.facing
+	_shown[sprite] = frame
 
 
 func _ground(walker: GridWalker) -> Vector3:

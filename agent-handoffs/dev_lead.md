@@ -3,7 +3,7 @@ Start from this file, CLAUDE.md, your brief (`agent-briefs/DEV_LEAD_OPUS.md`), `
 §Phase 1 only, `docs/specs/phase1_visual_proof.md`, and `docs/01_ENGINE_DECISION.md` "Rendering plan".
 Run `git fetch`, then `gh pr list` and `docs/STATUS.md`: PR states below are as of writing.
 
-## State: working (slice M1 PR open; next: stage freeze to 84 px after Art's #52, then M5 loop skeleton)
+## State: working (#53 slice M1 open; draft `claude/slice-m2-clips` adds walk/idle playback; then stage freeze)
 ## THE GOAL (director, 2026-10-09)
 "A playable vertical slice that I can test and assess the art direction before we develop bulk
 assets and content." Spec: `docs/specs/art_direction_slice.md` (the playable Phase 1 gate build:
@@ -62,8 +62,14 @@ whole-screen wrap; `Text.t()` (`presentation/text.gd`) reads `data/text/en.json`
 960x540 / 84 px itself; the stage's own defaults (and stage_scale's rig check reading
 px_per_m_1x) change in the stage-freeze PR after #52. New suite `slice` (11, real input events).
 Merged earlier: #49 (sheets load from a .pck), #51 is the slice spec.
+## Draft `claude/slice-m2-clips` (depends on #53; merge main in after #53, then mark ready)
+`SheetClip` (presentation/world/sheet_clip.gd) loads a whole mercs.sheet/1 once: frames per facing
+("frame" 0..n-1), "fps", "loop", "ground_speed_mps". SliceGame plays walk while moving, idle while
+standing (rest pose fallback), crowd phase-offset 0.37 s, mercs move at the walk clip's ground
+speed. Art's agreed layout: row per facing in rig order, walk 8 frames (~6.5 fps), idle 4 (~4 fps),
+files `average_m_body_walk.json` / `_idle.json` beside the rest sheet. slice floor 11 -> 13.
 ## Suites (floors)
-data 88, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 11, slice 11 (M1 PR).
+data 88, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 11, slice 11 (#53) -> 13 (m2-clips draft).
 ## Next for the Dev Lead, in order
 1. After #52: stage-freeze PR (stage.json pixel 960x540 x2, sprite_height 84, stage_scale reads
    px_per_m_1x, capture defaults). Tell the director M1 is playable once main's build.yml is green.
