@@ -14,5 +14,17 @@
   },
   "hud": {
     "frame_time_smoothing": 0.1
+  },
+  "loop": {
+    "battle_origin_xz": [-10, -2],
+    "seed": 1009
+  },
+  "markers": {
+    "radius_m": 0.3,
+    "height_m": 0.02,
+    "lift_m": 0.012,
+    "company_rgb": [0.86, 0.68, 0.24],
+    "enemy_rgb": [0.66, 0.16, 0.14],
+    "down_rgb": [0.18, 0.16, 0.16]
   }
 }
