@@ -10,7 +10,7 @@ Current phase: **1 — Visual and factory proof** (Phase 0 gate PASS WITH NOTES,
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | working | M5 loop flow (#66) and loop on screen (#67) merged; the director's F5 checkpoint build is main's `build.yml`; next: sprite-layers PR, then loop presentation polish | — | 2026-10-09 |
+| Dev Lead (Opus 5.5) | working | M5 loop flow (#66) and loop on screen (#67) merged; the director's F5 checkpoint build is main's `build.yml`; sprite layers compositing merged (#70, assets floor 13); next: loop presentation polish, then real layered art from Art (P1-ART-SLICE-CAST) | — | 2026-10-09 |
 | Merge & CI (Sonnet 5.5) | working | standing merge pass (D-030); board PR after each merge | — | 2026-10-08 |
 | Art Factory (Opus 5.5) | working | art route A chosen (D-059); assigned P1-ART-SLICE-CAST: the orc and the Vampyr at stage 1 (clay, gait, geared sheets with the injury starter set), branch claude/art-slice-cast in the art-publish worktree | claude/art-slice-cast | 2026-10-09 |
 | Concept Lead (Fable 5.1) | working | rewrite roadmap Phases 1 (caps, deliverables, gate), 2 and 6 for the hand-made cast (D-048) and add recommendations to Q15-Q22, the art parts after P1-ART-REFOCUS is approved; Project Architect adoption awaits the director | — | 2026-10-09 |
