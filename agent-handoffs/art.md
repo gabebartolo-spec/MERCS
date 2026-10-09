@@ -3,7 +3,15 @@ Start from this file, CLAUDE.md, your brief (`agent-briefs/ART_AGENT.md`), and t
 Instructions come from the lead session ("Claude2: MERCS Lead" / "MERCS BOSS"). Director rule 2026-10-08:
 every sheet goes to the Lead for QC first; only passing sheets reach the director (Lead presents).
 
-## State: awaiting merge (publish PR); then walk + idle clips
+## INTERRUPTED by the director, 2026-10-09 (D-TBD-art-refocus)
+The director has revised the vision (`docs/00_VISION.md`): mercs are a hand-made cast of 25,
+including non-humans (an orc, a Vampyr), each with three stage looks and their own gear line.
+"One CC0 base body, equipment is the variety" (D-002) no longer fits. Stop the walk + idle work
+below; start no new base-body, equipment or GPU work. Your next item is P1-ART-REFOCUS
+(STATUS.md, once the board PR lands): a written pipeline proposal, no renders. The plan below is
+kept only as reference for what already works.
+
+## State: interrupted (was: walk + idle clips after the publish PR)
 ## Task
 P1-ART-PUBLISH-REST: publish the frozen average_m rest sheet (+ normal) at assets/sprites/mercs/average_m/ with a
 provenance manifest and a licensing-register row, so slice M1 (#53) and the build show the real body.

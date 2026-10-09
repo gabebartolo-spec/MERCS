@@ -14,6 +14,11 @@ that reads the assets. Read the section you need in `docs/06_STYLE_ART.md` (the 
 
 ## How a character is made
 
+**Paused for refocus (director, 2026-10-09, `D-TBD-art-refocus`).** The cast is now 25 hand-made
+mercs, including non-humans, each with three stage looks and their own gear line, so the
+single-base-body route below is under review. Do not build new work on it until P1-ART-REFOCUS is
+approved; the camera, light, pixel post, palette, packing and validator steps are not in question.
+
 One CC0 base body (MPFB; builds `slight`, `average`, `giant`) on one frozen Mixamo-named skeleton ->
 equipment meshes modelled or kitbashed to six sockets -> Blender headless batch (`render_character.py`:
 8 facings, clips, layers, fixed camera and light rig, at 4x) -> pixel post (`pixelate.py`: downscale,

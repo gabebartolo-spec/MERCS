@@ -56,6 +56,11 @@ Forbidden after: nothing new; it is foundation.
 
 **Goal:** prove the look and prove the machine that makes it, before any gameplay.
 
+> **Director, 2026-10-09 (`D-TBD-art-refocus`):** the base-body and equipment deliverables below
+> are paused. The cast is now hand-made (25 mercs, non-humans included, three stage looks and a
+> gear line each). The caps, deliverables and gate in this phase that name `average`, `giant`
+> or "three equipment combinations" are rewritten from the approved P1-ART-REFOCUS proposal.
+
 Caps: one street (about 40 × 20 m), one building interior, one `average` merc in three equipment
 combinations, one `giant`, two injury overlays, six clips, eight facings, two fonts, one palette.
 
@@ -81,6 +86,12 @@ Forbidden after: new facings, new clip types beyond the Phase 2–3 lists, any d
 ## Phase 2 — Character proof
 
 **Goal:** a generated person you want.
+
+> **Superseded in part (director, 2026-10-09, `D-TBD-handmade-cast`):** mercs are hand-made, not
+> generated from a seed. `MercGen`, backgrounds, aptitudes, cultures and signature qualities as
+> written here do not start. The Concept Lead rewrites this phase for the hand-made cast (merc
+> definitions in `data/`, stage looks, gear lines, learnt moves, one experience bar) before it is
+> assigned.
 
 Caps: 12 backgrounds, 6 aptitudes, 24 traits, 6 cultures, 8 signature qualities, 20 equipment
 items, 12 portraits approved, roster cap 12.
@@ -201,6 +212,9 @@ Forbidden after: any runtime text generation; storylets that reference a specifi
 ## Phase 6 — Recruitment proof
 
 **Goal:** capture and morality are the same mechanic.
+
+> **Open (director, 2026-10-09):** with a fixed cast of 25, whether surrendered enemies can be
+> recruited is Q21 in `11_OPEN_QUESTIONS.md`. This phase is rewritten once Q21 is answered.
 
 Deliverables
 - Surrender → prisoner → ransom / release / execute / exchange / recruit with company reactions
