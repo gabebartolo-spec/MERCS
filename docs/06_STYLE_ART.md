@@ -48,13 +48,13 @@ the same file.
 | Base body | MakeHuman/MPFB CC0 mesh, three builds: `slight`, `average`, `giant` **[D]** | one rig, three proportions |
 | Skeleton | Mixamo-compatible naming (so the free Mixamo library retargets cleanly), 65 bones max | frozen in Phase 1; never regenerated |
 | Sockets | `hand_r`, `hand_l`, `back`, `hip_l`, `head`, `chest_badge` | every equipment mesh attaches here |
-| Camera | orthographic, pitch **55°** (director, 2026-10-08), 8 facings at 45° steps, facing 0 = toward camera | same pitch as the game camera; `tools/pipeline/camera_rig.json` |
-| Character height | **56 px** standing at 1× for `average` (director, 2026-10-08); slight and giant follow the same scale | scale: 56 / (1.78 m × cos 55°) ≈ 55 px per metre on the image plane |
-| Proportion | **C, "B/W-like"** (director, 2026-10-08): head 1.8×, hands 1.3×, thighs 0.85×, refitted to 1.78 m (about 4½ heads) | pose-bone scales only, so the frozen skeleton and clips still apply; `tools/pipeline/proportions.json` |
+| Camera | orthographic sprite camera at **45°** inside a **55°** game world (director, 2026-10-09: realistic heads read above the shoulders), 8 facings at 45° steps, facing 0 = toward camera | the sprite scale is pinned to the 55° world, so one texel is one logical pixel; `tools/pipeline/camera_rig.json` |
+| Character height | density **84 px** at the 55° world scale (director, 2026-10-09; 960×540 logical, ×2 at 1080p, ×4 at 4K); slight and giant follow the same scale | scale authority `px_per_m_1x` = 84 / (1.78 m × cos 55°) ≈ 82.3 px per metre; the 45° sprite stands about 103.6 px tall (derived) |
+| Proportion | **realistic** (director, 2026-10-09; the big-headed C was dropped): about 7½ heads, no bone scale; flesh contour from MPFB targets applied after the rig is hashed | rest stance (arms close, fingers together, heels ~0.12 m apart, toes out) is a pose, not the rig; `tools/pipeline/proportions.json`, `bodies/bodies.json` |
 | Render size | 4× (192 px tall) then integer downscale | downscale is nearest after a 2-px-equivalent pre-blur, then quantise to palette |
 | Lighting | one key (sun, 45° elevation, from camera-left), one fill at 20 %, no cast shadows on the sprite | shadows are a separate blob sprite in-engine |
-| Outline | 1-px `soot` outline added in post, inner-line only where the silhouette would merge | deterministic script |
-| Frame size | 96×96 cell for average, pivot (48, 80) at feet centre, recorded per strip; giant later | packer and validator enforce no clipping; toes may sit up to 12 px below the pivot at 55° |
+| Outline | 1-px `soot` outline added in post, inner-line only where the silhouette would merge | `pixelate.py`: outline on the figure's own edge pixels; inner lines where an arm meets the body (a render parts pass labels arms, body and the never-lined shoulder root); body shading uses the skin ramp only, soot is drawn, never quantised to |
+| Frame size | 176×176 cell for average, pivot (88, 152) at feet centre, recorded per strip; giant later | packer and validator enforce no clipping; toes may sit up to 12 px below the pivot at 45° |
 | Animation set, Phase 1 | idle (4f), walk (8f), attack_1h (6f), hit (3f), death (6f), down (1f) per facing | from the Mixamo library, retargeted in Blender, cleaned by script |
 | Layers | body, hair/head, torso, legs, helmet, weapon, offhand, injury_overlay, cloak/insignia | each layer rendered separately with the same camera and frame timing, so they align by construction |
 | Skin | rendered in a fixed neutral skin ramp, recoloured by shader to one of six skin ramps | palette indices, never free colour |
@@ -87,7 +87,7 @@ the same file.
 
 ## 6. Environment contract
 
-- Low-poly 3D, textures at the sprite's pixels-per-metre (≈ 55 at 56 px and 55°) texel density, painted from
+- Low-poly 3D, textures at the sprite's pixels-per-metre (≈ 82 px per metre at density 84) texel density, painted from
   the master palette (textures are quantised at export).
 - Modular kit per biome: ground tiles, walls, roofs, doors, props, foliage cards. One `GridMap`
   mesh library per biome.

@@ -4,9 +4,9 @@
   "layer": "body",
   "clip": "rest",
   "image": "sheet.png",
-  "image_pixel_sha256": "3ee4f9af7e2971967e8fc18345b518bfbc42d0b9cf38af03b91f916c34f31a7b",
-  "frame_w": 96,
-  "frame_h": 96,
+  "image_pixel_sha256": "5d0b33245c403cf81b6ee1992e69c14d3fc4035eaf2caf69c48598b29db3e04b",
+  "frame_w": 176,
+  "frame_h": 176,
   "frame_count": 8,
   "frames_per_facing": 1,
   "facings": [
@@ -25,69 +25,69 @@
       "index": 0,
       "x": 0,
       "y": 0,
-      "w": 96,
-      "h": 96
+      "w": 176,
+      "h": 176
     },
     {
       "facing": "SE",
       "index": 1,
-      "x": 96,
+      "x": 176,
       "y": 0,
-      "w": 96,
-      "h": 96
+      "w": 176,
+      "h": 176
     },
     {
       "facing": "E",
       "index": 2,
-      "x": 192,
+      "x": 352,
       "y": 0,
-      "w": 96,
-      "h": 96
+      "w": 176,
+      "h": 176
     },
     {
       "facing": "NE",
       "index": 3,
-      "x": 288,
+      "x": 528,
       "y": 0,
-      "w": 96,
-      "h": 96
+      "w": 176,
+      "h": 176
     },
     {
       "facing": "N",
       "index": 4,
-      "x": 384,
+      "x": 704,
       "y": 0,
-      "w": 96,
-      "h": 96
+      "w": 176,
+      "h": 176
     },
     {
       "facing": "NW",
       "index": 5,
-      "x": 480,
+      "x": 880,
       "y": 0,
-      "w": 96,
-      "h": 96
+      "w": 176,
+      "h": 176
     },
     {
       "facing": "W",
       "index": 6,
-      "x": 576,
+      "x": 1056,
       "y": 0,
-      "w": 96,
-      "h": 96
+      "w": 176,
+      "h": 176
     },
     {
       "facing": "SW",
       "index": 7,
-      "x": 672,
+      "x": 1232,
       "y": 0,
-      "w": 96,
-      "h": 96
+      "w": 176,
+      "h": 176
     }
   ],
   "pivot": {
-    "x": 102,
-    "y": 80,
+    "x": 182,
+    "y": 152,
     "doc": "feet centre in frame pixels, the same in every frame"
   },
   "palette": {
@@ -101,52 +101,52 @@
       {
         "file": "facing_0_S.png",
         "kind": "render_4x",
-        "sha256": "f8bf5468bd5cb30110d0b0ed631de0d0cf9708410c35240351ac64a8ef57226e"
+        "sha256": "71e751b9436c0eb9ee8e866482d406fad12ac936e131b0d48c0a2f82e452e12e"
       },
       {
         "file": "facing_1_SE.png",
         "kind": "render_4x",
-        "sha256": "606c41635b9af86ccb1ba59dd7f01942658ef5aafcb638f99c88ea2bb2d0d0db"
+        "sha256": "8bb1aa30221fb1b6379f887b0689bee312bb10f0e0963ceffc7dc97d7e1a6490"
       },
       {
         "file": "facing_2_E.png",
         "kind": "render_4x",
-        "sha256": "dc877578fe157b9f514d52e57b4ac6076d62b470d6cf2c59d14bc5a32dc81900"
+        "sha256": "a66b40a66b40dda495d9e3c416a3c65d7a3924c9fe12901cceb53d3817f10818"
       },
       {
         "file": "facing_3_NE.png",
         "kind": "render_4x",
-        "sha256": "db94abc41bfa57035b89fe74406ad05c3cc4b15e41f25b594d749e6abe1c8f60"
+        "sha256": "1c6eff0a5aa0f799d8aca05a83f84bc8feda5f7d2f92dce0cad5ce0ed6b72aef"
       },
       {
         "file": "facing_4_N.png",
         "kind": "render_4x",
-        "sha256": "f80d6a02b4f9abdc31efdb9a4cfa48f04387faaa3a7af3391fd3bfcb31c073be"
+        "sha256": "d2625f0d1339307d10213a1e0deaaa214f016a72ff853ca2fbc3e1f17f0169cd"
       },
       {
         "file": "facing_5_NW.png",
         "kind": "render_4x",
-        "sha256": "d827891ea1e1a1c37dcfc101a743cac30876b9eee3eb7300298008d81046d3de"
+        "sha256": "922b43cc8a4b8577d09f4ad14bf8f96f3031571e2a7768836c631e1594a849a0"
       },
       {
         "file": "facing_6_W.png",
         "kind": "render_4x",
-        "sha256": "9e40c0c450b2de305cd123786fa4cc59a82581c309162cc2c974206bece4d9df"
+        "sha256": "3a20862aee249d2019cf0ae10ab26f33b326c38847bcfa17b265e292a768bf37"
       },
       {
         "file": "facing_7_SW.png",
         "kind": "render_4x",
-        "sha256": "ceec52398c00fdfea596fe0917768e421c144719e7f44134c7091d7ead3d2900"
+        "sha256": "149e8b3c003ab70424adcab750eee4bbdf53287476818e2b4f6afaabe0f832e0"
       }
     ],
     "inputs": {
       "body_blend": {
         "file": "tools/pipeline/bodies/average_m.blend",
-        "sha256": "aa9da1d3b091ba89a52779a3b9571897c8a5c89c3ea1c620822666c18df47f94"
+        "sha256": "95326b38dcd406211abb6f35577da5afca59b573ba0ab2123eb95969b91e60fd"
       },
       "camera_rig": {
         "file": "tools/pipeline/camera_rig.json",
-        "sha256": "b3ed7bbc6fd2ae4760b23b046adc11793ad8daa88496b4b114e014f04e4de4b7"
+        "sha256": "c67f2acbf991807339bc45b1ed927c0cecd04af73edd7d88819a6ffc0bb8cdc8"
       },
       "light_rig": {
         "file": "tools/pipeline/light_rig.json",
@@ -154,15 +154,15 @@
       },
       "render_script": {
         "file": "tools/pipeline/render_character.py",
-        "sha256": "150524579507120a7f836a3732ae273ec277d9f352a39ed6ffeff433535633ce"
+        "sha256": "c673a4df1d639b5958706852fd76a3115a37fef914db3a98aa543d6a43c5f7ae"
       },
       "proportions": {
         "file": "tools/pipeline/proportions.json",
-        "sha256": "0a8775ccf36941675e0f6784209dfe273ae1fafbc501c7388dcb2288d3196bc3"
+        "sha256": "f0722e47bb29a53294e8db4b691c13b6b03748567097f8a59c4a7f0ca0657d8a"
       },
       "pixelate_config": {
         "file": "tools/pipeline/pixelate.json",
-        "sha256": "356dda9ced2ba4177d0f80e9bbcde55786585d2165529561d41016da4f0b4699"
+        "sha256": "3f6f5ba7db17dbe8d12df3607ba9c2f6fab04e6f5f726b7ebb063b597a52761e"
       }
     },
     "tools": {
@@ -171,7 +171,7 @@
       "scripts": {
         "pngio.py": "c97d8df63884ddc60bfeb5ff6464c46b913c40f53939b6dcc7db856cffc6438c",
         "palette_lib.py": "f22644e8a13658cb3543f958ed0d15c4521242dbf05ae06829ccba14cce085a0",
-        "pixelate.py": "e8e6fc4da4fbc2275fb204c1c2c86d7bd1dcde03441cee876724f30313e802c4",
+        "pixelate.py": "703232efdc4810538c2bfcc3f630a7c0de49b1ca57b9a1a0d12ab4149906a1c2",
         "pack_sheets.py": "039780aa67ead7a246f285a1029f4055d01c1b064941383fb1c0bc8093df9e43"
       }
     },
@@ -182,6 +182,6 @@
     ]
   },
   "normal_image": "normal.png",
-  "normal_image_pixel_sha256": "f50776aec0a952159be9fd83bcc6aec8e1e91e494350c744425d1ee3753e88fe",
+  "normal_image_pixel_sha256": "acc6e23708b3c6c183682c533da955fb69ae3b3b3d34762b9ee4feaa137042d7",
   "normal_doc": "camera-facing tangent space, OpenGL: R = screen right, G = screen up, B = toward camera, encoded n * 0.5 + 0.5; alpha copied from the colour frame"
 }

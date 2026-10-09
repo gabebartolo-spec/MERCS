@@ -46,7 +46,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--camera", default=str(CAMERA_FILE), help="camera rig json (default: the committed rig)")
     p.add_argument("--proportions", default=str(PROPORTIONS_FILE), help="proportion variants json")
     p.add_argument("--variant", default="", help="variant in --proportions (default: its 'default')")
-    p.add_argument("--pass", dest="render_pass", choices=("color", "normal"), default="color")
+    p.add_argument("--pass", dest="render_pass", choices=("color", "normal", "parts"), default="color")
     return p.parse_args(argv)
 
 
@@ -70,7 +70,10 @@ def srgb_to_linear(hex_colour: str) -> tuple[float, float, float, float]:
 
 
 def px_per_m(cam: dict) -> float:
-    """1x pixels per metre on the image plane (the scale rule in camera_rig.json)."""
+    """1x pixels per metre on the image plane: camera_rig.json's px_per_m_1x when it pins the scale to the
+    world camera, else the older rule char_height_px / (reference_height_m * cos(pitch_deg))."""
+    if "px_per_m_1x" in cam:
+        return cam["px_per_m_1x"]
     return cam["char_height_px"] / (cam["reference_height_m"] * math.cos(math.radians(cam["pitch_deg"])))
 
 
@@ -199,6 +202,56 @@ def apply_normal_pass() -> None:
     scene.render.dither_intensity = 0.0
 
 
+PART_GROUPS = {  # flat emission colour -> bones whose summed vertex weight marks the part
+    (1.0, 0.0, 0.0): ("mixamorig:LeftArm", "mixamorig:LeftForeArm", "mixamorig:LeftHand"),
+    (0.0, 1.0, 0.0): ("mixamorig:RightArm", "mixamorig:RightForeArm", "mixamorig:RightHand"),
+}
+PART_BODY = (0.0, 0.0, 1.0)
+PART_WEIGHT = 0.5
+PART_ROOT = (1.0, 1.0, 1.0)  # the arm's root (shoulder cap): neither arm nor body, so no line either side
+PART_ROOT_CLEAR_M = 0.10  # arm vertices this close to the shoulder joint are root
+
+
+def apply_parts_pass() -> None:
+    """Flat colour per body part (left arm red, right arm green, the rest blue) for the pixel post's
+    inner lines (06 section 3: a line only where the silhouette would merge). Finger and hand
+    groups count towards their arm by name prefix. The shoulder cap (arm vertices within
+    PART_ROOT_CLEAR_M of the arm's root joint, at rest) is labelled root (white): lines are drawn only
+    where an arm meets the body, never at the root, which the round-3 "body" label turned into a
+    tick across the arm. Raw view, no dither: labels, not colour."""
+    mat = bpy.data.materials.new("mercs_parts_pass")
+    if mat.node_tree is None:
+        mat.use_nodes = True
+    nodes, links = mat.node_tree.nodes, mat.node_tree.links
+    nodes.clear()
+    attr = nodes.new("ShaderNodeVertexColor")
+    attr.layer_name = "mercs_parts"
+    emit = nodes.new("ShaderNodeEmission")
+    out = nodes.new("ShaderNodeOutputMaterial")
+    links.new(attr.outputs["Color"], emit.inputs["Color"])
+    links.new(emit.outputs["Emission"], out.inputs["Surface"])
+    for obj in bpy.data.objects:
+        if obj.type != "MESH":
+            continue
+        layer = obj.data.color_attributes.new("mercs_parts", "FLOAT_COLOR", "POINT")
+        index_of = {g.index: g.name for g in obj.vertex_groups}
+        rig = obj.parent
+        roots = {rgb: rig.matrix_world @ rig.data.bones[bones[0]].head_local for rgb, bones in PART_GROUPS.items()}
+        for v in obj.data.vertices:
+            colour = PART_BODY
+            where = obj.matrix_world @ v.co
+            for rgb, bones in PART_GROUPS.items():
+                w = sum(g.weight for g in v.groups if index_of[g.group].startswith(bones))
+                if w >= PART_WEIGHT:
+                    colour = rgb if (where - roots[rgb]).length >= PART_ROOT_CLEAR_M else PART_ROOT
+            layer.data[v.index].color = (*colour, 1.0)
+        obj.data.materials.clear()
+        obj.data.materials.append(mat)
+    scene = bpy.context.scene
+    scene.view_settings.view_transform = NORMAL_VIEW_TRANSFORM
+    scene.render.dither_intensity = 0.0
+
+
 def figure_extent_z(rig: bpy.types.Object) -> tuple[float, float]:
     """World z range of the deformed body (shape keys and pose evaluated, never base vertices)."""
     bpy.context.view_layer.update()
@@ -236,6 +289,60 @@ def aim_bones(rig: bpy.types.Object, targets: dict) -> None:
     bpy.context.view_layer.update()
 
 
+def group_centroid(rig: bpy.types.Object, group: str, min_weight: float) -> Vector:
+    """World centroid of the deformed vertices weighted to a vertex group (the head mesh, say)."""
+    bpy.context.view_layer.update()
+    deps = bpy.context.evaluated_depsgraph_get()
+    total, n = Vector((0.0, 0.0, 0.0)), 0
+    for obj in rig.children:
+        if obj.type != "MESH" or group not in obj.vertex_groups:
+            continue
+        gi = obj.vertex_groups[group].index
+        ev = obj.evaluated_get(deps)
+        mesh = ev.to_mesh()
+        for v in mesh.vertices:
+            if any(g.group == gi and g.weight >= min_weight for g in v.groups):
+                total += ev.matrix_world @ v.co
+                n += 1
+        ev.to_mesh_clear()
+    if not n:
+        raise SystemExit(f"recentre: no vertices weighted to {group}")
+    return total / n
+
+
+def twist_bones(rig: bpy.types.Object, twists: dict) -> None:
+    """Roll each named bone about its own length by degrees (pose only), e.g. palms toward the thighs."""
+    world_inv = rig.matrix_world.inverted()
+    for bone, degrees in twists.items():
+        bpy.context.view_layer.update()
+        pb = rig.pose.bones[bone]
+        m = rig.matrix_world @ pb.matrix
+        axis = (m.to_3x3() @ Vector((0.0, 1.0, 0.0))).normalized()
+        turn = Matrix.Rotation(math.radians(degrees), 4, axis)
+        head = Matrix.Translation(m.translation)
+        pb.matrix = world_inv @ (head @ turn @ head.inverted() @ m)
+    bpy.context.view_layer.update()
+
+
+def recentre_bones(rig: bpy.types.Object, specs: dict) -> None:
+    """Shift a bone (pose only) so its mesh centroid's horizontal offset from another bone's head
+    shrinks to keep_offset of what it was, then lift it.
+
+    Scaling the head 1.8x about its joint multiplies the face's natural forward offset by 1.8;
+    keep_offset 1/1.8 restores the natural offset (0 would sit the head's centre on the spine,
+    which pushes it behind the neck: measured side-on, 2026-10-09). Metres, before the refit.
+    """
+    world_inv = rig.matrix_world.inverted()
+    for bone, spec in specs.items():
+        pb = rig.pose.bones[bone]
+        centre = group_centroid(rig, bone, spec["min_weight"])
+        anchor = rig.matrix_world @ rig.pose.bones[spec["over"]].head
+        pull = 1.0 - spec["keep_offset"]
+        delta = Vector(((anchor.x - centre.x) * pull, (anchor.y - centre.y) * pull, spec["lift_m"]))
+        pb.matrix = world_inv @ (Matrix.Translation(delta) @ (rig.matrix_world @ pb.matrix))
+    bpy.context.view_layer.update()
+
+
 def apply_proportions(rig: bpy.types.Object, path: str, name: str, height_m: float) -> dict:
     """Pose and scale bones for a sample variant, then refit the figure to height_m with feet on z = 0."""
     cfg = json.loads(Path(path).read_text(encoding="utf-8"))
@@ -243,15 +350,17 @@ def apply_proportions(rig: bpy.types.Object, path: str, name: str, height_m: flo
     spec = cfg["variants"][name]
     scales = spec["bone_scale"]
     aim = {**cfg.get("pose", {}).get("bone_direction", {}), **spec.get("bone_direction", {})}
-    if not scales and not aim:
+    if not scales and not aim and not cfg.get("pose", {}).get("bone_twist_deg"):
         return {"variant": name, "rig_scale": 1.0, "height_m": None}
     rig.data.pose_position = "POSE"
     aim_bones(rig, aim)
+    twist_bones(rig, {**cfg.get("pose", {}).get("bone_twist_deg", {}), **spec.get("bone_twist_deg", {})})
     for bone, factor in scales.items():
         pb = rig.pose.bones.get(bone)
         if pb is None:
             raise SystemExit(f"variant {name}: no bone {bone}; bones are never added or renamed")
         pb.scale = (factor, factor, factor)
+    recentre_bones(rig, spec.get("recentre", {}))
     lo, hi = figure_extent_z(rig)
     s = height_m / (hi - lo)
     rig.scale = (s, s, s)
@@ -286,6 +395,8 @@ def main() -> None:
     setup_render(cam, light)
     if args.render_pass == "normal":
         apply_normal_pass()
+    elif args.render_pass == "parts":
+        apply_parts_pass()
     else:
         apply_material(light["body_material"])
     rig = body_rig()

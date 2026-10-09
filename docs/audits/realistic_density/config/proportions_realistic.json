@@ -1,0 +1,241 @@
+{
+  "_doc": "SAMPLE (director 2026-10-09: realistic proportions, more pixels per merc). Realistic body: no bone scale; the same rest stance as the frozen file (arms down, ankles about 0.2 m apart, soft knees, toes out). Not the game default.",
+  "schema": "mercs.proportions/1",
+  "default": "realistic",
+  "variants": {
+    "realistic": {
+      "label": "REALISTIC",
+      "bone_scale": {}
+    }
+  },
+  "pose": {
+    "doc": "Rest stance, Lead QC round 3 (2026-10-09). World directions, body facing -Y, left = +X. Clavicles 6 degrees lower than rest; upper arms 6 degrees off vertical with the elbow slightly back, forearms near vertical slightly forward; hands and every finger segment straight down so the fingers lie together (the rest pose bent the hands forward like claws), thumbs along the index; hands rolled so palms face the thighs. Legs straight (knees 0), ankles about 0.12 m apart, toes out 13 degrees.",
+    "bone_direction": {
+      "mixamorig:LeftShoulder": [
+        0.82,
+        -0.04,
+        -0.57
+      ],
+      "mixamorig:RightShoulder": [
+        -0.82,
+        -0.04,
+        -0.57
+      ],
+      "mixamorig:LeftArm": [
+        0.1,
+        0.05,
+        -1.0
+      ],
+      "mixamorig:RightArm": [
+        -0.1,
+        0.05,
+        -1.0
+      ],
+      "mixamorig:LeftForeArm": [
+        0.05,
+        -0.04,
+        -1.0
+      ],
+      "mixamorig:RightForeArm": [
+        -0.05,
+        -0.04,
+        -1.0
+      ],
+      "mixamorig:LeftHand": [
+        0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:RightHand": [
+        -0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:LeftHandIndex1": [
+        0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:LeftHandIndex2": [
+        0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:LeftHandIndex3": [
+        0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:LeftHandMiddle1": [
+        0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:LeftHandMiddle2": [
+        0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:LeftHandMiddle3": [
+        0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:LeftHandRing1": [
+        0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:LeftHandRing2": [
+        0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:LeftHandRing3": [
+        0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:LeftHandPinky1": [
+        0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:LeftHandPinky2": [
+        0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:LeftHandPinky3": [
+        0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:LeftHandThumb1": [
+        -0.15,
+        -0.35,
+        -0.92
+      ],
+      "mixamorig:LeftHandThumb2": [
+        -0.15,
+        -0.35,
+        -0.92
+      ],
+      "mixamorig:LeftHandThumb3": [
+        -0.15,
+        -0.35,
+        -0.92
+      ],
+      "mixamorig:RightHandIndex1": [
+        -0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:RightHandIndex2": [
+        -0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:RightHandIndex3": [
+        -0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:RightHandMiddle1": [
+        -0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:RightHandMiddle2": [
+        -0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:RightHandMiddle3": [
+        -0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:RightHandRing1": [
+        -0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:RightHandRing2": [
+        -0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:RightHandRing3": [
+        -0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:RightHandPinky1": [
+        -0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:RightHandPinky2": [
+        -0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:RightHandPinky3": [
+        -0.02,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:RightHandThumb1": [
+        0.15,
+        -0.35,
+        -0.92
+      ],
+      "mixamorig:RightHandThumb2": [
+        0.15,
+        -0.35,
+        -0.92
+      ],
+      "mixamorig:RightHandThumb3": [
+        0.15,
+        -0.35,
+        -0.92
+      ],
+      "mixamorig:LeftUpLeg": [
+        -0.06,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:RightUpLeg": [
+        0.06,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:LeftLeg": [
+        -0.06,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:RightLeg": [
+        0.06,
+        0.0,
+        -1.0
+      ],
+      "mixamorig:LeftFoot": [
+        0.215,
+        -0.933,
+        -0.285
+      ],
+      "mixamorig:RightFoot": [
+        -0.215,
+        -0.933,
+        -0.285
+      ]
+    },
+    "bone_twist_deg": {
+      "mixamorig:LeftHand": 0.0,
+      "mixamorig:RightHand": 0.0
+    },
+    "twist_doc": "hand roll is measured from a 0-degree side render before it is set"
+  }
+}

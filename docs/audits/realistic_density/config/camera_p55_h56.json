@@ -1,0 +1,42 @@
+{
+  "_doc": "SAMPLE camera derived from camera_rig.json (pitch 55, cell and pivot scaled with the figure height); not the game rig. Fixed sprite camera (06_STYLE_ART.md section 3, 07 section 2.4). Orthographic, one pitch for every facing. The camera never moves between facings; the character turns on the spot. Scale rule: px_per_m_1x = char_height_px / (reference_height_m * cos(pitch_deg)), so a standing reference body seen at this pitch projects to char_height_px at 1x; the render is render_scale times larger, and pixelate.py reduces it by exactly render_scale. pitch_deg 55 and char_height_px 56 are the director's picks (2026-10-08, from docs/audits/proportion_samples/).",
+  "schema": "mercs.camera_rig/1",
+  "projection": "orthographic",
+  "pitch_deg": 55.0,
+  "pitch_doc": "degrees below horizontal; the same pitch as the game camera",
+  "char_height_px": 56,
+  "reference_height_m": 1.78,
+  "reference_doc": "average_m standing height (bodies/bodies.json); giant and slight bodies use the same px_per_m so a giant is taller on screen",
+  "render_scale": 4,
+  "frame_px": 96,
+  "frame_doc": "square cell at 1x. Measured on average_m (proportion C, rest stance) at 55 degrees and 56 px: the figure reaches 64 px above the pivot, 10 below and 16 either side; 96 leaves headroom for helmets and raised weapons. Giant builds may need more, a later decision.",
+  "pivot_px": [
+    48,
+    80
+  ],
+  "pivot_doc": "feet centre (world origin) in 1x cell pixels, x from the left, y from the top; the camera is aimed so the origin lands on this pixel. 16 px are left below the pivot because toes nearer the camera project up to 10 px below it at 55 degrees.",
+  "feet_tolerance_px": {
+    "above": 2,
+    "below": 12
+  },
+  "feet_tolerance_doc": "validate_sheet.py: a frame's lowest opaque row may sit this far above the pivot (heels at the N facing) or below it (toes toward the camera; measured 10 at 55 degrees, plus 2). Pitch-dependent, so it lives with the pitch.",
+  "camera_distance_m": 20.0,
+  "distance_doc": "orthographic, so distance only has to clear the body; it does not change scale",
+  "clip_start_m": 0.1,
+  "clip_end_m": 100.0,
+  "facings": {
+    "count": 8,
+    "step_deg": 45.0,
+    "order": [
+      "S",
+      "SE",
+      "E",
+      "NE",
+      "N",
+      "NW",
+      "W",
+      "SW"
+    ],
+    "order_doc": "facing k turns the character k * step_deg counter-clockwise seen from above. S (k=0) faces the camera; SE (k=1) faces the camera turned towards screen right; N (k=4) shows the back. Names are screen directions with S = towards the viewer."
+  }
+}
