@@ -3,7 +3,7 @@ Start from this file, CLAUDE.md, your brief (`agent-briefs/DEV_LEAD_OPUS.md`), `
 §Phase 1 only, `docs/specs/phase1_visual_proof.md`, and `docs/01_ENGINE_DECISION.md` "Rendering plan".
 Run `git fetch`, then `gh pr list` and `docs/STATUS.md`: PR states below are as of writing.
 
-## State: working (M5 sim core PR open: Rng + sketch battle; walk clip back with Art for a shoulder fix)
+## State: paused (director, 2026-10-09). #60 open; Art paused; walk gait question open
 ## THE GOAL (director, 2026-10-09)
 "A playable vertical slice that I can test and assess the art direction before we develop bulk
 assets and content." Spec: `docs/specs/art_direction_slice.md` (the playable Phase 1 gate build:
@@ -85,9 +85,13 @@ down, morale loss (leader more), surrender below threshold; `BattleAi`: acts onl
 sight_cells). Numbers in `data/balance/battle.json`. Suite `battle` (10). Next M5 pieces: visible
 check (`sim/story/checks.gd`), recruit card + contract (thin, from data/backgrounds + traits), loop
 flow state machine, then presentation (battle on the street grid, panels).
-## Lead QC: walk clip FAILED round 1
-NW/SE F0-3 the far shoulder rises to ear height and reads as a second head; S/N arms swing out
-sideways. Cause: clavicle lift in the T/A-pose retarget. Sent back; idle reviewed after the fix.
+## Walk clip: Lead QC passed round 2, then the DIRECTOR flagged the gait
+Round 1 failed (clavicle lift: second head NW/SE). Round 2 (clips_2026-10-09c) passed Lead QC and
+played correctly in the slice, but the director told Art "watch the gait of the walking animation,
+legs should be angled and move naturally". Art measured the retarget matches Mixamo exactly, so it is
+how the gait READS as a sprite. Unclear which read (stiff/straight legs from S/N, choppy 8 frames,
+robotic stride, wide feet); the director paused before answering. Art's clips PR is NOT open.
+Lesson: judge a walk as a played clip at game speed, not as frames. Ask the director on resume.
 ## Sprite sheets are plain git (Lead, 2026-10-09)
 Art's #55 (rest sheet under assets/) went red on CI: `*.png` is LFS and CI checks out without LFS,
 so Godot read pointer files. `.gitattributes` now makes `assets/sprites/**/*.png` plain git (like
