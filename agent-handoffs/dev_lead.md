@@ -3,19 +3,20 @@ Start from this file, CLAUDE.md, `~/.claude/memory-shared/MEMORY.md`, your brief
 (`agent-briefs/DEV_LEAD_OPUS.md`), `docs/00_VISION.md` (revised 2026-10-09, #63) and
 `docs/specs/art_direction_slice.md`. Run `git fetch`, then `gh pr list` and `docs/STATUS.md`.
 
-## State: working. Director resumed 2026-10-10 ("resume the team, kill and resurrect them"); Art on step 2
+## State: PAUSED by the director (2026-10-10: "once you and the team have all been regenerated, pause development")
 
 ## Who does what
 This account has no Concept Lead: the session acts as lead AND Dev Lead under the original
 account's rules. Peers (desktop sessions, message by session id):
 "MERCS SUPPORT" (local_f70eca67-...) = Merge & CI; "MERCS ART FACTORY" (local_e5986dbb-...) = Art.
 
-## Team refresh (director, 2026-10-10: "periodically archive and resurrect the team")
+## Team refresh and pause (director, 2026-10-10)
 Rule: `.claude/skills/mercs-handoff` "The lead refreshes the team" + shared memory
-refresh-workers-at-task-boundaries. Art cleared and got its kick-off (step 1 r2 PASS, step 2 gait).
-Support declined relayed instructions; it waits for the director to type "restart" in its chat,
-then fixes merge_ci.md (#70 merged), clears, and needs the kick-off "You are MERCS SUPPORT
-(Merge & CI). Read your handoff and continue." The lead cleared itself after this rewrite.
+refresh-workers-at-task-boundaries. Art: regenerated, passed step 1 r2, started step 2 gait,
+then told to PAUSE (commit WIP, rewrite art.md, push, stop). Support: NOT yet regenerated; it
+refuses relayed director instructions and waits for the director to type "restart" in its chat
+(then it fixes merge_ci.md for #70, merges that, clears). After its clear send NO kick-off while
+paused. The lead regenerated itself after this rewrite. Nothing resumes until the director says.
 
 ## THE GOAL (director /goal, 2026-10-09)
 "A playable vertical slice that I can test and assess the art direction before we develop bulk
@@ -35,7 +36,7 @@ slice, then the gate ("is this the look?").
 ## Art (P1-ART-SLICE-CAST, branch claude/art-slice-cast, no PR)
 QC order: (1) clay + 45 deg silhouettes: PASSED r2 (2026-10-10), (2) gait as a played 3 s loop
 (orc heavy and grounded, Vampyr controlled and predatory; bare bodies + weapon, no cape; S/SE/E/NE
-at 1x and 2x; no foot slide): IN PROGRESS, clips come to the lead, (3) geared sheets with injury
+at 1x and 2x; no foot slide): STARTED then PAUSED, clips come to the lead, (3) geared sheets with injury
 layers per the layer contract. Step 3 must fix: orc tusks (front reads as flat plates; want
 tapered cones from the lower jaw) and Vampyr cape (stands off the shoulder like a tower shield
 in SE/SW/E/W; must hug back and shoulders). Vampyr Tripo head at 4x before full sheets.
