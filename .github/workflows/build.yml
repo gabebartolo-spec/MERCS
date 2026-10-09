@@ -8,8 +8,9 @@ name: build
 # project.godot, export_presets.cfg or this file is proven by the push to main that
 # merges it, or by running the workflow by hand on the branch. The exported game runs
 # headless for 120 frames and must load the main scene from project.godot without
-# logging an error; the .exe is then uploaded as the "MERCS-windows" artefact. No LFS
-# assets exist in Phase 0; the phase that adds them turns on `lfs: true` at checkout
+# logging an error; the .exe is then uploaded as the "MERCS-windows" artefact. Sprite
+# sheets under assets/sprites are plain git (.gitattributes), so no LFS is needed here; a
+# phase that ships LFS assets (audio, fonts, models) turns on `lfs: true` at checkout
 # (and caches the objects; LFS bandwidth is metered).
 on:
   push:

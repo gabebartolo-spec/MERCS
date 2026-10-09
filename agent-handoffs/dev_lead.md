@@ -3,7 +3,7 @@ Start from this file, CLAUDE.md, your brief (`agent-briefs/DEV_LEAD_OPUS.md`), `
 §Phase 1 only, `docs/specs/phase1_visual_proof.md`, and `docs/01_ENGINE_DECISION.md` "Rendering plan".
 Run `git fetch`, then `gh pr list` and `docs/STATUS.md`: PR states below are as of writing.
 
-## State: working (#53 slice M1 open; draft `claude/slice-m2-clips` adds walk/idle playback; then stage freeze)
+## State: working (open: #54 playback (this), #55 Art rest sheet, #57 stage freeze; next: M5 loop skeleton)
 ## THE GOAL (director, 2026-10-09)
 "A playable vertical slice that I can test and assess the art direction before we develop bulk
 assets and content." Spec: `docs/specs/art_direction_slice.md` (the playable Phase 1 gate build:
@@ -68,6 +68,16 @@ Merged earlier: #49 (sheets load from a .pck), #51 is the slice spec.
 standing (rest pose fallback), crowd phase-offset 0.37 s, mercs move at the walk clip's ground
 speed. Art's agreed layout: row per facing in rig order, walk 8 frames (~6.5 fps), idle 4 (~4 fps),
 files `average_m_body_walk.json` / `_idle.json` beside the rest sheet. slice floor 11 -> 13.
+## #54 walk/idle playback (`claude/slice-m2-clips`)
+`SheetClip` (presentation/world/sheet_clip.gd) loads a whole mercs.sheet/1 once: frames per facing
+("frame" 0..n-1), "fps", "loop", "ground_speed_mps"; a facing short of a frame is dropped. SliceGame
+plays walk while moving, idle while standing (rest fallback), crowd phase-offset 0.37 s, mercs move
+at the walk clip's ground speed (Art measured 1.1004 m/s). slice floor 11 -> 13.
+## Sprite sheets are plain git (Lead, 2026-10-09)
+Art's #55 (rest sheet under assets/) went red on CI: `*.png` is LFS and CI checks out without LFS,
+so Godot read pointer files. `.gitattributes` now makes `assets/sprites/**/*.png` plain git (like
+the pipeline fixtures); big binaries stay LFS. After the fix merges, Art merges main into #55 and
+runs `git add --renormalize assets/`. Lead QC of #55 in game: PASS (real merc in the slice).
 ## Suites (floors)
 data 88, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 11, slice 11 (#53) -> 13 (m2-clips draft).
 ## Next for the Dev Lead, in order
