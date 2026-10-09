@@ -30,6 +30,9 @@ QA failure: the director caught a backwards orc axe (rot_deg sign) and a Vampyr 
 that reads as tendrils. I approved trimmed checks: A (clearance under 1 cm fails; prop
 orientation), B (flat-colour pass, 2x contact crops). Vampyr renders bare for the gait; the
 orc keeps the fixed axe if A passes. Then Art sends me the clips, writes its findings and pauses.
+UPDATE: Art was reset by the director mid step 2 (405d2b7, art.md has exact next steps). Check A
+caught both old defects and a new haft-in-thigh clash, so it is PROVEN (playbook and art-qa-critic
+learnings updated). Art's first job on resume: fix the axe clearance, or render the orc bare.
 
 ## THE GOAL (director /goal, 2026-10-09)
 "A playable vertical slice that I can test and assess the art direction before we develop bulk
