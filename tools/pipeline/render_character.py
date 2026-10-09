@@ -70,7 +70,10 @@ def srgb_to_linear(hex_colour: str) -> tuple[float, float, float, float]:
 
 
 def px_per_m(cam: dict) -> float:
-    """1x pixels per metre on the image plane (the scale rule in camera_rig.json)."""
+    """1x pixels per metre on the image plane: camera_rig.json's px_per_m_1x when it pins the scale to the
+    world camera, else the older rule char_height_px / (reference_height_m * cos(pitch_deg))."""
+    if "px_per_m_1x" in cam:
+        return cam["px_per_m_1x"]
     return cam["char_height_px"] / (cam["reference_height_m"] * math.cos(math.radians(cam["pitch_deg"])))
 
 

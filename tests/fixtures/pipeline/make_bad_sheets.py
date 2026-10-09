@@ -3,9 +3,9 @@
 How the fixtures were made (Blender 5.2, one process):
   blender -b --factory-startup -P tools/pipeline/render_character.py -- --body average_m --out <r>
   copy <r>/facing_*.png and <r>/render_meta.json to tests/fixtures/pipeline/render_4x/
-  blender ... render_character.py -- --body average_m --pass normal --out <n>
-  copy <n>/facing_*.png to tests/fixtures/pipeline/render_4x_normal/
-  python tools/pipeline/pixelate.py --in tests/fixtures/pipeline/render_4x --out <p>
+  blender ... render_character.py -- --body average_m --pass normal --out <n>   (and --pass parts --out <t>)
+  copy <n>/facing_*.png to tests/fixtures/pipeline/render_4x_normal/ (and <t> to render_4x_parts/)
+  python tools/pipeline/pixelate.py --in tests/fixtures/pipeline/render_4x --parts tests/fixtures/pipeline/render_4x_parts --out <p>
   python tools/pipeline/pixelate.py --normals --in tests/fixtures/pipeline/render_4x_normal --mask <p> --out <q>
   python tools/pipeline/pack_sheets.py --body average_m --render-dir tests/fixtures/pipeline/render_4x \
       --pixel-dir <p> --normal-dir <q> --out tests/fixtures/pipeline/sheets/good

@@ -32,51 +32,52 @@
       "facing": 0,
       "name": "S",
       "file": "facing_0_S.png",
-      "sha256": "71e751b9436c0eb9ee8e866482d406fad12ac936e131b0d48c0a2f82e452e12e"
+      "sha256": "4ba350a454d9d947dbbef537ab0a0527e8be6e79ecf671076b18654a617e4c0e"
     },
     {
       "facing": 1,
       "name": "SE",
       "file": "facing_1_SE.png",
-      "sha256": "8bb1aa30221fb1b6379f887b0689bee312bb10f0e0963ceffc7dc97d7e1a6490"
+      "sha256": "06202c906efd50613779533b7c4b58871a2b83e660b596ecbe677b211f9ddfb5"
     },
     {
       "facing": 2,
       "name": "E",
       "file": "facing_2_E.png",
-      "sha256": "a66b40a66b40dda495d9e3c416a3c65d7a3924c9fe12901cceb53d3817f10818"
+      "sha256": "8e4f905a0fcc596d9755e85255d2ef409f4741be6731924780b077e9c9dc2f4a"
     },
     {
       "facing": 3,
       "name": "NE",
       "file": "facing_3_NE.png",
-      "sha256": "1c6eff0a5aa0f799d8aca05a83f84bc8feda5f7d2f92dce0cad5ce0ed6b72aef"
+      "sha256": "1c78737409ae38b1f716f927ed1ac7cd555698db026ba180b2f080bd31b56f9f"
     },
     {
       "facing": 4,
       "name": "N",
       "file": "facing_4_N.png",
-      "sha256": "d2625f0d1339307d10213a1e0deaaa214f016a72ff853ca2fbc3e1f17f0169cd"
+      "sha256": "a0cde57eac75cb9e33b4f9bb82fcf21c1371f2db2e5e1b73a3f4cb9e72d7fad7"
     },
     {
       "facing": 5,
       "name": "NW",
       "file": "facing_5_NW.png",
-      "sha256": "922b43cc8a4b8577d09f4ad14bf8f96f3031571e2a7768836c631e1594a849a0"
+      "sha256": "d4b342836af356c8f355041e745f5ff4b60d586312ea66757904c3178551d223"
     },
     {
       "facing": 6,
       "name": "W",
       "file": "facing_6_W.png",
-      "sha256": "3a20862aee249d2019cf0ae10ab26f33b326c38847bcfa17b265e292a768bf37"
+      "sha256": "b18ff9e0a56afab52b9e517cb1d6ed500a4e1b0200604e06c3bcdb8e391ed9b2"
     },
     {
       "facing": 7,
       "name": "SW",
       "file": "facing_7_SW.png",
-      "sha256": "149e8b3c003ab70424adcab750eee4bbdf53287476818e2b4f6afaabe0f832e0"
+      "sha256": "291950dd795f034258bb203499e4214c46aa6271b357c5a26c4cbed294cf8db2"
     }
   ],
+  "pass": "parts",
   "proportion": {
     "variant": "realistic",
     "rig_scale": 0.986958,

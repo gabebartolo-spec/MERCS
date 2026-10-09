@@ -4,8 +4,8 @@
 1. Validator fixtures: every folder in tests/fixtures/pipeline/sheets/ holds one manifest and an
    expected.txt; validate_sheet.py must report exactly those rules (none for `good`), and exit 1
    exactly when it reports any.
-2. Rebuild: the committed 4x colour and normal renders in tests/fixtures/pipeline/render_4x/ and
-   render_4x_normal/ are pixelated twice and packed twice into separate temp folders. Both runs
+2. Rebuild: the committed 4x colour, normal and parts renders in tests/fixtures/pipeline/render_4x/,
+   render_4x_normal/ and render_4x_parts/ are pixelated twice (the parts pass drives the inner lines) and packed twice into separate temp folders. Both runs
    must be byte-identical (frames, strips and manifest), the colour and normal strips' pixel hashes
    must equal the committed good sheet's, and the packed sheet must pass the validator.
 3. Normals: a synthetic 4x normal render reduces to unit-length encoded normals, takes its alpha
@@ -73,13 +73,14 @@ def same_files(a: Path, b: Path) -> list[str]:
 def case_rebuild() -> list[str]:
     src = FIXTURES / "render_4x"
     src_n = FIXTURES / "render_4x_normal"
+    src_p = FIXTURES / "render_4x_parts"
     good = json.loads(next((FIXTURES / "sheets" / "good").glob("*.json")).read_text(encoding="utf-8"))
     problems: list[str] = []
     with tempfile.TemporaryDirectory() as tmp:
         t = Path(tmp)
         for run_id in ("a", "b"):
             pix, nrm = str(t / f"pix_{run_id}"), str(t / f"nrm_{run_id}")
-            for argv in (["tools/pipeline/pixelate.py", "--in", str(src), "--out", pix],
+            for argv in (["tools/pipeline/pixelate.py", "--in", str(src), "--parts", str(src_p), "--out", pix],
                          ["tools/pipeline/pixelate.py", "--normals", "--in", str(src_n), "--mask", pix,
                           "--out", nrm],
                          ["tools/pipeline/pack_sheets.py", "--body", BODY, "--render-dir", str(src),
