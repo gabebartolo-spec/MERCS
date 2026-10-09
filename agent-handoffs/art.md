@@ -1,7 +1,10 @@
 # Art Factory handoff, 2026-10-10 AEDT
 Start from this file, CLAUDE.md, your brief, and the Lead ("MERCS BOSS") messages. Load art-qa-critic before any visual review.
 
-## State: AWAITING LEAD. Step 2 (gait) hit a QA failure the director caught; reported to Lead with a plan (2026-10-10). Render nothing until the Lead answers.
+## State: PAUSED by the director (2026-10-10, via Lead). No jobs running. Step 2 WIP committed; QA plan and two
+## decisions (approve plan A-E; Vampyr gait bare or with the fixed sword) are with the Lead, unanswered. Send no clips until resumed.
+## Exact next step on resume: get the Lead's answers; build check A (prop-intent direction + kit/bone clearance in the clip
+## facts) and show it failing on the current axe/scabbard first; then re-render the orc (axe fix) and the Vampyr; walk B and C; send to the Lead.
 ## Task
 P1-ART-SLICE-CAST: orc and Vampyr at stage 1. Step 1 r2 PASSED (Lead, 2026-10-10). Step 2: a 3 s gait loop at game speed,
 1x and 2x, S/SE/E/NE at least, on bare bodies plus weapon, with no cape panels. Orc: heavy, grounded, sway, arms swing from
