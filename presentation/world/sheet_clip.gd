@@ -17,22 +17,75 @@ var _frames := {}
 
 ## The clip in a manifest, or null when the manifest, its image or its normal map is broken.
 static func load_manifest(manifest_path: String) -> SheetClip:
+	var paths: Array[String] = [manifest_path]
+	return load_layers(paths)
+
+
+## One clip drawn from stacked layers, bottom first: body, then gear, head and injury layers
+## (director, 2026-10-09: "permanent injuries must be considered for all spritework"). Every
+## layer is a whole mercs.sheet/1 sheet on the same grid: same image size, frames and pivot.
+## Each opaque layer pixel replaces the one below, in colour and in the normal map, so any
+## mix of stage, returning variant and injuries is one sheet and one sprite. Null when a
+## layer does not load or does not match the first.
+static func load_layers(manifest_paths: Array[String]) -> SheetClip:
+	if manifest_paths.is_empty():
+		return null
+	var base := _read(manifest_paths[0])
+	if base.is_empty():
+		return null
+	var image: Image = base["image"]
+	var normal: Image = base["normal"]
+	var manifest: Dictionary = base["manifest"]
+	for path: String in manifest_paths.slice(1):
+		var layer := _read(path)
+		if layer.is_empty() or not _same_grid(manifest, layer):
+			return null
+		var layer_image: Image = layer["image"]
+		if layer_image.get_size() != image.get_size():
+			return null
+		_stack(image, layer_image, layer_image)
+		var layer_normal: Image = layer["normal"]
+		if normal != null and layer_normal != null:
+			_stack(normal, layer_normal, layer_image)
+	return _from(manifest, image, normal)
+
+
+## {"manifest", "image", "normal" (or null)} for one sheet, or {} when broken.
+static func _read(manifest_path: String) -> Dictionary:
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(manifest_path))
 	if not parsed is Dictionary:
-		return null
+		return {}
 	var manifest: Dictionary = parsed
 	var base := manifest_path.get_base_dir()
 	var image := SheetFrame.load_image(base.path_join(str(manifest.get("image", ""))))
 	if image == null or image.is_empty():
-		return null
-	var texture := ImageTexture.create_from_image(image)
-	var normal: ImageTexture = null
+		return {}
+	image.convert(Image.FORMAT_RGBA8)
+	var normal: Image = null
 	var normal_name := str(manifest.get("normal_image", ""))
 	if not normal_name.is_empty():
-		var normal_image := SheetFrame.load_image(base.path_join(normal_name))
-		if normal_image == null or normal_image.get_size() != image.get_size():
-			return null
-		normal = ImageTexture.create_from_image(normal_image)
+		normal = SheetFrame.load_image(base.path_join(normal_name))
+		if normal == null or normal.get_size() != image.get_size():
+			return {}
+		normal.convert(Image.FORMAT_RGBA8)
+	return {"manifest": manifest, "image": image, "normal": normal}
+
+
+## Same frames (facing, frame and rect) and pivot as the base sheet.
+static func _same_grid(base: Dictionary, layer: Dictionary) -> bool:
+	var other: Dictionary = layer["manifest"]
+	return (
+		str(base.get("frames")) == str(other.get("frames"))
+		and str(base.get("pivot")) == str(other.get("pivot"))
+	)
+
+
+## Copies every pixel of top whose mask pixel is not transparent onto bottom.
+static func _stack(bottom: Image, top: Image, mask: Image) -> void:
+	bottom.blit_rect_mask(top, mask, Rect2i(Vector2i.ZERO, top.get_size()), Vector2i.ZERO)
+
+
+static func _from(manifest: Dictionary, image: Image, normal: Image) -> SheetClip:
 	var clip := SheetClip.new()
 	clip.fps = _num(manifest, "fps")
 	clip.loop = manifest.get("loop", true) == true
@@ -40,7 +93,9 @@ static func load_manifest(manifest_path: String) -> SheetClip:
 	var pivot_value: Variant = manifest.get("pivot", {})
 	var pivot_block: Dictionary = pivot_value if pivot_value is Dictionary else {}
 	var pivot := Vector2(_num(pivot_block, "x"), _num(pivot_block, "y"))
-	clip._index_frames(manifest, texture, normal, pivot)
+	var texture := ImageTexture.create_from_image(image)
+	var normal_texture := ImageTexture.create_from_image(normal) if normal != null else null
+	clip._index_frames(manifest, texture, normal_texture, pivot)
 	return clip if not clip._frames.is_empty() else null
 
 

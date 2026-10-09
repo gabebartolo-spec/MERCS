@@ -17,6 +17,9 @@ const SMALL_NORMAL_PX := 32
 const PACK_FILE := "user://assets_suite/exported_sheet.pck"
 const PACK_ROOT := "res://exported_sheet"
 const FACING := "S"
+const LAYER_DIR := "user://assets_suite/layers"
+const LAYER_CELL := 8
+const LAYER_SPOT := 3
 
 
 func suite_name() -> String:
@@ -47,6 +50,7 @@ func run_checks() -> void:
 	_check_rule("ENGINE-PIVOT", _plant("pivot", {"pivot_y": WRONG_PIVOT_Y}))
 	_check_rule("ENGINE-NORMAL", _plant("normal", {"small_normal": true}))
 	_check_exported_load()
+	_check_layers()
 	await process_frame
 
 
@@ -197,3 +201,51 @@ func _same_pixels(a: Image, b: Image) -> bool:
 			if pixel_a.a != pixel_b.a or (pixel_a.a > 0.0 and pixel_a != pixel_b):
 				return false
 	return true
+
+
+## Stacked layers (body, then gear, head and injury): an opaque layer pixel replaces the
+## one below in colour and in the normal map, a clear one leaves it, and a layer on another
+## grid is refused (director, 2026-10-09: injuries in all spritework).
+func _check_layers() -> void:
+	DirAccess.make_dir_recursive_absolute(LAYER_DIR)
+	var base := _layer_sheet("body", Color.RED, false)
+	var scar := _layer_sheet("scar", Color.BLUE, true)
+	var paths: Array[String] = [base, scar]
+	var clip := SheetClip.load_layers(paths)
+	var frame := clip.frame_at(FACING, 0.0) if clip != null else null
+	var ok := frame != null
+	if ok:
+		var image := frame.texture.get_image()
+		var normal := frame.normal.get_image()
+		var spot := Vector2i(LAYER_SPOT, LAYER_SPOT)
+		ok = (
+			image.get_pixelv(spot).is_equal_approx(Color.BLUE)
+			and image.get_pixel(0, 0).is_equal_approx(Color.RED)
+			and normal.get_pixelv(spot).is_equal_approx(Color.BLUE)
+			and normal.get_pixel(0, 0).is_equal_approx(Color.RED)
+		)
+	check(ok, "a layer's opaque pixels replace the body's colour and normal; clear ones keep it")
+	var wide := _layer_sheet("wide", Color.GREEN, true, LAYER_CELL * 2)
+	var mismatched: Array[String] = [base, wide]
+	check(SheetClip.load_layers(mismatched) == null, "a layer on another grid is refused")
+
+
+## A one-frame sheet (facing S) of a solid colour, or with only one opaque pixel at
+## (LAYER_SPOT, LAYER_SPOT) when spot_only; its normal map is the same picture, so the test
+## can tell which layer's normal won.
+func _layer_sheet(name: String, colour: Color, spot_only: bool, cell: int = LAYER_CELL) -> String:
+	var image := Image.create(cell, cell, false, Image.FORMAT_RGBA8)
+	image.fill(Color.TRANSPARENT if spot_only else colour)
+	if spot_only:
+		image.set_pixel(LAYER_SPOT, LAYER_SPOT, colour)
+	image.save_png(LAYER_DIR.path_join(name + ".png"))
+	image.save_png(LAYER_DIR.path_join(name + "_normal.png"))
+	var manifest := {
+		"image": name + ".png",
+		"normal_image": name + "_normal.png",
+		"pivot": {"x": cell / 2, "y": cell},
+		"frames": [{"facing": FACING, "x": 0, "y": 0, "w": cell, "h": cell}],
+	}
+	var path := LAYER_DIR.path_join(name + ".json")
+	FileAccess.open(path, FileAccess.WRITE).store_string(JSON.stringify(manifest))
+	return path

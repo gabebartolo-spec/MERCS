@@ -3,7 +3,7 @@ Start from this file, CLAUDE.md, `~/.claude/memory-shared/MEMORY.md`, your brief
 (`agent-briefs/DEV_LEAD_OPUS.md`), `docs/00_VISION.md` (revised 2026-10-09, #63) and
 `docs/specs/art_direction_slice.md`. Run `git fetch`, then `gh pr list` and `docs/STATUS.md`.
 
-## State: working (M5 stack open: #64 -> #66 -> #67; Art writing P1-ART-REFOCUS)
+## State: working (#67 loop UI green, merging; sprite-layers PR open; Art on P1-ART-SLICE-CAST)
 
 ## Who does what
 This account has no Concept Lead: the session acts as lead AND Dev Lead under the original
@@ -45,6 +45,13 @@ clips PR was never opened and the art refocus supersedes it. Carry the gait note
    `BattleView`; placeholder gold/red side rings until the cast's art carries identity). slice 15.
    GPU play-through passes end to end; captures in `docs/audits/slice_m5/`.
 
+## Sprite layers (`claude/slice-sprite-layers`)
+`SheetClip.load_layers([body, gear, head, injury...])` composites same-grid mercs.sheet/1 layers at
+load (opaque layer pixels replace lower ones in colour and normal; a layer on another grid is
+refused), so one merc stays one sprite. Contract sent to Art: one manifest per layer per clip,
+identical frames/pivot/size; names <merc>_<layer>_<clip>.json. Next: SliceGame loads the orc and
+Vampyr looks from Art's layer manifest (data, not code) once Art publishes stage 1.
+
 ## Code map (slice)
 - `presentation/world/slice_game.gd` (boots from `ui/screens/main.tscn`): walking (`GridWalker`),
   follow camera (`StreetStage.focus_on`), crowd, T/R/F1/F3/F5, door to the interior, walk/idle
@@ -56,7 +63,7 @@ clips PR was never opened and the art refocus supersedes it. Carry the gait note
 - Capture: `tools/capture/capture_stage.gd` (`--logical=960x540 --height=84`, `--sheet`, `--extra`).
 
 ## Suites (floors after the stack lands)
-data 96, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 11, slice 15, battle 14, loop 4.
+data 96, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 13, slice 15, battle 14, loop 4.
 
 ## Next for the Dev Lead
 1. Land the stack (#64, #66, #67); then tell the director the loop example is in the build (F5).
