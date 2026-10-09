@@ -177,13 +177,13 @@
    "group": "axe",
    "bone": "mixamorig:RightHand",
    "offset_m": [
-    -0.15,
     0,
+    -0.15,
     0.78
    ],
    "size": [
-    0.28,
     0.035,
+    0.28,
     0.42
    ]
   },
@@ -192,8 +192,8 @@
    "group": "axe",
    "bone": "mixamorig:RightHand",
    "offset_m": [
-    0.07,
     0,
+    0.07,
     0.8
    ],
    "size": [
@@ -203,8 +203,8 @@
    ],
    "top_size": 0.0,
    "rot_deg": [
+    -90,
     0,
-    90,
     0
    ]
   }
@@ -214,11 +214,11 @@
    "bone": "mixamorig:RightHand",
    "at": "mid",
    "rot_deg": [
-    -28,
+    20,
     -14,
     0
    ],
-   "doc": "axe in the right fist, haft tipped forward and out so it clears the arm; the head rides above the shoulder",
+   "doc": "axe in the right fist, haft tipped forward (+X leans the head toward -Y, the body's front) and out so it clears the arm; the head rides above the shoulder, cutting edge leading, spike behind (rev 3: rev 2 leaned the head back and turned the edge out sideways, so the axe read as held backwards)",
    "offset_m": [
     0,
     0,

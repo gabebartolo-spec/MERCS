@@ -14,7 +14,10 @@ Writes <out>/facing_<k>_<name>.png (frame_px * render_scale square, RGBA 8-bit) 
 and <out>/render_meta.json (input and output hashes, Blender version). Camera and light rigs come
 from camera_rig.json and light_rig.json; nothing visual is set in this file. No Mixamo clips yet
 (they wait on the director's account sign-in), so the pose is the frozen rig's rest pose.
-Equipment layers and clips are later arguments of this same script (07 section 2.4).
+Clips: --clip <Mixamo FBX> --frames N retargets one loop onto the body, applies the body's "gait" block
+(bodies.json: arm adduction, swing amplitudes per bone, hip sway and bounce, cadence) and the posture lean,
+and writes facing_<k>_<name>_f<jj>.png per facing and frame; render_meta.json gains a "clip" block (fps at
+the real timing, ground_speed_mps, ground offset, measured foot slide). --kit-keep keeps only some kit pieces.
 """
 from __future__ import annotations
 
@@ -26,7 +29,7 @@ import sys
 from pathlib import Path
 
 import bpy
-from mathutils import Euler, Matrix, Vector
+from mathutils import Euler, Matrix, Quaternion, Vector
 
 PIPELINE = Path(__file__).resolve().parent
 CAMERA_FILE = PIPELINE / "camera_rig.json"
@@ -47,7 +50,11 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--proportions", default=str(PROPORTIONS_FILE), help="proportion variants json")
     p.add_argument("--variant", default="", help="variant in --proportions (default: its 'default')")
     p.add_argument("--kit", default="", help="stage gear kit json (tools/pipeline/kits/); blockout primitives on bones")
+    p.add_argument("--kit-keep", default="", help="comma-separated kit piece name prefixes to keep (default all)")
     p.add_argument("--pass", dest="render_pass", choices=("color", "normal", "parts"), default="color")
+    p.add_argument("--clip", default="", help="Mixamo FBX (vault) to retarget and sample; empty = rest pose")
+    p.add_argument("--frames", type=int, default=8, help="frames sampled from one loop of --clip")
+    p.add_argument("--loop-window", default="", help="LO-HI source frames: sample the best-matching sub-loop")
     return p.parse_args(argv)
 
 
@@ -411,7 +418,7 @@ def euler_matrix(degrees) -> Matrix:
     return Euler([math.radians(a) for a in degrees], "XYZ").to_matrix().to_4x4()
 
 
-def add_kit(rig: bpy.types.Object, path: str) -> dict:
+def add_kit(rig: bpy.types.Object, path: str, keep: tuple[str, ...] = ()) -> dict:
     """Stage gear blockout (route A): primitives sized in metres and placed on the posed figure,
     each parented to a bone so clips carry it. A piece sits at its bone's posed head, tail or mid
     point plus offset_m (world axes: +X the body's left, -Y its front, +Z up). "along_bone" turns
@@ -424,7 +431,8 @@ def add_kit(rig: bpy.types.Object, path: str) -> dict:
     for gname, g in cfg.get("groups", {}).items():
         groups[gname] = (Matrix.Translation(bone_point(rig, g["bone"], g.get("at", "head")) + Vector(g.get("offset_m", (0, 0, 0))))
                          @ euler_matrix(g.get("rot_deg", (0.0, 0.0, 0.0))))
-    for name, piece in cfg["pieces"].items():
+    pieces = {n: p for n, p in cfg["pieces"].items() if not keep or n.startswith(keep)}
+    for name, piece in pieces.items():
         pb = rig.pose.bones[piece["bone"]]
         head = rig.matrix_world @ pb.head
         tail = rig.matrix_world @ pb.tail
@@ -456,7 +464,302 @@ def add_kit(rig: bpy.types.Object, path: str) -> dict:
         bpy.context.view_layer.update()
         obj.matrix_world = world
     bpy.context.view_layer.update()
-    return {"file": rel_path(Path(path).resolve()), "sha256": sha256(Path(path)), "pieces": len(cfg["pieces"])}
+    return {"file": rel_path(Path(path).resolve()), "sha256": sha256(Path(path)), "pieces": len(pieces),
+            "kept": list(keep)}
+
+
+CONTACT_M = 0.02  # a foot within this of its lowest height in the loop counts as planted (ground speed)
+HIPS = "mixamorig:Hips"
+DIRECTION_BONES = tuple(f"mixamorig:{side}{part}" for side in ("Left", "Right")
+                        for part in ("Arm", "ForeArm", "Hand",  # Hand also prefixes the finger bones
+                                     "UpLeg", "Leg", "Foot", "ToeBase"))  # limbs: rest poses differ
+SHOULDERS = ("mixamorig:LeftArm", "mixamorig:RightArm")
+LOOP_STEP = 3  # source frames between candidate loop windows
+HIP_WEIGHT = 10.0  # radians of pose difference per metre of hip travel when matching a loop's ends
+FEET = ("mixamorig:LeftToeBase", "mixamorig:RightToeBase")
+DENSE = 4  # retargeted poses per sampled frame: ground speed and foot slide are measured on the dense loop
+
+
+def import_clip(path: str) -> tuple[bpy.types.Object, int, int, float]:
+    """Import a Mixamo FBX (skin off) and return its armature, loop frame range and source fps."""
+    before = set(bpy.data.objects)
+    bpy.ops.import_scene.fbx(filepath=path, automatic_bone_orientation=False)
+    src = next(o for o in bpy.data.objects if o not in before and o.type == "ARMATURE")
+    f0, f1 = (int(v) for v in src.animation_data.action.frame_range)
+    return src, f0, f1, bpy.context.scene.render.fps / bpy.context.scene.render.fps_base
+
+
+def bone_order(rig: bpy.types.Object) -> list[str]:
+    """Bone names parents-first, so a retargeted child follows its already-posed parent."""
+    order: list[str] = []
+    stack = [b for b in rig.data.bones if b.parent is None]
+    while stack:
+        b = stack.pop(0)
+        order.append(b.name)
+        stack = list(b.children) + stack
+    return order
+
+
+def clip_offsets(src: bpy.types.Object, dst: bpy.types.Object, names: list[str]) -> dict:
+    """Per bone, the rotation that maps a source world orientation onto ours.
+
+    Limb chains (DIRECTION_BONES): the rest poses differ (the X Bot's arms rest level in a T-pose, ours hang
+    in an A-pose), so the rest direction is aligned to the source's first and the bone copies the source's
+    world direction. Every other bone keeps its own rest and takes the source's rotation delta from rest:
+    copying direction on the clavicles lifted the far shoulder to ear height (Lead QC 2026-10-09)."""
+    def rest(arm, n):
+        return (arm.matrix_world @ arm.data.bones[n].matrix_local).to_quaternion()
+
+    def direction(arm, n):
+        b = arm.data.bones[n]
+        return (arm.matrix_world.to_3x3() @ (b.tail_local - b.head_local)).normalized()
+
+    def align(n):
+        if n.startswith(DIRECTION_BONES):
+            return direction(dst, n).rotation_difference(direction(src, n))
+        return Quaternion()
+
+    return {n: rest(src, n).inverted() @ (align(n) @ rest(dst, n)) for n in names}
+
+
+def prefixed(name: str, table: dict, default):
+    """The value for a bone: its own entry, or the longest matching prefix (fingers follow the hand)."""
+    best = max((k for k in table if name.startswith(k)), key=len, default=None)
+    return table[best] if best else default
+
+
+def adduction(adduct_deg: dict) -> dict:
+    """World rotations, about the body's forward axis at each joint, that bring each arm part toward the body.
+    Left limbs sit on +X, so +angle about Y turns a hanging left arm inward and -angle the right; a negative
+    angle holds the arm out (a bulky torso)."""
+    out = {}
+    for part, degrees in adduct_deg.items():
+        for side, sign in (("Left", 1.0), ("Right", -1.0)):
+            out[f"mixamorig:{side}{part}"] = Quaternion(Vector((0.0, 1.0, 0.0)), math.radians(sign * degrees))
+    return out
+
+
+def lean_angles(rig: bpy.types.Object, names: list[str], posture: dict) -> dict:
+    """Per bone, the posture lean it carries (radians about world X): its own plus its ancestors'. Limb chains
+    copy the clip's world direction and carry none, as the rest stance re-aims the arms after the lean."""
+    out = {}
+    for n in names:
+        if n.startswith(DIRECTION_BONES):
+            out[n] = 0.0
+            continue
+        b, total = rig.data.bones[n], 0.0
+        while b is not None:
+            total += posture.get(b.name, 0.0)
+            b = b.parent
+        out[n] = math.radians(total)
+    return out
+
+
+def retarget_frame(src: bpy.types.Object, dst: bpy.types.Object, names: list[str], offsets: dict,
+                   hips_at, adduct: dict, lean: dict) -> None:
+    """Pose dst like src at the current frame: world orientations copied through the offsets, parents first,
+    with the merc's posture lean on the torso chain; the hips go where hips_at puts the source's hips (scaled
+    and reshaped by the gait), every other bone keeps its head."""
+    world_inv = dst.matrix_world.inverted()
+    across = Vector((1.0, 0.0, 0.0))
+    for n in names:
+        bpy.context.view_layer.update()
+        sp = src.matrix_world @ src.pose.bones[n].matrix
+        pb = dst.pose.bones[n]
+        pos = hips_at(sp.translation) if n == HIPS else (dst.matrix_world @ pb.matrix).translation
+        q = Quaternion(across, lean[n]) @ prefixed(n, adduct, Quaternion()) @ sp.to_quaternion() @ offsets[n]
+        pb.matrix = world_inv @ (Matrix.Translation(pos) @ q.to_matrix().to_4x4())
+    bpy.context.view_layer.update()
+
+
+def set_time(t: float) -> None:
+    bpy.context.scene.frame_set(int(math.floor(t)), subframe=t - math.floor(t))
+
+
+def find_loop_window(src: bpy.types.Object, f0: int, f1: int, span: tuple[int, int]) -> tuple[int, int]:
+    """The sub-range [s, s + L] (L within span, in source frames) whose end pose best matches its start pose:
+    a long clip (Mixamo's standing idle is 8 s) sampled at a few frames would hold each pose for seconds."""
+    rot, hips = {}, {}
+    for f in range(f0, f1 + 1):
+        set_time(f)
+        bpy.context.view_layer.update()
+        rot[f] = [(src.matrix_world @ pb.matrix).to_quaternion() for pb in src.pose.bones]
+        hips[f] = (src.matrix_world @ src.pose.bones[HIPS].matrix).translation.copy()
+    best, best_d = (f0, min(f1, f0 + span[1])), math.inf
+    for length in range(span[0], span[1] + 1, LOOP_STEP):
+        for start in range(f0, f1 - length + 1, LOOP_STEP):
+            end = start + length
+            d = sum(a.rotation_difference(b).angle for a, b in zip(rot[start], rot[end]))
+            d += HIP_WEIGHT * (hips[start] - hips[end]).length
+            if d < best_d:
+                best, best_d = (start, end), d
+    print(f"LOOP window {best} distance {best_d:.4f}")
+    return best
+
+
+def scale_swing(poses: list[dict], amplitude: dict) -> None:
+    """The gait's character: each listed bone's rotation (pose space, about its own mean over the loop) is
+    scaled by its factor; above 1 swings wider, below 1 holds steadier. Children follow, as a keyed layer."""
+    for name in poses[0]:
+        k = prefixed(name, amplitude, 1.0)
+        if k == 1.0:
+            continue
+        qs = [p[name].to_quaternion() for p in poses]
+        ref = Vector(qs[0])
+        mean = Vector((0.0, 0.0, 0.0, 0.0))
+        for q in qs:
+            mean += Vector(q) if Vector(q).dot(ref) >= 0 else -Vector(q)
+        m = Quaternion(mean).normalized()  # a 4D Vector.normalized() scales by its xyz length only
+        for p, q in zip(poses, qs):
+            axis, angle = (m.inverted() @ q).to_axis_angle()
+            if angle > math.pi:
+                angle -= 2 * math.pi
+            p[name] = Matrix.Translation(p[name].to_translation()) @ (m @ Quaternion(axis, angle * k)).to_matrix().to_4x4()
+
+
+def apply_pose(rig: bpy.types.Object, pose: dict) -> None:
+    for name, basis in pose.items():
+        rig.pose.bones[name].matrix_basis = basis
+    bpy.context.view_layer.update()
+
+
+def foot_slide(tracks: dict, speed: float, dt: float) -> float:
+    """Worst planted-foot drift in metres with the body travelling at speed: over each contact run the foot's
+    ground position (its in-place y minus the distance walked) should stand still."""
+    worst = 0.0
+    for pts in tracks.values():
+        low = min(q.z for q in pts)
+        run: list[float] = []
+        for i, q in enumerate(pts):
+            if q.z <= low + CONTACT_M:
+                run.append(q.y - speed * dt * i)
+            elif run:
+                worst, run = max(worst, max(run) - min(run)), []
+        if run:
+            worst = max(worst, max(run) - min(run))
+    return worst
+
+
+LEGS = tuple((f"mixamorig:{s}UpLeg", f"mixamorig:{s}Leg", f"mixamorig:{s}Foot", f"mixamorig:{s}ToeBase")
+             for s in ("Left", "Right"))
+REACH = 0.999  # a leg straightens to at most this share of its length (no snap through full extension)
+
+
+def world_of(rig: bpy.types.Object, name: str) -> Matrix:
+    return rig.matrix_world @ rig.pose.bones[name].matrix
+
+
+def set_world(rig: bpy.types.Object, name: str, world: Matrix) -> None:
+    rig.pose.bones[name].matrix = rig.matrix_world.inverted() @ world
+    bpy.context.view_layer.update()
+
+
+def leg_targets(rig: bpy.types.Object) -> list:
+    """Per leg, what the clip put down: hip, knee and ankle positions and the foot and toe world matrices."""
+    return [(world_of(rig, leg).translation.copy(), world_of(rig, shin).translation.copy(),
+             world_of(rig, foot).translation.copy(), world_of(rig, foot).copy(), world_of(rig, toe).copy())
+            for leg, shin, foot, toe in LEGS]
+
+
+def aim_world(rig: bpy.types.Object, name: str, head: Vector, toward: Vector) -> None:
+    """Place a bone's head at head and turn it (shortest turn, so its roll is kept) to point at toward."""
+    m = world_of(rig, name)
+    current = (m.to_3x3() @ Vector((0.0, 1.0, 0.0))).normalized()
+    turn = current.rotation_difference((toward - head).normalized())
+    set_world(rig, name, Matrix.Translation(head) @ (turn @ m.to_quaternion()).to_matrix().to_4x4())
+
+
+def solve_legs(rig: bpy.types.Object, targets: list) -> None:
+    """Two-bone IK: after the gait moves the hips, each thigh and shin are re-aimed so the ankle lands where
+    the clip put it, the knee bending in the plane the clip's knee bent in; foot and toe keep the clip's
+    world orientation. Hip sway, bounce and drop therefore never slide a planted foot."""
+    for (leg, shin, foot, toe), (hip0, knee0, ankle, foot_m, toe_m) in zip(LEGS, targets):
+        hip = world_of(rig, leg).translation.copy()
+        l1, l2 = (knee0 - hip0).length, (ankle - knee0).length
+        to = ankle - hip
+        d = min(to.length, REACH * (l1 + l2))
+        u = to.normalized()
+        bend = knee0 - hip0
+        pole = bend - bend.project(u)
+        v = pole.normalized()
+        cos_a = max(-1.0, min(1.0, (l1 * l1 + d * d - l2 * l2) / (2 * l1 * d)))
+        knee = hip + l1 * (u * cos_a + v * math.sqrt(1.0 - cos_a * cos_a))
+        aim_world(rig, leg, hip, knee)
+        aim_world(rig, shin, world_of(rig, shin).translation.copy(), hip + u * d)
+        for bone, m in ((foot, foot_m), (toe, toe_m)):
+            set_world(rig, bone, Matrix.Translation(world_of(rig, bone).translation) @ m.to_quaternion().to_matrix().to_4x4())
+
+
+def sample_clip(rig: bpy.types.Object, path: str, frames: int, window: str, gait: dict,
+                posture: dict) -> tuple[list, dict]:
+    """Retarget one loop of a clip onto rig (facing 0) through the merc's gait and return `frames` poses as
+    bone matrix_basis copies, plus clip facts: fps at the real timing (times the gait's cadence), ground
+    speed from the planted foot, the measured foot slide at that speed and the constant ground offset.
+
+    The gait (bodies.json "gait") is a layer over the clip: swing_scale on torso and arms, then the hips
+    move (sway, bounce, drop) and the legs are solved back onto the clip's own foot path (solve_legs)."""
+    src, f0, f1, src_fps = import_clip(path)
+    if window:
+        lo, hi = (int(v) for v in window.split("-"))
+        f0, f1 = find_loop_window(src, f0, f1, (lo, hi))
+    stance = {pb.name: pb.matrix_basis.copy() for pb in rig.pose.bones}
+    for pb in rig.pose.bones:
+        pb.matrix_basis = Matrix.Identity(4)
+    bpy.context.view_layer.update()
+    names = [n for n in bone_order(rig) if n in src.data.bones]
+    offsets = clip_offsets(src, rig, names)
+    adduct = adduction(gait.get("arm_adduct_deg", {}))
+    lean = lean_angles(rig, names, posture)
+    ratio = ((rig.matrix_world @ rig.data.bones[HIPS].head_local).z
+             / (src.matrix_world @ src.data.bones[HIPS].head_local).z)
+    dense = frames * DENSE
+    poses, targets, hips = [], [], []
+    for i in range(dense):
+        set_time(f0 + i * (f1 - f0) / dense)
+        retarget_frame(src, rig, names, offsets, lambda p: p * ratio, adduct, lean)
+        poses.append({pb.name: pb.matrix_basis.copy() for pb in rig.pose.bones})
+        targets.append(leg_targets(rig))
+        hips.append(world_of(rig, HIPS).translation.copy())
+    for obj in [src, *src.children]:
+        bpy.data.objects.remove(obj, do_unlink=True)
+    scale_swing(poses, gait.get("swing_scale", {}))
+    for pose in poses:  # a gripping hand keeps the stance's wrist angle, so a weapon does not flail
+        for name in (n for n in pose if n.startswith(tuple(gait.get("hold_stance", ())))):
+            pose[name] = Matrix.Translation(pose[name].to_translation()) @ stance[name].to_quaternion().to_matrix().to_4x4()
+    mean = sum(hips, Vector()) / len(hips)
+    sway, bounce = gait.get("hip_sway_scale", 1.0), gait.get("hip_bounce_scale", 1.0)
+    drop = gait.get("hip_drop_m", 0.0)
+    tracks: dict = {foot: [] for foot in FEET}
+    lowest, rise = math.inf, -math.inf
+    rest_z = {b: (rig.matrix_world @ rig.data.bones[b].head_local).z for b in SHOULDERS}
+    for pose, target, h in zip(poses, targets, hips):
+        apply_pose(rig, pose)
+        d = h - mean
+        at = mean + Vector((d.x * sway, d.y, d.z * bounce - drop))
+        set_world(rig, HIPS, Matrix.Translation(at) @ world_of(rig, HIPS).to_quaternion().to_matrix().to_4x4())
+        solve_legs(rig, target)
+        pose.update({pb.name: pb.matrix_basis.copy() for pb in rig.pose.bones})
+        for foot in FEET:
+            tracks[foot].append(world_of(rig, foot).translation.copy())
+        lowest = min(lowest, figure_extent_z(rig)[0])
+        rise = max(rise, max(world_of(rig, b).translation.z - rest_z[b] for b in SHOULDERS))
+    cadence = gait.get("cadence_scale", 1.0)
+    dt = (f1 - f0) / src_fps / dense / cadence  # playback seconds between dense poses
+    speeds = []
+    for pts in tracks.values():
+        low = min(q.z for q in pts)
+        speeds += [(b.y - a.y) / dt for a, b in zip(pts, pts[1:]) if max(a.z, b.z) <= low + CONTACT_M]
+    speeds.sort()
+    speed = speeds[len(speeds) // 2] if speeds else 0.0
+    rig.location.z -= lowest
+    facts = {"clip": Path(path).name, "clip_sha256": sha256(Path(path)), "source_frames": [f0, f1],
+             "source_fps": src_fps, "frames": frames,
+             "fps": round(frames * src_fps * cadence / (f1 - f0), 4), "loop": True,
+             "ground_speed_mps": round(abs(speed), 4), "ground_offset_m": round(-lowest, 4),
+             "foot_slide_m": round(foot_slide(tracks, speed, dt), 4), "bones_matched": len(names),
+             "max_shoulder_rise_m": round(rise, 4), "gait": gait}
+    print("CLIP " + json.dumps(facts))
+    return poses[::DENSE], facts
 
 
 def body_spec(body: str) -> dict:
@@ -494,7 +797,11 @@ def main() -> None:
     rig = body_rig()
     proportion = apply_proportions(rig, args.proportions, args.variant, body_height_m(args.body, cam),
                                    body_spec(args.body).get("posture_lean_deg", {}))
-    kit = add_kit(rig, args.kit) if args.kit else None
+    keep = tuple(k for k in args.kit_keep.split(",") if k)
+    kit = add_kit(rig, args.kit, keep) if args.kit else None
+    poses, clip = (sample_clip(rig, args.clip, args.frames, args.loop_window, body_spec(args.body).get("gait", {}),
+                               body_spec(args.body).get("posture_lean_deg", {}))
+                   if args.clip else ([None], None))
     if args.render_pass == "normal":
         apply_normal_pass()
     elif args.render_pass == "parts":
@@ -513,17 +820,22 @@ def main() -> None:
     for k in wanted:
         rig.rotation_mode = "XYZ"
         rig.rotation_euler = (0.0, 0.0, math.radians(k * cam["facings"]["step_deg"]))
-        bpy.context.view_layer.update()
-        path = out / f"facing_{k}_{names[k]}.png"
-        bpy.context.scene.render.filepath = str(path)
-        bpy.ops.render.render(write_still=True)
-        outputs.append({"facing": k, "name": names[k], "file": path.name, "sha256": sha256(path)})
-        print(f"RENDERED {path.name} {outputs[-1]['sha256']}")
+        for j, pose in enumerate(poses):
+            if pose is not None:
+                apply_pose(rig, pose)
+            bpy.context.view_layer.update()
+            stem = f"facing_{k}_{names[k]}" if pose is None else f"facing_{k}_{names[k]}_f{j:02d}"
+            path = out / f"{stem}.png"
+            bpy.context.scene.render.filepath = str(path)
+            bpy.ops.render.render(write_still=True)
+            outputs.append({"facing": k, "name": names[k], **({} if pose is None else {"frame": j}),
+                            "file": path.name, "sha256": sha256(path)})
+            print(f"RENDERED {path.name} {outputs[-1]['sha256']}")
 
     meta = {
         "schema": "mercs.render_meta/1",
         "body": args.body,
-        "pose": "rest",
+        "pose": "rest" if clip is None else "clip",
         "inputs": {
             "body_blend": {"file": f"tools/pipeline/bodies/{blend.name}", "sha256": sha256(blend)},
             "camera_rig": {"file": rel_path(camera_file), "sha256": sha256(camera_file)},
@@ -540,6 +852,8 @@ def main() -> None:
     meta["proportion"] = proportion
     if kit:
         meta["inputs"]["kit"] = kit
+    if clip is not None:
+        meta["clip"] = clip
     (out / "render_meta.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8", newline="\n")
     print("RENDER_OK " + str(len(outputs)))
 

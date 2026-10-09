@@ -148,6 +148,31 @@
           "tip_radius_m": 0.004,
           "length_m": 0.1
         }
+      },
+      "gait": {
+        "doc": "Heavy, grounded walk (Lead step 2, 2026-10-10): weight shifts over the planted leg (wide hip sway), the torso sways and the pelvis rolls, arms swing from the shoulder with stiffer elbows, a slower cadence. Applied on top of the retargeted Mixamo walk; swing_scale multiplies each bone's rotation about its loop mean. The axe hand keeps its stance grip (hold_stance) and the axe arm swings less, as a carried weight.",
+        "arm_adduct_deg": {
+          "Arm": -6.0,
+          "ForeArm": 0.0,
+          "Hand": 0.0
+        },
+        "swing_scale": {
+          "mixamorig:Hips": 1.5,
+          "mixamorig:Spine": 1.6,
+          "mixamorig:Neck": 0.7,
+          "mixamorig:Head": 0.6,
+          "mixamorig:LeftArm": 1.25,
+          "mixamorig:RightArm": 0.35,
+          "mixamorig:LeftForeArm": 0.7
+        },
+        "hip_sway_scale": 1.8,
+        "hip_bounce_scale": 1.0,
+        "cadence_scale": 0.88,
+        "hip_drop_m": 0.05,
+        "hold_stance": [
+          "mixamorig:RightForeArm",
+          "mixamorig:RightHand"
+        ]
       }
     },
     "vampyr": {
@@ -191,7 +216,29 @@
         "mixamorig:Spine2": -3.0,
         "mixamorig:Head": -4.0
       },
-      "posture_doc": "Regal: chest lifted, shoulders back, chin slightly raised; the beast shows in the hands and face, not the stance."
+      "posture_doc": "Regal: chest lifted, shoulders back, chin slightly raised; the beast shows in the hands and face, not the stance.",
+      "gait": {
+        "doc": "Controlled, predatory walk (Lead step 2, 2026-10-10): upright, little bounce, a steady torso and head that do not bob, arms held close with a short swing. Applied on top of the retargeted Mixamo walk; swing_scale multiplies each bone's rotation about its loop mean.",
+        "arm_adduct_deg": {
+          "Arm": 3.0,
+          "ForeArm": 6.0,
+          "Hand": 6.0
+        },
+        "swing_scale": {
+          "mixamorig:Hips": 0.6,
+          "mixamorig:Spine": 0.5,
+          "mixamorig:Neck": 0.4,
+          "mixamorig:Head": 0.3,
+          "mixamorig:LeftArm": 0.6,
+          "mixamorig:RightArm": 0.6,
+          "mixamorig:LeftForeArm": 0.6,
+          "mixamorig:RightForeArm": 0.6
+        },
+        "hip_sway_scale": 0.6,
+        "hip_bounce_scale": 0.45,
+        "cadence_scale": 0.92,
+        "hip_drop_m": 0.015
+      }
     }
   }
 }
