@@ -4,6 +4,22 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
+## 2026-10-09 · D-062 · Director · Permanent injuries are considered for all spritework
+Why: director: "permanent injuries must be considered for all spritework". Injuries are separate layers on every stage, facing and clip.
+Changes: the sprite contract (Art, P1-ART-SLICE-CAST).
+
+## 2026-10-09 · D-061 · Director · Gear visibility: the sprite changes only at promotion, plus one signature piece
+Why: director: "Sprite changes only at promotion, plus one signature piece". Relayed by the Lead from Art's session.
+Changes: gear lines (D-053) show on the sprite per stage only.
+
+## 2026-10-09 · D-060 · Director (relayed, PENDING the director's written confirmation) · Tripo may be used for any part, characters included; the ask threshold would rise from 500 to 2,000 credits per session
+Why: director, relayed by the Lead from Art's session: "we can always get more Tripo credits. Use it whenever it would achieve the most beautiful and functional result". Inputs stay ours (blockouts and text, never diffusion images). Buying credits still needs a written yes (hard rule 8). Because this loosens a spend rule, the 500-credit threshold in D-014 and `CLAUDE.md` stays in force until the director confirms this entry in writing. The licensing register row is widened in Art's first PR.
+Changes: amends D-014 once confirmed.
+
+## 2026-10-09 · D-059 · Director · Art route A: one skeleton contract with per-merc bone lengths; one body per merc kept across its 3 stages; a gear kit per stage
+Why: director: "go with option A" (P1-ART-REFOCUS). Retarget, clips, pixelate, palette, normals, packing and validators carry over; `build_body.py`, the 3 builds and shared equipment are retired. Supersedes D-002 fully.
+Changes: art pipeline (Art, P1-ART-SLICE-CAST).
+
 ## 2026-10-09 · D-058 · Director · Economy
 Upkeep is in and streamlined; contracts, trade, crafting, gladiator events, looting and banditry should all be viable income.
 Changes: `00_VISION.md` and `CLAUDE.md` (#63).
