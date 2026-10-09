@@ -26,7 +26,7 @@ const HALF := 2.0
 
 ## Camera pitch below the horizon, in degrees. Applies at once when changed.
 @export var pitch_degrees: float = 55.0:
-	set = set_pitch_degrees
+	set = _set_pitch_degrees
 ## How the 3D world reaches the window; see the class comment.
 @export var pixel_mode: PixelMode = PixelMode.WHOLE_SCREEN
 ## On-screen figure height in logical pixels (the factory's char_height_px); the
@@ -50,8 +50,17 @@ const HALF := 2.0
 ## Integer upscale of the logical viewport; zero takes data "pixel" "integer_scale".
 @export var integer_scale: int = 0
 
+## Current time of day and rain (set_conditions). The lighting export picks the start:
+## DAY is day and dry, RAIN_NIGHT is night and raining.
+var time_of_day := StageLighting.TimeOfDay.DAY
+var rain := false
 ## Times the walker has wrapped past the end of its loop since the stage was ready.
 var laps_completed: int = 0
+
+## The stage's data (data/balance/stage.json), for scenes built on the stage.
+var stage_data: StageData:
+	get:
+		return _data
 
 var _data: StageData = null
 var _loop_length_m: float = 0.0
@@ -62,6 +71,7 @@ var _stand_point := Vector3.ZERO
 var _frame: SheetFrame = null
 var _extras: Array[Sprite3D] = []
 var _extra_points: Array[Vector3] = []
+var _sprite_tint := Color.WHITE
 
 @onready var _world: Node3D = %World
 @onready var _street: GridMap = %Street
@@ -77,7 +87,8 @@ var _extra_points: Array[Vector3] = []
 func _ready() -> void:
 	_data = StageData.load_file(STAGE_DATA_PATH)
 	StreetGrid.build(_street, _data)
-	_setup_light()
+	var night := lighting == Lighting.RAIN_NIGHT
+	set_conditions(StageLighting.TimeOfDay.NIGHT if night else StageLighting.TimeOfDay.DAY, night)
 	_setup_camera()
 	_setup_path()
 	_setup_merc()
@@ -102,7 +113,7 @@ func step(delta: float) -> void:
 	_place_merc()
 
 
-func set_pitch_degrees(value: float) -> void:
+func _set_pitch_degrees(value: float) -> void:
 	pitch_degrees = value
 	if is_node_ready():
 		_apply_pitch()
@@ -143,27 +154,15 @@ func merc_centre_screen_position() -> Vector2:
 	return _camera.unproject_position((_merc.global_transform * _merc.get_aabb()).get_center())
 
 
-func _setup_light() -> void:
-	var light := "light" if lighting == Lighting.DAY else "rain_night/light"
-	_key_light.rotation_degrees = Vector3(
-		-_data.num(light, "elevation_degrees"), _data.num(light, "azimuth_degrees"), 0.0
-	)
-	_key_light.light_color = _data.rgb(light, "color_rgb")
-	_key_light.light_energy = _data.num(light, "energy")
-	_key_light.shadow_enabled = true
-	var environment := Environment.new()
-	environment.background_mode = Environment.BG_COLOR
-	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.ambient_light_energy = _data.num(light, "ambient_energy")
-	if lighting == Lighting.DAY:
-		environment.background_color = _data.grey("shades", "sky")
-		environment.ambient_light_color = _data.grey(light, "ambient_grey")
-	else:
-		environment.background_color = _data.rgb("rain_night", "sky_rgb")
-		environment.ambient_light_color = _data.rgb(light, "ambient_rgb")
-		_world.add_child(StageWeather.torch(_data))
-		_world.add_child(StageWeather.rain(_data))
-	_ambient.environment = environment
+## Switches time of day and rain at runtime (StageLighting); unshaded sprites take the
+## matching tint at once.
+func set_conditions(time: StageLighting.TimeOfDay, raining: bool) -> void:
+	time_of_day = time
+	rain = raining
+	_sprite_tint = StageLighting.apply(_data, _key_light, _ambient, _world, time, raining)
+	if _frame != null:
+		for sprite: Sprite3D in _all_mercs():
+			_show_frame(sprite, _frame)
 
 
 func _setup_camera() -> void:
@@ -255,9 +254,7 @@ func _show_frame(sprite: Sprite3D, frame: SheetFrame) -> void:
 	sprite.offset = Vector2(-frame.pivot.x, frame.pivot.y - frame.region.size.y)
 	var lit := lit_sprites and frame.normal != null
 	sprite.material_override = frame.lit_material() if lit else frame.unlit_material()
-	sprite.modulate = Color.WHITE
-	if not lit and lighting == Lighting.RAIN_NIGHT:
-		sprite.modulate = _data.rgb("rain_night", "sprite_tint_rgb")
+	sprite.modulate = _sprite_tint if not lit else Color.WHITE
 
 
 func _setup_path() -> void:
@@ -301,6 +298,33 @@ func extra_mercs() -> Array[Sprite3D]:
 	return _extras
 
 
+## Moves an added merc's feet to a world point (the slice's crowd walks).
+func move_extra(index: int, point: Vector3) -> void:
+	if index >= 0 and index < _extra_points.size():
+		_extra_points[index] = point
+		_place_sprite(_extras[index], point)
+
+
+## Shows a frame (one facing of a sheet) on one merc only; the walker is merc().
+func show_frame_on(sprite: Sprite3D, frame: SheetFrame) -> void:
+	if frame != null:
+		_show_frame(sprite, frame)
+		_apply_texel(sprite)
+
+
+## Centres the camera rail on a ground point, moved in whole logical pixels at the look-at
+## depth (x by one texel, z by one texel over sin(pitch)), so the world never swims as the
+## camera follows; then re-places every merc on the new pixel grid.
+func focus_on(point: Vector3) -> void:
+	var texel := texel_m()
+	var pitch_sin := sin(deg_to_rad(pitch_degrees))
+	if texel <= 0.0 or pitch_sin <= 0.0:
+		return
+	_rail.position.x = snappedf(point.x, texel)
+	_rail.position.z = snappedf(point.z, texel / pitch_sin)
+	_place_merc()
+
+
 func _all_mercs() -> Array[Sprite3D]:
 	var all: Array[Sprite3D] = [_merc]
 	all.append_array(_extras)
@@ -323,27 +347,8 @@ func _configure(sprite: Sprite3D) -> void:
 
 
 func _apply_pixel_mode() -> void:
-	if pixel_mode != PixelMode.WHOLE_SCREEN:
-		_camera.current = true
-		return
-	var scale := screen_scale()
-	var logical := logical_size()
-	var container := SubViewportContainer.new()
-	container.name = &"PixelScreen"
-	# Sized from the data, not the window, so the logical viewport is 640 × 360 even
-	# headless; the window is the same 1920 × 1080 (project.godot).
-	container.position = Vector2.ZERO
-	container.size = Vector2(logical * scale)
-	container.stretch = true
-	container.stretch_shrink = scale
-	container.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	var viewport := SubViewport.new()
-	viewport.name = &"LogicalViewport"
-	viewport.size = logical
-	viewport.handle_input_locally = false
-	add_child(container)
-	container.add_child(viewport)
-	_world.reparent(viewport)
+	if pixel_mode == PixelMode.WHOLE_SCREEN:
+		PixelScreen.wrap(self, _world, logical_size(), screen_scale())
 	_camera.current = true
 
 
