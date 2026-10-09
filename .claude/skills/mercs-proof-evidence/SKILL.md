@@ -88,3 +88,8 @@ In the PR body (`agent-briefs/HANDOFF_TEMPLATE.md` section B):
 After two similar failed fixes, change the evidence before writing another fix: a minimal
 reproduction, the last good commit, the runtime state, the event path (CLAUDE.md rule 10; guardrail
 B5). Write what you learnt in the PR.
+
+## Learnings
+
+Proven findings for this project live in `references/learnings.md`. Read it before using this
+skill; add to it only what proved effective, with evidence.

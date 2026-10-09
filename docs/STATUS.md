@@ -10,10 +10,10 @@ Current phase: **1 — Visual and factory proof** (Phase 0 gate PASS WITH NOTES,
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | available | stage defaults 55 degrees / 56 px (#31), handoff refresh (#33) and crowd with occlusion (#36) merged; next: Art's re-frozen good fixture as the stage's default merc | — | 2026-10-08 |
+| Dev Lead (Opus 5.5) | working | sheets load from an exported .pck (#49, assets floor 8 to 11); next: QC Art's realistic round 3, then the director's density pick | — | 2026-10-09 |
 | Merge & CI (Sonnet 5.5) | working | standing merge pass (D-030); board PR after each merge | — | 2026-10-08 |
-| Art Factory (Opus 5.5) | available | P1-ART-PROPORTIONS (#28) and P1-ART-FREEZE-C55 (#34: proportion C, 56 px, 55 degrees frozen into `camera_rig.json` and `proportions.json`) merged; next is average_f (needs assigning); Mixamo clips need the director's sign-in (D-029) | — | 2026-10-08 |
-| Concept Lead (Fable 5.1) | available | merge workflow audit merged (#20, D-028..D-030); render pipeline skeleton merged (#22); next: Phase 1 sample review | — | 2026-10-08 |
+| Art Factory (Opus 5.5) | working (local; no PR until the density pick) | P1-ART-PROPORTIONS (#28) and P1-ART-FREEZE-C55 (#34) merged; proportion C reversed (D-042): realistic density samples at 56 / 84 / 112 px, QC with the Lead; Mixamo clips need the director's sign-in (D-029) | — | 2026-10-09 |
+| Concept Lead (Fable 5.1) | awaiting director | handoff refreshed (#47); Project Architect adoption | — | 2026-10-09 |
 
 States: working · running a check · awaiting director · blocked · available.
 
@@ -54,8 +54,10 @@ States: working · running a check · awaiting director · blocked · available.
 13. Dev Lead: stage defaults 55 degrees / 56 px (#31); crowd, occlusion and camera-facing sprites in the street. DONE (#36).
 
 ## Waiting on the director
-- Sign in to mixamo.com in a browser the Art chat can use, so the fourteen clips can be downloaded (D-029).
-- Restart the Merge & CI chat in the repo folder with the one-line kickoff in `agent-briefs/KICKOFF_PROMPTS.md` once this PR merges, so the new `.claude/settings.json` and brief load.
+- The density pick (56 / 84 / 112 px) from Art's realistic samples once the Lead has QC'd them (D-042). Art works locally and opens no PR until then.
+- Project Architect adoption (Concept Lead handoff).
+- Mixamo: 10 of 14 clips are in the vault (D-029 sign-in); the rest wait on the director's sign-in.
+- Allow or decline deleting the unmerged, superseded remote branches `claude/p1-crisp-snap` (664434c) and `claude/p1-frame-time` (7236cdc), and `claude/p1-sheet-export-load` (d520808, superseded by #49); the permission classifier refused the first two.
 
 ## Merge queue
 (empty)
@@ -75,3 +77,6 @@ States: working · running a check · awaiting director · blocked · available.
   `-100` and `+1` and does not exempt `sim/core/rng.gd`; `layering.py` misses `Timer.new()`-style
   node construction in sim.
 - Look direction (director, 2026-10-08, NOT a ruling): mercs read like Pokémon Black/White trainer sprites with more detail and slightly bigger; steep top-down 3/4 camera (about 50-60 degrees), big-headed short figures, dense detailed pixel environments; grim Westeros setting. `06_STYLE_ART.md` and spec §3's 30-40 degree pitch range need revisiting from the proportion samples (#28).
+- QC defect (Lead, on #39's evidence sheet): sprite lean at 55 degrees. #39's option B fixes the main bug (a merc 0.2 m in front of the well lost everything above the shins) but the merc then draws nearly black, because lighting still reads the leaning quad inside the well's shadow. The Dev Lead's follow-up moves lighting to the upright point (option D), which also stops the ground cutting off the toes. #39's `dev_lead.md` "awaiting director" state is superseded.
+- Art Factory request (from #39, needs assigning): publish the good sheet (average_m body rest, C/56/55, with its normal map) under `assets/` with its licensing-register row, so the stage can default to it in the build.
+- Merge & CI: `claude/p1-crisp-snap` and `claude/p1-frame-time` (unmerged, no PR, superseded by #25 and D-031) were to be deleted; the delete was refused by the permission classifier, so they stay until the director allows it. Tips for recovery if ever wanted: 664434c, 7236cdc.
