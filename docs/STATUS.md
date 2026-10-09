@@ -10,7 +10,7 @@ Current phase: **1 — Visual and factory proof** (Phase 0 gate PASS WITH NOTES,
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | working | capture density support, `--logical=WxH` (#44); next: QC Art's realistic samples, then the director's density pick; sheets load from an exported .pck (export-load PR, the Lead's `claude/p1-sheet-export-load`, do not prune) | — | 2026-10-09 |
+| Dev Lead (Opus 5.5) | working | sheets load from an exported .pck (#49, assets floor 8 to 11); next: QC Art's realistic round 3, then the director's density pick | — | 2026-10-09 |
 | Merge & CI (Sonnet 5.5) | working | standing merge pass (D-030); board PR after each merge | — | 2026-10-08 |
 | Art Factory (Opus 5.5) | working (local; no PR until the density pick) | P1-ART-PROPORTIONS (#28) and P1-ART-FREEZE-C55 (#34) merged; proportion C reversed (D-042): realistic density samples at 56 / 84 / 112 px, QC with the Lead; Mixamo clips need the director's sign-in (D-029) | — | 2026-10-09 |
 | Concept Lead (Fable 5.1) | awaiting director | handoff refreshed (#47); Project Architect adoption | — | 2026-10-09 |
@@ -57,7 +57,7 @@ States: working · running a check · awaiting director · blocked · available.
 - The density pick (56 / 84 / 112 px) from Art's realistic samples once the Lead has QC'd them (D-042). Art works locally and opens no PR until then.
 - Project Architect adoption (Concept Lead handoff).
 - Mixamo: 10 of 14 clips are in the vault (D-029 sign-in); the rest wait on the director's sign-in.
-- Allow or decline deleting the unmerged, superseded remote branches `claude/p1-crisp-snap` (664434c) and `claude/p1-frame-time` (7236cdc); the permission classifier refused it.
+- Allow or decline deleting the unmerged, superseded remote branches `claude/p1-crisp-snap` (664434c) and `claude/p1-frame-time` (7236cdc), and `claude/p1-sheet-export-load` (d520808, superseded by #49); the permission classifier refused the first two.
 
 ## Merge queue
 (empty)
