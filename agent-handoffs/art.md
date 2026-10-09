@@ -1,7 +1,7 @@
 # Art Factory handoff, 2026-10-09 AEDT
 Start from this file, CLAUDE.md, your brief, and the director's route A decisions (Lead messages, 2026-10-09).
 
-## State: working (step 1 rework after Lead QC: NOT passed)
+## State: awaiting Lead QC (step 1 revision 2 sent; images *_r2.png in scratchpad slice/)
 ## Task
 P1-ART-SLICE-CAST (Lead): orc + vampyr at stage 1. QC order: (1) side-on clay at 0 deg + 45 deg stage-1
 silhouette, (2) gait loop clip, (3) geared rest/walk/idle sheets with injury starter layers. First PR widens the

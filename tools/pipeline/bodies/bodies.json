@@ -73,23 +73,23 @@
         "lr-lowerleg-muscle-incr": 0.8,
         "measure-upperleg-height-decr": 0.6,
         "lowerlegs-height-decr": 0.4,
-        "neck-scale-horiz-incr": 1.5,
-        "neck-scale-depth-incr": 1.2,
-        "neck-scale-vert-decr": 0.8,
+        "neck-scale-horiz-incr": 2.0,
+        "neck-scale-depth-incr": 1.5,
+        "neck-scale-vert-decr": 0.3,
         "neck-trans-forward": 0.6,
         "head-scale-vert-decr": 0.3,
         "head-square": 0.7,
-        "chin-width-incr": 1.0,
+        "chin-width-incr": 1.6,
         "chin-prominent-incr": 0.7,
-        "chin-prognathism-incr": 1.0,
-        "chin-bones-incr": 1.0,
-        "eyebrows-trans-forward": 1.0,
+        "chin-prognathism-incr": 1.4,
+        "chin-bones-incr": 1.6,
+        "eyebrows-trans-forward": 1.8,
         "eyebrows-angle-down": 1.0,
-        "forehead-trans-backward": 0.8,
-        "forehead-scale-vert-decr": 0.7,
+        "forehead-trans-backward": 1.2,
+        "forehead-scale-vert-decr": 1.0,
         "nose-scale-horiz-incr": 0.8,
         "nose-flaring-incr": 1.0,
-        "nose-scale-vert-decr": 0.6,
+        "nose-scale-vert-decr": 1.0,
         "nose-point-up": 0.7,
         "mouth-scale-horiz-incr": 0.6,
         "lr-ear-shape-pointed": 0.8,
@@ -97,51 +97,56 @@
         "measure-wrist-circ-incr": 1.0,
         "measure-calf-circ-incr": 1.0,
         "lr-lowerleg-scale-depth-incr": 0.8,
-        "lr-leg-valgus-decr": 0.7,
+        "lr-leg-valgus-decr": 2.0,
         "measure-knee-circ-incr": 0.8,
-        "measure-upperarm-circ-incr": 0.6
+        "measure-upperarm-circ-incr": 0.6,
+        "measure-upperarm-length-decr": 2.6,
+        "measure-lowerarm-length-decr": 2.6,
+        "chin-height-incr": 0.4,
+        "nose-greek-decr": 1.0,
+        "nose-trans-backward": 0.5
       },
       "doc": "Merc 'orc' (director's reference, 2026-10-09): big, bulky, mean; charges in on pure aggression, plate and a battle axe. Anchors: hunched shoulder mass on a thick short neck, heavy jaw with tusks, grey-green skin ramp (palette, not texture).",
       "posture_lean_deg": {
-        "mixamorig:Spine": 4.0,
-        "mixamorig:Spine1": 5.0,
-        "mixamorig:Spine2": 6.0,
-        "mixamorig:Neck": 6.0,
-        "mixamorig:Head": -16.0
+        "mixamorig:Spine": 3.0,
+        "mixamorig:Spine1": 4.0,
+        "mixamorig:Spine2": 4.0,
+        "mixamorig:Neck": 3.0,
+        "mixamorig:Head": -10.0
       },
       "posture_doc": "Hunched predator: chest and shoulders rolled forward, head thrust forward and level, so the mass leads.",
       "features": {
         "tusk_l": {
           "bone": "mixamorig:Head",
           "base_m": [
-            0.024,
-            -0.178,
-            1.832
+            0.03,
+            -0.18,
+            1.825
           ],
           "dir": [
-            0.18,
-            -0.12,
+            0.22,
+            -0.15,
             1.0
           ],
-          "radius_m": 0.013,
-          "tip_radius_m": 0.003,
-          "length_m": 0.065
+          "radius_m": 0.022,
+          "tip_radius_m": 0.004,
+          "length_m": 0.1
         },
         "tusk_r": {
           "bone": "mixamorig:Head",
           "base_m": [
-            -0.024,
-            -0.178,
-            1.832
+            -0.03,
+            -0.18,
+            1.825
           ],
           "dir": [
-            -0.18,
-            -0.12,
+            -0.22,
+            -0.15,
             1.0
           ],
-          "radius_m": 0.013,
-          "tip_radius_m": 0.003,
-          "length_m": 0.065
+          "radius_m": 0.022,
+          "tip_radius_m": 0.004,
+          "length_m": 0.1
         }
       }
     },

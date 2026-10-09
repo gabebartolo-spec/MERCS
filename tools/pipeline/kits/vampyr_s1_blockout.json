@@ -3,23 +3,6 @@
  "merc": "vampyr",
  "stage": 1,
  "pieces": {
-  "cape": {
-   "shape": "cone",
-   "bone": "mixamorig:Spine2",
-   "at": "head",
-   "offset_m": [
-    0,
-    0.13,
-    -0.55
-   ],
-   "size": [
-    0.62,
-    0.2,
-    1.4
-   ],
-   "top_size": 0.44,
-   "sides": 10
-  },
   "collar": {
    "shape": "box",
    "bone": "mixamorig:Neck",
@@ -248,6 +231,50 @@
     0,
     12,
     20
+   ]
+  },
+  "cape_l": {
+   "shape": "cone",
+   "bone": "mixamorig:Spine2",
+   "at": "head",
+   "offset_m": [
+    0.12,
+    0.13,
+    -0.44
+   ],
+   "size": [
+    0.36,
+    0.16,
+    1.1
+   ],
+   "top_size": 0.2,
+   "sides": 6,
+   "rot_deg": [
+    -4,
+    4,
+    0
+   ]
+  },
+  "cape_r": {
+   "shape": "cone",
+   "bone": "mixamorig:Spine2",
+   "at": "head",
+   "offset_m": [
+    -0.12,
+    0.13,
+    -0.44
+   ],
+   "size": [
+    0.36,
+    0.16,
+    1.1
+   ],
+   "top_size": 0.2,
+   "sides": 6,
+   "rot_deg": [
+    -4,
+    -4,
+    0
    ]
   }
  }

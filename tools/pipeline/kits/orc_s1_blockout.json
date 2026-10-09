@@ -40,14 +40,14 @@
    "bone": "mixamorig:LeftArm",
    "at": "head",
    "offset_m": [
-    0.05,
+    0.07,
     0,
-    0.05
+    -0.01
    ],
    "size": [
     0.3,
-    0.32,
-    0.18
+    0.3,
+    0.12
    ],
    "rot_deg": [
     0,
@@ -60,14 +60,14 @@
    "bone": "mixamorig:RightArm",
    "at": "head",
    "offset_m": [
-    -0.05,
+    -0.07,
     0,
-    0.05
+    -0.01
    ],
    "size": [
     0.3,
-    0.32,
-    0.18
+    0.3,
+    0.12
    ],
    "rot_deg": [
     0,
@@ -218,7 +218,12 @@
     -14,
     0
    ],
-   "doc": "axe in the right fist, haft tipped forward and out so it clears the arm; the head rides above the shoulder"
+   "doc": "axe in the right fist, haft tipped forward and out so it clears the arm; the head rides above the shoulder",
+   "offset_m": [
+    0,
+    0,
+    -0.12
+   ]
   }
  }
 }

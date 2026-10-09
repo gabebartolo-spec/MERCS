@@ -124,11 +124,11 @@
       "height_after_contour_m": 1.7959
     },
     "orc": {
-      "height_m": 2.0203,
-      "height_macro": 0.777344,
+      "height_m": 2.0199,
+      "height_macro": 0.771484,
       "bone_count": 52,
-      "rest_pose_sha256": "af487239d1ce429f483608510a628cc21861ce027bbce4ddb6708563b25fa657",
-      "height_after_contour_m": 2.0203
+      "rest_pose_sha256": "114b35c2ff57f6f82a016d092b7111165c69271a5e8e979808ba49bc58a77236",
+      "height_after_contour_m": 2.0199
     },
     "vampyr": {
       "height_m": 1.9284,
