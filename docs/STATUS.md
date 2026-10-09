@@ -10,9 +10,9 @@ Current phase: **1 — Visual and factory proof** (Phase 0 gate PASS WITH NOTES,
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | working | sheets load from an exported .pck (#49, assets floor 8 to 11); next: QC Art's realistic round 3, then the director's density pick | — | 2026-10-09 |
+| Dev Lead (Opus 5.5) | working | slice M1 (#53) + walk/idle playback (#54) + stage defaults at 84 px (#57) merged; next: M5 core-loop skeleton | — | 2026-10-09 |
 | Merge & CI (Sonnet 5.5) | working | standing merge pass (D-030); board PR after each merge | — | 2026-10-08 |
-| Art Factory (Opus 5.5) | working (local; no PR until the density pick) | P1-ART-PROPORTIONS (#28) and P1-ART-FREEZE-C55 (#34) merged; proportion C reversed (D-042): realistic density samples at 56 / 84 / 112 px, QC with the Lead; Mixamo clips need the director's sign-in (D-029) | — | 2026-10-09 |
+| Art Factory (Opus 5.5) | working | realistic freeze, 84 px, 45 degree sprites (#52) and the first published asset, `average_m` rest sheet with normal and register row (#55), merged; next: walk and idle sheets beside it; Mixamo clips need the director's sign-in (D-029) | — | 2026-10-09 |
 | Concept Lead (Fable 5.1) | awaiting director | handoff refreshed (#47); Project Architect adoption | — | 2026-10-09 |
 
 States: working · running a check · awaiting director · blocked · available.
@@ -53,8 +53,11 @@ States: working · running a check · awaiting director · blocked · available.
 12. Art Factory: P1-ART-FREEZE-C55, the look frozen into the rig. DONE (#34).
 13. Dev Lead: stage defaults 55 degrees / 56 px (#31); crowd, occlusion and camera-facing sprites in the street. DONE (#36).
 
+14. Art Factory: P1-ART-FREEZE-REALISTIC (realistic, 84 px, 45 degree sprites in the 55 degree world, #52); first published asset `average_m` rest sheet (#55). DONE.
+15. Dev Lead: art direction slice (spec #51, D-043): M1 playable grey-box (#53), M2 walk/idle playback (#54), stage defaults at 84 px / 960x540 (#57). DONE. Next: M5 core-loop skeleton (M3, M4 and the gate still open).
+16. Merge & CI: sprite sheets under `assets/sprites/` are plain git (#56, D-046). DONE.
+
 ## Waiting on the director
-- The density pick (56 / 84 / 112 px) from Art's realistic samples once the Lead has QC'd them (D-042). Art works locally and opens no PR until then.
 - Project Architect adoption (Concept Lead handoff).
 - Mixamo: 10 of 14 clips are in the vault (D-029 sign-in); the rest wait on the director's sign-in.
 - Allow or decline deleting the unmerged, superseded remote branches `claude/p1-crisp-snap` (664434c) and `claude/p1-frame-time` (7236cdc), and `claude/p1-sheet-export-load` (d520808, superseded by #49); the permission classifier refused the first two.

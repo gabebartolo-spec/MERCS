@@ -4,7 +4,23 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
-## 2026-10-09 · D-042 · Director · Proportion C is reversed: realistic proportions, a 4k pixel art look; pixel density stays open until the director picks from samples
+## 2026-10-09 · D-046 · Lead (technical, same game) · Engine sprite sheets under `assets/sprites/` are plain git, not LFS; large binaries stay in LFS
+Why: CI and the build check out without LFS, so LFS pointers were read as PNGs (#55's red CI). Sheets are small.
+Changes: `.gitattributes`, `build.yml` comment (#56).
+
+## 2026-10-09 · D-045 · Director · Sprites are rendered at a 45 degree sprite pitch inside the 55 degree world camera, at the same px per metre (about 82.27 px/m at 1x)
+Why: chosen from labelled 4K street captures (Lead QC passed). The camera stays at 55 degrees (D-037).
+Changes: `camera_rig.json`, `proportions.json` (#52); stage defaults (#57).
+
+## 2026-10-09 · D-044 · Director · Merc pixel density is 84 px standing, on a 960x540 logical screen (x2 at 1080p, x4 at 4K); realistic proportions
+Why: picked from the realistic density samples (B: 84 px) and the labelled street captures. Resolves D-042's open density; supersedes D-036 (56 px) and D-038 (proportion C).
+Changes: rig freeze (#52); stage defaults (#57).
+
+## 2026-10-09 · D-043 · Director · The Phase 1 gate is played in a playable "art direction slice" that includes a one-pass example of the core loop
+Why: the director wants to test and assess the art direction before bulk assets and content. The question: "is this the look, and does it hold up in play?" Bulk assets and content wait for the gate. Lead note: the loop example is a sketch, shallow on systems and inside the hard rules; it does not pass the Phase 2 to 6 gates, which are still proved separately.
+Changes: `docs/specs/art_direction_slice.md`, roadmap pointer (#51); slice M1 and M2 (#53, #54).
+
+## 2026-10-09 · D-042 · Director · Proportion C is reversed: realistic proportions, a 4k pixel art look; pixel density stays open until the director picks from samples (density resolved by D-044)
 Why: the director said "I don't like the big head, lets go for a realistic, 4k pixel art look." Supersedes D-038 (proportion C) and reopens D-036 (56 px standing height): the merc density candidates are 56, 84 or 112 px, picked from samples. D-037 (55 degree pitch) is not touched by this entry.
 Changes: capture support `--logical=WxH` (#44); Art renders realistic density samples at 56 / 84 / 112 px; `06_STYLE_ART.md` follows the pick.
 
