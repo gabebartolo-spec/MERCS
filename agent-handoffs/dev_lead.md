@@ -1,75 +1,70 @@
-# Dev Lead handoff, 2026-10-09 evening (desktop, second Claude account, "MERCS BOSS")
+# Dev Lead handoff, 2026-10-10 (desktop, second Claude account, "MERCS BOSS")
 Start from this file, CLAUDE.md, `~/.claude/memory-shared/MEMORY.md`, your brief
 (`agent-briefs/DEV_LEAD_OPUS.md`), `docs/00_VISION.md` (revised 2026-10-09, #63) and
 `docs/specs/art_direction_slice.md`. Run `git fetch`, then `gh pr list` and `docs/STATUS.md`.
 
-## State: paused by the director (2026-10-09); #70 sprite layers open and synced; Art step-1 QC failed (7 fixes sent)
+## State: paused by the director ("pause your team until i say"); team refreshed at the pause
 
 ## Who does what
 This account has no Concept Lead: the session acts as lead AND Dev Lead under the original
-account's rules. Peers (desktop sessions, wake with ccd_session_mgmt send_message by id):
+account's rules. Peers (desktop sessions, message by session id):
 "MERCS SUPPORT" (local_f70eca67-...) = Merge & CI; "MERCS ART FACTORY" (local_e5986dbb-...) = Art.
+
+## Team refresh (director, 2026-10-10: "periodically archive and resurrect the team")
+Rule: `.claude/skills/mercs-handoff` "The lead refreshes the team" + shared memory
+refresh-workers-at-task-boundaries. At the pause both peers were told to clear_session("self")
+(Art 246k, Support 338k context; handoffs pushed; nothing live). ON RESUME: send each the
+kick-off "You are <role>. Read your handoff and continue." Art first gets the lead's step-1 r2
+verdict. Refresh myself at my next task boundary or past 150k.
 
 ## THE GOAL (director /goal, 2026-10-09)
 "A playable vertical slice that I can test and assess the art direction before we develop bulk
-assets and content", including "an example of the core gameplay loop". Spec (merged #51):
-M1 playable street (done) -> M2 body in motion -> M3 street kit and weather -> M4 looks (waits for
-P1-ART-REFOCUS) -> M5 loop example -> gate ("is this the look?").
+assets and content", including "an example of the core gameplay loop". M1 street, M2 motion and
+M5 loop example are on main (F5 in the build). Remaining: the cast's art (orc + Vampyr) in the
+slice, then the gate ("is this the look?").
 
-## Director decisions that shape the work (logged D-042..D-058)
-- Realistic proportions; 84 px mercs on a 960x540 logical screen (x2 1080p, x4 4K); sprites drawn
-  at 45 deg inside the 55 deg world at the same px/m (camera_rig px_per_m_1x 82.275).
-- Vision revised (#63): a HAND-MADE cast of 25 (no procedural recruits), grim grounded fantasy WITH
-  magic (orcs, a Vampyr), no type chart (counters from combat roles; themed resolve per merc),
-  three-stage promotion lines, per-merc gear lines, up to 4 moves. Art pipeline paused for
-  P1-ART-REFOCUS (written proposal first, no renders). Nothing of Phase 2 MercGen starts.
-- Testing cadence: per PR the smallest relevant suites + one capture; audits at milestones.
-- Mixels are an automatic fail; every look question goes to the director with labelled images.
+## Director decisions that shape the work (logged D-042..D-062)
+- Realistic proportions; 84 px mercs on a 960x540 logical screen; sprites drawn at 45 deg in the
+  55 deg world at the same px/m.
+- Vision (#63): hand-made cast of 25, grim fantasy with magic, no type chart, promotion lines.
+- Route A: Tripo for any part where it gives the best result (ask above 2,000 credits/session;
+  D-060 confirmation pending on the board). Sprite changes only at promotion + one signature piece.
+- "Permanent injuries must be considered for all spritework" -> injury layers.
+- Testing: smallest suites per PR, audits at milestones. Mixels fail automatically.
 
-## Lead QC of Art (global CLAUDE.md; skill art-qa-critic)
-Every Art image comes to the lead first; only passing work reaches the director. Lesson from the
-walk clip: judge motion as a PLAYED CLIP at game speed, not frame by frame. The director flagged
-the realistic walk's gait ("legs should be angled and move naturally") after a lead pass; Art's
-clips PR was never opened and the art refocus supersedes it. Carry the gait note into the refocus.
+## Art (P1-ART-SLICE-CAST, branch claude/art-slice-cast, d2d8f93, no PR)
+QC order: (1) clay + 45 deg silhouettes, (2) gait as a played 3 s loop, (3) geared sheets with
+injury layers per the layer contract. Step 1 r1 failed (7 fixes). Step 1 r2 is waiting for MY QC
+(art-qa-critic, 2x crops): images in Art's scratchpad
+`C:\Users\DANTE\AppData\Local\Temp\claude\C--Users-DANTE-Documents-GitHub-MERCS\71abc762-dc71-4892-a48a-8de29e6c4d82\scratchpad\slice\`
+(step1_side0_clay_r2, orc_head_r2, step1_45_stage1_{1x,x4}_r2, step1_45_silhouette_{1x,x4}_r2).
+Check: orc wrist at crotch, brow/jaw/tusks read at 1x, straight legs, head clears pauldrons N/NE/NW,
+axe headroom; Vampyr split cape shows legs. Vampyr Tripo head comes at 4x in step 3.
+Lesson: judge motion as a PLAYED CLIP at game speed, not frame by frame.
 
-## Open PRs (stacked; merge in order, sync each after the one below lands)
-1. #64 `claude/slice-m5-cast-check`: the director's reference pair in `battle.json` "fighters"
-   (orc: charge = walk + attack in one turn; Vampyr: blood price = pay hp, never the last, for one
-   powered attack), bandits, `sim/story/checks.gd` (visible d20 + skill vs difficulty). battle 14.
-2. #66 draft `claude/slice-m5-loop`: `sim/story/slice_loop.gd` (SliceLoop: arrive, recruit,
-   contract, travel, gate, battle, aftermath, return, camp, done), `data/scenarios.json` + schema
-   + fixtures, caps.json `scenarios: 1`. Suite loop 4; data floor 96. Lead sketch calls flagged
-   for the director: a talked-down lookout leaves the band shaken; the defeated cannot be hired
-   (Q21); the recruit is a placeholder.
-3. #67 draft `claude/slice-m5-loop-ui`: F5 plays the loop on screen (`LoopDirector`, `LoopPanel`,
-   `BattleView`; placeholder gold/red side rings until the cast's art carries identity). slice 15.
-   GPU play-through passes end to end; captures in `docs/audits/slice_m5/`.
-
-## Sprite layers (`claude/slice-sprite-layers`)
-`SheetClip.load_layers([body, gear, head, injury...])` composites same-grid mercs.sheet/1 layers at
-load (opaque layer pixels replace lower ones in colour and normal; a layer on another grid is
-refused), so one merc stays one sprite. Contract sent to Art: one manifest per layer per clip,
-identical frames/pivot/size; names <merc>_<layer>_<clip>.json. Next: SliceGame loads the orc and
-Vampyr looks from Art's layer manifest (data, not code) once Art publishes stage 1.
+## Sprite layers (#70, merged)
+`SheetClip.load_layers([body, gear, head, injury...])` composites same-grid mercs.sheet/1 layers.
+Contract sent to Art: one manifest per layer per clip, identical frames/pivot/size, hard alpha,
+`<merc>_<layer>_<clip>.json`, plus a look manifest (layer order per merc per stage).
+Next code: SliceGame loads the orc and Vampyr looks from that manifest (data, not code).
 
 ## Code map (slice)
-- `presentation/world/slice_game.gd` (boots from `ui/screens/main.tscn`): walking (`GridWalker`),
-  follow camera (`StreetStage.focus_on`), crowd, T/R/F1/F3/F5, door to the interior, walk/idle
-  playback (`SheetClip`), the loop (`LoopDirector`).
-- `presentation/world/street_stage.gd`: the 3D street, pixel screen (`PixelScreen`), lighting
-  (`StageLighting`), upright depth/light shaders, `add_merc`/`move_extra`/`remove_merc`.
-- `sim/core/rng.gd` (named streams), `sim/battle/` (Battle, BattleUnit, BattleAi),
-  `sim/story/` (Checks, SliceLoop). Numbers in `data/balance/{stage,slice,battle}.json`.
-- Capture: `tools/capture/capture_stage.gd` (`--logical=960x540 --height=84`, `--sheet`, `--extra`).
+- `presentation/world/slice_game.gd`: walking, follow camera, crowd, T/R/F1/F3/F5, door, clips, loop.
+- `presentation/world/{loop_director,loop_panel,battle_view,street_stage,sheet_clip}.gd`.
+- `sim/core/rng.gd`, `sim/battle/`, `sim/story/{checks,slice_loop}.gd`.
+- Data: `data/balance/{stage,slice,battle}.json`, `data/scenarios.json`.
 
-## Suites (floors after the stack lands)
+## Suites (floors)
 data 96, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 13, slice 15, battle 14, loop 4.
 
-## Next for the Dev Lead
-1. Land the stack (#64, #66, #67); then tell the director the loop example is in the build (F5).
-2. Review Art's P1-ART-REFOCUS proposal when it arrives (lead QC), then one director question.
-3. Battle feel when the cast's art exists: walk/hit/death clips in the battle view, facing.
-4. Branches waiting on the director (deletes refused by settings): claude/p1-crisp-snap,
+## Open PRs
+`claude/team-refresh`: docs-only, the refresh rule in mercs-handoff + this handoff. Merge & CI merges.
+
+## Next for the Dev Lead (on resume)
+1. Kick off both peers (above). 2. QC Art step 1 r2; pass or send concrete fixes.
+3. Tell the director the F5 loop example is playable in the build.
+4. Load the cast's looks in SliceGame when Art publishes stage-1 sheets.
+5. Branches waiting on the director (deletes refused by settings): claude/p1-crisp-snap,
    claude/p1-frame-time, claude/p1-sheet-export-load.
 
 ## Worktrees
@@ -77,9 +72,9 @@ Mine: `../MERCS-wt/slice-m1` (branch changes per PR). Art: `../MERCS-wt/art-publ
 
 ## Rules learnt the hard way (keep under 10 lines)
 - REWRITE this file each time; never insert sections (doc-caps fails past 120 lines).
+- tests.yml skips draft PRs: mark ready, THEN push.
 - Headless test windows are 64x64: size root to 1920x1080 before clicking GUI in a suite.
 - Lit sprites ignore `modulate`; mark sides or states with world geometry, not tint.
-- Damage is rolled 1..damage: to force a kill in a test set the target's hp to 1.
 - `git show <ref>:file > file` writes LFS pointers for LFS paths; use `git lfs smudge`.
 - A suite extending a script that fails to parse HANGS: `SUITE_TIMEOUT=120`; kill by PID.
 - Typed GDScript: assign a Variant to a typed local before arithmetic, casts or `.get()`.
