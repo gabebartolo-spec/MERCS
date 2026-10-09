@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Scenarios",
+  "description": "data/scenarios.json: authored scenarios, by id. The art direction slice's loop example (docs/specs/art_direction_slice.md section 2a) is the first. Fighter ids name entries in data/balance/battle.json \"fighters\"; text keys name entries in data/text/en.json.",
+  "type": "object",
+  "required": [
+    "scenarios"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "company",
+          "recruit",
+          "battle",
+          "aftermath_choices",
+          "injury_keys"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^scn_[a-z0-9]+(_[a-z0-9]+)*$"
+          },
+          "company": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/fighter_id"
+            }
+          },
+          "recruit": {
+            "$ref": "#/$defs/fighter_id"
+          },
+          "battle": {
+            "type": "object",
+            "required": [
+              "grid",
+              "company_cells",
+              "enemies",
+              "lookout"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "grid": {
+                "$ref": "#/$defs/cell"
+              },
+              "company_cells": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/cell"
+                }
+              },
+              "enemies": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "fighter",
+                    "cell"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "fighter": {
+                      "$ref": "#/$defs/fighter_id"
+                    },
+                    "cell": {
+                      "$ref": "#/$defs/cell"
+                    }
+                  }
+                }
+              },
+              "lookout": {
+                "type": "object",
+                "required": [
+                  "fighter",
+                  "cell"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "fighter": {
+                    "$ref": "#/$defs/fighter_id"
+                  },
+                  "cell": {
+                    "$ref": "#/$defs/cell"
+                  }
+                }
+              }
+            }
+          },
+          "aftermath_choices": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z]+(_[a-z]+)*$"
+            }
+          },
+          "injury_keys": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "fighter_id": {
+      "type": "string",
+      "pattern": "^[a-z]+(_[a-z]+)*$"
+    },
+    "cell": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0
+      }
+    }
+  }
+}

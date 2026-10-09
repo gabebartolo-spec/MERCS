@@ -20,6 +20,8 @@ The loop sketch's fighters, by id. The orc and the Vampyr are the director's ref
 - `presence`: weight in social checks (talking the lookout down).
 - `ability_charge`: walks and attacks in one turn (the orc: pure aggression). `ability_blood_price`: may pay hp to power an attack (the Vampyr: health as energy).
 - `leader`: losing this fighter costs `morale_loss_leader_down`.
+- `recruit_placeholder`: the loop's recruit until the director designs the cast member offered there.
 
 ## gate
 - `die_sides`, `talk_down_difficulty`: the bandit lookout check: die + presence must reach the difficulty.
+- `shaken_morale`: morale the band starts without when its lookout is talked down (he slips away; on a failure he fights with them).

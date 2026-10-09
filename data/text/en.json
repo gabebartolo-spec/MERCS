@@ -5,5 +5,11 @@
   "cast.orc.name": "The Orc",
   "cast.vampyr.name": "The Vampyr",
   "enemy.bandit.name": "Bandit",
-  "enemy.bandit_chief.name": "Bandit chief"
+  "enemy.bandit_chief.name": "Bandit chief",
+  "cast.recruit_placeholder.name": "Recruit (placeholder)",
+  "slice.injury.lost_eye": "{name} lost an eye.",
+  "slice.injury.scarred_face": "{name} carries a new scar across the face.",
+  "slice.fate.spare": "Spare him",
+  "slice.fate.ransom": "Ransom him",
+  "slice.fate.execute": "Execute him"
 }
