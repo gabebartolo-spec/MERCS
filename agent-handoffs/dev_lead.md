@@ -22,8 +22,8 @@ paused. The lead regenerated itself after this rewrite. Nothing resumes until th
 `~/.claude/memory-shared/co-lead-playbook.md` is shared by every BOSS on every project and both
 accounts. Workers report "Findings for the lead". I curate them into the playbook before ANY refresh
 and write "playbook: updated" or "playbook: nothing new" here. playbook: updated (seeded 2026-10-10).
-The AFL boss was told; its message is queued. Open question to the director: may workers still write
-skill learnings.md directly (the CLAUDE.md rule), or only through the lead?
+The AFL boss was told; its message is queued. Director: only the lead writes learnings.md and the
+playbook (global and MERCS CLAUDE.md updated; the MERCS change is on PR #72).
 
 ## Art step 2 (gait) status
 QA failure: the director caught a backwards orc axe (rot_deg sign) and a Vampyr scabbard
