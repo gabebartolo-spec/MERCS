@@ -58,6 +58,11 @@ var rain := false
 ## Times the walker has wrapped past the end of its loop since the stage was ready.
 var laps_completed: int = 0
 
+## The mercs added with add_merc, in order (read-only).
+var extra_mercs: Array[Sprite3D]:
+	get:
+		return _extras
+
 ## The stage's data (data/balance/stage.json), for scenes built on the stage.
 var stage_data: StageData:
 	get:
@@ -295,8 +300,13 @@ func add_merc(point: Vector3) -> Sprite3D:
 	return sprite
 
 
-func extra_mercs() -> Array[Sprite3D]:
-	return _extras
+## Takes an added merc off the street (a fight's fighters when the loop example ends).
+func remove_merc(sprite: Sprite3D) -> void:
+	var index := _extras.find(sprite)
+	if index >= 0:
+		_extras.remove_at(index)
+		_extra_points.remove_at(index)
+		sprite.queue_free()
 
 
 ## Moves an added merc's feet to a world point (the slice's crowd walks).

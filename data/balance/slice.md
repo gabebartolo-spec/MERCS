@@ -16,3 +16,13 @@ The logical screen and the merc's height are the stage's (`stage.json` "pixel", 
 
 ## hud
 - `frame_time_smoothing`: how much of each new frame's time the F3 readout takes in (0–1; smaller is steadier).
+
+## loop
+The loop example (F5; `LoopDirector`, `SliceLoop`, `data/scenarios.json`).
+- `battle_origin_xz`: the street cell under battle cell (0, 0); the battle grid (12 × 8 in the scenario) sits on open street from there (x −10…1, z −2…5).
+- `seed`: the pass's Rng seed, so F5 replays the same rolls for the same choices.
+
+## markers
+Placeholder side rings under each fighter in the loop's battle, until the hand-made cast's art says whose side a merc is on.
+- `radius_m`, `height_m`, `lift_m`: the flat ring's size and how far above the ground it floats (no z-fighting).
+- `company_rgb`, `enemy_rgb`, `down_rgb`: the company's gold, the enemy's red, and the dark ring where a fighter fell (their sprite is taken away).
