@@ -50,12 +50,13 @@ func _ready() -> void:
 	_data = StageData.load_file(SLICE_DATA)
 	_stage = STAGE_SCENE.instantiate() as StreetStage
 	_stage.auto_walk = false
-	var logical := Vector2i(
-		int(_data.num("pixel", "logical_width_px")), int(_data.num("pixel", "logical_height_px"))
+	# The stage's logical screen (stage.json "pixel"), at the largest whole scale the window
+	# fits: x2 at 1080p, x4 at 4K.
+	var stage_data := StageData.load_file(StreetStage.STAGE_DATA_PATH)
+	var logical_h := int(stage_data.num("pixel", "logical_height_px"))
+	_stage.integer_scale = maxi(
+		1, int(get_viewport().get_visible_rect().size.y) / maxi(1, logical_h)
 	)
-	_stage.logical_size_px = logical
-	_stage.integer_scale = maxi(1, int(get_viewport().get_visible_rect().size.y) / logical.y)
-	_stage.sprite_height_px = int(_data.num("pixel", "sprite_height_px"))
 	add_child(_stage)
 	_setup_walkers()
 	_load_frames()
