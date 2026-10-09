@@ -1,7 +1,8 @@
 # 06 — Art style bible and consistency contracts
 
-The look: detailed pixel-art humans inside perspective low-poly 3D environments. Pokémon Black/White
-in camera and composition, feudal political fantasy in palette and tone. This file fixes the
+The look: detailed pixel-art mercs, human and not, inside perspective low-poly 3D environments.
+Pokémon Black/White in camera and composition; grim, grounded feudal fantasy, with magic, in
+palette and tone (`00_VISION.md`). This file fixes the
 numbers that a machine can check and the references a human judges against. Every value marked
 **[D]** is a director decision still open (see `11_OPEN_QUESTIONS.md`); the Art agent's first job
 is to produce the labelled options for those.
@@ -42,6 +43,11 @@ not part of base sprites. The UI uses a 10-colour subset defined in `UiKit.gd` t
 the same file.
 
 ## 3. Render contract (characters)
+
+> **Under review (director, 2026-10-09, `D-TBD-art-refocus`).** The base-body, build, socket and
+> layer rows assume one human body with shared equipment. The hand-made cast of 25 includes
+> non-humans, three stage looks per merc and a bespoke gear line each. Camera, density, pixel
+> post, outline and palette rows are not in question. P1-ART-REFOCUS proposes the new rows.
 
 | Parameter | Value | Note |
 |-----------|-------|------|

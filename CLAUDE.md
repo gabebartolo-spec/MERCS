@@ -10,8 +10,8 @@ in the docs, report it to the Merge & CI agent.
 **Designed by a person, developed with AI, never designed by AI.** The director supplies vision,
 taste and final judgement. Agents supply execution, evidence and honest pushback.
 
-- **The mercenaries are the game.** Every system is judged by whether it makes a procedurally
-  generated person more memorable. A system that does not change what the player sees, decides or
+- **The mercenaries are the game.** Every system is judged by whether it makes one of the
+  hand-made mercs more memorable. A system that does not change what the player sees, decides or
   remembers is cut, not polished.
 - **A roadmap item is context, not authorisation.** Start only what the director or the Dev Lead
   assigned. When an assigned task is done: stop, report with evidence, recommend the next step,
