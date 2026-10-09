@@ -8,3 +8,4 @@ stage_scale 11
 stage_light 8
 assets 11
 slice 13
+battle 10
