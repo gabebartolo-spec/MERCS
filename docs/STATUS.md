@@ -10,10 +10,10 @@ Current phase: **1 — Visual and factory proof** (Phase 0 gate PASS WITH NOTES,
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | working (paused by the director, 2026-10-09) | M5 sim core merged (#60: `Rng` and the sketch battle in `sim/battle/`, `battle` suite floor 10); next: visible check, recruit card, contract, loop flow, battle presentation | — | 2026-10-09 |
+| Dev Lead (Opus 5.5) | working | M5 core-loop skeleton where it does not depend on the base body (M5 sim core #60 merged; reference pair abilities #64 open); slice M4 "Looks" waits for P1-ART-REFOCUS; nothing from Phase 2 `MercGen` starts (D-048) | — | 2026-10-09 |
 | Merge & CI (Sonnet 5.5) | working | standing merge pass (D-030); board PR after each merge | — | 2026-10-08 |
-| Art Factory (Opus 5.5) | working | realistic freeze, 84 px, 45 degree sprites (#52) and the first published asset, `average_m` rest sheet with normal and register row (#55), merged; next: walk and idle sheets beside it; Mixamo clips need the director's sign-in (D-029) | — | 2026-10-09 |
-| Concept Lead (Fable 5.1) | awaiting director | handoff refreshed (#47); Project Architect adoption | — | 2026-10-09 |
+| Art Factory (Opus 5.5) | interrupted by the director | walk and idle sheets stopped, no GPU jobs (D-051); assigned P1-ART-REFOCUS: a written proposal, no renders, for making the hand-made cast; needs the director's approval before any new art work | — | 2026-10-09 |
+| Concept Lead (Fable 5.1) | working | rewrite roadmap Phases 1 (caps, deliverables, gate), 2 and 6 for the hand-made cast (D-048) and add recommendations to Q15-Q22, the art parts after P1-ART-REFOCUS is approved; Project Architect adoption awaits the director | — | 2026-10-09 |
 
 States: working · running a check · awaiting director · blocked · available.
 
@@ -41,7 +41,7 @@ States: working · running a check · awaiting director · blocked · available.
 1. Art Factory: rig freeze (`average_m`, Mixamo skeleton, sockets, contract hash). DONE (#13).
 2. Dev Lead: grey-box street capture stage, stage suite, capture tool. DONE (#19).
 3. Concept Lead (subagent): render pipeline skeleton (camera/light rigs, render, pixelate, palette draft, pack, validators). DONE (#22).
-4. Art Factory: fourteen Mixamo clips to `D:\MERCS-vault\clips` (needs D-029 sign-in), then sample set 1 (pitch × height) and sample set 2 (pixel mode, palette, fonts) as labelled sheets per `docs/specs/phase1_visual_proof.md`.
+4. (PAUSED under D-051) Art Factory: fourteen Mixamo clips to `D:\MERCS-vault\clips` (needs D-029 sign-in), then sample set 1 (pitch × height) and sample set 2 (pixel mode, palette, fonts) as labelled sheets per `docs/specs/phase1_visual_proof.md`.
 5. Art Factory: `assets.yml` (validators + Godot assets fixture + contact-sheet artefact).
 6. Dev Lead: Phase 1 LOW: lint precision gaps listed by PR #5; function-length and complexity project lint. DONE (#21).
 
@@ -56,6 +56,10 @@ States: working · running a check · awaiting director · blocked · available.
 14. Art Factory: P1-ART-FREEZE-REALISTIC (realistic, 84 px, 45 degree sprites in the 55 degree world, #52); first published asset `average_m` rest sheet (#55). DONE.
 15. Dev Lead: art direction slice (spec #51, D-043): M1 playable grey-box (#53), M2 walk/idle playback (#54), stage defaults at 84 px / 960x540 (#57). DONE. Next: M5 core-loop skeleton (M3, M4 and the gate still open).
 16. Merge & CI: sprite sheets under `assets/sprites/` are plain git (#56, D-046). DONE.
+
+17. Art Factory: P1-ART-REFOCUS, a written proposal (no renders) for making the hand-made cast: non-human builds, three stage looks per merc, bespoke gear lines, personal-detail variants for a returning playstyle, what of the current pipeline carries over, art cost for the slice and for 25 mercs; options with costs, to the director as a question; approval before any new art work. Assigned (D-051).
+18. Concept Lead: roadmap rewrite for the hand-made cast, Phases 1, 2 and 6, plus Q15-Q22 recommendations. Assigned (D-048).
+19. Merge & CI: vision revision (#63, D-047..D-058) merged; #61 superseded. DONE.
 
 ## Waiting on the director
 - Project Architect adoption (Concept Lead handoff).
