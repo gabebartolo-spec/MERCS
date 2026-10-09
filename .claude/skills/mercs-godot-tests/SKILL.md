@@ -1,6 +1,6 @@
 ---
 name: mercs-godot-tests
-description: How to run, add and debug MERCS Godot test suites and CI without tripping over other agents on the same PC - the tools/run_tests.sh interface, isolated user data, check floors, pinned seeds, one Godot process per agent, killing by recorded PID, and reading a red CI run (tests.yml plan, shards, aggregate test). Use it whenever you run tools/run_tests.sh or a Godot --script, add or change a suite or a floor in tests/expected_checks.txt, read a red or cancelled CI run, or see a failure that might not be your change's fault - even if you think you already know how to run the tests.
+description: Extends the general game-architecture skill (tests and CI shape) with this repo's runners, floors and shards. How to run, add and debug MERCS Godot test suites and CI without tripping over other agents on the same PC - the tools/run_tests.sh interface, isolated user data, check floors, pinned seeds, one Godot process per agent, killing by recorded PID, and reading a red CI run (tests.yml plan, shards, aggregate test). Use it whenever you run tools/run_tests.sh or a Godot --script, add or change a suite or a floor in tests/expected_checks.txt, read a red or cancelled CI run, or see a failure that might not be your change's fault - even if you think you already know how to run the tests.
 ---
 
 # Running Godot tests in MERCS
