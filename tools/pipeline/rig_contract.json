@@ -122,6 +122,20 @@
       "bone_count": 52,
       "rest_pose_sha256": "17b2aa4204efa250fe30b3c96390733466528ad70d45c12909806fc021f43cc5",
       "height_after_contour_m": 1.7959
+    },
+    "orc": {
+      "height_m": 2.0203,
+      "height_macro": 0.777344,
+      "bone_count": 52,
+      "rest_pose_sha256": "af487239d1ce429f483608510a628cc21861ce027bbce4ddb6708563b25fa657",
+      "height_after_contour_m": 2.0203
+    },
+    "vampyr": {
+      "height_m": 1.9284,
+      "height_macro": 0.632675,
+      "bone_count": 52,
+      "rest_pose_sha256": "0e9201771432fb598f14e6076005bf63b89ae3d32d7a643b5257eea4e3d17e8a",
+      "height_after_contour_m": 1.9284
     }
   }
 }

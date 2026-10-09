@@ -1,0 +1,224 @@
+{
+ "_doc": "Orc, stage 1 blockout (silhouette study, route A). Plate over the mass, a two-handed battle axe carried in the right hand, head bare so tusks and personal details read. Shipped gear (Tripo hard pieces + Blender) replaces these piece by piece.",
+ "merc": "orc",
+ "stage": 1,
+ "pieces": {
+  "breastplate": {
+   "shape": "sphere",
+   "bone": "mixamorig:Spine1",
+   "at": "mid",
+   "offset_m": [
+    0,
+    -0.02,
+    0.02
+   ],
+   "size": [
+    0.62,
+    0.44,
+    0.56
+   ]
+  },
+  "fauld": {
+   "shape": "cone",
+   "bone": "mixamorig:Hips",
+   "at": "head",
+   "offset_m": [
+    0,
+    0,
+    -0.06
+   ],
+   "size": [
+    0.6,
+    0.44,
+    0.26
+   ],
+   "top_size": 0.52,
+   "sides": 10
+  },
+  "pauldron_l": {
+   "shape": "sphere",
+   "bone": "mixamorig:LeftArm",
+   "at": "head",
+   "offset_m": [
+    0.05,
+    0,
+    0.05
+   ],
+   "size": [
+    0.3,
+    0.32,
+    0.18
+   ],
+   "rot_deg": [
+    0,
+    -20,
+    0
+   ]
+  },
+  "pauldron_r": {
+   "shape": "sphere",
+   "bone": "mixamorig:RightArm",
+   "at": "head",
+   "offset_m": [
+    -0.05,
+    0,
+    0.05
+   ],
+   "size": [
+    0.3,
+    0.32,
+    0.18
+   ],
+   "rot_deg": [
+    0,
+    20,
+    0
+   ]
+  },
+  "vambrace_l": {
+   "shape": "cylinder",
+   "bone": "mixamorig:LeftForeArm",
+   "at": "mid",
+   "size": [
+    0.15,
+    0.15,
+    0.75
+   ],
+   "along_bone": true
+  },
+  "vambrace_r": {
+   "shape": "cylinder",
+   "bone": "mixamorig:RightForeArm",
+   "at": "mid",
+   "size": [
+    0.15,
+    0.15,
+    0.75
+   ],
+   "along_bone": true
+  },
+  "greave_l": {
+   "shape": "cylinder",
+   "bone": "mixamorig:LeftLeg",
+   "at": "mid",
+   "size": [
+    0.17,
+    0.17,
+    0.8
+   ],
+   "along_bone": true
+  },
+  "greave_r": {
+   "shape": "cylinder",
+   "bone": "mixamorig:RightLeg",
+   "at": "mid",
+   "size": [
+    0.17,
+    0.17,
+    0.8
+   ],
+   "along_bone": true
+  },
+  "cuisse_l": {
+   "shape": "cylinder",
+   "bone": "mixamorig:LeftUpLeg",
+   "at": "mid",
+   "size": [
+    0.24,
+    0.24,
+    0.6
+   ],
+   "along_bone": true
+  },
+  "cuisse_r": {
+   "shape": "cylinder",
+   "bone": "mixamorig:RightUpLeg",
+   "at": "mid",
+   "size": [
+    0.24,
+    0.24,
+    0.6
+   ],
+   "along_bone": true
+  },
+  "gorget": {
+   "shape": "cone",
+   "bone": "mixamorig:Neck",
+   "at": "head",
+   "offset_m": [
+    0,
+    0.01,
+    0
+   ],
+   "size": [
+    0.34,
+    0.3,
+    0.12
+   ],
+   "top_size": 0.24
+  },
+  "axe_haft": {
+   "shape": "cylinder",
+   "group": "axe",
+   "bone": "mixamorig:RightHand",
+   "offset_m": [
+    0,
+    0,
+    0.25
+   ],
+   "size": [
+    0.045,
+    0.045,
+    1.35
+   ]
+  },
+  "axe_blade": {
+   "shape": "box",
+   "group": "axe",
+   "bone": "mixamorig:RightHand",
+   "offset_m": [
+    -0.15,
+    0,
+    0.78
+   ],
+   "size": [
+    0.28,
+    0.035,
+    0.42
+   ]
+  },
+  "axe_spike": {
+   "shape": "cone",
+   "group": "axe",
+   "bone": "mixamorig:RightHand",
+   "offset_m": [
+    0.07,
+    0,
+    0.8
+   ],
+   "size": [
+    0.07,
+    0.07,
+    0.15
+   ],
+   "top_size": 0.0,
+   "rot_deg": [
+    0,
+    90,
+    0
+   ]
+  }
+ },
+ "groups": {
+  "axe": {
+   "bone": "mixamorig:RightHand",
+   "at": "mid",
+   "rot_deg": [
+    -28,
+    -14,
+    0
+   ],
+   "doc": "axe in the right fist, haft tipped forward and out so it clears the arm; the head rides above the shoulder"
+  }
+ }
+}

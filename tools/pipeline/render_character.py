@@ -46,6 +46,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--camera", default=str(CAMERA_FILE), help="camera rig json (default: the committed rig)")
     p.add_argument("--proportions", default=str(PROPORTIONS_FILE), help="proportion variants json")
     p.add_argument("--variant", default="", help="variant in --proportions (default: its 'default')")
+    p.add_argument("--kit", default="", help="stage gear kit json (tools/pipeline/kits/); blockout primitives on bones")
     p.add_argument("--pass", dest="render_pass", choices=("color", "normal", "parts"), default="color")
     return p.parse_args(argv)
 
@@ -234,6 +235,13 @@ def apply_parts_pass() -> None:
         if obj.type != "MESH":
             continue
         layer = obj.data.color_attributes.new("mercs_parts", "FLOAT_COLOR", "POINT")
+        if obj.parent_type == "BONE":  # rigid gear or feature: one label, from the bone it rides on
+            colour = next((rgb for rgb, bones in PART_GROUPS.items() if obj.parent_bone.startswith(bones)), PART_BODY)
+            for v in obj.data.vertices:
+                layer.data[v.index].color = (*colour, 1.0)
+            obj.data.materials.clear()
+            obj.data.materials.append(mat)
+            continue
         index_of = {g.index: g.name for g in obj.vertex_groups}
         rig = obj.parent
         roots = {rgb: rig.matrix_world @ rig.data.bones[bones[0]].head_local for rgb, bones in PART_GROUPS.items()}
@@ -258,7 +266,7 @@ def figure_extent_z(rig: bpy.types.Object) -> tuple[float, float]:
     deps = bpy.context.evaluated_depsgraph_get()
     lo, hi = math.inf, -math.inf
     for obj in rig.children:
-        if obj.type != "MESH":
+        if obj.type != "MESH" or obj.name.startswith(KIT_PREFIX):
             continue
         ev = obj.evaluated_get(deps)
         mesh = ev.to_mesh()
@@ -343,16 +351,32 @@ def recentre_bones(rig: bpy.types.Object, specs: dict) -> None:
     bpy.context.view_layer.update()
 
 
-def apply_proportions(rig: bpy.types.Object, path: str, name: str, height_m: float) -> dict:
+def lean_bones(rig: bpy.types.Object, degrees: dict) -> None:
+    """A merc's posture (bodies.json "posture_lean_deg"): turn each bone, in order, about the world X
+    axis through its head; positive leans forward (the body faces -Y). Runs before the arm aims, so
+    the arms still hang to their stance directions from the leaned shoulders."""
+    world_inv = rig.matrix_world.inverted()
+    for bone, deg in degrees.items():
+        bpy.context.view_layer.update()
+        pb = rig.pose.bones[bone]
+        m = rig.matrix_world @ pb.matrix
+        turn = Matrix.Rotation(math.radians(deg), 4, Vector((1.0, 0.0, 0.0)))
+        head = Matrix.Translation(m.translation)
+        pb.matrix = world_inv @ (head @ turn @ head.inverted() @ m)
+    bpy.context.view_layer.update()
+
+
+def apply_proportions(rig: bpy.types.Object, path: str, name: str, height_m: float, posture: dict) -> dict:
     """Pose and scale bones for a sample variant, then refit the figure to height_m with feet on z = 0."""
     cfg = json.loads(Path(path).read_text(encoding="utf-8"))
     name = name or cfg["default"]
     spec = cfg["variants"][name]
     scales = spec["bone_scale"]
     aim = {**cfg.get("pose", {}).get("bone_direction", {}), **spec.get("bone_direction", {})}
-    if not scales and not aim and not cfg.get("pose", {}).get("bone_twist_deg"):
+    if not scales and not aim and not posture and not cfg.get("pose", {}).get("bone_twist_deg"):
         return {"variant": name, "rig_scale": 1.0, "height_m": None}
     rig.data.pose_position = "POSE"
+    lean_bones(rig, posture)
     aim_bones(rig, aim)
     twist_bones(rig, {**cfg.get("pose", {}).get("bone_twist_deg", {}), **spec.get("bone_twist_deg", {})})
     for bone, factor in scales.items():
@@ -369,6 +393,80 @@ def apply_proportions(rig: bpy.types.Object, path: str, name: str, height_m: flo
     lo, hi = figure_extent_z(rig)
     print(f"PROPORTION {name} rig_scale {s:.4f} height {hi - lo:.4f} feet {lo:.4f}")
     return {"variant": name, "rig_scale": round(s, 6), "height_m": round(hi - lo, 4)}
+
+
+KIT_PREFIX = "kit_"
+KIT_SHAPES = {"sphere": lambda: bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=8, radius=0.5),
+              "box": lambda: bpy.ops.mesh.primitive_cube_add(size=1.0),
+              "cylinder": lambda: bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.5, depth=1.0)}
+
+
+def bone_point(rig: bpy.types.Object, bone: str, at: str) -> Vector:
+    pb = rig.pose.bones[bone]
+    head, tail = rig.matrix_world @ pb.head, rig.matrix_world @ pb.tail
+    return {"head": head, "tail": tail, "mid": (head + tail) / 2}[at]
+
+
+def euler_matrix(degrees) -> Matrix:
+    return Euler([math.radians(a) for a in degrees], "XYZ").to_matrix().to_4x4()
+
+
+def add_kit(rig: bpy.types.Object, path: str) -> dict:
+    """Stage gear blockout (route A): primitives sized in metres and placed on the posed figure,
+    each parented to a bone so clips carry it. A piece sits at its bone's posed head, tail or mid
+    point plus offset_m (world axes: +X the body's left, -Y its front, +Z up). "along_bone" turns
+    the piece's Z axis down the bone (vambraces, greaves) and makes size[2] a share of the bone's
+    length; otherwise rot_deg is a world XYZ rotation. A "cone" piece tapers from size[0] to
+    top_size. Blockouts are silhouette studies; shipped gear replaces them piece by piece."""
+    cfg = json.loads(Path(path).read_text(encoding="utf-8"))
+    bpy.context.view_layer.update()
+    groups = {}
+    for gname, g in cfg.get("groups", {}).items():
+        groups[gname] = (Matrix.Translation(bone_point(rig, g["bone"], g.get("at", "head")) + Vector(g.get("offset_m", (0, 0, 0))))
+                         @ euler_matrix(g.get("rot_deg", (0.0, 0.0, 0.0))))
+    for name, piece in cfg["pieces"].items():
+        pb = rig.pose.bones[piece["bone"]]
+        head = rig.matrix_world @ pb.head
+        tail = rig.matrix_world @ pb.tail
+        anchor = {"head": head, "tail": tail, "mid": (head + tail) / 2}[piece.get("at", "head")]
+        size = Vector(piece["size"])
+        if piece["shape"] == "cone":
+            bpy.ops.mesh.primitive_cone_add(vertices=piece.get("sides", 12), radius1=0.5,
+                                            radius2=0.5 * piece.get("top_size", 0.0) / size[0], depth=1.0)
+        else:
+            KIT_SHAPES[piece["shape"]]()
+        obj = bpy.context.active_object
+        obj.name = f"{KIT_PREFIX}{name}"
+        if piece.get("along_bone"):
+            axis = (tail - head)
+            size[2] *= axis.length
+            rot = Vector((0.0, 0.0, 1.0)).rotation_difference(axis.normalized()).to_matrix().to_4x4()
+        else:
+            rot = Euler([math.radians(a) for a in piece.get("rot_deg", (0.0, 0.0, 0.0))], "XYZ").to_matrix().to_4x4()
+        scale = Matrix.Diagonal((*size, 1.0))
+        if "group" in piece:  # offset and rotation in the group's frame (an axe is one rigid object)
+            obj.matrix_world = groups[piece["group"]] @ Matrix.Translation(Vector(piece.get("offset_m", (0, 0, 0)))) @ rot @ scale
+        else:
+            obj.matrix_world = Matrix.Translation(anchor + Vector(piece.get("offset_m", (0.0, 0.0, 0.0)))) @ rot @ scale
+        bpy.context.view_layer.update()
+        world = obj.matrix_world.copy()
+        obj.parent = rig
+        obj.parent_type = "BONE"
+        obj.parent_bone = piece["bone"]
+        bpy.context.view_layer.update()
+        obj.matrix_world = world
+    bpy.context.view_layer.update()
+    return {"file": rel_path(Path(path).resolve()), "sha256": sha256(Path(path)), "pieces": len(cfg["pieces"])}
+
+
+def body_spec(body: str) -> dict:
+    return json.loads((BODIES_DIR / "bodies.json").read_text(encoding="utf-8"))["bodies"].get(body, {})
+
+
+def body_height_m(body: str, cam: dict) -> float:
+    """The body's own standing height (bodies.json): a merc body keeps its height on the shared
+    px_per_m scale, so the orc stands taller on screen than average_m (camera reference height)."""
+    return body_spec(body).get("height_m", cam["reference_height_m"])
 
 
 def body_rig() -> bpy.types.Object:
@@ -393,14 +491,16 @@ def main() -> None:
         if obj.type in ("CAMERA", "LIGHT"):
             bpy.data.objects.remove(obj, do_unlink=True)
     setup_render(cam, light)
+    rig = body_rig()
+    proportion = apply_proportions(rig, args.proportions, args.variant, body_height_m(args.body, cam),
+                                   body_spec(args.body).get("posture_lean_deg", {}))
+    kit = add_kit(rig, args.kit) if args.kit else None
     if args.render_pass == "normal":
         apply_normal_pass()
     elif args.render_pass == "parts":
         apply_parts_pass()
     else:
         apply_material(light["body_material"])
-    rig = body_rig()
-    proportion = apply_proportions(rig, args.proportions, args.variant, cam["reference_height_m"])
     add_camera(cam)
     add_lights(light)
 
@@ -438,6 +538,8 @@ def main() -> None:
     prop_file = Path(args.proportions).resolve()
     meta["inputs"]["proportions"] = {"file": rel_path(prop_file), "sha256": sha256(prop_file)}
     meta["proportion"] = proportion
+    if kit:
+        meta["inputs"]["kit"] = kit
     (out / "render_meta.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8", newline="\n")
     print("RENDER_OK " + str(len(outputs)))
 

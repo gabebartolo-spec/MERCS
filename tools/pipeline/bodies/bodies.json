@@ -5,14 +5,188 @@
   "bodies": {
     "average_m": {
       "height_m": 1.78,
-      "macros": {"gender": 1.0, "age": 0.5, "muscle": 0.5, "weight": 0.5, "proportions": 0.5,
-                 "cupsize": 0.5, "firmness": 0.5,
-                 "race": {"asian": 0.33, "caucasian": 0.33, "african": 0.33}},
-      "contour_targets": {"torso-scale-depth-incr": 0.3, "hip-scale-depth-incr": 0.3,
-                          "buttocks-volume-incr": 0.3, "stomach-pregnant-incr": 0.1,
-                          "l-upperarm-shoulder-muscle-decr": 0.4, "r-upperarm-shoulder-muscle-decr": 0.4,
-                          "torso-muscle-dorsi-decr": 0.4, "neck-scale-vert-incr": 0.3},
+      "macros": {
+        "gender": 1.0,
+        "age": 0.5,
+        "muscle": 0.5,
+        "weight": 0.5,
+        "proportions": 0.5,
+        "cupsize": 0.5,
+        "firmness": 0.5,
+        "race": {
+          "asian": 0.33,
+          "caucasian": 0.33,
+          "african": 0.33
+        }
+      },
+      "contour_targets": {
+        "torso-scale-depth-incr": 0.3,
+        "hip-scale-depth-incr": 0.3,
+        "buttocks-volume-incr": 0.3,
+        "stomach-pregnant-incr": 0.1,
+        "l-upperarm-shoulder-muscle-decr": 0.4,
+        "r-upperarm-shoulder-muscle-decr": 0.4,
+        "torso-muscle-dorsi-decr": 0.4,
+        "neck-scale-vert-incr": 0.3
+      },
       "contour_doc": "Lead QC 2026-10-09: the E/W profile read as a straight column under the big head. The torso was already 0.224 m deep (12-13 px at 56 px and 55 deg, measured), so these add curve (chest, belly, buttocks) more than depth. Round 3: buttocks 0.5 -> 0.3; shoulder caps and lats eased toward average and the neck lengthened a little, so the head no longer sinks between heavy traps and delts. Applied after the rig is hashed: flesh only, no bone moves."
+    },
+    "orc": {
+      "height_m": 2.02,
+      "macros": {
+        "gender": 1.0,
+        "age": 0.5,
+        "muscle": 1.0,
+        "weight": 0.85,
+        "proportions": 0.25,
+        "cupsize": 0.5,
+        "firmness": 0.5,
+        "race": {
+          "asian": 0.2,
+          "caucasian": 0.2,
+          "african": 0.6
+        }
+      },
+      "shape_targets": {
+        "measure-shoulder-dist-incr": 1.2,
+        "torso-scale-horiz-incr": 1.0,
+        "torso-scale-depth-incr": 0.9,
+        "torso-vshape-incr": 0.4,
+        "torso-muscle-dorsi-incr": 1.0,
+        "torso-muscle-pectoral-incr": 0.8,
+        "stomach-pregnant-incr": 0.5,
+        "hip-scale-horiz-incr": 0.5,
+        "hip-scale-depth-incr": 0.4,
+        "lr-upperarm-scale-horiz-incr": 1.0,
+        "lr-upperarm-scale-depth-incr": 1.0,
+        "lr-upperarm-muscle-incr": 1.0,
+        "lr-upperarm-shoulder-muscle-incr": 1.0,
+        "lr-lowerarm-scale-horiz-incr": 1.4,
+        "lr-lowerarm-scale-depth-incr": 1.2,
+        "lr-lowerarm-muscle-incr": 1.0,
+        "lr-hand-scale-incr": 1.0,
+        "lr-hand-fingers-diameter-incr": 1.0,
+        "lr-upperleg-scale-horiz-incr": 0.5,
+        "lr-upperleg-scale-depth-incr": 0.6,
+        "lr-upperleg-muscle-incr": 0.8,
+        "lr-lowerleg-scale-horiz-incr": 0.8,
+        "lr-lowerleg-muscle-incr": 0.8,
+        "measure-upperleg-height-decr": 0.6,
+        "lowerlegs-height-decr": 0.4,
+        "neck-scale-horiz-incr": 1.5,
+        "neck-scale-depth-incr": 1.2,
+        "neck-scale-vert-decr": 0.8,
+        "neck-trans-forward": 0.6,
+        "head-scale-vert-decr": 0.3,
+        "head-square": 0.7,
+        "chin-width-incr": 1.0,
+        "chin-prominent-incr": 0.7,
+        "chin-prognathism-incr": 1.0,
+        "chin-bones-incr": 1.0,
+        "eyebrows-trans-forward": 1.0,
+        "eyebrows-angle-down": 1.0,
+        "forehead-trans-backward": 0.8,
+        "forehead-scale-vert-decr": 0.7,
+        "nose-scale-horiz-incr": 0.8,
+        "nose-flaring-incr": 1.0,
+        "nose-scale-vert-decr": 0.6,
+        "nose-point-up": 0.7,
+        "mouth-scale-horiz-incr": 0.6,
+        "lr-ear-shape-pointed": 0.8,
+        "lr-ear-scale-decr": 0.3,
+        "measure-wrist-circ-incr": 1.0,
+        "measure-calf-circ-incr": 1.0,
+        "lr-lowerleg-scale-depth-incr": 0.8,
+        "lr-leg-valgus-decr": 0.7,
+        "measure-knee-circ-incr": 0.8,
+        "measure-upperarm-circ-incr": 0.6
+      },
+      "doc": "Merc 'orc' (director's reference, 2026-10-09): big, bulky, mean; charges in on pure aggression, plate and a battle axe. Anchors: hunched shoulder mass on a thick short neck, heavy jaw with tusks, grey-green skin ramp (palette, not texture).",
+      "posture_lean_deg": {
+        "mixamorig:Spine": 4.0,
+        "mixamorig:Spine1": 5.0,
+        "mixamorig:Spine2": 6.0,
+        "mixamorig:Neck": 6.0,
+        "mixamorig:Head": -16.0
+      },
+      "posture_doc": "Hunched predator: chest and shoulders rolled forward, head thrust forward and level, so the mass leads.",
+      "features": {
+        "tusk_l": {
+          "bone": "mixamorig:Head",
+          "base_m": [
+            0.024,
+            -0.178,
+            1.832
+          ],
+          "dir": [
+            0.18,
+            -0.12,
+            1.0
+          ],
+          "radius_m": 0.013,
+          "tip_radius_m": 0.003,
+          "length_m": 0.065
+        },
+        "tusk_r": {
+          "bone": "mixamorig:Head",
+          "base_m": [
+            -0.024,
+            -0.178,
+            1.832
+          ],
+          "dir": [
+            -0.18,
+            -0.12,
+            1.0
+          ],
+          "radius_m": 0.013,
+          "tip_radius_m": 0.003,
+          "length_m": 0.065
+        }
+      }
+    },
+    "vampyr": {
+      "height_m": 1.93,
+      "macros": {
+        "gender": 1.0,
+        "age": 0.75,
+        "muscle": 0.6,
+        "weight": 0.2,
+        "proportions": 1.0,
+        "cupsize": 0.5,
+        "firmness": 0.5,
+        "race": {
+          "asian": 0.1,
+          "caucasian": 0.8,
+          "african": 0.1
+        }
+      },
+      "shape_targets": {
+        "measure-shoulder-dist-incr": 0.4,
+        "torso-vshape-incr": 0.5,
+        "measure-waist-circ-decr": 0.6,
+        "neck-scale-vert-incr": 0.5,
+        "neck-scale-horiz-decr": 0.3,
+        "head-oval": 0.6,
+        "head-scale-vert-incr": 0.3,
+        "chin-height-incr": 0.4,
+        "chin-prominent-incr": 0.4,
+        "eyebrows-angle-down": 0.6,
+        "nose-scale-vert-incr": 0.4,
+        "nose-hump-incr": 0.5,
+        "nose-point-width-decr": 0.5,
+        "forehead-temple-decr": 0.6,
+        "lr-cheek-volume-decr": 1.0,
+        "lr-cheek-bones-incr": 0.9,
+        "lr-ear-shape-pointed": 0.7
+      },
+      "doc": "Merc 'vampyr' (director's reference, 2026-10-09): regal dark knight, bestial nature barely contained (mood: an undead Tywin Lannister, not a likeness). Anchors: tall upright lean frame, gaunt hollow-cheeked face, high collar and cape line (stage gear), corpse-pale skin ramp.",
+      "posture_lean_deg": {
+        "mixamorig:Spine1": -3.0,
+        "mixamorig:Spine2": -3.0,
+        "mixamorig:Head": -4.0
+      },
+      "posture_doc": "Regal: chest lifted, shoulders back, chin slightly raised; the beast shows in the hands and face, not the stance."
     }
   }
 }

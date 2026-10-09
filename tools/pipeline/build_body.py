@@ -10,6 +10,10 @@ rounded to 0.1 mm / 0.0001 rad, so the same inputs give the same hash.
 A body's "contour_targets" (MPFB target name -> weight) are loaded after the rig is fitted and
 hashed: they reshape the flesh (chest, belly, buttocks) without moving a bone, so the frozen rig
 contract stays valid.
+A merc body (route A, director 2026-10-09: one skeleton naming, a body per merc) may also carry
+"shape_targets", loaded before the height fit and the rig, so the joints follow the merc's own
+proportions (shoulder width, neck, jaw), and "features": small rigid meshes on a bone for what the
+human base mesh lacks (tusks). Each merc gets its own entry and hash in the rig contract.
 """
 from __future__ import annotations
 
@@ -68,8 +72,20 @@ def set_macros(basemesh: bpy.types.Object, macros: dict, height_macro: float) ->
     TargetService.reapply_macro_details(basemesh)
 
 
+def load_targets(basemesh: bpy.types.Object, targets: dict) -> None:
+    """Load MPFB targets by name. "lr-x" loads both "l-x" and "r-x"; a weight above 1 is allowed
+    (the slider maximum is raised to it), for proportions past the human range (the orc)."""
+    for name, weight in sorted(targets.items()):
+        names = [f"l-{name[3:]}", f"r-{name[3:]}"] if name.startswith("lr-") else [name]
+        for n in names:
+            key = TargetService.load_target(basemesh, TargetService.target_full_path(n), weight=0.0, name=n)
+            key.slider_max = max(1.0, weight)
+            key.value = weight
+
+
 def build_mesh(spec: dict, tolerance: float) -> tuple[bpy.types.Object, float]:
     basemesh = HumanService.create_human(feet_on_ground=False)
+    load_targets(basemesh, spec.get("shape_targets", {}))
     lo, hi = 0.0, 1.0
     macro = 0.5
     for _ in range(BISECT_STEPS):
@@ -105,6 +121,27 @@ def add_sockets(armature: bpy.types.Object, sockets: dict) -> None:
         empty.matrix_world = world
 
 
+def add_features(armature: bpy.types.Object, features: dict) -> None:
+    """Rigid cones on a bone (tusks, horns). base_m is the world position of the cone's base on the
+    built body (feet on z = 0, facing -Y, left = +X); the tip points along dir."""
+    for name, f in sorted(features.items()):
+        base = Vector(f["base_m"])
+        direction = Vector(f["dir"]).normalized()
+        bpy.ops.mesh.primitive_cone_add(vertices=f.get("sides", 8), radius1=f["radius_m"],
+                                        radius2=f.get("tip_radius_m", 0.0), depth=f["length_m"])
+        obj = bpy.context.active_object
+        obj.name = f"feature_{name}"
+        rot = Vector((0.0, 0.0, 1.0)).rotation_difference(direction).to_matrix().to_4x4()
+        obj.matrix_world = Matrix.Translation(base + direction * f["length_m"] / 2) @ rot
+        bpy.context.view_layer.update()
+        world = obj.matrix_world.copy()
+        obj.parent = armature
+        obj.parent_type = "BONE"
+        obj.parent_bone = f["bone"]
+        bpy.context.view_layer.update()
+        obj.matrix_world = world
+
+
 def rest_pose(armature: bpy.types.Object, sockets: dict) -> dict:
     r = lambda v: [round(float(c), ROUND_DIGITS) + 0.0 for c in v]  # +0.0 folds -0.0
     bones = {}
@@ -137,6 +174,7 @@ def main() -> None:
     armature = HumanService.add_builtin_rig(basemesh, bodies["rig"], import_weights=True)
     check_left_is_plus_x(armature)
     add_sockets(armature, sockets)
+    add_features(armature, spec.get("features", {}))
 
     pose = rest_pose(armature, sockets)
     digest = hashlib.sha256(json.dumps(pose, sort_keys=True).encode("utf-8")).hexdigest()
