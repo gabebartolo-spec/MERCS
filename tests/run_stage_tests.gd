@@ -92,17 +92,23 @@ func _check_scene_loads() -> void:
 		* int(_knob("street", "depth_m") / _knob("street", "cell_size_m"))
 	)
 	var houses := _knob_list("street", "house_cells_xz").size() / 2
-	var expected_cells := ground_cells + houses + 3
+	var room := _knob_list("interior", "size_cells")
+	var room_x: float = room[0] if room.size() >= 2 else 0.0
+	var room_z: float = room[1] if room.size() >= 2 else 0.0
+	var floor_cells := int(room_x) * int(room_z)
+	# Walls ring the room's edge (two cells thinner inside each way), less the exit gap.
+	var wall_cells := floor_cells - (int(room_x) - 2) * (int(room_z) - 2) - 1
+	var expected_cells := ground_cells + houses + 3 + floor_cells + wall_cells
 	check(
 		street.get_used_cells().size() == expected_cells,
 		(
-			"the GridMap holds %d cells (ground, %d houses, well, cart, door), not %d"
+			"the GridMap holds %d cells (ground, %d houses, well, cart, door, interior), not %d"
 			% [expected_cells, houses, street.get_used_cells().size()]
 		)
 	)
 	check(
-		street.mesh_library != null and street.mesh_library.get_item_list().size() == 5,
-		"the MeshLibrary has five placeholder items"
+		street.mesh_library != null and street.mesh_library.get_item_list().size() == 6,
+		"the MeshLibrary has six placeholder items (five street boxes and the interior wall)"
 	)
 	check(houses == 6, "the data places six houses, not %d" % houses)
 	_check_camera_and_light(stage)

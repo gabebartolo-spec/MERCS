@@ -1,3 +1,5 @@
 {
-  "_comment": "Every player-visible string, by key. Code calls Text.t(\"merc.died.title\", {...}); no player-visible string lives in a script (04_GUARDRAILS.md B12). Schema: data/schema/text.schema.json."
+  "_comment": "Every player-visible string, by key. Code calls Text.t(\"merc.died.title\", {...}); no player-visible string lives in a script (04_GUARDRAILS.md B12). Schema: data/schema/text.schema.json.",
+  "slice.help": "WASD or arrows: walk   Click: walk there   T: time of day   R: rain   F1: hide help   F3: frame time",
+  "slice.frame_time": "{ms} ms"
 }

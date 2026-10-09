@@ -20,3 +20,6 @@ docs/**/*.png -filter -diff -merge
 assets/golden/*.png -filter -diff -merge
 # Pipeline test fixtures: CI checks out without LFS and the pipeline self-test reads these.
 tests/fixtures/pipeline/**/*.png -filter -diff -merge
+# Engine sprite sheets (pixel art, kilobytes each): plain git, so CI's checkout (no LFS) and
+# the exported build get the real PNGs and runs cost no LFS bandwidth. Big binaries stay LFS.
+assets/sprites/**/*.png -filter -diff -merge

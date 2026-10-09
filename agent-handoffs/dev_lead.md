@@ -3,7 +3,14 @@ Start from this file, CLAUDE.md, your brief (`agent-briefs/DEV_LEAD_OPUS.md`), `
 §Phase 1 only, `docs/specs/phase1_visual_proof.md`, and `docs/01_ENGINE_DECISION.md` "Rendering plan".
 Run `git fetch`, then `gh pr list` and `docs/STATUS.md`: PR states below are as of writing.
 
-## State: working (this PR open: sheets load from an exported .pck; Art on realistic QC round 3)
+## State: working (#53 and #52 merged; #54 walk/idle playback ready; LFS fix PR for #55; then stage freeze)
+## THE GOAL (director, 2026-10-09)
+"A playable vertical slice that I can test and assess the art direction before we develop bulk
+assets and content." Spec: `docs/specs/art_direction_slice.md` (the playable Phase 1 gate build:
+controllable merc, crowd, real kit, day/dusk/night, rain + particles, three looks + eye-patch,
+one interior, plus a scripted one-pass example of the core loop (recruit, contract, gate, 3v4
+turn-based battle, aftermath, camp); milestones M1 playable grey-box -> M2 body -> M3 street ->
+M4 looks -> M5 loop example -> gate). Dev owns M1 now, then the M5 skeleton.
 ## Who does what
 This account has no Concept Lead: the session acts as lead AND Dev Lead under the original
 account's rules. Peers (desktop sessions): "MERCS SUPPORT" = Merge & CI (merges, board PRs);
@@ -40,22 +47,43 @@ Art renders the realistic body (round-2 fixes carried over) at pitch 55 and 56 /
 QC Art's strips, capture each in the street, then ONE director question with labelled 4K images.
 ## Merged since the last handoff
 #41 `.gdignore` import fix; #42 mercs lit where they stand; #44 `--logical=WxH` density captures.
-## This PR (`claude/p1-sheet-pck-load`)
-The cloud subagent's `claude/p1-sheet-export-load` (c790e02 test-first, d520808 fix) merged onto main:
-`SheetFrame._load_image()` loads imported res:// PNGs through ResourceLoader, so sheets work from an
-exported .pck (the Phase 1 gate is played in the build). Three `assets` checks: imported textures keep
-every visible pixel, a sheet that exists only inside a .pck loads, and its pixels match. Floor 8 -> 11.
-Delete the old remote branch `claude/p1-sheet-export-load` after merge (superseded by this PR).
+## Director picks 2026-10-09 (labelled 4K street captures, Lead QC passed)
+Density **84 px** (960x540 logical; x2 at 1080p, x4 at 4K) and **45° sprites in the 55° world** at the
+same px/m (82.275 px/m at 1x). Art's freeze is PR #52 (camera_rig: pitch_deg 45, world_pitch_deg 55,
+px_per_m_1x authority, cell 176, pivot 88,152). Then Art publishes
+`assets/sprites/mercs/average_m/average_m_body_rest.json` (the slice loads exactly this path) and
+renders walk + idle (Mixamo works now: all 10 clips in the vault, retarget probe OK).
+## Slice M1 PR (`claude/slice-m1-playable`)
+`ui/screens/main.tscn` boots `presentation/world/slice_game.tscn`: `SliceGame` (keys / click walk via
+`GridWalker`, A* on `StreetGrid.walkable_cells()`, camera `focus_on` in whole logical pixels, crowd
+routes from `data/balance/slice.json`, T/R/F1/F3, door -> interior at x 100 and back). Runtime
+lighting split into `StageLighting` (day / dusk / night, rain toggle); `PixelScreen` holds the
+whole-screen wrap; `Text.t()` (`presentation/text.gd`) reads `data/text/en.json`. Slice sets
+960x540 / 84 px itself; the stage's own defaults (and stage_scale's rig check reading
+px_per_m_1x) change in the stage-freeze PR after #52. New suite `slice` (11, real input events).
+Merged earlier: #49 (sheets load from a .pck), #51 is the slice spec.
+## Draft `claude/slice-m2-clips` (depends on #53; merge main in after #53, then mark ready)
+`SheetClip` (presentation/world/sheet_clip.gd) loads a whole mercs.sheet/1 once: frames per facing
+("frame" 0..n-1), "fps", "loop", "ground_speed_mps". SliceGame plays walk while moving, idle while
+standing (rest pose fallback), crowd phase-offset 0.37 s, mercs move at the walk clip's ground
+speed. Art's agreed layout: row per facing in rig order, walk 8 frames (~6.5 fps), idle 4 (~4 fps),
+files `average_m_body_walk.json` / `_idle.json` beside the rest sheet. slice floor 11 -> 13.
+## Sprite sheets are plain git (Lead, 2026-10-09)
+Art's #55 (rest sheet under assets/) went red on CI: `*.png` is LFS and CI checks out without LFS,
+so Godot read pointer files. `.gitattributes` now makes `assets/sprites/**/*.png` plain git (like
+the pipeline fixtures); big binaries stay LFS. After the fix merges, Art merges main into #55 and
+runs `git add --renormalize assets/`. Lead QC of #55 in game: PASS (real merc in the slice).
 ## Suites (floors)
-data 88, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 11 (this PR).
+data 88, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 11, slice 11 (#53) -> 13 (m2-clips draft).
 ## Next for the Dev Lead, in order
-1. QC Art's realistic density samples; director picks the density (labelled 4K images).
-2. Freeze the pick (Art: camera_rig/proportions; Dev: stage.json pixel block), default merc from
-   `assets/`, head/hair-layer question. 3. (this PR) then idle on code until a pick.
+1. After #52: stage-freeze PR (stage.json pixel 960x540 x2, sprite_height 84, stage_scale reads
+   px_per_m_1x, capture defaults). Tell the director M1 is playable once main's build.yml is green.
+2. M5 loop skeleton (recruit card, contract board, gate check, 3-4 v 4 battle on the grid, aftermath,
+   camp) in sim/ + presentation, seeded. 3. Walk/idle playback (sheet clips) when Art delivers.
 4. Street spec §6 occlusion/sorting fixture (crowd capture: `--extra=x,z;x,z`).
 5. Weather catalogue only if the director pulls it forward (Phase 1 caps: rain, night, torch).
 ## Worktrees
-Mine: `../MERCS-wt/p1-pck` (this PR); remove it when it merges.
+Mine: `../MERCS-wt/slice-m1` (M1 PR); remove it when it merges.
 Art: `../MERCS-wt/art-qc`. Not mine: `.claude/worktrees/dual-desktop-instances-a78d20`.
 ## Rules learnt the hard way (keep under 10 lines)
 - `git fetch` and read `git log origin/main` before choosing or briefing any work.
