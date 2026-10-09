@@ -206,6 +206,8 @@ def outline(img: Image, colour: tuple[int, int, int]) -> Image:
 
 
 BODY_LABEL = 2  # parts pass: channel 0 = left arm, 1 = right arm, 2 = the rest of the body
+ROOT_LABEL = 3  # white in the parts pass: an arm's root (shoulder cap), never lined
+WHITE_MIN = 128
 
 
 def part_labels(parts: Image, scale: int, threshold: int) -> list[list[int]]:
@@ -214,12 +216,15 @@ def part_labels(parts: Image, scale: int, threshold: int) -> list[list[int]]:
     labels = [[-1] * w for _ in range(h)]
     for oy in range(h):
         for ox in range(w):
-            votes = [0, 0, 0]
+            votes = [0, 0, 0, 0]
             for y in range(oy * scale, oy * scale + scale):
                 for x in range(ox * scale, ox * scale + scale):
                     r, g, b, a = parts.get(x, y)
                     if a >= threshold:
-                        votes[(r, g, b).index(max(r, g, b))] += 1
+                        if min(r, g, b) >= WHITE_MIN:
+                            votes[ROOT_LABEL] += 1
+                        else:
+                            votes[(r, g, b).index(max(r, g, b))] += 1
             if any(votes):
                 labels[oy][ox] = votes.index(max(votes))
     return labels
@@ -232,7 +237,7 @@ def inner_lines(img: Image, labels: list[list[int]], colour: tuple[int, int, int
     out.rgba[:] = img.rgba
     for y in range(img.height):
         for x in range(img.width):
-            if img.get(x, y)[3] == 0 or labels[y][x] in (-1, BODY_LABEL):
+            if img.get(x, y)[3] == 0 or labels[y][x] in (-1, BODY_LABEL, ROOT_LABEL):
                 continue
             for dx, dy in NEIGHBOURS_4:
                 nx, ny = x + dx, y + dy

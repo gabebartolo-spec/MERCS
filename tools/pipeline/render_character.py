@@ -205,15 +205,17 @@ PART_GROUPS = {  # flat emission colour -> bones whose summed vertex weight mark
 }
 PART_BODY = (0.0, 0.0, 1.0)
 PART_WEIGHT = 0.5
-PART_ROOT_CLEAR_M = 0.10  # arm vertices this close to the shoulder joint count as body: no seam at the root
+PART_ROOT = (1.0, 1.0, 1.0)  # the arm's root (shoulder cap): neither arm nor body, so no line either side
+PART_ROOT_CLEAR_M = 0.10  # arm vertices this close to the shoulder joint are root
 
 
 def apply_parts_pass() -> None:
     """Flat colour per body part (left arm red, right arm green, the rest blue) for the pixel post's
     inner lines (06 section 3: a line only where the silhouette would merge). Finger and hand
-    groups count towards their arm by name prefix; the shoulder cap (within PART_ROOT_CLEAR_M of
-    the arm's root joint, at rest) counts as body, so no line is drawn where the arm joins the torso
-    (Lead QC round 3). Raw view, no dither: labels, not colour."""
+    groups count towards their arm by name prefix. The shoulder cap (arm vertices within
+    PART_ROOT_CLEAR_M of the arm's root joint, at rest) is labelled root (white): lines are drawn only
+    where an arm meets the body, never at the root, which the round-3 "body" label turned into a
+    tick across the arm. Raw view, no dither: labels, not colour."""
     mat = bpy.data.materials.new("mercs_parts_pass")
     if mat.node_tree is None:
         mat.use_nodes = True
@@ -237,8 +239,8 @@ def apply_parts_pass() -> None:
             where = obj.matrix_world @ v.co
             for rgb, bones in PART_GROUPS.items():
                 w = sum(g.weight for g in v.groups if index_of[g.group].startswith(bones))
-                if w >= PART_WEIGHT and (where - roots[rgb]).length >= PART_ROOT_CLEAR_M:
-                    colour = rgb
+                if w >= PART_WEIGHT:
+                    colour = rgb if (where - roots[rgb]).length >= PART_ROOT_CLEAR_M else PART_ROOT
             layer.data[v.index].color = (*colour, 1.0)
         obj.data.materials.clear()
         obj.data.materials.append(mat)

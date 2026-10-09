@@ -4,7 +4,7 @@
   "layer": "body",
   "clip": "rest",
   "image": "average_m_realistic_p55_h56.png",
-  "image_pixel_sha256": "058a453c3d23d5663ff9332dcd3c6bc9c79319c41168e0efa0f297019747bb8e",
+  "image_pixel_sha256": "4562e738e8352775056a37edb93c5d8c9c4285de8c47d1a567394ec229e640a3",
   "frame_w": 96,
   "frame_h": 96,
   "frame_count": 8,
@@ -101,48 +101,48 @@
       {
         "file": "facing_0_S.png",
         "kind": "render_4x",
-        "sha256": "ca7e4c77b5af9c258e18596ce707d45dcd39d05e5940f44cac107e2cfbc644ee"
+        "sha256": "fb8cb82ccf95e7670140a2e34a96c837d3df37accc9c2b5d538cd6537faf757e"
       },
       {
         "file": "facing_1_SE.png",
         "kind": "render_4x",
-        "sha256": "e97dd6c8b155168e019c16f29ee7f573b5a78c643e3908b020c6523a7434e7e5"
+        "sha256": "9997f827d2a7d2047ab23b716d5dc214406db6b2ba91d1f34b5f1ad3ce25c59c"
       },
       {
         "file": "facing_2_E.png",
         "kind": "render_4x",
-        "sha256": "62c7da7645591b938d1d99194c7bc456e5ce03cd57f78815638ef16fa4390f2d"
+        "sha256": "280e4af319ce9f790d288dc055a5813d530e375b7fa120f2dffb9417c43de628"
       },
       {
         "file": "facing_3_NE.png",
         "kind": "render_4x",
-        "sha256": "589b44278aa7a5fcff419f780d2b9ddd395b830e4ec217d80e8de1b999536ce0"
+        "sha256": "d0fa1249fc93f9e5f3c7ce7e747d3974d5539b3ac3ed39823ef9247ce55887c9"
       },
       {
         "file": "facing_4_N.png",
         "kind": "render_4x",
-        "sha256": "591ef418659b8bd01f004e6adb0c32645bee067ad7d0ec147016e91860a97dc0"
+        "sha256": "60e6f9050e8960bc9650e9ea765e6aaabff435893c65212422b5be8289897aa4"
       },
       {
         "file": "facing_5_NW.png",
         "kind": "render_4x",
-        "sha256": "cc5200d97f2b49a5faba9d2e7d482de0ef29545d11216bd85a638bdb488a0520"
+        "sha256": "bb9946e1a04f22f0eb2f771b07b04b9d121aec3ed6972df73cfe5e648b85afd8"
       },
       {
         "file": "facing_6_W.png",
         "kind": "render_4x",
-        "sha256": "a050fef83a2cb299627c668e466c37c9b1fcf756d9ac9ce948916931dc2e854e"
+        "sha256": "0d047eb342823da3d71cf33064d47e6330e097d4c0bf6bb73c0a298facf99434"
       },
       {
         "file": "facing_7_SW.png",
         "kind": "render_4x",
-        "sha256": "ddac98438305690bc4f025440633b708e1fa3a512261caabe5a5123cce616eb2"
+        "sha256": "bcb4c7f10e66f1c6205dcf83f359c8aac24720ad0856ca0829c9a4a2dd6eccfb"
       }
     ],
     "inputs": {
       "body_blend": {
         "file": "tools/pipeline/bodies/average_m.blend",
-        "sha256": "26d6a151dfda0f75a97afb00c8deb6a5dcc7def5e72c480e77575f43f54b0d52"
+        "sha256": "95326b38dcd406211abb6f35577da5afca59b573ba0ab2123eb95969b91e60fd"
       },
       "camera_rig": {
         "file": "docs/audits/realistic_density/config/camera_p55_h56.json",
@@ -154,11 +154,11 @@
       },
       "render_script": {
         "file": "tools/pipeline/render_character.py",
-        "sha256": "8ada017bdf10fc7264a50af632c46226d05af173c44af7f6ef6567ccf8fbbaf5"
+        "sha256": "d6f40df0248bbec1ff2bdcc1bb7e2d60027980b892c55e076cc091b818501b40"
       },
       "proportions": {
         "file": "docs/audits/realistic_density/config/proportions_realistic.json",
-        "sha256": "9b18dca503be38140d28cb8d779f446113aefe098f125a36831ee4a469076ff4"
+        "sha256": "70d6fb482fe46fe8a77b49509bcfc43afaab6ce215d2b6fa201fd6d86c85aad8"
       },
       "pixelate_config": {
         "file": "tools/pipeline/pixelate.json",
@@ -171,7 +171,7 @@
       "scripts": {
         "pngio.py": "c97d8df63884ddc60bfeb5ff6464c46b913c40f53939b6dcc7db856cffc6438c",
         "palette_lib.py": "f22644e8a13658cb3543f958ed0d15c4521242dbf05ae06829ccba14cce085a0",
-        "pixelate.py": "fd611794de9bc0fbc0ba195254f8089aa7213af849e5558dafd75c156aaf9605",
+        "pixelate.py": "703232efdc4810538c2bfcc3f630a7c0de49b1ca57b9a1a0d12ab4149906a1c2",
         "pack_sheets.py": "039780aa67ead7a246f285a1029f4055d01c1b064941383fb1c0bc8093df9e43"
       }
     },
@@ -182,6 +182,6 @@
     ]
   },
   "normal_image": "average_m_realistic_p55_h56_normal.png",
-  "normal_image_pixel_sha256": "8cebf92797a6fb3cc48a36fdf7198d07dcb5f3b6233e3d707c4d433da2fb31ce",
+  "normal_image_pixel_sha256": "d9e51ff79d8198d583862de3374346218c200d305cddf4dafb16f6ca50adfb1c",
   "normal_doc": "camera-facing tangent space, OpenGL: R = screen right, G = screen up, B = toward camera, encoded n * 0.5 + 0.5; alpha copied from the colour frame"
 }
