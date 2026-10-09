@@ -52,6 +52,27 @@ head commit?) and that the branch tip is the sha written there. Carry on from "U
 something you need is missing, ask its owner, or the director in protocol format
 (`agent-briefs/DIRECTOR_QUESTION_PROTOCOL.md`); do not guess. Report your state at the end of your turn.
 With nothing assigned, say "available" and wait; do not invent work (guardrail C4).
+Before any new work, run the smallest baseline check that covers your area (`smoke`, or the one
+suite you own). If the start is broken, fix that first; never build on it.
+
+## The lead refreshes the team
+
+Director, 2026-10-10: archive and resurrect the team periodically, but only at finished tasks.
+The general rule is in `~/.claude/memory-shared/refresh-workers-at-task-boundaries.md`; for MERCS:
+- **When:** the worker has just finished a task, its handoff is pushed, and nothing it owns is live
+  (no Godot PID, GPU job, Tripo job or CI watch). At least one of these is also true: its context is
+  past 150k tokens (check with `get_usage` on its session id), the next task is unrelated, or it has
+  finished 3 tasks since its last refresh. Never refresh mid-task.
+- **How:** the worker calls `clear_session("self")`. The session id stays the same, so cross-session
+  messages still reach it. The lead then sends a one-line kick-off: "You are <role>. Read your
+  handoff and continue."
+- **Findings first (required, director 2026-10-10):** before the clear, the worker lists what helped
+  under "Findings for the lead" in its handoff. The lead records the worthwhile ones in
+  `~/.claude/memory-shared/co-lead-playbook.md` (shared with every project and both accounts) and
+  rejects the rest. Workers never write memory or the playbook. No refresh happens until the lead's
+  handoff says "playbook: updated" or "playbook: nothing new".
+- **Director pause:** everyone is at a boundary, so clear the team then and send the kick-off when
+  work resumes. The lead refreshes itself last, the same way.
 
 ## Learnings
 
