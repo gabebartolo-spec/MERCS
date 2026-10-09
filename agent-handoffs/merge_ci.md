@@ -1,17 +1,17 @@
 # Merge & CI handoff, 2026-10-09 AEDT
 Start from this file, CLAUDE.md, your brief (`agent-briefs/MERGE_CI_AGENT.md`, with step C2), and the current phase section of `docs/08_ROADMAP.md` only.
 
-## State: available (director paused the team; nothing running)
+## State: available (team resumed by the director 2026-10-10; this session is being cleared and restarted from this file)
 ## Task
-Standing merge pass (D-030). Last pass: `main` green; board current through #67 (board PRs through #69, D-059..D-062 logged, D-060 pending).
+Standing merge pass (D-030). Last pass: `main` green; board current through #70 (board PRs through #69; #70's row is in this PR); D-060 pending.
 ## Branch and commit
 This handoff only: docs/merge-ci-handoff-2.
 ## Files I own right now
 None besides this file.
 ## Unfinished changes
-None. Open PR: #70 (sprite layers compositing, assets floor 11 to 13, the Lead's): not merged, held by the pause; check it first when work resumes (green + real shards + no conflict with main; if it conflicts on dev_lead.md or expected_checks keep both: assets 13, slice 15).
+None. Open PR: #72 (the refresh rule in `mercs-handoff`, docs only, the Lead's): check it first in the next pass (green + mergeable + no conflict; docs-only so shards skip legitimately).
 ## Evidence so far
-Merged this session: #23-#29, #31-#37, #39-#60, #62-#69 (squash, `--match-head-commit`, exact-head CI green). M1 and F5 exes: build.yml runs 37882105269 (3eaa7c6) and 37890864099 (5ab5e5c), both green.
+Merged this session: #23-#29, #31-#37, #39-#60, #62-#71 (#70 sprite layers, assets floor 13) (squash, `--match-head-commit`, exact-head CI green). M1 and F5 exes: build.yml runs 37882105269 (3eaa7c6) and 37890864099 (5ab5e5c), both green.
 ## Attempts (for the fix-loop rule)
 None open.
 ## Open decisions (awaiting director)
