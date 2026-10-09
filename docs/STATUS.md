@@ -10,7 +10,7 @@ Current phase: **1 — Visual and factory proof** (Phase 0 gate PASS WITH NOTES,
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | working | slice M1 (#53) + walk/idle playback (#54) + stage defaults at 84 px (#57) merged; next: M5 core-loop skeleton | — | 2026-10-09 |
+| Dev Lead (Opus 5.5) | working (paused by the director, 2026-10-09) | M5 sim core merged (#60: `Rng` and the sketch battle in `sim/battle/`, `battle` suite floor 10); next: visible check, recruit card, contract, loop flow, battle presentation | — | 2026-10-09 |
 | Merge & CI (Sonnet 5.5) | working | standing merge pass (D-030); board PR after each merge | — | 2026-10-08 |
 | Art Factory (Opus 5.5) | working | realistic freeze, 84 px, 45 degree sprites (#52) and the first published asset, `average_m` rest sheet with normal and register row (#55), merged; next: walk and idle sheets beside it; Mixamo clips need the director's sign-in (D-029) | — | 2026-10-09 |
 | Concept Lead (Fable 5.1) | awaiting director | handoff refreshed (#47); Project Architect adoption | — | 2026-10-09 |
