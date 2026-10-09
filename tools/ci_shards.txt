@@ -6,4 +6,4 @@
 # ten minutes of suite time, and say so in the PR.
 #
 # Phase 0: two quick suites, one shard. Phase 1 adds stage, stage_scale, stage_light and assets (seconds, same shard).
-1: data smoke stage stage_scale stage_light assets
+1: data smoke stage stage_scale stage_light assets slice

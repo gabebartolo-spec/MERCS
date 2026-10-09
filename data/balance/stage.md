@@ -15,6 +15,7 @@ and `tools/capture/capture_stage.gd`. Spec: `docs/specs/phase1_visual_proof.md` 
 
 ## shades
 - `ground`, `house`, `well`, `cart`, `door`: grey level (0–1) of each placeholder box's material.
+- `interior_wall`: grey of the interior room's wall boxes.
 - `sky`: flat background grey.
 
 ## light
@@ -23,7 +24,13 @@ and `tools/capture/capture_stage.gd`. Spec: `docs/specs/phase1_visual_proof.md` 
 - `color_rgb`, `energy`: warm white key colour and strength.
 - `ambient_grey`, `ambient_energy`: the flat ambient sky colour and strength.
 
+## dusk
+The slice's T key steps day → dusk → night (`StageLighting`). Low warm sun from camera-left, rosy ambient.
+- `light`: the key and ambient as in `rain_night.light` (`ambient_rgb` a colour).
+- `sky_rgb`, `sprite_tint_rgb`: dusk background and the unshaded sprite's tint. Torches burn at dusk and night.
+
 ## rain_night
+Night for `StageLighting` too; rain is a separate toggle there.
 Used when the stage's `lighting` export is RAIN_NIGHT (sample set 2, spec §4); DAY uses `light` and `shades.sky`.
 - `light`: the moonlight key and ambient, as in `light` above, but `ambient_rgb` is a colour (cool blue) instead of a grey.
 - `sky_rgb`: the flat night background colour.
@@ -52,3 +59,9 @@ Used when the stage's `lighting` export is RAIN_NIGHT (sample set 2, spec §4); 
 - `settle_frames`: frames rendered before a still is saved.
 - `clip_seconds`, `clip_fps`: the image-sequence length and rate.
 - `crop_width_px`, `crop_height_px`, `crop_scale`: the window-pixel region centred on the standing figure that is also saved, and its upscale. 320 × 180 (the spec's 160 × 90 predates the derived rail and cut a 48 px figure, 144 window px tall, in half).
+
+## interior
+The one grey-box interior of the art direction slice, built far off the street (x 100) so the street camera never shows it.
+- `origin_cell`: its near-left floor cell; `size_cells`: x × z floor cells including the walls round the edge.
+- `wall_height_m`: wall box height.
+- `exit_cell`: the gap in the near wall; stepping on it returns to the street in front of the door. `entry_cell`: where the door puts a figure inside.
