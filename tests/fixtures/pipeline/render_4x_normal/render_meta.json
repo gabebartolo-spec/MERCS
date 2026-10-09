@@ -5,11 +5,11 @@
   "inputs": {
     "body_blend": {
       "file": "tools/pipeline/bodies/average_m.blend",
-      "sha256": "aa9da1d3b091ba89a52779a3b9571897c8a5c89c3ea1c620822666c18df47f94"
+      "sha256": "95326b38dcd406211abb6f35577da5afca59b573ba0ab2123eb95969b91e60fd"
     },
     "camera_rig": {
       "file": "tools/pipeline/camera_rig.json",
-      "sha256": "b3ed7bbc6fd2ae4760b23b046adc11793ad8daa88496b4b114e014f04e4de4b7"
+      "sha256": "c67f2acbf991807339bc45b1ed927c0cecd04af73edd7d88819a6ffc0bb8cdc8"
     },
     "light_rig": {
       "file": "tools/pipeline/light_rig.json",
@@ -17,11 +17,11 @@
     },
     "render_script": {
       "file": "tools/pipeline/render_character.py",
-      "sha256": "150524579507120a7f836a3732ae273ec277d9f352a39ed6ffeff433535633ce"
+      "sha256": "c673a4df1d639b5958706852fd76a3115a37fef914db3a98aa543d6a43c5f7ae"
     },
     "proportions": {
       "file": "tools/pipeline/proportions.json",
-      "sha256": "0a8775ccf36941675e0f6784209dfe273ae1fafbc501c7388dcb2288d3196bc3"
+      "sha256": "f0722e47bb29a53294e8db4b691c13b6b03748567097f8a59c4a7f0ca0657d8a"
     }
   },
   "tools": {
@@ -32,55 +32,55 @@
       "facing": 0,
       "name": "S",
       "file": "facing_0_S.png",
-      "sha256": "59fef2c6b5cd27635a145c8e4d3b2f6267660158923833fcc8e8e857a2161180"
+      "sha256": "631febae227ad671fe6b44215219e2c209b83ddccc9f638ccf7467dfb8ea50a2"
     },
     {
       "facing": 1,
       "name": "SE",
       "file": "facing_1_SE.png",
-      "sha256": "9122742c4645f2a99936978b1250bd96e98bd5e4ec43ebb8a4881df30ab6265f"
+      "sha256": "fd3d7bfd90b8edfb41f6db68daae771171f5a48ba9ca1b5d518658616380815f"
     },
     {
       "facing": 2,
       "name": "E",
       "file": "facing_2_E.png",
-      "sha256": "28285064e338157110376a9ccd6f8693d350f8ca87318b567dfb1551e3e5e63f"
+      "sha256": "03617547f46891b89142354b61cfb751392b6c7822af5a387a23a130a7838272"
     },
     {
       "facing": 3,
       "name": "NE",
       "file": "facing_3_NE.png",
-      "sha256": "47c27296f2acd68130eaaee71ece221f7c93d5fff06a33546351472a6810491b"
+      "sha256": "6538485e714fabd26622c1d8edb80cb7f8a9eac07eb640d9533d6446fd34d860"
     },
     {
       "facing": 4,
       "name": "N",
       "file": "facing_4_N.png",
-      "sha256": "e49eb7443577eea031fb9a02529833cefb3ecc4bb71e5c5e8dab851cff87fcd7"
+      "sha256": "21b9c0629d7efa583697e2cf57004ca7f63dcef4c95e6531ea520331c13c94e1"
     },
     {
       "facing": 5,
       "name": "NW",
       "file": "facing_5_NW.png",
-      "sha256": "0e69cdc0e8988209b98deb80e5e3c6e88ae402a288ddc98b2e32d5d84f512a3f"
+      "sha256": "5e8168d8665ed852fb90c96e3ee8ac867a225d5c345f621b217b86f4cc860ae9"
     },
     {
       "facing": 6,
       "name": "W",
       "file": "facing_6_W.png",
-      "sha256": "be29459eaaee37015fedd2debfc1130a67887832efc5825ac9178c012b5cbb09"
+      "sha256": "9037e715cd5604b23088828f18e558426333b28dc6bd057a888a199fb861bd13"
     },
     {
       "facing": 7,
       "name": "SW",
       "file": "facing_7_SW.png",
-      "sha256": "e900234115c12beee80996f0d6078576d7297407a5039da100a0df4c5649a010"
+      "sha256": "841864bc72172363a302d614eda1434039e2f658c94323dc9f6485dd14ca65a4"
     }
   ],
   "pass": "normal",
   "proportion": {
-    "variant": "bw",
-    "rig_scale": 0.986429,
+    "variant": "realistic",
+    "rig_scale": 0.986958,
     "height_m": 1.78
   }
 }

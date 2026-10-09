@@ -7,6 +7,9 @@ Writes <out>/<body>.blend and, unless --check, updates tools/pipeline/rig_contra
 With --check it rebuilds in memory and exits 1 if the rest-pose hash differs from the contract.
 Deterministic: the hash covers bone names, parents, rest head/tail/roll and socket transforms,
 rounded to 0.1 mm / 0.0001 rad, so the same inputs give the same hash.
+A body's "contour_targets" (MPFB target name -> weight) are loaded after the rig is fitted and
+hashed: they reshape the flesh (chest, belly, buttocks) without moving a bone, so the frozen rig
+contract stays valid.
 """
 from __future__ import annotations
 
@@ -140,6 +143,10 @@ def main() -> None:
     result = {"body": args.body, "height_m": round(body_height(basemesh), ROUND_DIGITS),
               "height_macro": round(height_macro, 6), "bone_count": len(pose["bones"]),
               "rest_pose_sha256": digest}
+    for name, weight in sorted(spec.get("contour_targets", {}).items()):
+        TargetService.load_target(basemesh, TargetService.target_full_path(name), weight=weight, name=name)
+    bpy.context.view_layer.update()
+    result["height_after_contour_m"] = round(body_height(basemesh), ROUND_DIGITS)
     print("BUILD_BODY_RESULT " + json.dumps(result))
 
     contract = json.loads(CONTRACT_FILE.read_text(encoding="utf-8")) if CONTRACT_FILE.exists() else {}

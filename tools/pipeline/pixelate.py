@@ -6,7 +6,8 @@ Every facing_*.png in --in is reduced by pixelate.json's scale (box mean over co
 alpha is thresholded to 0 or 255, and each opaque pixel is mapped to the nearest colour of the
 layer's ramps in the palette, with no dithering. Integer arithmetic only, sorted inputs and a
 fixed PNG encoder: the same input bytes give byte-identical output (tools/pipeline/test_pipeline.py
-proves it). Prints one `PIXELATED <file> <pixel sha256>` line per frame.
+proves it). Prints one `PIXELATED <file> <pixel sha256>` line per frame. With --parts <4x parts
+renders> the outline also runs inside the figure where an arm meets the body (06 section 3).
 
   python tools/pipeline/pixelate.py --normals --in <normal renders> --mask <1x colour frames> --out <dir>
 
@@ -131,15 +132,141 @@ def normals_dir(src_dir: Path, mask_dir: Path, out_dir: Path, cfg: dict) -> list
     return results
 
 
-def pixelate_dir(src_dir: Path, out_dir: Path, layer: str, cfg: dict) -> list[tuple[str, str]]:
+NEIGHBOURS_4 = ((1, 0), (-1, 0), (0, 1), (0, -1))
+
+
+def luma(rgb) -> int:
+    return 299 * rgb[0] + 587 * rgb[1] + 114 * rgb[2]
+
+
+def despeckle(img: Image, max_px: int) -> Image:
+    """Merge small dark blotches inside the figure into the tone around them.
+
+    A blotch is a 4-connected run of one colour, at most max_px pixels, with no transparent
+    neighbour, and darker than every pixel bordering it (block-mean shading noise, not a drawn
+    line). It takes the most common bordering colour (ties: lowest colour). Decided on the input
+    image only, so the result does not depend on scan order.
+    """
+    out = Image.blank(img.width, img.height)
+    out.rgba[:] = img.rgba
+    seen: set = set()
+    for y in range(img.height):
+        for x in range(img.width):
+            px = img.get(x, y)
+            if px[3] == 0 or (x, y) in seen:
+                continue
+            region, border, stack, open_edge = [], [], [(x, y)], False
+            seen.add((x, y))
+            while stack:
+                cx, cy = stack.pop()
+                region.append((cx, cy))
+                for dx, dy in NEIGHBOURS_4:
+                    nx, ny = cx + dx, cy + dy
+                    if not (0 <= nx < img.width and 0 <= ny < img.height):
+                        open_edge = True
+                        continue
+                    n = img.get(nx, ny)
+                    if n[3] == 0:
+                        open_edge = True
+                    elif n[:3] == px[:3]:
+                        if (nx, ny) not in seen:
+                            seen.add((nx, ny))
+                            stack.append((nx, ny))
+                    else:
+                        border.append(n[:3])
+            if open_edge or len(region) > max_px or not border:
+                continue
+            if not all(luma(px) < luma(b) for b in border):
+                continue
+            counts: dict = {}
+            for b in border:
+                counts[b] = counts.get(b, 0) + 1
+            best = max(sorted(counts), key=lambda c: counts[c])
+            for rx, ry in region:
+                out.put(rx, ry, (*best, OPAQUE))
+    return out
+
+
+def outline(img: Image, colour: tuple[int, int, int]) -> Image:
+    """06 section 3 outline: every opaque pixel with a transparent 4-neighbour (or on the image
+    edge) becomes the outline colour. Drawn on the figure's own edge pixels, so the silhouette,
+    the pivot and the alpha the normal map copies do not change."""
+    out = Image.blank(img.width, img.height)
+    out.rgba[:] = img.rgba
+    for y in range(img.height):
+        for x in range(img.width):
+            if img.get(x, y)[3] == 0:
+                continue
+            for dx, dy in NEIGHBOURS_4:
+                nx, ny = x + dx, y + dy
+                if not (0 <= nx < img.width and 0 <= ny < img.height) or img.get(nx, ny)[3] == 0:
+                    out.put(x, y, (*colour, OPAQUE))
+                    break
+    return out
+
+
+BODY_LABEL = 2  # parts pass: channel 0 = left arm, 1 = right arm, 2 = the rest of the body
+ROOT_LABEL = 3  # white in the parts pass: an arm's root (shoulder cap), never lined
+WHITE_MIN = 128
+
+
+def part_labels(parts: Image, scale: int, threshold: int) -> list[list[int]]:
+    """1x label per pixel: the channel that wins most of the block's covered 4x samples (-1: none)."""
+    w, h = parts.width // scale, parts.height // scale
+    labels = [[-1] * w for _ in range(h)]
+    for oy in range(h):
+        for ox in range(w):
+            votes = [0, 0, 0, 0]
+            for y in range(oy * scale, oy * scale + scale):
+                for x in range(ox * scale, ox * scale + scale):
+                    r, g, b, a = parts.get(x, y)
+                    if a >= threshold:
+                        if min(r, g, b) >= WHITE_MIN:
+                            votes[ROOT_LABEL] += 1
+                        else:
+                            votes[(r, g, b).index(max(r, g, b))] += 1
+            if any(votes):
+                labels[oy][ox] = votes.index(max(votes))
+    return labels
+
+
+def inner_lines(img: Image, labels: list[list[int]], colour: tuple[int, int, int]) -> Image:
+    """06 section 3 inner line: an arm pixel with a body pixel beside it becomes the outline colour,
+    so an arm crossing the torso reads as an arm. Drawn on the arm's side; opaque pixels only."""
+    out = Image.blank(img.width, img.height)
+    out.rgba[:] = img.rgba
+    for y in range(img.height):
+        for x in range(img.width):
+            if img.get(x, y)[3] == 0 or labels[y][x] in (-1, BODY_LABEL, ROOT_LABEL):
+                continue
+            for dx, dy in NEIGHBOURS_4:
+                nx, ny = x + dx, y + dy
+                if (0 <= nx < img.width and 0 <= ny < img.height and img.get(nx, ny)[3]
+                        and labels[ny][nx] == BODY_LABEL):
+                    out.put(x, y, (*colour, OPAQUE))
+                    break
+    return out
+
+
+def pixelate_dir(src_dir: Path, out_dir: Path, layer: str, cfg: dict,
+                 parts_dir: Path | None = None) -> list[tuple[str, str]]:
     pal: Palette = load_palette(REPO / cfg["palette"])
     quant = Quantiser(pal.ramp_colours(cfg["ramps_by_layer"].get(layer)))
+    line = cfg.get("outline", {})
+    line_colour = pal.ramp_colours([line["ramp"]])[line["step"]] if layer in line.get("layers", []) else None
     frames = sorted(src_dir.glob("facing_*.png"))
     if not frames:
         raise SystemExit(f"no facing_*.png in {src_dir}")
     results = []
     for path in frames:
         img = reduce_image(read_png(path), cfg, quant)
+        if layer in cfg.get("despeckle_layers", []):
+            img = despeckle(img, cfg["despeckle_max_px"])
+        if line_colour is not None:
+            img = outline(img, line_colour)
+            if parts_dir is not None:
+                labels = part_labels(read_png(parts_dir / path.name), cfg["scale"], cfg["alpha_threshold"])
+                img = inner_lines(img, labels, line_colour)
         write_png(out_dir / path.name, img)
         results.append((path.name, img.pixel_sha256()))
     return results
@@ -153,6 +280,7 @@ def main(argv: list[str]) -> int:
     p.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     p.add_argument("--normals", action="store_true", help="reduce a normal pass (needs --mask)")
     p.add_argument("--mask", type=Path, help="1x colour frames whose alpha the normal frames copy")
+    p.add_argument("--parts", type=Path, help="4x parts-pass renders: draw inner lines where an arm meets the body")
     args = p.parse_args(argv)
     cfg = load_config(args.config)
     if args.normals:
@@ -161,7 +289,7 @@ def main(argv: list[str]) -> int:
         args.out.mkdir(parents=True, exist_ok=True)
         results = normals_dir(args.src, args.mask, args.out, cfg)
     else:
-        results = pixelate_dir(args.src, args.out, args.layer, cfg)
+        results = pixelate_dir(args.src, args.out, args.layer, cfg, args.parts)
     for name, digest in results:
         print(f"PIXELATED {name} {digest}")
     return 0
