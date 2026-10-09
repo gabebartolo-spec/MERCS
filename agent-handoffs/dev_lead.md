@@ -3,7 +3,7 @@ Start from this file, CLAUDE.md, `~/.claude/memory-shared/MEMORY.md`, your brief
 (`agent-briefs/DEV_LEAD_OPUS.md`), `docs/00_VISION.md` (revised 2026-10-09, #63) and
 `docs/specs/art_direction_slice.md`. Run `git fetch`, then `gh pr list` and `docs/STATUS.md`.
 
-## State: working (#67 loop UI green, merging; sprite-layers PR open; Art on P1-ART-SLICE-CAST)
+## State: paused by the director (2026-10-09); #70 sprite layers open and synced; Art step-1 QC failed (7 fixes sent)
 
 ## Who does what
 This account has no Concept Lead: the session acts as lead AND Dev Lead under the original
