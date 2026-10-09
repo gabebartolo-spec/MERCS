@@ -21,7 +21,8 @@
     "well": 0.5,
     "cart": 0.55,
     "door": 0.3,
-    "sky": 0.72
+    "sky": 0.72,
+    "interior_wall": 0.5
   },
   "light": {
     "elevation_degrees": 45,
@@ -30,6 +31,18 @@
     "energy": 1.2,
     "ambient_grey": 0.55,
     "ambient_energy": 0.6
+  },
+  "dusk": {
+    "light": {
+      "elevation_degrees": 22,
+      "azimuth_degrees": -60,
+      "color_rgb": [1.0, 0.62, 0.38],
+      "energy": 0.95,
+      "ambient_rgb": [0.36, 0.3, 0.36],
+      "ambient_energy": 0.85
+    },
+    "sky_rgb": [0.42, 0.3, 0.3],
+    "sprite_tint_rgb": [0.86, 0.7, 0.62]
   },
   "rain_night": {
     "light": {
@@ -85,5 +98,12 @@
     "crop_width_px": 320,
     "crop_height_px": 180,
     "crop_scale": 2
+  },
+  "interior": {
+    "origin_cell": [100, 0, 0],
+    "size_cells": [8, 6],
+    "wall_height_m": 2.6,
+    "exit_cell": [103, 0, 5],
+    "entry_cell": [103, 0, 4]
   }
 }
