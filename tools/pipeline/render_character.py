@@ -51,7 +51,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--variant", default="", help="variant in --proportions (default: its 'default')")
     p.add_argument("--kit", default="", help="stage gear kit json (tools/pipeline/kits/); blockout primitives on bones")
     p.add_argument("--kit-keep", default="", help="comma-separated kit piece name prefixes to keep (default all)")
-    p.add_argument("--pass", dest="render_pass", choices=("color", "normal", "parts"), default="color")
+    p.add_argument("--pass", dest="render_pass", choices=("color", "normal", "parts", "layers"), default="color")
     p.add_argument("--clip", default="", help="Mixamo FBX (vault) to retarget and sample; empty = rest pose")
     p.add_argument("--frames", type=int, default=8, help="frames sampled from one loop of --clip")
     p.add_argument("--loop-window", default="", help="LO-HI source frames: sample the best-matching sub-loop")
@@ -445,6 +445,7 @@ def add_kit(rig: bpy.types.Object, path: str, keep: tuple[str, ...] = ()) -> dic
             KIT_SHAPES[piece["shape"]]()
         obj = bpy.context.active_object
         obj.name = f"{KIT_PREFIX}{name}"
+        obj["kit_group"] = piece.get("group", name)
         if piece.get("along_bone"):
             axis = (tail - head)
             size[2] *= axis.length
@@ -642,6 +643,8 @@ def foot_slide(tracks: dict, speed: float, dt: float) -> float:
 
 LEGS = tuple((f"mixamorig:{s}UpLeg", f"mixamorig:{s}Leg", f"mixamorig:{s}Foot", f"mixamorig:{s}ToeBase")
              for s in ("Left", "Right"))
+KEY_BONES = ("mixamorig:LeftFoot", "mixamorig:RightFoot", "mixamorig:RightHand")  # contact and extreme frames (-Y forward)
+MARK_BONES = ("mixamorig:LeftHand", "mixamorig:RightHand", "mixamorig:Hips", "mixamorig:LeftFoot", "mixamorig:RightFoot")
 REACH = 0.999  # a leg straightens to at most this share of its length (no snap through full extension)
 
 
@@ -691,7 +694,7 @@ def solve_legs(rig: bpy.types.Object, targets: list) -> None:
 
 
 def sample_clip(rig: bpy.types.Object, path: str, frames: int, window: str, gait: dict,
-                posture: dict) -> tuple[list, dict]:
+                posture: dict, on_frame=None) -> tuple[list, dict]:
     """Retarget one loop of a clip onto rig (facing 0) through the merc's gait and return `frames` poses as
     bone matrix_basis copies, plus clip facts: fps at the real timing (times the gait's cadence), ground
     speed from the planted foot, the measured foot slide at that speed and the constant ground offset.
@@ -732,13 +735,19 @@ def sample_clip(rig: bpy.types.Object, path: str, frames: int, window: str, gait
     tracks: dict = {foot: [] for foot in FEET}
     lowest, rise = math.inf, -math.inf
     rest_z = {b: (rig.matrix_world @ rig.data.bones[b].head_local).z for b in SHOULDERS}
-    for pose, target, h in zip(poses, targets, hips):
+    reach: dict = {b: [] for b in KEY_BONES}
+    for i, (pose, target, h) in enumerate(zip(poses, targets, hips)):
         apply_pose(rig, pose)
         d = h - mean
         at = mean + Vector((d.x * sway, d.y, d.z * bounce - drop))
         set_world(rig, HIPS, Matrix.Translation(at) @ world_of(rig, HIPS).to_quaternion().to_matrix().to_4x4())
         solve_legs(rig, target)
         pose.update({pb.name: pb.matrix_basis.copy() for pb in rig.pose.bones})
+        if on_frame is not None:
+            on_frame(i)
+        if i % DENSE == 0:
+            for b in KEY_BONES:
+                reach[b].append(world_of(rig, b).translation.y)
         for foot in FEET:
             tracks[foot].append(world_of(rig, foot).translation.copy())
         lowest = min(lowest, figure_extent_z(rig)[0])
@@ -757,9 +766,175 @@ def sample_clip(rig: bpy.types.Object, path: str, frames: int, window: str, gait
              "fps": round(frames * src_fps * cadence / (f1 - f0), 4), "loop": True,
              "ground_speed_mps": round(abs(speed), 4), "ground_offset_m": round(-lowest, 4),
              "foot_slide_m": round(foot_slide(tracks, speed, dt), 4), "bones_matched": len(names),
-             "max_shoulder_rise_m": round(rise, 4), "gait": gait}
+             "max_shoulder_rise_m": round(rise, 4), "gait": gait,
+             "key_frames": {"left_foot_forward": min(range(frames), key=lambda j: reach[KEY_BONES[0]][j]),
+                            "right_foot_forward": min(range(frames), key=lambda j: reach[KEY_BONES[1]][j]),
+                            "right_hand_forward": min(range(frames), key=lambda j: reach[KEY_BONES[2]][j]),
+                            "right_hand_back": max(range(frames), key=lambda j: reach[KEY_BONES[2]][j])}}
     print("CLIP " + json.dumps(facts))
     return poses[::DENSE], facts
+
+
+CLEARANCE_M = 0.01  # Lead, 2026-10-10: a kit piece within 1 cm of the body (outside its contact bones) fails the run
+INSIDE_MAX_M = 0.12  # a point counts as inside only this near the surface: any penetration crosses the surface, and
+# beyond it the nearest face can be the far side of a limb whose contact part (a gripping hand) is excluded
+SAMPLE_M = 0.02  # spacing of the points sampled over each kit piece's surface for the clearance check
+BONE_ATTR = "mercs_bone"  # point attribute: the vertex's dominant bone, carried through the Mask modifier
+
+
+def body_mesh(rig: bpy.types.Object) -> bpy.types.Object:
+    return next(o for o in rig.children if o.type == "MESH" and o.parent_type == "OBJECT")
+
+
+def tag_dominant_bones(rig: bpy.types.Object) -> list[str]:
+    """Store each body vertex's most-weighted bone as an integer point attribute (so it survives the modifiers
+    into the evaluated mesh) and return the index -> bone name table."""
+    body = body_mesh(rig)
+    bones = [b.name for b in rig.data.bones]
+    index = {n: i for i, n in enumerate(bones)}
+    names = {g.index: g.name for g in body.vertex_groups}
+    attr = body.data.attributes.new(BONE_ATTR, "INT", "POINT")
+    for v in body.data.vertices:
+        best = max(((g.weight, names[g.group]) for g in v.groups if names[g.group] in index), default=None)
+        attr.data[v.index].value = index[best[1]] if best else -1
+    return bones
+
+
+def piece_samples(obj: bpy.types.Object) -> list[Vector]:
+    """Points over a kit primitive's surface in its local space, at most SAMPLE_M apart in world size."""
+    mesh = obj.data
+    mesh.calc_loop_triangles()
+    scale = obj.matrix_world.to_scale()
+    pts = []
+    for tri in mesh.loop_triangles:
+        a, b, c = (mesh.vertices[i].co for i in tri.vertices)
+        size = max(Vector([(p - q)[k] * scale[k] for k in range(3)]).length for p, q in ((a, b), (b, c), (c, a)))
+        n = max(1, math.ceil(size / SAMPLE_M))
+        for i in range(n + 1):
+            for j in range(n + 1 - i):
+                pts.append(a + (b - a) * (i / n) + (c - a) * (j / n))
+    return pts
+
+
+class KitChecks:
+    """Lead plan A (2026-10-10). Clearance: every kit piece stays CLEARANCE_M off the deformed body on every dense
+    gait frame, except the bones it is allowed to touch ("contact": bone-name prefixes, default its parent bone;
+    a grip lists the hand so the fingers may close on the haft). Distance is to the nearest point of the deformed body surface, signed by
+    the nearest surface's normal (inside the body counts negative, see INSIDE_MAX_M). Direction: the kit's "checks"
+    list, each a vector (from one piece or bone to another, or a piece's own local "axis") that must point along
+    "toward" (body frame at facing 0: -Y forward, +Z up) with at least "min_dot"; only pieces with a real direction
+    carry one (an axe edge, a scabbard tip)."""
+
+    def __init__(self, rig: bpy.types.Object, kit_path: str):
+        self.rig = rig
+        self.cfg = json.loads(Path(kit_path).read_text(encoding="utf-8"))
+        self.bones = tag_dominant_bones(rig)
+        self.pieces = {o.name[len(KIT_PREFIX):]: o for o in rig.children if o.name.startswith(KIT_PREFIX)}
+        self.samples = {n: piece_samples(o) for n, o in self.pieces.items()}
+        self.allowed = {}
+        for n, o in self.pieces.items():
+            prefixes = tuple(self.cfg["pieces"][n].get("contact", [o.parent_bone]))
+            self.allowed[n] = {i for i, b in enumerate(self.bones) if b.startswith(prefixes)}
+        self.worst = {n: (math.inf, "", -1) for n in self.pieces}
+        self.dirs = {c["name"]: (math.inf, -1) for c in self.cfg.get("checks", []) if self.wanted(c)}
+
+    def wanted(self, check: dict) -> bool:
+        if "axis" in check:
+            return check["piece"] in self.pieces
+        return all(not e.startswith("piece:") or e[6:] in self.pieces for e in (check["from"], check["to"]))
+
+    def point(self, ref: str) -> Vector:
+        kind, name = ref.split(":", 1)
+        if kind == "piece":
+            return self.pieces[name].matrix_world.translation.copy()
+        return world_of(self.rig, name).translation.copy()
+
+    def frame(self, i: int) -> None:
+        from mathutils.bvhtree import BVHTree
+        deps = bpy.context.evaluated_depsgraph_get()
+        ev = body_mesh(self.rig).evaluated_get(deps)
+        mesh = ev.to_mesh()
+        mw = ev.matrix_world
+        owner = mesh.attributes[BONE_ATTR].data
+        coords = [mw @ v.co for v in mesh.vertices]
+        polys = [(tuple(p.vertices), {owner[k].value for k in p.vertices}) for p in mesh.polygons]
+        ev.to_mesh_clear()
+        for name, obj in self.pieces.items():
+            allowed = self.allowed[name]
+            kept = [(vs, bs) for vs, bs in polys if not (bs & allowed)]
+            tree = BVHTree.FromPolygons(coords, [vs for vs, _ in kept])
+            mw_piece = obj.matrix_world
+            for p in self.samples[name]:
+                q = mw_piece @ p
+                co, nrm, k, d = tree.find_nearest(q)
+                if co is None:
+                    continue
+                inside = (q - co).dot(nrm) < 0 and d < INSIDE_MAX_M
+                signed = -d if inside else d
+                if signed < self.worst[name][0]:
+                    b = max(kept[k][1])
+                    self.worst[name] = (signed, self.bones[b] if b >= 0 else "?", i)
+        for c in self.cfg.get("checks", []):
+            if c["name"] not in self.dirs:
+                continue
+            dot = self.vector(c).dot(Vector(c["toward"]).normalized())
+            if dot < self.dirs[c["name"]][0]:
+                self.dirs[c["name"]] = (dot, i)
+
+    def vector(self, check: dict) -> Vector:
+        """The measured direction: a piece's own local axis ("axis": "-z") or the line from one point to another."""
+        if "axis" in check:
+            sign, axis = (-1.0 if check["axis"][0] == "-" else 1.0), check["axis"][-1]
+            local = Vector([sign if a == axis else 0.0 for a in "xyz"])
+            return (self.pieces[check["piece"]].matrix_world.to_3x3() @ local).normalized()
+        return (self.point(check["to"]) - self.point(check["from"])).normalized()
+
+    def facts(self) -> dict:
+        clear = {n: {"min_m": round(d, 4), "nearest_bone": b, "dense_frame": i, "pass": d >= CLEARANCE_M}
+                 for n, (d, b, i) in self.worst.items()}
+        dirs = {}
+        for c in self.cfg.get("checks", []):
+            if c["name"] in self.dirs:
+                dot, i = self.dirs[c["name"]]
+                dirs[c["name"]] = {"claim": c.get("claim", ""), "min_dot": round(dot, 3), "need": c["min_dot"],
+                                   "dense_frame": i, "pass": dot >= c["min_dot"]}
+        ok = all(v["pass"] for v in clear.values()) and all(v["pass"] for v in dirs.values())
+        return {"clearance_m": CLEARANCE_M, "clearance": clear, "direction": dirs, "pass": ok}
+
+
+LAYER_COLOURS = ("#c23b3b", "#3b7fc2", "#d9a62e", "#3bb07a", "#9b59c2", "#e07b39")  # QC labels only, never shipped
+
+
+def apply_layers_pass(light: dict) -> dict:
+    """Lead plan B: the body in its clay material, each kit group (a piece's "group", else its own name) in a
+    flat label colour, so gear can never be mistaken for anatomy. Lit like the colour pass; review only."""
+    apply_material(light["body_material"])
+    groups: dict = {}
+    for obj in bpy.data.objects:
+        if obj.type != "MESH" or not obj.name.startswith(KIT_PREFIX):
+            continue
+        key = obj.get("kit_group", obj.name[len(KIT_PREFIX):])
+        if key not in groups:
+            colour = LAYER_COLOURS[len(groups) % len(LAYER_COLOURS)]
+            groups[key] = colour
+        mat = bpy.data.materials.get(f"mercs_layer_{key}") or bpy.data.materials.new(f"mercs_layer_{key}")
+        mat.use_nodes = True
+        bsdf = next(n for n in mat.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
+        bsdf.inputs["Base Color"].default_value = srgb_to_linear(groups[key])
+        obj.data.materials.clear()
+        obj.data.materials.append(mat)
+    return groups
+
+
+def marks(rig: bpy.types.Object, cam: dict) -> dict:
+    """1x cell pixel positions of MARK_BONES in the current render (QC crops find the contact points by these)."""
+    from bpy_extras.object_utils import world_to_camera_view
+    scene = bpy.context.scene
+    out = {}
+    for b in MARK_BONES:
+        v = world_to_camera_view(scene, scene.camera, world_of(rig, b).translation)
+        out[b.split(":")[1]] = [round(v.x * cam["frame_px"], 1), round((1.0 - v.y) * cam["frame_px"], 1)]
+    return out
 
 
 def body_spec(body: str) -> dict:
@@ -799,20 +974,31 @@ def main() -> None:
                                    body_spec(args.body).get("posture_lean_deg", {}))
     keep = tuple(k for k in args.kit_keep.split(",") if k)
     kit = add_kit(rig, args.kit, keep) if args.kit else None
+    checks = KitChecks(rig, args.kit) if (args.clip and args.kit) else None
     poses, clip = (sample_clip(rig, args.clip, args.frames, args.loop_window, body_spec(args.body).get("gait", {}),
-                               body_spec(args.body).get("posture_lean_deg", {}))
+                               body_spec(args.body).get("posture_lean_deg", {}), checks.frame if checks else None)
                    if args.clip else ([None], None))
+    out = Path(args.out).resolve()
+    out.mkdir(parents=True, exist_ok=True)
+    if checks is not None:
+        clip["kit_checks"] = checks.facts()
+        print("KIT_CHECKS " + json.dumps(clip["kit_checks"]))
+        if not clip["kit_checks"]["pass"]:
+            (out / "kit_checks.json").write_text(json.dumps(clip["kit_checks"], indent=2) + "\n",
+                                                 encoding="utf-8", newline="\n")
+            raise SystemExit("KIT_CHECKS FAIL: no frames rendered (see kit_checks.json)")
+    layers = None
     if args.render_pass == "normal":
         apply_normal_pass()
     elif args.render_pass == "parts":
         apply_parts_pass()
+    elif args.render_pass == "layers":
+        layers = apply_layers_pass(light)
     else:
         apply_material(light["body_material"])
     add_camera(cam)
     add_lights(light)
 
-    out = Path(args.out).resolve()
-    out.mkdir(parents=True, exist_ok=True)
     names = cam["facings"]["order"]
     count = cam["facings"]["count"]
     wanted = range(count) if args.facings == "all" else [int(k) for k in args.facings.split(",")]
@@ -828,7 +1014,7 @@ def main() -> None:
             path = out / f"{stem}.png"
             bpy.context.scene.render.filepath = str(path)
             bpy.ops.render.render(write_still=True)
-            outputs.append({"facing": k, "name": names[k], **({} if pose is None else {"frame": j}),
+            outputs.append({"facing": k, "name": names[k], **({} if pose is None else {"frame": j, "marks": marks(rig, cam)}),
                             "file": path.name, "sha256": sha256(path)})
             print(f"RENDERED {path.name} {outputs[-1]['sha256']}")
 
@@ -854,6 +1040,8 @@ def main() -> None:
         meta["inputs"]["kit"] = kit
     if clip is not None:
         meta["clip"] = clip
+    if layers is not None:
+        meta["layer_colours"] = layers
     (out / "render_meta.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8", newline="\n")
     print("RENDER_OK " + str(len(outputs)))
 

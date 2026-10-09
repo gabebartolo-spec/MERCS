@@ -277,5 +277,19 @@
     0
    ]
   }
- }
+ },
+ "checks": [
+  {
+   "name": "scabbard tip trails",
+   "claim": "a sword worn at the hip: hilt forward and up, scabbard tip down and back, out of the stride",
+   "piece": "scabbard",
+   "axis": "-z",
+   "toward": [
+    0,
+    0.5,
+    -0.866
+   ],
+   "min_dot": 0.9
+  }
+ ]
 }

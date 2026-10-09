@@ -160,6 +160,7 @@
   "axe_haft": {
    "shape": "cylinder",
    "group": "axe",
+   "contact": ["mixamorig:RightHand"],
    "bone": "mixamorig:RightHand",
    "offset_m": [
     0,
@@ -175,6 +176,7 @@
   "axe_blade": {
    "shape": "box",
    "group": "axe",
+   "contact": ["mixamorig:RightHand"],
    "bone": "mixamorig:RightHand",
    "offset_m": [
     0,
@@ -190,6 +192,7 @@
   "axe_spike": {
    "shape": "cone",
    "group": "axe",
+   "contact": ["mixamorig:RightHand"],
    "bone": "mixamorig:RightHand",
    "offset_m": [
     0,
@@ -225,5 +228,43 @@
     -0.12
    ]
   }
- }
+ },
+ "checks": [
+  {
+   "name": "edge leads",
+   "claim": "the cutting edge faces the way he walks: spike-to-blade points forward",
+   "from": "piece:axe_spike",
+   "to": "piece:axe_blade",
+   "toward": [
+    0,
+    -1,
+    0
+   ],
+   "min_dot": 0.5
+  },
+  {
+   "name": "head forward of the grip",
+   "claim": "the axe head leans forward of the fist, never back over the shoulder",
+   "from": "bone:mixamorig:RightHand",
+   "to": "piece:axe_blade",
+   "toward": [
+    0,
+    -1,
+    0
+   ],
+   "min_dot": 0.1
+  },
+  {
+   "name": "head above the grip",
+   "claim": "the axe is carried head up, the head above the fist",
+   "from": "bone:mixamorig:RightHand",
+   "to": "piece:axe_blade",
+   "toward": [
+    0,
+    0,
+    1
+   ],
+   "min_dot": 0.7
+  }
+ ]
 }
