@@ -23,6 +23,10 @@ claude/<topic> at <sha>, worktree ../MERCS-wt/<topic>, PR #<n> (or "no PR yet")
 <question ids asked, waiting on whom>
 ## Running jobs
 <PIDs, Actions run ids, ComfyUI job ids>
+## Findings for the lead
+<tricks, tools, skills or checks that made the game better or caught a defect this task, each
+with evidence; or "none". The lead decides what goes to memory. Leads: "playbook: updated" or
+"playbook: nothing new">
 ## Rules learnt the hard way (keep under 10 lines)
 ```
 
