@@ -4,8 +4,9 @@ extends Node
 ## as a flat map over the street (OverworldMap), and the company's day chosen through a
 ## LoopPanel list: a road to each neighbouring site, a day's rest, or a save. Opens on the
 ## save on disk when there is one (SaveSystem), so a closed game continues where it was;
-## otherwise on a fresh region from the balance seed. The sim decides every day and every
-## cost; this only words and draws them. Words come from data/text/en.json.
+## otherwise on a fresh region from the balance seed. One director lives for the session:
+## hiding the map (set_open) keeps the run; only "Save" writes it to disk. The sim decides
+## every day and every cost; this only words and draws them. Words: data/text/en.json.
 
 const WORLD_DATA := "res://data/balance/world.json"
 const REST := "rest"
@@ -21,6 +22,7 @@ var panel: LoopPanel = null
 var map: OverworldMap = null
 
 var _balance: Dictionary = {}
+var _layer: CanvasLayer = null
 
 
 ## Continues the save on disk, or starts a fresh region, and shows the map and the choices.
@@ -36,15 +38,29 @@ func begin() -> void:
 		rng = Rng.from_seed(int(numbers.num("world", "seed")))
 		world = WorldSim.new()
 		world.start(_balance, rng)
-	var layer := CanvasLayer.new()
-	add_child(layer)
+	_layer = CanvasLayer.new()
+	add_child(_layer)
 	map = OverworldMap.new()
 	map.setup(Vector2i(int(numbers.num("region", "grid_w")), int(numbers.num("region", "grid_h"))))
-	layer.add_child(map)
+	_layer.add_child(map)
 	panel = LoopPanel.new()
-	layer.add_child(panel)
+	_layer.add_child(panel)
 	panel.chosen.connect(_on_choice)
 	_show(Text.t("world.panel.body"))
+
+
+## Whether the map is on screen; the run lives on while it is hidden.
+func is_open() -> bool:
+	return _layer != null and _layer.visible
+
+
+## Shows the map (redrawn with the day's choices) or hides it, keeping the run.
+func set_open(open: bool) -> void:
+	if _layer == null:
+		return
+	_layer.visible = open
+	if open:
+		_show(Text.t("world.panel.body"))
 
 
 func _on_choice(choice_id: String) -> void:

@@ -9,8 +9,9 @@ extends Node
 ## the loop example (LoopDirector): panels, then a battle on an open patch of street during
 ## which the camera watches the fight and walking pauses. F2 opens the overworld map
 ## (OverworldDirector): the region, the company's day and supplies, and the road choices;
-## walking pauses while it is open, and F2 again or Escape closes it. Presentation only:
-## nothing here is random, and walking the hub decides no outcome.
+## walking pauses while it is open, and F2 again or Escape hides it. The director lives
+## for the session, so a day travelled and not yet saved is there when the map reopens.
+## Presentation only: nothing here is random, and walking the hub decides no outcome.
 
 const STAGE_SCENE := preload("res://presentation/world/street_stage.tscn")
 const SLICE_DATA := "res://data/balance/slice.json"
@@ -112,7 +113,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	var click := event as InputEventMouseButton
 	if click != null and click.pressed and click.button_index == MOUSE_BUTTON_LEFT:
-		if _overworld != null:
+		if _overworld_open():
 			return
 		var cell := ground_cell_at(click.position)
 		if not cell.has(&"cell"):
@@ -159,7 +160,7 @@ func _on_key(key: InputEventKey) -> void:
 		start_loop()
 	elif code == KEY_F2:
 		toggle_overworld()
-	elif code == KEY_ESCAPE and _overworld != null:
+	elif code == KEY_ESCAPE and _overworld_open():
 		end_overworld()
 
 
@@ -188,30 +189,35 @@ func end_loop() -> void:
 	_shown.clear()
 
 
-## Opens the overworld map over the street, or closes it when it is open.
+## Shows the overworld map over the street, or hides it when it is open. The first F2
+## creates the director (which continues the save on disk, if any); later ones show and
+## hide the same one, so the run stays as it is until the player saves.
 func toggle_overworld() -> void:
-	if _overworld != null:
-		end_overworld()
+	if _overworld == null:
+		_overworld = OverworldDirector.new()
+		add_child(_overworld)
+		_overworld.begin()
 		return
-	_overworld = OverworldDirector.new()
-	add_child(_overworld)
-	_overworld.begin()
+	_overworld.set_open(not _overworld.is_open())
 
 
 func overworld_director() -> OverworldDirector:
 	return _overworld
 
 
+## Hides the map; the run it holds stays for the next F2.
 func end_overworld() -> void:
-	if _overworld == null:
-		return
-	_overworld.queue_free()
-	_overworld = null
+	if _overworld != null:
+		_overworld.set_open(false)
+
+
+func _overworld_open() -> bool:
+	return _overworld != null and _overworld.is_open()
 
 
 ## Walking waits while the loop example or the overworld map has the player's attention.
 func _paused() -> bool:
-	return _loop != null or _overworld != null
+	return _loop != null or _overworld_open()
 
 
 func _held_direction() -> Vector2i:
