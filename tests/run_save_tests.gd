@@ -12,6 +12,10 @@ const V0_FIXTURE := "res://tests/fixtures/save/v0.json"
 const SEED := 424242
 const STEPS := 6
 const SPLIT := 3
+## Stream positions JSON's doubles cannot hold: 2^53 + 1 and an odd value near 2^62.
+const BIG_STATE := 9007199254740993
+const HUGE_STATE := 4611686018427387905
+const WORLD_STREAM := "world"
 
 
 func suite_name() -> String:
@@ -25,6 +29,7 @@ func run_checks() -> void:
 	_check_defaults()
 	_check_newer_version_refused()
 	_check_migrate_v0()
+	_check_rng_exact_through_json()
 	await process_frame
 
 
@@ -155,4 +160,27 @@ func _check_migrate_v0() -> void:
 			"the version 0 fixture migrates to version %d and keeps its day, place, sites and seed"
 			% SaveModel.VERSION
 		)
+	)
+
+
+## A 64-bit stream position survives the save as JSON writes it (every number a double).
+func _check_rng_exact_through_json() -> void:
+	var exact := true
+	for position: int in [BIG_STATE, HUGE_STATE]:
+		var rng := Rng.restore({"seed": SEED, "streams": {WORLD_STREAM: position}})
+		var world := _world(rng)
+		# start() rolled on from `position`; the position to keep is where the stream is now.
+		var streams_now: Dictionary = rng.state().get("streams", {})
+		var position_now: int = streams_now.get(WORLD_STREAM, 0)
+		var parsed: Variant = JSON.parse_string(JSON.stringify(SaveModel.to_dict(world, rng)))
+		var reread: Dictionary = parsed if parsed is Dictionary else {}
+		var model := SaveModel.from_dict(reread, _balance())
+		var state_after: Dictionary = model.rng.state().get("streams", {})
+		var kept: int = state_after.get(WORLD_STREAM, 0)
+		var next_roll := rng.roll(WORLD_STREAM, 0, HUGE_STATE)
+		exact = exact and model.ok and kept == position_now and absi(position_now) > BIG_STATE
+		exact = exact and model.rng.roll(WORLD_STREAM, 0, HUGE_STATE) == next_roll
+	check(
+		exact,
+		"a stream position above 2^53 comes back from JSON identical and rolls the same next number"
 	)
