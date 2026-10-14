@@ -64,6 +64,16 @@ campaign; every system has a passing player-effect fixture; all content in `data
   Captures are evidence, not the review.
 - **Deliberately left out.** Promotion lines and stage looks (mercs stay at stage 1); trade,
   crafting and gladiator events; weather, rain and night; portraits and the final UI.
+- **Loot includes generic equipment.** Chosen over coin-and-supplies-only and over sellable
+  goods, knowing it overrides the vision's "no general gear is shared between mercs" for the
+  baseline; the vision line is amended by decision. How mercs use it is the open question below.
+- **Player-effect fixture on every milestone.** A milestone is not reviewable until a fixture
+  proves the system changes what the player sees, decides or remembers.
+- **Phase 8 stays.** After the horizontal slice passes, depth passes system by system (the old
+  Phases 2 to 7, reordered after the breadth phase), then Phase 8's polished 60 to 90 minute
+  loop and the north star success test, then Phase 9.
+- **Assigned.** The roadmap rewrite (board item 18, reshaped to this plan) is assigned to the
+  Concept Lead now, docs only.
 - **This session.** No art credits spent; the focus is content and architecture. Director:
   "i dont want to waste too many credits on art in this session, focus on content and
   architecture."
@@ -79,14 +89,14 @@ campaign; every system has a passing player-effect fixture; all content in `data
   gate is recorded PASS." Starting breadth before the Phase 1 look gate breaks it. The director
   chose this knowingly; the rule needs a decision line, and the roadmap rewrite amends it for
   Phase 1 only (art and breadth run in parallel; the look gate still has to be signed).
-- **Loot against bespoke gear lines (open).** The vision: "no general gear is shared between
-  mercs." Loot as generic equipment would break that. The Concept Lead's reading: in the baseline,
-  loot is coin and supplies, and a merc-specific piece only if it is from that merc's own gear
-  line. Needs the director's yes (below).
+- **Loot against bespoke gear lines (decided against the vision).** The vision: "no general
+  gear is shared between mercs." The Concept Lead recommended coin and supplies only; the
+  director chose generic equipment too. The vision line is amended by D-066; whether mercs can
+  equip generic gear (and so change their look) is the open question below.
 - **Pillar 1 risk, not a failure.** "Recruitment must feel like discovery, not shopping." Hiring at
   the hub is the thin structural version; the baseline will feel like shopping. Acceptable for
   structure, and the depth pass after the gate owes the discovery (Q21).
-- **Core test for every milestone (recommendation, not yet decided).** The player-effect fixture
+- **Core test for every milestone (decided, yes).** The player-effect fixture
   rule (every system has a fixture proving it changes what the player sees, decides or remembers)
   as a hard entry condition on each milestone, because a thin pass makes decorative systems easy.
 - **Hard rules.** Determinism, sim authority, content in data, mortality final: nothing decided
@@ -106,11 +116,9 @@ campaign; every system has a passing player-effect fixture; all content in `data
 
 ## Open questions for the director
 
-1. Loot in the baseline is coin and supplies only (no generic equipment)? Yes / no.
-2. The player-effect fixture as a hard entry condition on every milestone? Yes / no.
-3. Does this plan replace the roadmap's Phase 8 "vertical slice and success test", or does Phase 8
-   remain as the depth gate after the horizontal slice passes?
-4. Is the Project Architect 3.0 adoption MERCS-only or both projects? (It was recommended for AFL
+1. Generic equipment: can a merc equip it (slots beside the gear line, look changes), or is it
+   loot to sell and trade only? Asked 2026-10-14; the answer sets the economy milestone's shape.
+2. Is the Project Architect 3.0 adoption MERCS-only or both projects? (It was recommended for AFL
    first; the director's answer here covers MERCS.)
 
 ## For the decision log (ready to paste, pending the director's confirmation)
@@ -122,11 +130,16 @@ campaign; every system has a passing player-effect fixture; all content in `data
 - D-065: Breadth starts now with placeholder sprites, in parallel with art; the Phase 1 look gate
   is signed when art lands. Amends the roadmap's phase-order rule for Phase 1 only.
 - D-066: Baseline caps: 6 mercs; one region, one hub, two or three hamlets, two or three
-  procedural sites; two factions; wages, supplies, contracts, loot; combat skeleton plus one
-  terrain feature; full injury ladder one of each; hire at the hub plus one prisoner choice,
-  captain's office and succession; one storylet plus the memory system.
+  procedural sites; two factions; wages, supplies, contracts, loot including generic equipment
+  (amends the vision's "no general gear is shared between mercs"; usage per open question 1);
+  combat skeleton plus one terrain feature; full injury ladder one of each; hire at the hub plus
+  one prisoner choice, captain's office and succession; one storylet plus the memory system. A
+  player-effect fixture is the entry condition of every milestone.
 - D-067: Left out of the baseline: promotion lines and stage looks, trade/crafting/gladiator
   events, weather, portraits and final UI.
 - D-068: No art spend this session (2026-10-14); content and architecture first.
-- D-069: Project Architect 3.0 adopted as the team structure for the breadth phase (set as in the
+- D-069: Phase 8 (vertical slice and success test) stays as the depth gate after the horizontal
+  slice; the old Phases 2 to 7 become depth passes after the breadth phase.
+- D-070: Roadmap rewrite (board item 18, reshaped) assigned to the Concept Lead, 2026-10-14.
+- D-071: Project Architect 3.0 adopted as the team structure for the breadth phase (set as in the
   Concept Lead handoff of 2026-10-09).
