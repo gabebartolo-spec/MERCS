@@ -1,0 +1,18 @@
+{
+  "_comment": "Phase 2 M1a world sim (sim/world/world_sim.gd): the region, the roads and the company's supply drain. world.md explains each knob.",
+  "world": {
+    "seed": 1009
+  },
+  "region": {
+    "hamlets": 3,
+    "sites": 3,
+    "grid_w": 8,
+    "grid_h": 6,
+    "road_min_days": 1,
+    "road_max_days": 3
+  },
+  "company": {
+    "start_supplies": 30,
+    "supplies_per_day": 2
+  }
+}
