@@ -66,7 +66,9 @@ campaign; every system has a passing player-effect fixture; all content in `data
   crafting and gladiator events; weather, rain and night; portraits and the final UI.
 - **Loot includes generic equipment.** Chosen over coin-and-supplies-only and over sellable
   goods, knowing it overrides the vision's "no general gear is shared between mercs" for the
-  baseline; the vision line is amended by decision. How mercs use it is the open question below.
+  baseline; the vision line is amended by decision. Mercs **equip generic gear for stats in a
+  few slots; the sprite and portrait stay the merc's own gear line** (chosen over sell-only and
+  over gear that shows on the sprite). "Appearance shows abilities" holds unchanged.
 - **Player-effect fixture on every milestone.** A milestone is not reviewable until a fixture
   proves the system changes what the player sees, decides or remembers.
 - **Phase 8 stays.** After the horizontal slice passes, depth passes system by system (the old
@@ -91,8 +93,8 @@ campaign; every system has a passing player-effect fixture; all content in `data
   Phase 1 only (art and breadth run in parallel; the look gate still has to be signed).
 - **Loot against bespoke gear lines (decided against the vision).** The vision: "no general
   gear is shared between mercs." The Concept Lead recommended coin and supplies only; the
-  director chose generic equipment too. The vision line is amended by D-066; whether mercs can
-  equip generic gear (and so change their look) is the open question below.
+  director chose generic equipment too, equipped for stats with the sprite unchanged. The vision
+  line is amended by D-066; the glance-readable look is untouched.
 - **Pillar 1 risk, not a failure.** "Recruitment must feel like discovery, not shopping." Hiring at
   the hub is the thin structural version; the baseline will feel like shopping. Acceptable for
   structure, and the depth pass after the gate owes the discovery (Q21).
@@ -116,9 +118,7 @@ campaign; every system has a passing player-effect fixture; all content in `data
 
 ## Open questions for the director
 
-1. Generic equipment: can a merc equip it (slots beside the gear line, look changes), or is it
-   loot to sell and trade only? Asked 2026-10-14; the answer sets the economy milestone's shape.
-2. Is the Project Architect 3.0 adoption MERCS-only or both projects? (It was recommended for AFL
+1. Is the Project Architect 3.0 adoption MERCS-only or both projects? (It was recommended for AFL
    first; the director's answer here covers MERCS.)
 
 ## For the decision log (ready to paste, pending the director's confirmation)
@@ -131,7 +131,8 @@ campaign; every system has a passing player-effect fixture; all content in `data
   is signed when art lands. Amends the roadmap's phase-order rule for Phase 1 only.
 - D-066: Baseline caps: 6 mercs; one region, one hub, two or three hamlets, two or three
   procedural sites; two factions; wages, supplies, contracts, loot including generic equipment
-  (amends the vision's "no general gear is shared between mercs"; usage per open question 1);
+  equipped for stats in a few slots, sprite and portrait unchanged (amends the vision's "no
+  general gear is shared between mercs"; the look rule holds);
   combat skeleton plus one terrain feature; full injury ladder one of each; hire at the hub plus
   one prisoner choice, captain's office and succession; one storylet plus the memory system. A
   player-effect fixture is the entry condition of every milestone.
