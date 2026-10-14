@@ -84,7 +84,7 @@ the same file.
 |-----------|-------|
 | Size | 256×320 shipped, generated at 1024×1280 and downscaled with the same pixel post as sprites **[D: pixelated vs painterly portraits — needs samples]** |
 | Framing | head and shoulders, 3/4 view toward camera-left, neutral background from `slate` ramp |
-| Base model | FLUX.2 klein 4B (Apache-2.0) or SDXL base (OpenRAIL++-M), decided by Phase 2 sample quality; Qwen-Image and Anima are banned |
+| Base model | FLUX.2 klein 4B (Apache-2.0) or SDXL base (OpenRAIL++-M), decided by Phase 3 sample quality; Qwen-Image and Anima are banned |
 | Style lock | one style LoRA trained on 40–60 director-approved portraits produced from the base model itself (no scraped art, no artist names in prompts) |
 | Identity | each merc's portrait seed is stored in the save; injury states are inpainted from the same seed with masks, so the face stays the same face |
 | Prompt | a template filled from merc data (age band, build, skin ramp, hair, scars, faction cloth); no free text from an agent |

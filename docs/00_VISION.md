@@ -59,6 +59,9 @@ game works. Nothing scales until this is true in a playable slice.
   moveset is changed (trainers, potions or something else) is open (Q17).
 - **Bespoke gear lines.** Each merc has their own gear line; no general gear is shared between
   mercs, so a merc's look always matches their abilities.
+  Amended by the director, 2026-10-14 (D-066): generic equipment exists as loot and can be
+  equipped for stats in a few slots, but it never shows on the sprite or portrait; the gear line
+  is the look, so appearance still shows abilities.
 
 ## Death and return
 
@@ -185,11 +188,11 @@ the director supplied. The brief remains inspiration, not scripture.
 
 | Topic | Brief said | Pack says | Why |
 |-------|------------|-----------|-----|
-| Grid | hex "or similarly clear" | square grid, 8 facings, shared with overworld | one sprite facing set instead of two; revisit only if combat feel fails in Phase 3 |
+| Grid | hex "or similarly clear" | square grid, 8 facings, shared with overworld | one sprite facing set instead of two; revisit only if combat feel fails in Phase 4 |
 | 3D source characters | Tripo generates/standardises source humans | **SUPERSEDED by the director, 2026-10-09:** the hand-made cast includes non-humans (an orc) and every merc has bespoke stage looks and a gear line, so "one CC0 base body, equipment is the variety" no longer fits. The art pipeline is paused and being refocused (`D-TBD-art-refocus`). | — |
 | Tripo | primary 3D gateway | optional prop and equipment concept tool, paid tier only with director approval | free tier is CC-BY (attribution in a commercial game), API wallet is empty, 300 credits already spent on AFL |
 | Asset factory proof | eighth build step | second step, paired with the visual proof | it is the largest technical and stylistic risk; everything visual depends on it |
-| Three.js animation lab | optional staging environment | deferred to Phase 7 R&D at the earliest | Mixamo library + Blender covers Phase 1–6 motion; a second runtime adds failure modes before the slice exists |
+| Three.js animation lab | optional staging environment | deferred to Phase 8 R&D at the earliest | Mixamo library + Blender covers Phase 1–7 motion; a second runtime adds failure modes before the slice exists |
 | Generative video (Wan, AnimateDiff) | R&D tool for bespoke 2D motion | parked entirely until the slice passes | 12 GB VRAM makes 14B video impractical; the deterministic pipeline does not need it |
 | Qwen-Image 2.1 for concepting | implied by prior use | banned from anything that feeds the product | research-only licence |
 | Roster size | "modest reserve" | hard cap of 12 in the slice (6 deployed + 6 reserve) | attachment and permadeath weight; raise only after the success test |
@@ -198,14 +201,14 @@ the director supplied. The brief remains inspiration, not scripture.
 
 | Addition | Where it lands |
 |----------|----------------|
-| The company is the player; the captain is a mortal office with succession and deploy-or-delegate | this file; roadmap Phases 2, 3, 4, 8; question Q13, Q14 |
-| Company chronicle for living, retired and dead members | roadmap Phase 4 and Phase 8 caps |
-| Down is not yet dead: post-battle triage | roadmap Phase 4 |
-| Retreat is legitimate; encounters do not scale; left-behind mercs can be rescued later | roadmap Phases 3, 6 |
-| Regional recruitment pools as the "habitat" layer | roadmap Phase 7; to revisit for the fixed cast (Q21) |
+| The company is the player; the captain is a mortal office with succession and deploy-or-delegate | this file; roadmap Phases 3, 3, 4, 8; question Q13, Q14 |
+| Company chronicle for living, retired and dead members | roadmap Phase 5 and Phase 9 caps |
+| Down is not yet dead: post-battle triage | roadmap Phase 5 |
+| Retreat is legitimate; encounters do not scale; left-behind mercs can be rescued later | roadmap Phases 4, 6 |
+| Regional recruitment pools as the "habitat" layer | roadmap Phase 8; to revisit for the fixed cast (Q21) |
 | No rarity labels or coloured borders; rarity is recognised, not announced | guardrail A9 |
-| Moral scenes voice one to three relevant mercenaries, never everyone | roadmap Phase 5 |
-| Which mercenary attempts a check is itself the roleplay | already pillar 7; Phase 5 deliverable |
+| Moral scenes voice one to three relevant mercenaries, never everyone | roadmap Phase 6 |
+| Which mercenary attempts a check is itself the roleplay | already pillar 7; Phase 6 deliverable |
 
 ## What this game is not
 

@@ -88,5 +88,5 @@ Recommendations printed: 56 colours; fonts per the Art agent's judgement after r
 
 ## 7. What is not in Phase 1
 
-No gameplay, no UI beyond the font sample, no portraits (Phase 2), no second body build beyond
+No gameplay, no UI beyond the font sample, no portraits (Phase 3), no second body build beyond
 `giant`, no facings beyond eight, no clips beyond the six, no diffusion anywhere.

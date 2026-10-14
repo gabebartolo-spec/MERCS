@@ -26,7 +26,7 @@ animation state or facing outside the phase count is a director decision, not a 
 
 ### A3. World before people
 *Pitfall:* a big procedural map hides a weak character game.
-*Rule:* no region generation beyond one authored town plus three procedural sites until Phase 8's
+*Rule:* no region generation beyond one authored town plus three procedural sites until Phase 9's
 success test passes.
 *Enforced by:* roadmap gate; Concept Lead review.
 
@@ -49,7 +49,7 @@ because every loot game has them; and a dead mercenary vanishes like a used item
 unusual combination happened and the player recognises it. Every member who ever served has a
 chronicle entry that survives death and retirement.
 *Enforced by:* `strings.py` banned-word list for UI labels (`rare`, `epic`, `legendary`); the
-`chronicle` fixture in Phase 4; review.
+`chronicle` fixture in Phase 5; review.
 
 ## B. Engineering pitfalls
 
@@ -105,7 +105,7 @@ an autoload, because sim must not depend on the scene tree (D-021). A new autolo
 ### B9. Magic numbers and hidden balance
 *Rule:* every tunable number lives in `data/balance/*.json` with a comment key. A literal numeric
 constant in `sim/` other than 0, 1, -1 and 100 is flagged.
-*Enforced by:* `tools/lint/magic_numbers.py` (warning in Phase 1–2, error from Phase 3).
+*Enforced by:* `tools/lint/magic_numbers.py` (warning in Phase 1–3, error from Phase 4).
 
 ### B10. Secrets and spend
 *Rule:* no API keys in the repo; `.env` is git-ignored; CI has no paid secrets. No agent calls a
@@ -114,7 +114,7 @@ paid API without a DECISIONS.md entry.
 
 ### B11. Performance budgets
 *Rule:* 60 fps at 1920×1080 on this PC with the slice content; world tick under 50 ms for a
-year of simulated time; battle load under 2 s. Measured by the `perf` suite from Phase 3.
+year of simulated time; battle load under 2 s. Measured by the `perf` suite from Phase 4.
 *Enforced by:* CI perf suite with floors; a regression over 20 % fails.
 
 ### B12. Text hard-coded in scripts
