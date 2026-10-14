@@ -1,0 +1,20 @@
+{
+  "_comment": "A version 0 save (the first shape, before migrations): the company two days out from the hub at site_hamlet_1, with a one-day road on to site_wild_1. tests/run_save_tests.gd migrates it to SaveModel.VERSION and expects day 2, at site_hamlet_1, three sites and seed 424242.",
+  "version": 0,
+  "rng": {"seed": 424242, "streams": {}},
+  "world": {
+    "day": 2,
+    "supplies": 26,
+    "at": "site_hamlet_1",
+    "log": [
+      {"step": "travel", "to": "site_hamlet_1", "days": 2},
+      {"step": "tick", "day": 1, "supplies": 28},
+      {"step": "tick", "day": 2, "supplies": 26}
+    ],
+    "sites": [
+      {"id": "site_hub", "kind": 0, "x": 0, "y": 0, "roads": {"site_hamlet_1": 2}},
+      {"id": "site_hamlet_1", "kind": 1, "x": 2, "y": 1, "roads": {"site_hub": 2, "site_wild_1": 1}},
+      {"id": "site_wild_1", "kind": 2, "x": 1, "y": 3, "roads": {"site_hamlet_1": 1}}
+    ]
+  }
+}
