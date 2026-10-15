@@ -94,7 +94,7 @@ func _on_result(kind: String, result: Dictionary) -> void:
 	_judge().on_result(result)
 	if result.get("won", false) != true:
 		return
-	company.economy.take_loot(kind, rng)
+	company.economy.take_loot(kind, rng, result)
 	var taken := EncounterBattle.taken(result)
 	if not taken.is_empty():
 		company.economy.captives.take(world.day, taken)
@@ -204,6 +204,7 @@ func _wages_rows() -> Array[Dictionary]:
 		"days": economy.unpaid_days,
 		"per_day": economy.wage_per_day(company.roster),
 		"count": company.roster.size(),
+		"upkeep": economy.armoury.upkeep(company.roster),
 	}
 	var rows: Array[Dictionary] = [_label(Text.t("hub.title", params))]
 	rows.append(_label(Text.t("hub.status", params)))
@@ -211,6 +212,8 @@ func _wages_rows() -> Array[Dictionary]:
 		rows.append(_label(Text.t("hub.wages.clear", params)))
 		return rows
 	rows.append(_label(Text.t("hub.wages.owed", params)))
+	if Merc.whole(params["upkeep"]) > 0:
+		rows.append(_label(Text.t("hub.armoury.upkeep", params)))
 	var can_pay := _at_hub() and economy.purse >= economy.owed
 	rows.append(_button("pay", "wages", Text.t("hub.pay", params), can_pay))
 	return rows
