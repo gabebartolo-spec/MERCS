@@ -41,6 +41,7 @@ const EXPECTED_IDS: Array[String] = [
 	"hiring",
 	"battle_kit",
 	"levels",
+	"xp_from_fights",
 ]
 
 

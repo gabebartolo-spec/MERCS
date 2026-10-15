@@ -142,11 +142,21 @@ func _check_experience_bar(game: SliceGame) -> void:
 	await _tap(KEY_C)
 	await _click_button(panel.row_for("vampyr"))
 	var bar := panel.bar()
+	var xp: Dictionary = _json("res://data/balance/company.json").get("xp", {})
+	var level_xp: Array = xp.get("level_xp", [])
+	var two := Merc.whole(level_xp[1])
 	check(
-		bar.value == float(BLOOD_PRICE_XP) and bar.max_value == 10.0 and bar.is_visible_in_tree(),
 		(
-			"the experience bar shows %d of 10 for the Vampyr after the sim gave him %d"
-			% [int(bar.value), BLOOD_PRICE_XP]
+			bar.value == float(BLOOD_PRICE_XP)
+			and bar.max_value == float(two)
+			and bar.is_visible_in_tree()
+		),
+		(
+			(
+				"the experience bar shows %d of %d (level 2, from data) for the Vampyr after the sim "
+				% [int(bar.value), two]
+			)
+			+ "gave him %d" % BLOOD_PRICE_XP
 		)
 	)
 

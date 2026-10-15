@@ -23,6 +23,8 @@ var _rules := {}
 var _defs: Array = []
 var _injuries := {}
 var _downed: Array[Dictionary] = []
+## Enemies each fielded merc has put down this fight: {merc id: count} (experience, D-095).
+var _kills := {}
 
 
 ## rules: data/balance/injury.json; defs: data/injuries.json "injuries"; saved: the "wounds"
@@ -58,6 +60,7 @@ func units(cells: Array[Vector2i], side: int) -> Array[BattleUnit]:
 			fit[merc_id] = Injury.effective_stats(_row(mercs, merc_id), day, _defs)
 	fielded = ids
 	_downed.clear()
+	_kills.clear()
 	return company.battle_units(ids, cells, side, fit)
 
 
@@ -66,6 +69,9 @@ func units(cells: Array[Vector2i], side: int) -> Array[BattleUnit]:
 func hit_hook(hit: Dictionary) -> Array[Dictionary]:
 	var events: Array[Dictionary] = []
 	var target := str(hit.get("target", ""))
+	var actor := str(hit.get("unit", ""))
+	if hit.get("down", false) == true and actor in fielded and not target in fielded:
+		_kills[actor] = Merc.whole(_kills.get(actor, 0)) + 1
 	if hit.get("down", false) == true and target in fielded and not is_noted(target):
 		_downed.append({"merc": target, "by": str(hit.get("unit", ""))})
 		events.append({"type": "injury", "unit": target, "by": str(hit.get("unit", ""))})
@@ -102,9 +108,29 @@ func resolve() -> Array[Dictionary]:
 	for event: Dictionary in events:
 		_apply(event)
 	_downed.clear()
+	events.append_array(_award())
+	_kills.clear()
 	fielded = []
 	if company.is_wiped():
 		events.append({"type": "campaign_end", "day": day, "fallen": company.fallen.duplicate()})
+	return events
+
+
+## Experience from the fight (D-095, data/balance/company.json "xp"): every fielded merc who
+## lived through it gets "per_fight", and "per_kill" for each enemy they put down. The dead
+## (already buried) get nothing, a merc who was not fielded was not here. Returns
+## {"type": "xp", "merc", "gain", "level", "raised"} per merc, in fielding order. Rolls nothing.
+func _award() -> Array[Dictionary]:
+	var events: Array[Dictionary] = []
+	for merc_id: String in fielded:
+		var merc := company.member(merc_id)
+		if merc == null:
+			continue
+		var gain := company.xp_for_fight(Merc.whole(_kills.get(merc_id, 0)))
+		var raised := merc.gain(gain)
+		events.append(
+			{"type": "xp", "merc": merc_id, "gain": gain, "level": merc.level(), "raised": raised}
+		)
 	return events
 
 
