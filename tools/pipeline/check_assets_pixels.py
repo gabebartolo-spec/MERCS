@@ -1,8 +1,8 @@
 """Run validate_pixels.py over every PNG under assets/ except the allowlist (run_all.sh calls this).
 
-PNGs under a folder in PALETTE_DIRS are checked against that folder's palette (assets/sprites/: the
-draft sheet palette of record; the look target and golden references: the core + heartland biome
-palette, 06 section 2); all others are checked for upscaling, soft alpha and anti-aliased edges.
+PNGs under a folder in PALETTE_DIRS are checked against that folder's palette (the merc sheets, the
+look target and the golden references: the core + heartland biome palette, 06 section 2; the sheets
+moved off master_draft after the slop audit of 2026-10-15); all others are checked for upscaling, soft alpha and anti-aliased edges.
 """
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ ROOT = PIPELINE.parents[1]
 ALLOWLIST = PIPELINE / "pixels_allowlist.txt"
 HEARTLAND = ROOT / "assets" / "palette" / "biomes" / "heartland.json"
 PALETTE_DIRS = {
-    "assets/sprites/": PIPELINE / "palette" / "master_draft.json",
+    "assets/sprites/": HEARTLAND,
     "assets/look_target/heartland/": HEARTLAND,
     "assets/golden/": HEARTLAND,
 }

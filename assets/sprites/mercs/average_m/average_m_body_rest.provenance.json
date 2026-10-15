@@ -2,18 +2,18 @@
   "_doc": "Provenance manifest (docs/10_LICENSING_REGISTER.md 'Provenance manifest'): covers the three files of this sheet. Rendered by the sprite pipeline from the CC0 MPFB base body; no generative model touched it.",
   "asset": "sprites/mercs/average_m/average_m_body_rest.json",
   "files": {
-    "average_m_body_rest.json": "4b6c0e66c3e1c15fc6067422721fe8402997cebef713a9460782f6ccbddb274f",
-    "average_m_body_rest.png": "9ac6c96aa33aa11c5201b25f0f45c0057925b3d5322e199530f8312539bc2015",
+    "average_m_body_rest.json": "371ce28accaba0bd103d21b7e575430bbb686efee9ff3ca24bc903b2fe98af15",
+    "average_m_body_rest.png": "0a3c5812b6033233af8cf5a419673d14a982e748bb4bb29d754d43825ad344fe",
     "average_m_body_rest_normal.png": "5823a78a7f0db880378088f8f25325e45d9929d88c273bc5aff42bb2b168ca74"
   },
-  "produced_by": "tools/pipeline/render_character.py, pixelate.py, pack_sheets.py @ 80b1dcd (main, PR #52)",
+  "produced_by": "tools/pipeline/render_character.py, pixelate.py, pack_sheets.py (branch claude/art-cast-fix): re-run on the locked palette after the slop audit of 2026-10-15, outline on the silhouette only (no --parts inner lines)",
   "inputs": {
     "body_blend": "tools/pipeline/bodies/average_m.blend@95326b38dcd40621",
     "camera_rig": "tools/pipeline/camera_rig.json@c67f2acbf9918073",
     "light_rig": "tools/pipeline/light_rig.json@c246e0a0750c346e",
-    "pixelate_config": "tools/pipeline/pixelate.json@3f6f5ba7db17dbe8",
+    "pixelate_config": "assets/look_target/heartland/pixelate.json@e504d68e3a53b582",
     "proportions": "tools/pipeline/proportions.json@f0722e47bb29a532",
-    "render_script": "tools/pipeline/render_character.py@c673a4df1d639b59"
+    "render_script": "tools/pipeline/render_character.py@ea923b37759b29ab"
   },
   "clip": null,
   "models": [],
@@ -23,7 +23,6 @@
     "Python, Pillow, NumPy"
   ],
   "seed": null,
-  "palette_version": "master_draft (DRAFT)",
-  "created": "2026-10-09",
-  "identical_to": "tests/fixtures/pipeline/sheets/good/average_m_body_rest.json (same pipeline, same inputs)"
+  "palette_version": "core + heartland (look B 'Peat and Ochre', locked 2026-10-15)",
+  "created": "2026-10-15"
 }

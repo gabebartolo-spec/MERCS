@@ -32,6 +32,8 @@ import bpy
 from mathutils import Euler, Matrix, Quaternion, Vector
 
 PIPELINE = Path(__file__).resolve().parent
+sys.path.insert(0, str(PIPELINE))
+import kit_extras  # noqa: E402  (Blender runs this file with -P: the folder is not on the path)
 CAMERA_FILE = PIPELINE / "camera_rig.json"
 LIGHT_FILE = PIPELINE / "light_rig.json"
 PROPORTIONS_FILE = PIPELINE / "proportions.json"
@@ -445,6 +447,8 @@ def add_kit(rig: bpy.types.Object, path: str, keep: tuple[str, ...] = ()) -> dic
         else:
             KIT_SHAPES[piece["shape"]]()
         obj = bpy.context.active_object
+        if "pleats" in piece:
+            kit_extras.pleat(obj, piece["pleats"], size[1])
         obj.name = f"{KIT_PREFIX}{name}"
         obj["kit_group"] = piece.get("group", name)
         obj["kit_material"] = piece.get("material", DEFAULT_KIT_MATERIAL)
@@ -466,9 +470,13 @@ def add_kit(rig: bpy.types.Object, path: str, keep: tuple[str, ...] = ()) -> dic
         obj.parent_bone = piece["bone"]
         bpy.context.view_layer.update()
         obj.matrix_world = world
+    shells = kit_extras.add_shells(rig, body_mesh(rig), cfg.get("shells", {}))
+    eye_cfg = cfg.get("eyes")
+    eyes = [kit_extras.add_eyes(body_mesh(rig), eye_cfg.get("push_m", 0.0) if isinstance(eye_cfg, dict) else 0.0)
+            ] if eye_cfg else []
     bpy.context.view_layer.update()
     return {"file": rel_path(Path(path).resolve()), "sha256": sha256(Path(path)), "pieces": len(pieces),
-            "kept": list(keep)}
+            "kept": list(keep), "shells": shells, "features": eyes}
 
 
 CONTACT_M = 0.02  # a foot within this of its lowest height in the loop counts as planted (ground speed)
@@ -785,7 +793,8 @@ BONE_ATTR = "mercs_bone"  # point attribute: the vertex's dominant bone, carried
 
 
 def body_mesh(rig: bpy.types.Object) -> bpy.types.Object:
-    return next(o for o in rig.children if o.type == "MESH" and o.parent_type == "OBJECT")
+    return next(o for o in rig.children if o.type == "MESH" and o.parent_type == "OBJECT"
+                and not o.get(kit_extras.EXTRA_FLAG))
 
 
 def tag_dominant_bones(rig: bpy.types.Object) -> list[str]:
@@ -929,8 +938,8 @@ def apply_layers_pass(light: dict) -> dict:
 
 
 MATID_COLOURS = {"skin": "#ff0000", "iron": "#00ff00", "timber": "#0000ff", "cloth": "#ffff00",
-                 "bone": "#ff00ff", "soot": "#00ffff", "leather": "#ff8000"}  # IDs, never shipped
-FEATURE_MATERIALS = (("tusk", "bone"), ("tooth", "bone"), ("teeth", "bone"), ("eye", "soot"), ("nail", "bone"))
+                 "bone": "#ff00ff", "soot": "#00ffff", "leather": "#ff8000", "eye": "#8000ff"}  # IDs, never shipped
+FEATURE_MATERIALS = (("tusk", "bone"), ("tooth", "bone"), ("teeth", "bone"), ("eye", "eye"), ("nail", "bone"))
 
 
 def apply_matid_pass() -> dict:
@@ -941,7 +950,7 @@ def apply_matid_pass() -> dict:
     for obj in bpy.data.objects:
         if obj.type != "MESH":
             continue
-        if obj.name.startswith(KIT_PREFIX):
+        if obj.name.startswith(KIT_PREFIX) or "kit_material" in obj:
             key = obj.get("kit_material", DEFAULT_KIT_MATERIAL)
         else:
             low = obj.name.lower()

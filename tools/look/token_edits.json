@@ -1,0 +1,7 @@
+{
+ "_doc": "Hand edits applied last to each map token by build_sprites.py (slop audit rows 8, 9: tokens are hand-cleaned). Each edit is [x, y, ramp, step]: the pixel takes that palette colour. Every edit names why; an edit that no longer lands on the pixel it describes fails the build (expect: the colour it replaces).",
+ "vampyr": [
+  {"at": [46, 25], "to": ["skin_pale", 2], "expect": ["soot", 0], "why": "the far eye sat against the cheek outline and read as a doubled outline; one eye pixel with pale on both sides reads as an eye"}
+ ],
+ "orc": []
+}

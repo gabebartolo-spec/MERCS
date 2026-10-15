@@ -1,5 +1,5 @@
 {
- "_doc": "Vampyr, stage 1 blockout (silhouette study, route A). Dark knight: long cape from the shoulders, high collar framing the face, narrow angular plate, longsword sheathed on the left hip. Head bare. Shipped gear replaces these piece by piece.",
+ "_doc": "Vampyr, stage 1 blockout (silhouette study, route A). Dark knight: long cape from the shoulders, high collar framing the face, narrow angular plate, longsword sheathed on the left hip. Head bare. Shipped gear replaces these piece by piece. Look fix 2026-10-15 (slop audit rows 15, 16): full fitted plate as a conformed shell (kit_extras.py), lean where the orc is massive; sabatons; pleated cape; hands and head bare.",
  "merc": "vampyr",
  "stage": 1,
  "pieces": {
@@ -23,21 +23,6 @@
     0
    ]
   },
-  "breastplate": {
-   "shape": "sphere",
-   "bone": "mixamorig:Spine1",
-   "at": "mid",
-   "offset_m": [
-    0,
-    -0.035,
-    0.03
-   ],
-   "size": [
-    0.44,
-    0.37,
-    0.54
-   ]
-  },
   "tassets": {
    "shape": "cone",
    "bone": "mixamorig:Hips",
@@ -45,14 +30,14 @@
    "offset_m": [
     0,
     0,
-    -0.08
+    -0.1
    ],
    "size": [
-    0.44,
-    0.32,
-    0.36
+    0.4,
+    0.3,
+    0.26
    ],
-   "top_size": 0.36,
+   "top_size": 0.37,
    "sides": 8
   },
   "pauldron_l": {
@@ -88,50 +73,6 @@
    ],
    "top_size": 0.05,
    "sides": 6
-  },
-  "vambrace_l": {
-   "shape": "cylinder",
-   "bone": "mixamorig:LeftForeArm",
-   "at": "mid",
-   "size": [
-    0.12,
-    0.12,
-    0.8
-   ],
-   "along_bone": true
-  },
-  "vambrace_r": {
-   "shape": "cylinder",
-   "bone": "mixamorig:RightForeArm",
-   "at": "mid",
-   "size": [
-    0.12,
-    0.12,
-    0.8
-   ],
-   "along_bone": true
-  },
-  "greave_l": {
-   "shape": "cylinder",
-   "bone": "mixamorig:LeftLeg",
-   "at": "mid",
-   "size": [
-    0.12,
-    0.12,
-    0.85
-   ],
-   "along_bone": true
-  },
-  "greave_r": {
-   "shape": "cylinder",
-   "bone": "mixamorig:RightLeg",
-   "at": "mid",
-   "size": [
-    0.12,
-    0.12,
-    0.85
-   ],
-   "along_bone": true
   },
   "scabbard": {
    "shape": "cylinder",
@@ -249,13 +190,31 @@
     1.2
    ],
    "top_size": 0.36,
-   "sides": 8,
+   "sides": 16,
    "rot_deg": [
     6,
     0,
     0
    ],
-   "doc": "look target: one cape from the shoulder blades, flaring back toward the calves"
+   "doc": "look target: one cape from the shoulder blades, flaring back toward the calves; the bottom ring is pleated in depth (irregular metres per side) so folds catch the light in clusters",
+   "pleats": [
+    0.0,
+    0.08,
+    -0.03,
+    0.12,
+    0.02,
+    -0.06,
+    0.1,
+    0.03,
+    0.0,
+    0.11,
+    -0.02,
+    0.14,
+    -0.04,
+    0.07,
+    0.01,
+    0.12
+   ]
   }
  },
  "checks": [
@@ -271,5 +230,53 @@
    ],
    "min_dot": 0.9
   }
- ]
+ ],
+ "shells": {
+  "cuirass": {
+   "bones": [
+    "mixamorig:Spine",
+    "mixamorig:Hips",
+    "mixamorig:LeftShoulder",
+    "mixamorig:RightShoulder"
+   ],
+   "offset_m": 0.02,
+   "smooth": 30,
+   "material": "iron",
+   "doc": "fitted blackened plate, narrow waist"
+  },
+  "arms": {
+   "bones": [
+    "mixamorig:LeftArm",
+    "mixamorig:RightArm",
+    "mixamorig:LeftForeArm",
+    "mixamorig:RightForeArm"
+   ],
+   "offset_m": 0.012,
+   "smooth": 12,
+   "material": "iron"
+  },
+  "legs": {
+   "bones": [
+    "mixamorig:LeftUpLeg",
+    "mixamorig:RightUpLeg",
+    "mixamorig:LeftLeg",
+    "mixamorig:RightLeg"
+   ],
+   "offset_m": 0.014,
+   "smooth": 15,
+   "material": "iron"
+  },
+  "sabatons": {
+   "bones": [
+    "mixamorig:LeftFoot",
+    "mixamorig:RightFoot",
+    "mixamorig:LeftToeBase",
+    "mixamorig:RightToeBase"
+   ],
+   "offset_m": 0.018,
+   "smooth": 30,
+   "material": "iron"
+  }
+ },
+ "eyes": true
 }

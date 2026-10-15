@@ -1,23 +1,8 @@
 {
- "_doc": "Orc, stage 1 blockout (silhouette study, route A). Plate over the mass, a two-handed battle axe carried in the right hand, head bare so tusks and personal details read. Shipped gear (Tripo hard pieces + Blender) replaces these piece by piece.",
+ "_doc": "Orc, stage 1 blockout (silhouette study, route A). Plate over the mass, a two-handed battle axe carried in the right hand, head bare so tusks and personal details read. Shipped gear (Tripo hard pieces + Blender) replaces these piece by piece. Look fix 2026-10-15 (slop audit rows 7, 14): plate is a conformed shell (tools/pipeline/kit_extras.py) so skin cannot poke through; upper arms, neck and head bare (green skin only where he is unarmoured); heavy leather boots; round layered pauldrons and a wide fauld for a brutish silhouette.",
  "merc": "orc",
  "stage": 1,
  "pieces": {
-  "breastplate": {
-   "shape": "sphere",
-   "bone": "mixamorig:Spine1",
-   "at": "mid",
-   "offset_m": [
-    0,
-    -0.04,
-    0.02
-   ],
-   "size": [
-    0.68,
-    0.54,
-    0.62
-   ]
-  },
   "fauld": {
    "shape": "cone",
    "bone": "mixamorig:Hips",
@@ -25,137 +10,147 @@
    "offset_m": [
     0,
     0,
-    -0.06
+    -0.12
    ],
    "size": [
-    0.6,
-    0.44,
-    0.26
+    0.66,
+    0.5,
+    0.24
    ],
-   "top_size": 0.52,
-   "sides": 10
+   "top_size": 0.5,
+   "sides": 10,
+   "doc": "wide plate skirt flaring over the hips"
   },
   "pauldron_l": {
    "shape": "sphere",
    "bone": "mixamorig:LeftArm",
    "at": "head",
    "offset_m": [
-    0.045,
-    0,
-    0.0
+    0.04,
+    0.0,
+    -0.01
    ],
    "size": [
-    0.24,
-    0.22,
-    0.07
+    0.3,
+    0.3,
+    0.15
    ],
    "rot_deg": [
     0,
-    -25,
+    -28,
     0
-   ]
+   ],
+   "doc": "heavy round pauldron, the orc's brutish shoulder mass"
   },
   "pauldron_r": {
    "shape": "sphere",
    "bone": "mixamorig:RightArm",
    "at": "head",
    "offset_m": [
-    -0.045,
-    0,
-    0.0
+    -0.04,
+    0.0,
+    -0.01
    ],
    "size": [
-    0.24,
-    0.22,
-    0.07
+    0.3,
+    0.3,
+    0.15
    ],
    "rot_deg": [
     0,
-    25,
+    28,
     0
    ]
   },
-  "vambrace_l": {
-   "shape": "cylinder",
-   "bone": "mixamorig:LeftForeArm",
-   "at": "mid",
-   "size": [
-    0.19,
-    0.19,
-    0.75
+  "lame_l": {
+   "shape": "sphere",
+   "bone": "mixamorig:LeftArm",
+   "at": "head",
+   "offset_m": [
+    0.09,
+    0.0,
+    -0.09
    ],
-   "along_bone": true
-  },
-  "vambrace_r": {
-   "shape": "cylinder",
-   "bone": "mixamorig:RightForeArm",
-   "at": "mid",
    "size": [
-    0.19,
-    0.19,
-    0.75
+    0.23,
+    0.24,
+    0.1
    ],
-   "along_bone": true
+   "rot_deg": [
+    0,
+    -40,
+    0
+   ],
+   "doc": "a second plate below the pauldron: layered, not one dome"
   },
-  "greave_l": {
-   "shape": "cylinder",
-   "bone": "mixamorig:LeftLeg",
-   "at": "mid",
+  "lame_r": {
+   "shape": "sphere",
+   "bone": "mixamorig:RightArm",
+   "at": "head",
+   "offset_m": [
+    -0.09,
+    0.0,
+    -0.09
+   ],
    "size": [
-    0.21,
-    0.21,
-    0.8
+    0.23,
+    0.24,
+    0.1
    ],
-   "along_bone": true
+   "rot_deg": [
+    0,
+    40,
+    0
+   ]
   },
-  "greave_r": {
+  "belt": {
+   "material": "leather",
    "shape": "cylinder",
-   "bone": "mixamorig:RightLeg",
-   "at": "mid",
-   "size": [
-    0.21,
-    0.21,
-    0.8
-   ],
-   "along_bone": true
-  },
-  "cuisse_l": {
-   "shape": "cylinder",
-   "bone": "mixamorig:LeftUpLeg",
-   "at": "mid",
-   "size": [
-    0.31,
-    0.31,
-    0.6
-   ],
-   "along_bone": true
-  },
-  "cuisse_r": {
-   "shape": "cylinder",
-   "bone": "mixamorig:RightUpLeg",
-   "at": "mid",
-   "size": [
-    0.31,
-    0.31,
-    0.6
-   ],
-   "along_bone": true
-  },
-  "gorget": {
-   "shape": "cone",
-   "bone": "mixamorig:Neck",
+   "bone": "mixamorig:Hips",
    "at": "head",
    "offset_m": [
     0,
-    0.01,
-    0
+    0,
+    0.03
    ],
    "size": [
-    0.34,
-    0.3,
-    0.12
+    0.56,
+    0.44,
+    0.07
+   ]
+  },
+  "boot_cuff_l": {
+   "material": "leather",
+   "shape": "cylinder",
+   "bone": "mixamorig:LeftLeg",
+   "at": "tail",
+   "offset_m": [
+    0,
+    0,
+    0.17
    ],
-   "top_size": 0.24
+   "size": [
+    0.19,
+    0.19,
+    0.1
+   ],
+   "doc": "turned-down top of a heavy boot"
+  },
+  "boot_cuff_r": {
+   "material": "leather",
+   "shape": "cylinder",
+   "bone": "mixamorig:RightLeg",
+   "at": "tail",
+   "offset_m": [
+    0,
+    0,
+    0.17
+   ],
+   "size": [
+    0.19,
+    0.19,
+    0.1
+   ]
   },
   "axe_haft": {
    "material": "timber",
@@ -273,5 +268,59 @@
    ],
    "min_dot": 0.7
   }
- ]
+ ],
+ "shells": {
+  "cuirass": {
+   "bones": [
+    "mixamorig:Spine",
+    "mixamorig:Hips",
+    "mixamorig:LeftShoulder",
+    "mixamorig:RightShoulder",
+    "mixamorig:Neck"
+   ],
+   "offset_m": 0.035,
+   "smooth": 40,
+   "material": "iron",
+   "doc": "barrel plate over chest, back, pelvis and neck (a bare neck read as moss on the plate at 1x)"
+  },
+  "vambraces": {
+   "bones": [
+    "mixamorig:LeftArm",
+    "mixamorig:RightArm",
+    "mixamorig:LeftForeArm",
+    "mixamorig:RightForeArm"
+   ],
+   "offset_m": 0.02,
+   "smooth": 15,
+   "material": "iron",
+   "doc": "rerebraces and vambraces: bare upper arms between pauldron and vambrace read as moss patches at 1x"
+  },
+  "legs": {
+   "bones": [
+    "mixamorig:LeftUpLeg",
+    "mixamorig:RightUpLeg",
+    "mixamorig:LeftLeg",
+    "mixamorig:RightLeg"
+   ],
+   "offset_m": 0.025,
+   "smooth": 20,
+   "material": "iron",
+   "doc": "cuisses and greaves"
+  },
+  "boots": {
+   "bones": [
+    "mixamorig:LeftFoot",
+    "mixamorig:RightFoot",
+    "mixamorig:LeftToeBase",
+    "mixamorig:RightToeBase"
+   ],
+   "offset_m": 0.025,
+   "smooth": 30,
+   "material": "leather"
+  }
+ },
+ "eyes": {
+  "push_m": 0.016,
+  "doc": "his brow ridge juts forward: the eyes push further out to read under it from the 45 degree camera"
+ }
 }

@@ -46,10 +46,15 @@ def main() -> None:
     write(REPO / "assets" / "palette" / "biomes", "Biome palettes; heartland is look option B with its light.",
           ["tools/look/make_palettes.py"], [py], approved)
     write(REPO / "assets" / "look_target" / "heartland" / "sprites",
-          "Orc and Vampyr stage-1 blockouts rendered by the sprite pipeline (CC0 MPFB bodies, Blender primitives "
-          "for kit), reduced to core + heartland.",
-          ["tools/pipeline/render_character.py", "tools/pipeline/pixelate.py", "tools/pipeline/pack_sheets.py",
-           "tools/look/build_sprites.py"], [blender, mpfb, py], "prototype sprites for the golden references")
+          "Orc and Vampyr stage-1 blockouts rendered by the sprite pipeline (CC0 MPFB bodies; plate as shells "
+          "conformed to the body plus Blender primitives, kit_extras.py), reduced to core + heartland with the "
+          "outline on the silhouette only, speckle merged and the tokens hand-edited (token_edits.json). "
+          "Cast fix after the slop audit of 2026-10-15.",
+          ["tools/pipeline/render_character.py", "tools/pipeline/kit_extras.py", "tools/pipeline/pixelate.py",
+           "tools/pipeline/pack_sheets.py", "tools/pipeline/kits/orc_s1_blockout.json",
+           "tools/pipeline/kits/vampyr_s1_blockout.json", "tools/look/build_sprites.py",
+           "tools/look/token_edits.json"], [blender, mpfb, py],
+          "prototype sprites for the golden references; cast fix awaiting the director's look approval")
     write(REPO / "assets" / "look_target" / "kit",
           "Street and map kits modelled by script in Blender (primitives only), faces named pal:<ramp>:<step>.",
           ["tools/look/build_look_kit.py"], [blender, py], "prototype kit for the golden references")

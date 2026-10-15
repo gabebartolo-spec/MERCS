@@ -4,7 +4,7 @@
   "layer": "body",
   "clip": "rest",
   "image": "orc_look_heartland.png",
-  "image_pixel_sha256": "d38aa794e38a444e03aad4a065ee24b02c652195afef48618318bc64e6fac2c5",
+  "image_pixel_sha256": "e7ac9b403a3d1dd2aaf9d02726fb3829a78bcd5200785c2d7b381f7031fcdb3e",
   "frame_w": 176,
   "frame_h": 176,
   "frame_count": 8,
@@ -101,42 +101,42 @@
       {
         "file": "facing_0_S.png",
         "kind": "render_4x",
-        "sha256": "5d473ada1a619f1427c3fb825a12620069a7be2c582d7862ae794091f4a9cb7f"
+        "sha256": "965040dda4b5c6e28e90fe67cfd5625578767acf3178c4e7a99ff2a28e9191b9"
       },
       {
         "file": "facing_1_SE.png",
         "kind": "render_4x",
-        "sha256": "40da9c0e10154ad5910158cf2a21a561765062c5d3910fc52a313cb5a54ec139"
+        "sha256": "14b46391672e3af11e6725bfd3d6ed80275b551c20d5f75b680bcb13ad90a165"
       },
       {
         "file": "facing_2_E.png",
         "kind": "render_4x",
-        "sha256": "e9ed15e6d3f2e98bdfe0adc811016738c2699af42ac1948393aae7c253a525f6"
+        "sha256": "d741728a164b185a181d9ec709501aafad3813d41028609bdeffee3d594aa936"
       },
       {
         "file": "facing_3_NE.png",
         "kind": "render_4x",
-        "sha256": "12ab0ef4f2cee28a35a5f4ddeb62886d7003eb429dbe262314696d0dbe5c2771"
+        "sha256": "ececf25fea3f41f46e3010bbc864903689ab6cda5f18e7fcee15cd7cca69b468"
       },
       {
         "file": "facing_4_N.png",
         "kind": "render_4x",
-        "sha256": "8b7d8fbaaa3bab8cbb6a943e55f703c3577584661bd56c1b0f37d529a19146dc"
+        "sha256": "8ddefd82ffee4ccd169a0c62f81edb415bfb7cb0bfd00d34b68d0a696a7b0f9f"
       },
       {
         "file": "facing_5_NW.png",
         "kind": "render_4x",
-        "sha256": "51c55644a998ee0d7d34bbf7c722a972f0a7ea5b56198194f3ab2e7d303fe4d8"
+        "sha256": "040587c66e5d2de87815e474ec8c83ab53521f04cc113fbe8a7d31a32489ffd2"
       },
       {
         "file": "facing_6_W.png",
         "kind": "render_4x",
-        "sha256": "d65aca107b41c5af6f8b861b74b775997b72160775b74fd8c8608eeb8f3c75e4"
+        "sha256": "f61f507058814a055ed71b3899c3715f610f57ab644d98d8ccff4bb8fb1b8b3d"
       },
       {
         "file": "facing_7_SW.png",
         "kind": "render_4x",
-        "sha256": "e53d9c98e1f3f3eecb62ef036bb068b1ba356c5441e9f38f88ba613f613f9a32"
+        "sha256": "04e5d13972345662757e4ba3337419be47a61e932ec47ff315797054353ae64d"
       }
     ],
     "inputs": {
@@ -154,7 +154,7 @@
       },
       "render_script": {
         "file": "tools/pipeline/render_character.py",
-        "sha256": "d63ffb26d210188e854d47161bfa98171a8c39b7f3ed353166ca8be31d7767c3"
+        "sha256": "ea923b37759b29abab02683d0328e25c04db14497fe5f2d1ed275a6158c653dd"
       },
       "proportions": {
         "file": "tools/pipeline/proportions.json",
@@ -162,16 +162,23 @@
       },
       "kit": {
         "file": "tools/pipeline/kits/orc_s1_blockout.json",
-        "sha256": "a2ba6d66c63c967c03d416136199cfefe8fde87cf9c924fd8890b6bca1b06119",
-        "pieces": 11,
+        "sha256": "b1321640a5190465ca788c157591ce482945b5d10203e43c0fb09fa628497cef",
+        "pieces": 8,
         "kept": [
-          "breastplate",
-          "fauld",
           "pauldron",
-          "vambrace",
-          "greave",
-          "cuisse",
-          "gorget"
+          "lame",
+          "fauld",
+          "belt",
+          "boot"
+        ],
+        "shells": [
+          "shell_boots",
+          "shell_cuirass",
+          "shell_legs",
+          "shell_vambraces"
+        ],
+        "features": [
+          "feature_eyes"
         ]
       },
       "pixelate_config": {
@@ -196,6 +203,6 @@
     ]
   },
   "normal_image": "orc_look_heartland_normal.png",
-  "normal_image_pixel_sha256": "b48bd6b7911f308b1e26ffa6cc3cde2deb416f25be4506eeee150b0f7971468e",
+  "normal_image_pixel_sha256": "09df2c7f3cea83325a7af9b47a8a92c366038daccc1c1b4ba7434901227cfce9",
   "normal_doc": "camera-facing tangent space, OpenGL: R = screen right, G = screen up, B = toward camera, encoded n * 0.5 + 0.5; alpha copied from the colour frame"
 }

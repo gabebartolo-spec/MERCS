@@ -15,6 +15,21 @@ and golden references". Lock-B layout (supersedes the option paths below):
 - check_assets_pixels.py checks assets/look_target/heartland and assets/golden against heartland; self-test 24/24.
 - Pipeline default pixelate.json still points at master_draft (average_m sheet + fixtures): switching is a separate step.
 
+## Cast fix (2026-10-15, branch claude/art-cast-fix; slop audit rows 7-9, 13-16)
+- Plate is now a shell conformed to the body (`tools/pipeline/kit_extras.py`: a masked copy of the body per shell,
+  smoothed and pushed out along the normals; the body skin under it is masked), so skin cannot poke through.
+  Kits list `shells`; primitives only add silhouette (orc: round layered pauldrons, wide fauld, belt, leather boots;
+  Vampyr: pointed pauldrons, high collar, short tassets, a pleated cape). Kit `eyes` pushes the MPFB eye helpers out
+  through the lids; build_sprites keeps one deliberate eye pixel per eye (weighted centre).
+- build_sprites: outline on the silhouette only (no inner lines), 1-2 px slots closed before the outline, interior
+  runs under 3 px merged (eyes kept), token hand edits in `tools/look/token_edits.json` (checked against the colour
+  they replace). average_m re-run on core + heartland; check_assets_pixels checks assets/sprites/ on heartland.
+- Rerun: `bash D:/MERCS-vault/renders/cast_fix_2026-10-15/render.sh <out>` (orc + Vampyr, colour, matid, normal),
+  then `python tools/look/build_sprites.py --renders <out> --palette assets/palette/biomes/heartland.json
+  --out assets/look_target/heartland/sprites --tag heartland`. Board: `D:/MERCS-vault/renders/cast_fix_2026-10-15/`.
+- Not done: goldens still show the old orc (re-capture after claude/art-desloppify lands); SHEET-PIVOT on the orc
+  and Vampyr sheets (feet 13-15 px under the pivot; was already failing on main: tall bodies, rule is for average).
+
 ## Water fix (lead QC 2026-10-15: map water read as an asphalt road with a lane marking)
 - Cause: water was slate 1 lit by the warm sun (snapped to brown-greys), straight tile edges with a soil kerb,
   and a hairline crack between tiles showing the sky (bone 3) as one long pale line.
