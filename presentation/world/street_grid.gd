@@ -23,7 +23,7 @@ static func build(street: GridMap, data: StageData) -> void:
 	var library := MeshLibrary.new()
 	var thickness := data.num("street", "ground_thickness_m")
 	_add_box_item(
-		library, ITEM_GROUND, Vector3(cell, thickness, cell), data.grey("shades", "ground")
+		library, ITEM_GROUND, Vector3(cell, thickness, cell), data.colour("shades", "ground")
 	)
 	# Ground tiles sit one layer down with their top face at y = 0, so props above
 	# never replace a tile in its cell.
@@ -31,20 +31,20 @@ static func build(street: GridMap, data: StageData) -> void:
 		ITEM_GROUND, Transform3D(Basis(), Vector3(0.0, cell - thickness / HALF, 0.0))
 	)
 	_add_box_item(
-		library, ITEM_HOUSE, data.vec3("street", "house_size_m"), data.grey("shades", "house")
+		library, ITEM_HOUSE, data.vec3("street", "house_size_m"), data.colour("shades", "house")
 	)
 	_add_box_item(
-		library, ITEM_WELL, data.vec3("street", "well_size_m"), data.grey("shades", "well")
+		library, ITEM_WELL, data.vec3("street", "well_size_m"), data.colour("shades", "well")
 	)
 	_add_box_item(
-		library, ITEM_CART, data.vec3("street", "cart_size_m"), data.grey("shades", "cart")
+		library, ITEM_CART, data.vec3("street", "cart_size_m"), data.colour("shades", "cart")
 	)
 	var door_size := data.vec3("street", "door_size_m")
-	_add_box_item(library, ITEM_DOOR, door_size, data.grey("shades", "door"))
+	_add_box_item(library, ITEM_DOOR, door_size, data.colour("shades", "door"))
 	var door_lift := Vector3(0.0, door_size.y / HALF, data.num("street", "door_offset_z_m"))
 	library.set_item_mesh_transform(ITEM_DOOR, Transform3D(Basis(), door_lift))
 	var wall := Vector3(cell, data.num("interior", "wall_height_m"), cell)
-	_add_box_item(library, ITEM_WALL, wall, data.grey("shades", "interior_wall"))
+	_add_box_item(library, ITEM_WALL, wall, data.colour("shades", "interior_wall"))
 	street.mesh_library = library
 	street.cell_size = Vector3(cell, cell, cell)
 	street.cell_center_y = false

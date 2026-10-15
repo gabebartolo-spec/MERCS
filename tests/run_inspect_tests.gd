@@ -98,7 +98,8 @@ func _check_pick(game: SliceGame) -> void:
 			and lines.contains(Text.t("company.stat.resolve", {"value": vampyr.stat("resolve")}))
 			and lines.contains(Text.t("company.stat.hp", {"value": vampyr.stat("hp")}))
 			and lines.contains(Text.t("company.move.blood_price"))
-			and not lines.contains(Text.t("company.move.charge"))
+			and lines.contains("Moves: Move, Attack, Blood price")
+			and lines.contains(Text.t("company.next.move", {"move": Text.t("company.move.charge")}))
 			and lines.contains(Text.t("company.gear", {"gear": vampyr.stage_1_gear[0]}))
 			and lines.contains(
 				Text.t("company.slot.weapon", {"gear": Text.t("company.slot.empty")})

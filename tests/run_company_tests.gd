@@ -31,6 +31,8 @@ func run_checks() -> void:
 	_check_appoint_saved()
 	_check_experience_bar()
 	_check_moves_by_level()
+	_check_growth_by_level()
+	_check_levels_in_data()
 	_check_roster_cap()
 	_check_older_save_defaults()
 	_check_odd_saves()
@@ -252,6 +254,51 @@ func _check_moves_by_level() -> void:
 		(
 			"moves are learnt by level, in order, once each: %s then %s then %s"
 			% [at_one, at_two, merc.moves()]
+		)
+	)
+
+
+func _check_growth_by_level() -> void:
+	var merc := _company().member("orc")
+	var base_hp := merc.stat("hp")
+	var base_attack := merc.stat("attack")
+	merc.gain(25)
+	check(
+		(
+			merc.level() == 3
+			and merc.stat("hp") == base_hp + 4
+			and merc.stat("attack") == base_attack + 2
+			and merc.stat("defense") == Merc.whole(merc.stats["defense"])
+		),
+		(
+			"the orc at level 3 has two levels of growth (hp +4, attack +2) and no more: %d, %d"
+			% [merc.stat("hp"), merc.stat("attack")]
+		)
+	)
+
+
+func _check_levels_in_data() -> void:
+	var company := _company()
+	var odd: Array[String] = []
+	for merc: Merc in company.roster:
+		var gains := merc.next_level()
+		var growth: Dictionary = gains.get("growth", {})
+		if gains.is_empty() or growth.is_empty():
+			odd.append(merc.id + ":no growth")
+		var at_one := merc.moves().size()
+		merc.gain(25)
+		if merc.moves().size() <= at_one:
+			odd.append(merc.id + ":no new move by level 3")
+	var orc := company.member("orc")
+	var vampyr := company.member("vampyr")
+	check(
+		(
+			odd.is_empty()
+			and not _is(orc.next_level().get("growth"), vampyr.next_level().get("growth"))
+		),
+		(
+			"every merc grows and learns a move by level 3 from data, the orc and the Vampyr differently: %s"
+			% [odd]
 		)
 	)
 
