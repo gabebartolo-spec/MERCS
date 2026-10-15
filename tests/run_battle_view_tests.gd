@@ -395,6 +395,6 @@ func _company_turn(mounted: Kit.Mounted, action: Dictionary) -> void:
 		await process_frame
 		return
 	var choice_id := Battle.ACTION_WAIT
-	if kind == Battle.ACTION_ATTACK:
-		choice_id = "%s:%s" % [Battle.ACTION_ATTACK, action.get("target")]
+	if kind != Battle.ACTION_WAIT and action.has("target"):
+		choice_id = "%s:%s" % [kind, action.get("target")]
 	await InputKit.click(self, mounted.panel.button_for(choice_id))

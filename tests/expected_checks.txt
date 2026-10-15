@@ -23,7 +23,7 @@ economy 92
 economy_company 70
 hub 12
 injury 29
-wiring 19
+wiring 20
 hub_fight 2
 story 60
 story_gui 21

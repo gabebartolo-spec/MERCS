@@ -9,7 +9,7 @@ extends "res://tests/lib/runner.gd"
 ## each survive a quit with Ironman On; with Ironman Off none of them writes anything.
 ## The commits the first pass left open (tests/ironman_resume/gap_checks.gd): meeting an
 ## encounter, a storylet attempt, the captain's appointment and a recorded action's types.
-## Seeded by design: world seed 424270, a lone ambush or patrol three steps out, the battle played
+## Seeded by design: world seed 4, a lone ambush or patrol three steps out, the battle played
 ## by BattleAi on both sides (InputKit), the start of the Ironman suite's own fight.
 ##   godot --headless --path . --script tests/run_ironman_resume_tests.gd
 
@@ -22,7 +22,7 @@ const SitOutChecks := preload("res://tests/ironman_resume/sit_out_checks.gd")
 const GapChecks := preload("res://tests/ironman_resume/gap_checks.gd")
 const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const WINDOW_SIZE := Vector2i(1920, 1080)
-const SEED := 424270
+const SEED := 4
 const NEAR := 3
 const TAP_LIMIT := 8
 const SETTLE := 4

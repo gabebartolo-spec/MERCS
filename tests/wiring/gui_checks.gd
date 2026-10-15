@@ -3,7 +3,7 @@ extends RefCounted
 ## at 1920x1080 through the whole game: walk into an ambush, Fight, the triage panel (the
 ## chronicle line, no key help), Continue, the C screen marking the fallen, Save, and a fresh
 ## session that never fields the dead. Seeded by design: the ambush met by walking on world
-## seed 424270, played by BattleAi.
+## seed 4, played by BattleAi.
 
 const Kit := preload("res://tests/lib/wiring_kit.gd")
 const Fixture := preload("res://tests/lib/company_fixture.gd")
@@ -11,12 +11,12 @@ const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const SAVE_SYSTEM := preload("res://presentation/autoload/save_system.gd")
 const LAYOUT_FRAMES := 3
 const FIGHT_FRAMES := 6000
-const GUI_SEED := 424270
+const GUI_SEED := 4
 const NEAR := 3
 const TAP_LIMIT := 8
 const World := preload("res://tests/lib/world_fixture.gd")
 ## Who dies in that fight (BattleAi plays the company, the injury stream rolls the triage).
-const FALLEN: Array[String] = ["merc_4"]
+const FALLEN: Array[String] = ["merc_3"]
 
 var _tree: SceneTree = null
 var _check: Callable
@@ -58,10 +58,31 @@ func run() -> void:
 		fought and fielded[0] == "orc" and director.view.battle.unit("orc").is_leader,
 		"Fight on the road fields the company, the orc captain first: %s" % [fielded]
 	)
+	var fight := director.view.battle
 	await _finish_fight(director)
+	_check_weapon_blows(fight)
 	await _frames(LAYOUT_FRAMES)
 	await _check_triage_panel(game, director)
 	await _continue_and_save(game, director)
+
+
+## An armed merc (his kit's first action is not the plain "attack") landed at least one weapon
+## blow through the clicks above; before the click helpers pressed his kit action, he only waited.
+func _check_weapon_blows(battle: Battle) -> void:
+	var armed := 0
+	for entry: Dictionary in battle.log:
+		if entry.get("type") != Battle.ACTION_ATTACK:
+			continue
+		var striker := battle.unit(str(entry.get("unit", "")))
+		if (
+			striker != null
+			and striker.side == BattleUnit.COMPANY
+			and battle.kit(striker.id)[0] != Battle.ACTION_ATTACK
+		):
+			armed += 1
+	_check.call(
+		armed > 0, "In the GUI fight an armed merc strikes with his weapon: %d blows" % armed
+	)
 
 
 func _continue_and_save(game: SliceGame, director: OverworldDirector) -> void:
@@ -258,8 +279,9 @@ func _company_turn(director: OverworldDirector, action: Dictionary) -> void:
 		await _tree.process_frame
 		return
 	var choice_id := Battle.ACTION_WAIT
-	if kind == Battle.ACTION_ATTACK:
-		choice_id = "%s:%s" % [Battle.ACTION_ATTACK, action.get("target")]
+	if kind != Battle.ACTION_WAIT and action.has("target"):
+		# The weapon action BattleAi chose (kit(actor)[0]) or a learnt move: "<type>:<target>".
+		choice_id = "%s:%s" % [kind, action.get("target")]
 	await _click_button(director.panel.button_for(choice_id))
 
 
