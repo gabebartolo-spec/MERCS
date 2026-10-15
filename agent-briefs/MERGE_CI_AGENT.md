@@ -21,6 +21,8 @@ to run a git or GitHub command (D-030). You never write game code or art.
 Project Architect 3.0 (director, 2026-10-14, D-071): steps B and C2 below become one script,
 `tools/merge_eligibility.sh <pr>`, that prints eligible or the first failing reason; you write it
 in your first pass after this brief lands and use it from then on. The checks do not change.
+Landed: run `bash tools/merge_eligibility.sh <pr>` for each open PR (`eligible <pr> <sha>` means go to C with that sha;
+anything else is the comment text for the owner). Its self-test is in `tools/test_run_tests.sh`.
 
 A. `git fetch -q origin`; `gh pr list --state open`.
 B. For each open, non-draft PR, check:

@@ -65,4 +65,22 @@ check_parse() {  # script, expect (fail|pass); isolated like every run
 }
 check_parse tests/fixtures/compile/untyped_var.gd fail
 check_parse tests/fixtures/compile/typed_ok.gd pass
+# merge_eligibility.sh (D-071): the decision logic reads fixtures, offline.
+me() {  # fixture, expect (eligible | a reason substring)
+	local out code=0
+	out=$(bash tools/merge_eligibility.sh --fixture "tests/fixtures/merge_eligibility/$1.json" 2>&1) || code=$?
+	if [ "$2" = eligible ] && [ "$code" = 0 ] && [[ "$out" == "eligible 99 "* ]]; then
+		echo "ok: merge_eligibility $1 is eligible"
+	elif [ "$2" != eligible ] && [ "$code" != 0 ] && [[ "$out" == *"$2"* ]]; then
+		echo "ok: merge_eligibility $1 is refused ($out)"
+	else
+		echo "FAIL: merge_eligibility $1 should give '$2' (exit $code): $out"
+		bad=1
+	fi
+}
+me eligible eligible
+me draft "is a draft"
+me wrong_head_check "has no run on head"
+me skipped_shards_code_pr "must run the Godot shards"
+me missing_evidence "missing the '## Evidence' section"
 exit "$bad"

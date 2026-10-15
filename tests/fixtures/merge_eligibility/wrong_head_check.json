@@ -1,0 +1,55 @@
+{
+ "pr": {
+  "number": 99,
+  "state": "OPEN",
+  "isDraft": false,
+  "mergeable": "MERGEABLE",
+  "mergeStateStatus": "CLEAN",
+  "headRefOid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "headRefName": "claude/x",
+  "body": "## What the player sees, and why\nnothing, internal\n\n## Evidence\n- Suites: smoke 10\n\n## Not exercised\nthe live game\n\n## Board and log\nnone\n\n## [MERGE NOTE]\n- Hot files touched: tools\n- Floors: none\n- Review needed: none\n- Director gate: none\n- Ordering with other PRs: none\n",
+  "files": [
+   {
+    "path": "tools/x.sh"
+   }
+  ]
+ },
+ "check_runs": [
+  {
+   "name": "test",
+   "status": "completed",
+   "conclusion": "success",
+   "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  {
+   "name": "doc-caps",
+   "status": "completed",
+   "conclusion": "success",
+   "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  {
+   "name": "gitleaks",
+   "status": "completed",
+   "conclusion": "success",
+   "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  {
+   "name": "project-lints",
+   "status": "completed",
+   "conclusion": "success",
+   "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  {
+   "name": "harness self-test",
+   "status": "completed",
+   "conclusion": "success",
+   "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  {
+   "name": "shard 1",
+   "status": "completed",
+   "conclusion": "success",
+   "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  }
+ ]
+}
