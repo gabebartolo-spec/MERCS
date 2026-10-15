@@ -111,7 +111,8 @@ func _walk_into(director: OverworldDirector) -> int:
 func _expected_body(director: OverworldDirector) -> String:
 	var found := director.world.encounter
 	var params := {"day": director.world.day, "toll": director.world.toll_cost()}
-	return Text.t("world.encounter.%s.body" % found.get("type"), params)
+	var body := Text.t("world.encounter.%s.body" % found.get("type"), params)
+	return body + "\n" + OverworldWords.deploy_lines(director.company)
 
 
 func _check_patrol_met(director: OverworldDirector) -> void:
@@ -128,9 +129,13 @@ func _check_patrol_met(director: OverworldDirector) -> void:
 			and director.panel.shown_body() == _expected_body(director)
 			and director.panel.button_for(OverworldDirector.FIGHT) != null
 			and director.panel.button_for(OverworldDirector.TOLL) != null
+			and director.panel.button_for(OverworldDirector.FIGHT_SIT_OUT) != null
 			and director.panel.button_for(OverworldDirector.REST) == null
 		),
-		"%d taps walk the band into the patrol: the panel words it with Fight and the toll" % taps
+		(
+			"%d taps walk the band into the patrol: panel words Fight, Fight sitting out, the toll"
+			% taps
+		)
 	)
 
 

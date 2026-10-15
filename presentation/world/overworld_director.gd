@@ -24,6 +24,7 @@ const REST := "rest"
 const SAVE := "save"
 const FIGHT := "fight"
 const TOLL := "toll"
+const FIGHT_SIT_OUT := "fight_sit_out"
 const CONTINUE := "continue"
 const IRONMAN_ON := "ironman_on"
 const IRONMAN_OFF := "ironman_off"
@@ -235,7 +236,8 @@ func _on_choice(choice_id: String) -> void:
 			ironman = choice_id == IRONMAN_ON
 			_choosing = false
 			_show(_place_line())
-		FIGHT:
+		FIGHT, FIGHT_SIT_OUT:
+			FieldCommand.set_out(company, choice_id == FIGHT_SIT_OUT)
 			_start_fight()
 		CONTINUE:
 			_triage = ""
@@ -312,6 +314,7 @@ func _on_fight_over() -> void:
 	view.queue_free()
 	view = null
 	var events := wounds.resolve()
+	FieldCommand.finish(company)
 	var kind := str(world.encounter.get("type", ""))
 	var hook := world.result_hook
 	world.result_hook = Callable()
@@ -366,7 +369,9 @@ func _show(body: String) -> void:
 		return
 	wounds.day = world.day
 	if not world.encounter.is_empty():
-		OverworldWords.show(panel, OverworldWords.encounter(world, FIGHT, TOLL))
+		OverworldWords.show(
+			panel, OverworldWords.encounter(world, FIGHT, TOLL, company, FIGHT_SIT_OUT)
+		)
 		return
 	var choices: Array[Dictionary] = [
 		{"id": REST, "label": Text.t("world.choice.rest")},

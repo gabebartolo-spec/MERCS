@@ -6,6 +6,9 @@
   "xp": {
     "level_xp": [0, 10, 25, 45, 70]
   },
+  "deploy": {
+    "captain_out_morale_dip": 10
+  },
   "campaign_end": {
     "memories_shown": 3
   }

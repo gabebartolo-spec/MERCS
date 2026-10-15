@@ -32,20 +32,57 @@ static func outcome(world: WorldSim, otherwise: String) -> String:
 
 
 ## The standing encounter as {"title", "body", "choices"}: the fight (its choice id `fight_id`)
-## and, while the supplies cover a patrol's toll, the toll (`toll_id`).
-static func encounter(world: WorldSim, fight_id: String, toll_id: String) -> Dictionary:
+## and, while the supplies cover a patrol's toll, the toll (`toll_id`). With a `company` the
+## captain may sit out: a second fight choice (`sit_out_id`) when a field sergeant can stand in,
+## and the body says what each choice does to the company's nerve before it is made.
+static func encounter(
+	world: WorldSim,
+	fight_id: String,
+	toll_id: String,
+	company: Company = null,
+	sit_out_id: String = ""
+) -> Dictionary:
 	var kind := str(world.encounter.get("type", ""))
 	var params := {"day": world.day, "toll": world.toll_cost()}
+	var body := Text.t("world.encounter.%s.body" % kind, params)
 	var choices: Array[Dictionary] = [
 		{"id": fight_id, "label": Text.t("world.encounter.%s.fight" % kind, params)}
 	]
+	if company != null and sit_out_id != "" and FieldCommand.can_sit_out(company):
+		var captain := company.name_of(company.captain_id)
+		body += "\n" + deploy_lines(company)
+		choices.append(
+			{"id": sit_out_id, "label": Text.t("world.deploy.sit_out", {"captain": captain})}
+		)
 	if world.toll_cost() > 0 and world.supplies >= world.toll_cost():
 		choices.append({"id": toll_id, "label": Text.t("world.encounter.%s.toll" % kind, params)})
 	return {
 		"title": Text.t("world.encounter.%s.title" % kind),
-		"body": Text.t("world.encounter.%s.body" % kind, params),
+		"body": body,
 		"choices": choices,
 	}
+
+
+## What each choice of the captain's place does, in words, before the fight: one line for
+## leading, one for sitting out (the sergeant, the morale dip, the captain's lost experience).
+static func deploy_lines(company: Company) -> String:
+	var captain := company.name_of(company.captain_id)
+	var out := FieldCommand.preview(company, true)
+	return (
+		Text.t("world.deploy.line_lead", {"captain": captain})
+		+ "\n"
+		+ (
+			Text
+			. t(
+				"world.deploy.line_out",
+				{
+					"sergeant": company.name_of(str(out["leader"])),
+					"captain": captain,
+					"dip": out["dip"],
+				}
+			)
+		)
+	)
 
 
 ## The campaign's first question, Ironman first: {"title", "body", "choices"}.
