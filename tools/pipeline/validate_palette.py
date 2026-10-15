@@ -14,23 +14,26 @@ import argparse
 import sys
 from pathlib import Path
 
-import numpy as np
-from PIL import Image
-
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from palette_lib import load_palette  # noqa: E402
+from pngio import read_png  # noqa: E402
 
 MIN_COLOURS = 48
 MAX_COLOURS = 64
 
 
 def check_image(path: Path, allowed: set[int]) -> tuple[int, int]:
-    a = np.asarray(Image.open(path).convert("RGBA")).reshape(-1, 4).astype(np.int64)
-    a = a[a[:, 3] > 0]
-    key = (a[:, 0] << 16) | (a[:, 1] << 8) | a[:, 2]
-    used = np.unique(key)
-    bad = ~np.isin(key, np.fromiter(allowed, dtype=np.int64))
-    return int(bad.sum()), len(used)
+    """Off-palette opaque pixels and colours used (standard library only, like the rest of the pipeline)."""
+    img = read_png(path)
+    px = img.rgba
+    bad, used = 0, set()
+    for i in range(0, len(px), 4):
+        if px[i + 3] == 0:
+            continue
+        key = (px[i] << 16) | (px[i + 1] << 8) | px[i + 2]
+        used.add(key)
+        bad += key not in allowed
+    return bad, len(used)
 
 
 def main(argv: list[str]) -> int:

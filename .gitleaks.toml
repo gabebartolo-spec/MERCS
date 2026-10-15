@@ -26,3 +26,15 @@ description = "High-entropy sk- style API key"
 regex = '''\bsk-[A-Za-z0-9_-]{24,}'''
 entropy = 4.0
 keywords = ["sk-"]
+
+# Art provenance manifests list each file with its SHA-256. A file named *_token_* (a map token
+# sprite) puts the word "token" beside a 64-hex value, which the default generic-api-key rule reads
+# as a key. Excused only in provenance.json files, only for that rule, and only on a line that is
+# exactly a file name and a lowercase SHA-256: any other secret in the same files still fails.
+[[allowlists]]
+description = "SHA-256 file hashes in art provenance manifests"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = ['''(^|/)provenance\.json$''']
+regexTarget = "line"
+regexes = ['''^\s*"[A-Za-z0-9_.-]+\.(png|json|gpl|glb)": "[0-9a-f]{64}",?\s*$''']
