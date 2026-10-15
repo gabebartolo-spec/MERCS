@@ -31,9 +31,8 @@ var jobs: Jobs = null
 var autosave := Callable()
 ## The terms screen: open while a contract's pay is being talked over.
 var talk := TermsPanel.new()
-## The armoury screen (Phase 5 C6, built apart): `armoury_rows` returns its rows for the right
-## column; `armoury_act` takes (action, id) for every panel action that begins "armoury".
-## Unset, the hub has no armoury.
+## The armoury screen's hook (C6's sim; its screen is built apart): `armoury_rows` gives right-
+## column rows, `armoury_act` takes (action, id) of every "armoury*" action. Unset: no armoury.
 var armoury_rows := Callable()
 var armoury_act := Callable()
 
