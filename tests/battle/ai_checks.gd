@@ -22,7 +22,10 @@ const HIGH := 99
 const AI_FILES: Array[String] = [
 	"res://sim/battle/battle_ai.gd",
 	"res://sim/battle/battle_knowledge.gd",
+	"res://sim/merc/merc_play.gd",
 ]
+## The fighter's OWN health is known to him: that read is allowed, any other is not.
+const OWN_READ := "fighter.hp"
 ## Reads of numbers an opponent cannot see; none may appear in the AI's files.
 const HIDDEN_READS := "\\.(hp|max_hp|attack|defense|damage|initiative|presence|moves)\\b"
 
@@ -161,7 +164,8 @@ func _check_no_hidden_reads() -> void:
 	for path: String in AI_FILES:
 		var source := FileAccess.get_file_as_string(path)
 		for line: String in source.split("\n"):
-			if not line.strip_edges().begins_with("#") and pattern.search(line) != null:
+			var code := line.replace(OWN_READ, "")
+			if not line.strip_edges().begins_with("#") and pattern.search(code) != null:
 				found.append("%s: %s" % [path.get_file(), line.strip_edges()])
 	if not found.is_empty():
 		print("HIDDEN READS: %s" % "; ".join(found))

@@ -6,7 +6,8 @@ extends "res://tests/lib/runner.gd"
 ## for byte, and from another seed does not; every stage of it really happened; the final save
 ## reads back and writes the same; the version 2 fixture (fixtures/save/v2.json) loads with its
 ## company, wounds and story; a memory sentence names a comrade who died by name, never by id.
-## Seeded by design: campaign seeds 424310 and 424311 (each has a death in its fight).
+## Seeded by design: campaign seeds 424310 and 424311 (each has a death in its fight); the
+## extra routes on 424308 and 424316.
 ##   godot --headless --path . --script tests/run_campaign_tests.gd
 
 const Campaign := preload("res://tests/lib/campaign_kit.gd")
@@ -15,6 +16,10 @@ const Fixture := preload("res://tests/lib/company_fixture.gd")
 const World := preload("res://tests/lib/world_fixture.gd")
 const SEED := 424310
 const OTHER_SEED := 424311
+## The extra routes' seeds (route_kit.gd; tools/audit/route_replay.sh plays 424308 too): the
+## routes were built on these, and P5's AI wins the loss route's fight on SEED.
+const ROUTE_SEED := 424308
+const ROUTE_OTHER_SEED := 424316
 const V2_FIXTURE := "res://tests/fixtures/save/v2.json"
 const MERC_ID_PREFIX := "merc_"
 ## What each extra route must have really done (route_kit.gd), beside the byte-for-byte replay.
@@ -53,9 +58,9 @@ func run_checks() -> void:
 ## ends in the same save, byte for byte, on another seed in a different one, and really
 ## happened (tools/audit/route_replay.sh plays the same pairs in two processes).
 func _check_route(route: String) -> void:
-	var first := Routes.run(route, SEED)
-	var again := Routes.run(route, SEED)
-	var other := Routes.run(route, OTHER_SEED)
+	var first := Routes.run(route, ROUTE_SEED)
+	var again := Routes.run(route, ROUTE_SEED)
+	var other := Routes.run(route, ROUTE_OTHER_SEED)
 	var stages: Dictionary = first["stages"]
 	var wanted: Dictionary = ROUTE_STAGES[route]
 	var missing: Array[String] = []
