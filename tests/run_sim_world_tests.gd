@@ -11,6 +11,7 @@ extends "res://tests/lib/runner.gd"
 ##   godot --headless --path . --script tests/run_sim_world_tests.gd
 
 const Fixture := preload("res://tests/lib/world_fixture.gd")
+const JobChecks := preload("res://tests/world/job_checks.gd")
 const SEED := 424242
 const OTHER_SEED := 424243
 const STEPS := 12
@@ -35,6 +36,7 @@ func run_checks() -> void:
 	_check_step_costs()
 	_check_starving()
 	_check_restore_continues()
+	JobChecks.new().run(check)
 	await process_frame
 
 

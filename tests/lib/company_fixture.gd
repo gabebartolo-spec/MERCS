@@ -10,6 +10,7 @@ const ECONOMY := "res://data/balance/economy.json"
 const FACTIONS := "res://data/factions.json"
 const EQUIPMENT := "res://data/equipment.json"
 const RECRUITS := "res://data/recruits.json"
+const JOBS := "res://data/jobs.json"
 const SCENARIOS := "res://data/scenarios.json"
 const MAX_ACTIONS := 300
 ## The band the merc faces: the scenario's first FOES enemies (the chief and a bandit).
@@ -32,6 +33,7 @@ static func defs() -> Dictionary:
 		"factions": json(FACTIONS),
 		"equipment": json(EQUIPMENT),
 		"recruits": json(RECRUITS),
+		"jobs": json(JOBS),
 	}
 
 

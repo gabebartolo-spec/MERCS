@@ -16,6 +16,9 @@ var company: Company = null
 var world: WorldSim = null
 var rng: Rng = null
 var panel: HubPanel = null
+## The contracts' jobs on the map (Phase 5 C1): placed when a contract is taken, judged after
+## every day and every fight.
+var jobs: Jobs = null
 ## The overworld's autosave (OverworldDirector.autosave: writes only under Ironman), called after
 ## each committed action so a quit cannot give the decision back (D-087).
 var autosave := Callable()
@@ -44,6 +47,9 @@ func begin(shared: Company, sim: WorldSim, stream: Rng) -> void:
 	_wearer = company.captain_id
 	world.day_hook = _on_day
 	world.result_hook = _on_result
+	var found: Variant = OverworldDirector.world_data().get("jobs", {})
+	var knobs: Dictionary = found if found is Dictionary else {}
+	jobs = Jobs.make(world, company, knobs)
 	if company.economy.board.is_empty():
 		company.economy.refresh_board(world.day, _site_ids(), rng)
 	_layer = CanvasLayer.new()
@@ -73,6 +79,7 @@ func economy() -> Economy:
 
 
 func _on_day(day: int) -> void:
+	_judge().on_day(day)
 	company.economy.on_day(company.roster, day, _site_ids(), rng)
 	if is_open():
 		_show()
@@ -82,6 +89,7 @@ func _on_day(day: int) -> void:
 ## surrendered men (EncounterBattle.result "prisoners"; a wipe or a rout leaves none: Phase 4
 ## ruling Q-C), and opens the hub.
 func _on_result(kind: String, result: Dictionary) -> void:
+	_judge().on_result(result)
 	if result.get("won", false) != true:
 		return
 	company.economy.take_loot(kind, rng)
@@ -97,7 +105,7 @@ func _on_action(action: String, id: String) -> void:
 		"pay":
 			economy.pay_wages()
 		"accept":
-			if economy.accept(id):
+			if jobs.take(id):
 				_remember_contract()
 		"inspect":
 			_inspected = id
@@ -126,6 +134,12 @@ func _remember_contract() -> void:
 	for merc: Merc in company.roster:
 		ids.append(merc.id)
 	shared.on_choice(ids, Memory.KEY_CONTRACT, world.day)
+
+
+## The jobs, about to judge: a judged job leaves its sentence in the shared memory store.
+func _judge() -> Jobs:
+	jobs.memory = StoryDirector.memory_of(self)
+	return jobs
 
 
 func _decide(choice: String) -> void:
