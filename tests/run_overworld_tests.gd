@@ -1,12 +1,12 @@
 extends "res://tests/lib/runner.gd"
 ## Overworld suite (Phase 2 M1b: OverworldDirector, OverworldMap, the SaveSystem autoload).
 ## Real input events reach the game through Input.parse_input_event, never a handler call:
-## a real F2 tap opens the map with a marker per site and the day's choices; a held key does
+## a real M tap opens the map with a marker per site and the day's choices; a held key does
 ## not walk the merc while it is open; real clicks on the panel's buttons take a road (the
 ## day moves by the road's days and the company's ring moves to the new site), rest a day,
-## and save; the map hidden by F2 and shown again keeps the run (the same director, its day
-## and site); the save on disk under the run's own user dir reads back equal; F2 hides the
-## map and walking resumes; a fresh session's first F2 continues the save instead of starting
+## and save; the map hidden by M and shown again keeps the run (the same director, its day
+## and site); the save on disk under the run's own user dir reads back equal; M hides the
+## map and walking resumes; a fresh session's first M continues the save instead of starting
 ## fresh; Escape hides it. Seeded by design: the balance seed only (data/balance/world.json).
 ##   godot --headless --path . --script tests/run_overworld_tests.gd
 
@@ -58,10 +58,10 @@ func _spawn() -> SliceGame:
 
 
 func _check_open(game: SliceGame) -> void:
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	var director := game.overworld_director()
 	if director == null:
-		check(false, "F2 opens the overworld map (no director)")
+		check(false, "M opens the overworld map (no director)")
 		return
 	for _frame: int in LAYOUT_FRAMES:
 		await process_frame
@@ -77,7 +77,7 @@ func _check_open(game: SliceGame) -> void:
 			and _choices_shown(director)
 		),
 		(
-			"F2 opens the map on day 0 at the hub: %d markers for %d sites, a road, rest and save"
+			"M opens the map on day 0 at the hub: %d markers for %d sites, a road, rest and save"
 			% [markers, world.sites.size()]
 		)
 	)
@@ -180,7 +180,7 @@ func _check_save_and_load(game: SliceGame) -> void:
 	)
 
 
-## A day passed, the map hidden with F2 and shown again: the same director, with the day and
+## A day passed, the map hidden with M and shown again: the same director, with the day and
 ## the site it had, not a reload from disk or a fresh start. (A rest, not a road: a long road
 ## may raise an encounter, which has its own suite, road.)
 func _check_hidden_keeps_run(game: SliceGame) -> void:
@@ -188,9 +188,9 @@ func _check_hidden_keeps_run(game: SliceGame) -> void:
 	var to := director.world.at
 	await _click_button(director.panel.button_for(OverworldDirector.REST))
 	var day := director.world.day
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	var hidden := is_instance_valid(director) and not director.is_open()
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	var same := is_instance_valid(director) and game.overworld_director() == director
 	check(
 		(
@@ -201,14 +201,14 @@ func _check_hidden_keeps_run(game: SliceGame) -> void:
 			and director.world.at == to
 		),
 		(
-			"the map hidden by F2 and shown again keeps the run: the same director on day %d at %s"
+			"the map hidden by M and shown again keeps the run: the same director on day %d at %s"
 			% [day, to]
 		)
 	)
 
 
 func _check_close(game: SliceGame) -> void:
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	var director := game.overworld_director()
 	var closed := director == null or not director.is_open()
 	var start := game.player.cell
@@ -216,13 +216,13 @@ func _check_close(game: SliceGame) -> void:
 	await _settle(game)
 	check(
 		closed and game.player.cell != start,
-		"F2 hides the map and holding D walks the merc again (%s -> %s)" % [start, game.player.cell]
+		"M hides the map and holding D walks the merc again (%s -> %s)" % [start, game.player.cell]
 	)
 
 
 func _check_continue_from_save(game: SliceGame) -> void:
 	var model := _saves().load_game(_json(BALANCE))
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	var director := game.overworld_director()
 	var continued := (
 		director != null
@@ -235,7 +235,7 @@ func _check_continue_from_save(game: SliceGame) -> void:
 	check(
 		continued and hidden,
 		(
-			"a fresh session's first F2 continues the save on disk (day %d) and Escape hides the map"
+			"a fresh session's first M continues the save on disk (day %d) and Escape hides the map"
 			% model.world.day
 		)
 	)

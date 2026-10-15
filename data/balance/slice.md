@@ -15,12 +15,12 @@ The logical screen and the merc's height are the stage's (`stage.json` "pixel", 
 - `route_1` … `route_5`: each crowd merc's waypoints as x, z cell pairs, walked in order and looped; a single pair is a merc standing still. All on free street cells.
 
 ## hud
-- `frame_time_smoothing`: how much of each new frame's time the F3 readout takes in (0–1; smaller is steadier).
+- `frame_time_smoothing`: how much of each new frame's time the frame-time readout (G) takes in (0–1; smaller is steadier).
 
 ## loop
-The loop example (F5; `LoopDirector`, `SliceLoop`, `data/scenarios.json`).
+The loop example (L; `LoopDirector`, `SliceLoop`, `data/scenarios.json`).
 - `battle_origin_xz`: the street cell under battle cell (0, 0); the battle grid (12 × 8 in the scenario) sits on open street from there (x −10…1, z −2…5).
-- `seed`: the pass's Rng seed, so F5 replays the same rolls for the same choices.
+- `seed`: the pass's Rng seed, so L replays the same rolls for the same choices.
 
 ## markers
 Placeholder side rings under each fighter in the loop's battle, until the hand-made cast's art says whose side a merc is on.
