@@ -1,0 +1,34 @@
+# economy.json — purse, wages, morale, contracts, loot, hiring, the prisoner
+
+One line per knob (docs/05_STYLE_CODE.md "Data"). Read by `sim/economy/` (Phase 2 M6). First numbers; the director tunes them.
+
+## purse
+- `start`: the coin the company begins with.
+
+## wages
+- `per_merc_per_day`: coin owed for each mercenary on the roster, every day that ticks.
+- `grace_days`: days without paying that cost nothing; the day after, morale starts to fall.
+- `morale_loss_per_day`: morale lost on each day past the grace while wages stand unpaid.
+- `paid_recovery`: morale regained each time the whole debt is paid.
+
+## morale
+- `start`: the company's morale at the first day.
+- `max`: the ceiling (a floor of 0 is fixed).
+
+## contracts
+- `board_min`, `board_max`: how many contracts the hub posts at a time.
+- `refresh_days`: days between fresh boards (accepted contracts stay).
+- `deadline_min`, `deadline_max`: days a contract gives, counted from posting.
+- `reward_min`, `reward_max`: the coin a contract pays.
+
+## loot (by the encounter's type, as in world.json "encounters")
+- `coin_min`, `coin_max`: coin looted from a won fight.
+- `item_chance`: percent chance of one generic item from `data/equipment.json`.
+
+## recruits
+- `offers`: how many unhired recruits the hub shows.
+- `cost`: coin to hire one.
+
+## prisoner (the company's reaction to each choice)
+- `ransom_coin`: coin a ransom brings.
+- `release_morale`, `ransom_morale`, `execute_morale`, `recruit_morale`: morale change for each choice.

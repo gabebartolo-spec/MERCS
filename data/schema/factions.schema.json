@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Factions",
-  "description": "data/factions.json. Phase 0 fixes the file shape and the id only; a field is added here in the PR that adds the first entry using it.",
+  "description": "data/factions.json: the two factions in tension (D-066). pressure (1 or more; the data keeps it to 100 at most) is how hard a faction presses the region; contracts are drawn from the factions weighted by it. placeholder marks an entry the director has yet to author.",
   "type": "object",
   "required": ["factions"],
   "additionalProperties": false,
@@ -10,10 +10,13 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id"],
+        "required": ["id", "name", "pressure"],
         "additionalProperties": false,
         "properties": {
-          "id": {"type": "string", "pattern": "^fac_[a-z0-9]+(_[a-z0-9]+)*$"}
+          "id": {"type": "string", "pattern": "^fac_[a-z0-9]+(_[a-z0-9]+)*$"},
+          "name": {"type": "string", "minLength": 1},
+          "placeholder": {"type": "boolean"},
+          "pressure": {"type": "integer", "minimum": 1}
         }
       }
     }

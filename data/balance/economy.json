@@ -1,0 +1,27 @@
+{
+  "_comment": "The company's purse, wages, morale, contracts, loot, hiring and the prisoner choice (Phase 2 milestone 6). Read by sim/economy/. economy.md explains each knob. First numbers: the director tunes them.",
+  "purse": {"start": 80},
+  "wages": {"per_merc_per_day": 2, "grace_days": 2, "morale_loss_per_day": 4, "paid_recovery": 2},
+  "morale": {"start": 60, "max": 100},
+  "contracts": {
+    "board_min": 1,
+    "board_max": 3,
+    "refresh_days": 5,
+    "deadline_min": 6,
+    "deadline_max": 12,
+    "reward_min": 20,
+    "reward_max": 50
+  },
+  "loot": {
+    "ambush": {"coin_min": 6, "coin_max": 14, "item_chance": 40},
+    "patrol": {"coin_min": 10, "coin_max": 20, "item_chance": 60}
+  },
+  "recruits": {"offers": 3, "cost": 25},
+  "prisoner": {
+    "ransom_coin": 20,
+    "release_morale": 5,
+    "ransom_morale": -2,
+    "execute_morale": -6,
+    "recruit_morale": 3
+  }
+}
