@@ -5,6 +5,7 @@
     {
       "id": "orc",
       "name": "The Orc",
+      "sex": "m",
       "species": "orc",
       "role": "Big, bulky and mean. Charges in on pure aggression and relies on his gear to survive.",
       "stats_from": "orc",
@@ -19,6 +20,7 @@
     {
       "id": "vampyr",
       "name": "The Vampyr",
+      "sex": "m",
       "species": "vampyr",
       "role": "A regal dark knight whose bestial nature is barely contained. Spends his own health for combat bonuses, plays cautiously and times his all-ins.",
       "stats_from": "vampyr",
@@ -32,7 +34,8 @@
     },
     {
       "id": "merc_3",
-      "name": "Unnamed 3",
+      "name": "Wren",
+      "sex": "f",
       "species": "",
       "placeholder": true,
       "role": "To be written by the director",
@@ -45,7 +48,8 @@
     },
     {
       "id": "merc_4",
-      "name": "Unnamed 4",
+      "name": "Gauda Kettle",
+      "sex": "f",
       "species": "",
       "placeholder": true,
       "role": "To be written by the director",
@@ -58,7 +62,8 @@
     },
     {
       "id": "merc_5",
-      "name": "Unnamed 5",
+      "name": "Ser Ambrose Vell",
+      "sex": "m",
       "species": "",
       "placeholder": true,
       "role": "To be written by the director",
@@ -71,7 +76,8 @@
     },
     {
       "id": "merc_6",
-      "name": "Unnamed 6",
+      "name": "Yaro Sedlak",
+      "sex": "m",
       "species": "",
       "placeholder": true,
       "role": "To be written by the director",

@@ -154,7 +154,7 @@ func _check_placeholder(game: SliceGame) -> void:
 	var lines := panel.lines_text()
 	check(
 		(
-			panel.header_text() == "Unnamed 3, level 1"
+			panel.header_text() == "Wren, level 1"
 			and lines.contains(Text.t("company.placeholder"))
 			and lines.contains("To be written by the director")
 			and lines.contains(Text.t("company.gear_none"))

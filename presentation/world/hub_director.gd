@@ -46,7 +46,7 @@ var _share_pct := 0
 
 
 ## Builds the hub for the game's company and world (its overworld must exist), hooked to the
-## world's days and fights, hidden, owned by `game`. An empty board is posted at once.
+## world's days and fights, hidden, owned by `game`. A board never posted is posted at once (an emptied one stays empty on reload).
 static func attach(game: SliceGame) -> HubDirector:
 	var hub := HubDirector.new()
 	game.add_child(hub)
@@ -69,7 +69,7 @@ func begin(shared: Company, sim: WorldSim, stream: Rng) -> void:
 	talk.setup(company, world, _block(_read(HUB_DATA), "terms"))
 	var wages := _block(_read(CompanyDirector.ECONOMY_DATA), "wages")
 	_share_pct = Merc.whole(wages.get("share_pct", 0))
-	if company.economy.board.is_empty():
+	if company.economy.board.is_empty() and company.economy.book.next_contract == 1:
 		company.economy.refresh_board(world.day, _site_ids(), rng)
 	_layer = CanvasLayer.new()
 	_layer.layer = 2

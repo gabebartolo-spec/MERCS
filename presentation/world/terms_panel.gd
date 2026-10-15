@@ -166,6 +166,9 @@ func _speaker_rows(row: Dictionary, open: bool) -> Array[Dictionary]:
 		var params := {"name": _company.name_of(merc.id), "odds": terms.odds(merc.id)}
 		var key := "hub.terms.speaker_picked" if merc.id == speaker else "hub.terms.speaker_pick"
 		rows.append(HubPanel.button_row("speaker", merc.id, Text.t(key, params), open))
+		if merc.id == speaker:
+			var hope := "hub.terms.speaker_hope." + merc.sex
+			rows.append(HubPanel.line(HubPanel.NOTE, Text.t(hope, params)))
 	var none_key := "hub.terms.speaker_none_picked" if speaker == "" else "hub.terms.speaker_none"
 	rows.append(HubPanel.button_row("speaker", NOBODY, Text.t(none_key), open))
 	return rows
