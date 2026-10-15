@@ -34,5 +34,22 @@
     "splat_m": 0.06,
     "pool_m": 0.03,
     "body_m": 0.05
+  },
+  "spray": {
+    "drops_base": 2,
+    "drops_per_damage": 1,
+    "drops_max": 8,
+    "drop_px_max": 2,
+    "chest_m": 1.1,
+    "push_m": 0.35,
+    "arc_m": 0.3,
+    "flight_s": 0.3,
+    "delay_spread_s": 0.08
+  },
+  "hit_stop": {
+    "on": true,
+    "min_damage": 5,
+    "max_hp_share": 0.5,
+    "frames": 4
   }
 }

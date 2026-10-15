@@ -35,3 +35,4 @@ ironman_resume 24
 look 17
 perf 14
 battle_view 45
+impact 20

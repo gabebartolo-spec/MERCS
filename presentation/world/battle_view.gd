@@ -37,6 +37,8 @@ var unit_names := {}
 ## What the fight leaves on the field (blood at every hit, bodies) and the hit flashes (P6b).
 var marks := BattleMarks.new()
 var fx := BattleFx.new()
+## Blood thrown by each blow and the hit-stop: the visual clock the effects run on (P6c).
+var impact := BattleImpact.new()
 
 var _origin := Vector2i.ZERO
 var _sight := 0
@@ -72,6 +74,7 @@ func begin(fight: Battle, origin: Vector2i, sight: int) -> void:
 		_rows.learn(sprite)
 		_rings[fighter.id] = _ring()
 	marks.begin(street_stage, world_point)
+	impact.begin(street_stage, world_point, self)
 	_make_hud()
 	if not panel.chosen.is_connected(_on_choice):
 		panel.chosen.connect(_on_choice)
@@ -83,6 +86,7 @@ func begin(fight: Battle, origin: Vector2i, sight: int) -> void:
 func clear() -> void:
 	fx.clear(_sprites, battle)
 	marks.clear()
+	impact.clear()
 	for unit_id: Variant in _sprites:
 		var sprite: Sprite3D = _sprites[unit_id]
 		street_stage.remove_merc(sprite)
@@ -159,11 +163,12 @@ func click_cell(street_cell: Vector2i) -> void:
 func _process(delta: float) -> void:
 	if battle == null:
 		return
-	fx.tick(delta, _sprites, battle)
+	var shown := impact.step(delta)
+	fx.tick(shown, _sprites, battle)
 	if battle.is_over():
 		return
 	if battle.current().side == BattleUnit.ENEMY:
-		_wait_s += delta
+		_wait_s += shown
 		if _wait_s >= ENEMY_PAUSE_S:
 			_wait_s = 0.0
 			_play(BattleAi.choose(battle, battle.current(), _sight))
@@ -189,6 +194,7 @@ func _play(action: Dictionary) -> void:
 	_refresh()
 	marks.record(events, battle, _sprites, fx)
 	fx.play(events, _sprites)
+	impact.play(events, battle, marks)
 	if battle.is_over():
 		finished.emit()
 	else:

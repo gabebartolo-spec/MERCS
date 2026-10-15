@@ -33,3 +33,20 @@ The death pool under a fallen fighter's torso (same two blood reds, drying with 
 ## lift
 - `pool_m`: the death pool, lowest (under the body).
 - `splat_m`, `body_m`: metres above the ground the splats and bodies lie, both above the side ring's top (0.022 m) so the ring does not hide them; the body is lower so blood lies over it.
+
+## spray (P6c, director 2026-10-16: blood flies along the blow and stains where it lands)
+Read by `presentation/battle/battle_spray.gd`. Drops are flat squares that face the camera, in the blood ramp's two reds, at the figures' pixel size. Each drop lands on one of its splat's own pixels; the splat shows when the first drop lands. Every drop's variation is seeded from its hit (round, hit number, attacker, target); no clock, no sim stream.
+- `drops_base`, `drops_per_damage`, `drops_max`: drops a hit throws = base + damage x per-damage, capped.
+- `drop_px_max`: a drop is a square of 1 to this many logical pixels a side.
+- `chest_m`: metres above the struck fighter's feet the drops leave from.
+- `push_m`: how far (metres, at mid-flight) a drop's path bows out along the blow (attacker's cell to the target's).
+- `arc_m`: how far (metres, at mid-flight) a drop's path rises above the straight line to its spot.
+- `flight_s`: visual seconds from leaving the chest to landing.
+- `delay_spread_s`: each drop leaves up to this many visual seconds after the blow (seeded), so they do not move as one block.
+
+## hit_stop (P6c)
+Read by `presentation/battle/battle_impact.gd`. A big hit holds the battle picture (flash, flying blood, the pause before the enemy's next turn) for a few rendered frames. It runs on the battle view's own visual clock: the sim is never paused or slowed and `Engine.time_scale` is never touched, so the battle log is the same with it on or off. The player's toggle is the Settings autoload's `hit_stop` (default on); both must be on.
+- `on`: hit-stop at all.
+- `min_damage`: a hit of at least this damage holds (0: unused).
+- `max_hp_share`: a hit of at least this share of the target's full health holds (0: unused).
+- `frames`: rendered frames the picture holds (frames, not seconds, so it is the same on every machine). Director 2026-10-16 03:17: "Subtle, a few frames" (3 to 5), a catch felt more than seen; no screen shake.

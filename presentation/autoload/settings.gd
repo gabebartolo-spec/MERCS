@@ -1,2 +1,5 @@
 extends Node
-## Settings autoload: will hold the player's preferences. Empty in Phase 0.
+## Settings autoload: the player's preferences.
+
+## Big hits hold the battle picture for a few frames (P6c hit-stop; BattleImpact). Default on.
+var hit_stop := true
