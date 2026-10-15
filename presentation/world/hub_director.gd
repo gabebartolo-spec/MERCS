@@ -2,7 +2,7 @@ class_name HubDirector
 extends Node
 ## The hub on screen (Phase 2 milestone 6): wages due and paid, the contract board, the
 ## placeholder recruits to inspect and hire, the pack of generic gear to put on a merc, and
-## after a won fight on the road the loot line and the prisoner's four choices. The Economy
+## after a won fight on the road the loot line and each prisoner's three fates. The Economy
 ## (held by the Company) and the WorldSim are the sim's and shared with the rest of the game;
 ## this registers two small hooks on the world (a day passes; a fight's result is applied),
 ## words what the sim decides (Text.t, data/text/en.json) and shows it in HubPanel. Wages,
@@ -85,16 +85,17 @@ func _on_day(day: int) -> void:
 		_show()
 
 
-## A fight's result was applied: a win leaves loot, and one prisoner when the enemy
-## surrendered men (EncounterBattle.result "prisoners"; a wipe or a rout leaves none: Phase 4
-## ruling Q-C), and opens the hub.
+## A fight's result was applied: a win leaves loot, and the men the enemy surrendered as
+## prisoners (EncounterBattle.result "prisoners"; a wipe or a rout leaves none: Phase 4 ruling
+## Q-C; Phase 5 C5), and opens the hub.
 func _on_result(kind: String, result: Dictionary) -> void:
 	_judge().on_result(result)
 	if result.get("won", false) != true:
 		return
 	company.economy.take_loot(kind, rng, result)
-	if not EncounterBattle.taken(result).is_empty():
-		company.economy.captives.take(world.day)
+	var taken := EncounterBattle.taken(result)
+	if not taken.is_empty():
+		company.economy.captives.take(world.day, taken)
 	_reaction = ""
 	set_open(true)
 
@@ -144,10 +145,13 @@ func _judge() -> Jobs:
 
 func _decide(choice: String) -> void:
 	var economy := company.economy
+	var before := economy.chronicle.size()
 	if economy.decide_prisoner(company, choice, world.day):
-		var last := economy.chronicle[economy.chronicle.size() - 1]
-		var name := company.member(str(last.get("merc", ""))).display_name
-		_reaction = Text.t("hub.memory." + str(last.get("key", "")), {"name": name})
+		var lines: Array[String] = []
+		for line: Dictionary in economy.chronicle.slice(before):
+			var name := company.member(str(line.get("merc", ""))).display_name
+			lines.append(Text.t("hub.memory." + str(line.get("key", "")), {"name": name}))
+		_reaction = "\n".join(lines)
 
 
 func _next_wearer() -> void:
@@ -263,10 +267,7 @@ func _prisoner_rows() -> Array[Dictionary]:
 	rows.append(_label(Text.t("hub.prisoner.body")))
 	for choice: String in Economy.CHOICES:
 		var params := {"coin": economy.captives.ransom_coin()}
-		var open := (
-			choice != Economy.RECRUIT or economy.captives.can_recruit(company, economy.hired)
-		)
-		rows.append(_button("prisoner", choice, Text.t("hub.prisoner." + choice, params), open))
+		rows.append(_button("prisoner", choice, Text.t("hub.prisoner." + choice, params), true))
 	return rows
 
 

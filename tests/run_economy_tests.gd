@@ -339,20 +339,20 @@ func _worn_ids() -> Array[String]:
 
 
 func _check_loot_determinism(seen: Array[String]) -> void:
-	var again := _company().economy.take_loot("patrol", Rng.from_seed(SEED))
+	var again := _company().economy.take_loot("patrol", Rng.from_seed(SEED), {})
 	check(
-		_is(again, _company().economy.take_loot("patrol", Rng.from_seed(SEED))),
+		_is(again, _company().economy.take_loot("patrol", Rng.from_seed(SEED), {})),
 		"the same seed loots the same things"
 	)
 	var seeds := {}
 	for entry: String in seen:
 		seeds[entry] = true
 	check(seeds.size() > 1, "different seeds loot different things")
-	var none := _company().economy.take_loot("not_a_fight", Rng.from_seed(SEED))
+	var none := _company().economy.take_loot("not_a_fight", Rng.from_seed(SEED), {})
 	check(
 		_w(none["coin"]) == 0 and str(none["item"]) == "",
 		"a fight the data does not list leaves nothing"
 	)
 	var rng := Rng.from_seed(SEED)
-	_company().economy.take_loot("ambush", rng)
+	_company().economy.take_loot("ambush", rng, {})
 	check(_streams(rng) == ["loot"], 'loot rolls only its own stream, "loot"')

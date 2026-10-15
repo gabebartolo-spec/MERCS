@@ -35,8 +35,10 @@ One line per knob (docs/05_STYLE_CODE.md "Data"). Read by `sim/economy/` (Phase 
 - `cost`: coin to hire one.
 
 ## prisoner (the company's reaction to each choice)
-- `ransom_coin`: coin a ransom brings.
-- `release_morale`, `ransom_morale`, `execute_morale`, `recruit_morale`: morale change for each choice.
+- `ransom_coin`: coin a ransom brings for a prisoner whose fighter type `ransom_by_fighter` does not price (and for a Phase 2 prisoner with no type).
+- `release_morale`, `ransom_morale`, `execute_morale`: morale change for each choice. Three fates (director Q-12, "Not until you design it": no recruit fate in this pass; an old save's recruit line still loads).
+- `ransom_by_fighter`: coin a ransom brings, by the prisoner's fighter type (data/balance/battle.json `fighters`; Phase 5 C5). Placeholder numbers.
+- `reactions` (PLACEHOLDER, `reactions_placeholder`: the director designs the mercs, like the bargaining traits of Q-8): per fate, a strength per merc id (data/mercs.json). The living merc, not the captain, with the largest strength of either sign remembers the fate beside the captain; a tie goes to the lower id; with nobody listed only the captain remembers. The sign (approves +, objects -) is not yet worded.
 
 ## standing (Phase 5 C4: the name with each faction and the grudges; director Q-7, Q-13, Q-15, Q-16)
 - `start`: the company's name with a faction it has not yet dealt with.

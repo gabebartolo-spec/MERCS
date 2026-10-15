@@ -31,13 +31,17 @@ const SEEDS := {
 ## ("job", drawn on the new "jobs" stream after the board's own draws), so all ten saves gain
 ## that key and a "jobs" stream position; with both stripped each hashes as P1b left it.
 ## C1 also added the "job" route (route_kit.gd).
+## Re-pinned by Phase 5 C5 (claude/c5-prisoners): win/424310 only. Its fight leaves one
+## surrendered man, released at the hub; the release is now remembered by the merc who reacts
+## most strongly (merc_3, economy.json "prisoner" "reactions") beside the captain, so the save
+## gains that one chronicle line and memory. 6e3ccee3... -> a9086cba...; the rest hold.
 ## Re-pinned by Phase 5 C6 (claude/c6-armoury): armour upkeep goes on the day's bill, so every
 ## route where the plated orc or Vampyr is on the roster when a day ticks owes more (win, toll,
 ## second_fight, job/424316); loot is drawn from the fallen's gear, so second_fight/424316's
 ## first win (only the chief's mace fell: no piece) skips the pick and its second fight's loot
 ## rolls move. loss and wipe (the orc and Vampyr are dead) and job/424308 (no day ticks) hold.
 const GOLDEN := {
-	"win/424310": "78bcba40d2d9935e264e1cc38b0318920e7f194c406e6314210ee553749c5252",
+	"win/424310": "764f232048becec9da60b5a7fae1853b3945d6306dbeb9aebd5cc96e55640f07",
 	"win/424311": "17afc3759f22468bd32a194872b128bee1b5d5754d23c2dc18f0fdb3761a867e",
 	"loss/424308": "78527d9fb2aeea09260487d334b9cf12c1a433219f7ff89de46564a9ed4daf1c",
 	"loss/424316": "ae1491173ccf7b35563033ab048932fe88b7f9e34b0a41d32b40520df5a03e9b",

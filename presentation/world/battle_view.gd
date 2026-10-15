@@ -217,28 +217,35 @@ func _show_turn() -> void:
 	panel.present(title, Text.t("slice.battle.move_hint"), _actions(actor))
 
 
-## The buttons for a company fighter: attack and each learnt move on each enemy in reach,
-## in loadout order, then wait.
+## The buttons for a company fighter: his weapon action on each enemy it reaches (Battle.targets:
+## beside him, a spear's two cells, a bow's shot; Phase 4 P1c) and each learnt move on each
+## enemy in reach, in loadout order, then wait. Each blow's hover says its chance to hit as a
+## percentage (Battle.odds; director 2026-10-16: "Hit 40%").
 func _actions(actor: BattleUnit) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
+	var blow := battle.kit(actor.id)[0]
+	var reach := battle.targets(actor.id)
 	for enemy: BattleUnit in battle.units:
 		if enemy.side == actor.side or enemy.down:
 			continue
 		var params := {"target": _name(enemy)}
-		if BattleLanding.adjacent(actor.cell, enemy.cell):
-			out.append(
-				{
-					"id": battle.kit(actor.id)[0] + ":" + enemy.id,
-					"label": Text.t("slice.battle.attack", params)
-				}
-			)
+		if reach.has(enemy.id):
+			out.append(_blow_choice(blow, enemy, Text.t("slice.battle.attack", params)))
 		for move: String in actor.moves:
 			if BattleLanding.cell(battle, actor, enemy, move) != NOWHERE:
-				out.append(
-					{"id": move + ":" + enemy.id, "label": Text.t("battle.move." + move, params)}
-				)
+				out.append(_blow_choice(move, enemy, Text.t("battle.move." + move, params)))
 	out.append({"id": Battle.ACTION_WAIT, "label": Text.t("slice.battle.wait")})
 	return out
+
+
+## One blow's button: its id ("<action>:<enemy>"), its label and the hover with the chance.
+func _blow_choice(kind: String, enemy: BattleUnit, label: String) -> Dictionary:
+	var odds := battle.odds({"type": kind, "target": enemy.id})
+	return {
+		"id": kind + ":" + enemy.id,
+		"label": label,
+		"hint": Text.t("battle.odds.hit", {"chance": odds.get("chance", 0)}),
+	}
 
 
 func _refresh() -> void:

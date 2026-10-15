@@ -53,7 +53,7 @@ static func run(seed_value: int) -> Dictionary:
 	}
 
 
-## The hub's choices after the fight: a contract, a hire, the waiting prisoner.
+## The hub's choices after the fight: a contract, a hire, each prisoner the fight left.
 static func _hub(played: Played) -> Dictionary:
 	var stages := {}
 	var economy := played.company.economy
@@ -64,12 +64,17 @@ static func _hub(played: Played) -> Dictionary:
 	if not offers.is_empty():
 		var recruit: Dictionary = offers[0]
 		stages["hired"] = economy.hire(played.company, str(recruit.get("id", "")))
-	if not economy.prisoner.is_empty():
+	var before := economy.chronicle.size()
+	while not economy.prisoner.is_empty():
 		var day := played.world.day
 		stages["prisoner"] = economy.decide_prisoner(played.company, SPARE, day)
-		# The memory the story director writes from the hub's chronicle line.
+		if stages["prisoner"] != true:
+			break
+	# The memories the story director writes from the hub's chronicle lines (the merc who
+	# reacts most strongly, then the captain: Prisoners.decide).
+	for line: Dictionary in economy.chronicle.slice(before):
 		var key := Memory.KEY_FATE_PREFIX + SPARE
-		played.memory.record(played.company.captain_id, key, {}, day)
+		played.memory.record(str(line.get("merc", "")), key, {}, Merc.whole(line.get("day", 0)))
 	return stages
 
 
@@ -143,5 +148,6 @@ class Played:
 		world.result_hook = func(kind: String, result: Dictionary) -> void:
 			if result.get("won", false) == true:
 				company.economy.take_loot(kind, rng, result)
-				if not EncounterBattle.taken(result).is_empty():
-					company.economy.captives.take(world.day)
+				var taken := EncounterBattle.taken(result)
+				if not taken.is_empty():
+					company.economy.captives.take(world.day, taken)

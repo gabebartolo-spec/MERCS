@@ -213,6 +213,7 @@
   "battle.intent.hold": "Holds",
   "battle.move.charge": "Charge {target}",
   "battle.move.blood_price": "Blood price on {target}",
+  "battle.odds.hit": "Hit {chance}%",
   "wiring.panel.title": "After the fight",
   "wiring.none": "Nobody went down.",
   "wiring.outcome.wound": "{name} went down and got up again: {injury}.",
