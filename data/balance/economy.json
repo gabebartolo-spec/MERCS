@@ -22,6 +22,10 @@
     "ambush": {"coin_min": 6, "coin_max": 14, "item_chance": 40},
     "patrol": {"coin_min": 10, "coin_max": 20, "item_chance": 60}
   },
+  "armoury": {
+    "sell_pct": 50,
+    "upkeep": {"leather": 0, "mail": 1, "plate": 2}
+  },
   "recruits": {"offers": 3, "cost": 25},
   "prisoner": {
     "ransom_coin": 20,
