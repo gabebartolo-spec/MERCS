@@ -14,7 +14,7 @@ sim_world 11
 sim_encounters 11
 save 12
 effect 19
-overworld 11
+overworld 14
 road 8
 company 12
 inspect 9

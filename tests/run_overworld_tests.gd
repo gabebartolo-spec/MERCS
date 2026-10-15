@@ -36,6 +36,7 @@ func run_checks() -> void:
 	await _check_walking_paused(game)
 	await _check_tap_walks(game)
 	await _check_hold_repeats(game)
+	await _check_blocked_step(game)
 	await _check_rest(game)
 	await _check_not_at_gate(game)
 	await _check_gate_cuts_to_street(game)
@@ -197,6 +198,30 @@ func _check_hold_repeats(game: SliceGame) -> void:
 			% [HOLD_FRAMES, walked.y]
 		)
 	)
+
+
+## A real tap into water, a town's wall and the map's edge does not move the band and the
+## panel says why (never a silent no-op).
+func _check_blocked_step(game: SliceGame) -> void:
+	var world := game.overworld_director().world
+	var panel := game.overworld_director().panel
+	var wall: Dictionary[String, TileRegion.Terrain] = {
+		"water": TileRegion.Terrain.WATER, "building": TileRegion.Terrain.TOWN
+	}
+	for kind: String in wall:
+		var east := world.band + Vector2i.RIGHT
+		var was := world.region.terrain(east)
+		world.region.set_terrain(east, wall[kind])
+		var before := world.band
+		await _tap(KEY_D)
+		await _frames(LAYOUT_FRAMES)
+		check(
+			world.band == before and panel.shown_body() == Text.t("world.panel.blocked_%s" % kind),
+			"a tap of D into %s leaves the band and the panel says why" % kind
+		)
+		world.region.set_terrain(east, was)
+	var edge := game.overworld_director()._blocked_line(Vector2i(-world.band.x - 1, 0))
+	check(edge == Text.t("world.panel.blocked_edge"), "a step off the map's edge says so")
 
 
 func _check_rest(game: SliceGame) -> void:

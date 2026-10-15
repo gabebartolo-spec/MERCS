@@ -181,6 +181,9 @@ func walk(direction: Vector2i, delta: float) -> void:
 ## gate, a site's line, or the map redrawn.
 func _step(direction: Vector2i) -> void:
 	if not world.step(direction):
+		var line := _blocked_line(direction)
+		if panel.shown_body() != line:
+			_show(line)
 		return
 	if not world.encounter.is_empty():
 		_walking = false
@@ -191,6 +194,16 @@ func _step(direction: Vector2i) -> void:
 		_show(_place_line())
 	else:
 		map.show_world(world)
+
+
+## Why a step was refused, in words: the edge of the land, water, or a town's walls.
+func _blocked_line(direction: Vector2i) -> String:
+	var target := world.band + direction
+	if not world.region.inside(target):
+		return Text.t("world.panel.blocked_edge")
+	if world.region.terrain(target) == TileRegion.Terrain.TOWN:
+		return Text.t("world.panel.blocked_building")
+	return Text.t("world.panel.blocked_water")
 
 
 ## What the panel says where the band stands: a site's line at a site, else how to walk.
