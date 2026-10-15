@@ -7,6 +7,7 @@ extends RefCounted
 ## carries every number so presentation can show the roll, never hide it.
 
 const STREAM := "story"
+const PERCENT := 100
 
 
 ## {"roll": int, "skill": int, "need": int, "success": bool}; need is the roll required.
@@ -27,3 +28,12 @@ static func best(skills: Dictionary) -> String:
 			pick = id
 			top = skill
 	return pick
+
+
+## The chance, in whole percent, that attempt() succeeds with these numbers: what the player
+## is shown before the roll. The roll is 1..die_sides and wins at `need` or more.
+static func odds(die_sides: int, skill: int, difficulty: int) -> int:
+	if die_sides <= 0:
+		return 0
+	var winning := clampi(die_sides - maxi(difficulty - skill, 1) + 1, 0, die_sides)
+	return winning * PERCENT / die_sides

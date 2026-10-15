@@ -1,0 +1,41 @@
+{
+  "_comment": "The one authored storylet of the Phase 2 slice (D-066; caps storylets: 1). STRUCTURE ONLY: its words in data/text/en.json are placeholders marked as such, the director writes them. Cast over tags (see sim/story/tags.gd): the mourner holds a memory of a comrade's death, the friend shares that memory (a relationship). Trigger: resting at the hub or a hamlet from day 1. Visible check: a d10 against difficulty 11, odds shown before the roll; the player picks who attempts (the mourner by resolve, the friend by presence). Both branches change state (a memory and experience): failing forward. Schema: data/schema/storylets.schema.json.",
+  "storylets": [
+    {
+      "id": "st_unspoken_loss",
+      "placeholder": true,
+      "title_key": "storylet.unspoken_loss.title",
+      "scene_key": "storylet.unspoken_loss.scene",
+      "once": true,
+      "cooldown_days": 0,
+      "trigger": {"hook": "rest", "min_day": 1, "location_kinds": ["hub", "hamlet"]},
+      "cast": [
+        {"role": "mourner", "require": ["memory:memory.comrade_died"]},
+        {"role": "friend", "require": ["shares_memory_with:mourner"]}
+      ],
+      "check": {
+        "die_sides": 10,
+        "difficulty": 11,
+        "attempts": [
+          {"role": "mourner", "stat": "resolve", "label_key": "storylet.unspoken_loss.attempt_mourner"},
+          {"role": "friend", "stat": "presence", "label_key": "storylet.unspoken_loss.attempt_friend"}
+        ]
+      },
+      "success": {
+        "line_key": "storylet.unspoken_loss.success",
+        "effects": [
+          {"kind": "memory", "role": "mourner", "key": "memory.grief_eased", "about_role": "friend"},
+          {"kind": "memory", "role": "friend", "key": "memory.shared_words", "about_role": "mourner"},
+          {"kind": "xp", "role": "mourner", "amount": 2}
+        ]
+      },
+      "failure": {
+        "line_key": "storylet.unspoken_loss.failure",
+        "effects": [
+          {"kind": "memory", "role": "mourner", "key": "memory.grief_deepened", "about_role": "friend"},
+          {"kind": "xp", "role": "mourner", "amount": 1}
+        ]
+      }
+    }
+  ]
+}

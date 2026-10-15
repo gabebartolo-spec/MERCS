@@ -121,7 +121,7 @@ func _detail(merc: Merc) -> Dictionary:
 	return {
 		"id": merc.id,
 		"header": Text.t("company.header", {"name": merc.display_name, "level": merc.level()}),
-		"lines": lines(merc),
+		"lines": _with_memories(merc),
 		"bar_value": earned if span > 0 else 1,
 		"bar_max": span if span > 0 else 1,
 		"bar_text": Text.t(bar_key, params),
@@ -153,6 +153,23 @@ static func lines(merc: Merc) -> Array[String]:
 		var held := worn if worn != "" else Text.t("company.slot.empty")
 		slots.append(Text.t("company.slot." + slot, {"gear": held}))
 	lines.append("   ".join(slots))
+	return lines
+
+
+## What the merc remembers, one sentence a line (the story director holds the memories).
+func _with_memories(merc: Merc) -> Array[String]:
+	var all := lines(merc)
+	all.append_array(_memory_lines(merc))
+	return all
+
+
+func _memory_lines(merc: Merc) -> Array[String]:
+	var memory := StoryDirector.memory_of(self)
+	var entries: Array[Dictionary] = memory.of(merc.id) if memory != null else []
+	if entries.is_empty():
+		return [Text.t("company.memories_none")]
+	var lines: Array[String] = [Text.t("company.memories")]
+	lines.append_array(MemoryWords.lines(entries, company))
 	return lines
 
 
