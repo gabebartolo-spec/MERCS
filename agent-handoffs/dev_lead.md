@@ -3,7 +3,7 @@ Start from this file, CLAUDE.md, `~/.claude/memory-shared/MEMORY.md`, the co-lea
 your brief (`agent-briefs/DEV_LEAD_OPUS.md`, Project Architect 3.0 since D-071) and
 `docs/08_ROADMAP.md` Phase 2 (lines 102-189). Run `git fetch`, `gh pr list`, `docs/STATUS.md`.
 
-## State: working (team at full width: M2 + M3 coders, Merge & CI tooling; awaiting the director's M1 play)
+## State: working (four coders: M2, M3, M4, M5; awaiting the director's M1 play)
 
 ## Who does what
 This account has no Concept Lead: the session is lead AND Dev Lead under the original account's
@@ -31,21 +31,21 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
 - "Start now" milestone 2 while he plays milestone 1.
 - "Keep Art paused".
 - "why do you only have 1 agent. get busy" -> run every slot (shared memory
-  run-the-team-at-full-width.md). D-071 cap: two coders live plus Merge & CI.
+  run-the-team-at-full-width.md).
+- "4 coders" (raises D-071's two-coder cap to four; log it in the next board PR body).
+- Merged since: #78 tools/merge_eligibility.sh (use it before every merge), #79 magic numbers
+  are lint errors from Phase 2 (caps phase 2).
 - Pending from him: milestone 1 verdict (play F2: road, rest, save, reopen). Also at milestone
   2's review: confirm or reorder milestones 3 and 4.
 
 ## Running (builder subagents of this session; they die with it)
-- M2 coder: encounters (ambush enemy-first, patrol fight-or-toll, Rng stream "encounter",
-  pending encounter saved with a default). `../MERCS-wt/p2-m2`, claude/p2-m2-encounters.
-- M3 coder: mercs.json (orc, Vampyr + four PLACEHOLDERS merc_3..6 for him to author), sim/merc
-  Company (roster, captain, xp), battle-unit helper, inspect screen on a new F-key, fixture orc
-  vs Vampyr. `../MERCS-wt/p2-m3`, claude/p2-m3-company. Overlap with M2: shared lists only.
-- Merge & CI: tools/merge_eligibility.sh + fixture self-test (D-071); also reports which
-  literals turn into errors at magic-number phase 2. `../MERCS-wt/slice-m1`,
-  claude/merge-eligibility.
-If this session died: none of them survive; respawn from the worktree state (each branch has
-its WIP only if it committed) with the same brief shape.
+- M2 encounters: `../MERCS-wt/p2-m2`, claude/p2-m2-encounters (Sonnet).
+- M3 company (four placeholder mercs for him to author): `../MERCS-wt/p2-m3`, claude/p2-m3-company.
+- M4 battle skeleton (Opus): `../MERCS-wt/slice-m1`, claude/p2-m4-battle. Keeps Battle's API.
+- M5 wounds/triage/death/chronicle/succession, sim only, keyed by merc id:
+  `../MERCS-wt/p2-m5`, claude/p2-m5-wounds.
+Wiring after merges: company -> encounters, M4 hit hook -> M5 injuries, a triage screen.
+If this session died: respawn each from its worktree with the same brief shape.
 
 ## Next for the lead
 1. Review M2 and M3 PRs (mercs-sim-review on the save keys, fixtures failing first, real taps),
@@ -61,9 +61,10 @@ its WIP only if it committed) with the same brief shape.
 data 96, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 13, slice 15, battle 14,
 loop 4, sim_world 9, save 7, effect 4, overworld 8.
 
-## Worktrees (4 / 4)
-`../MERCS-wt/p2-m2` (M2), `../MERCS-wt/p2-m3` (M3), `../MERCS-wt/slice-m1` (Merge & CI,
-claude/merge-eligibility), `../MERCS-wt/art-publish` (Art, paused). Remove each when its PR merges.
+## Worktrees (5 / 4: over cap by one, see below)
+p2-m2, p2-m3, p2-m5, slice-m1 (M4), art-publish (Art paused; clean, branch pushed at 99b3fdf).
+Removing art-publish with --force (only .godot/.import untracked) was refused by the permission
+classifier; ask the director to allow it or accept 5 while four coders run.
 
 ## Co-lead playbook
 playbook: nothing new (2026-10-15; no worker findings yet).
