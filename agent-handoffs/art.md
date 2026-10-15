@@ -1,51 +1,61 @@
-# Art Factory handoff, 2026-10-09 AEDT
-Start from this file, CLAUDE.md, your brief (`agent-briefs/ART_AGENT.md`), and the current phase section of `docs/08_ROADMAP.md` only (`docs/STATUS.md` names the phase).
-Instructions come from the lead session ("Claude2: MERCS Lead" / "MERCS BOSS"). Director rule 2026-10-08:
-every sheet goes to the Lead for QC first; only passing sheets reach the director (Lead presents).
+# Art Factory handoff, 2026-10-10 AEDT
+Start from this file, CLAUDE.md, your brief, and the Lead ("MERCS BOSS") messages. Load art-qa-critic before any visual review.
 
-## INTERRUPTED by the director, 2026-10-09 (D-TBD-art-refocus)
-The director has revised the vision (`docs/00_VISION.md`): mercs are a hand-made cast of 25,
-including non-humans (an orc, a Vampyr), each with three stage looks and their own gear line.
-"One CC0 base body, equipment is the variety" (D-002) no longer fits. Stop the walk + idle work
-below; start no new base-body, equipment or GPU work. Your next item is P1-ART-REFOCUS
-(STATUS.md, once the board PR lands): a written pipeline proposal, no renders. The plan below is
-kept only as reference for what already works.
-
-## State: interrupted (was: walk + idle clips after the publish PR)
+## State: RESET requested by the director mid step 2 (2026-10-10). No jobs running. WIP committed and pushed.
+Standing order (Lead, latest): FINISH step 2, send the clips to the Lead (never the director), then commit, rewrite this
+file, push and PAUSE. Do not start step 3.
 ## Task
-P1-ART-PUBLISH-REST: publish the frozen average_m rest sheet (+ normal) at assets/sprites/mercs/average_m/ with a
-provenance manifest and a licensing-register row, so slice M1 (#53) and the build show the real body.
-## Branch and commit
-claude/art-publish-rest from origin/main (after #52), worktree ../MERCS-wt/art-publish, PR (gh pr list).
-## Files I own right now
-assets/sprites/mercs/average_m/ (rest .json/.png/_normal.png/.provenance.json), docs/10_LICENSING_REGISTER.md
-"Shipped assets" section.
-## Unfinished changes
-Next (Lead-approved plan, 2026-10-09): walk + idle sheets beside the rest sheet:
-- clips: walk = D:\MERCS-vault\clips\mixamo\walk_standard.fbx, idle = idle_standing.fbx (sword-and-shield set kept for battle).
-- 8 walk / 4 idle frames per facing, one loop; manifest keys "fps" (real timing, ~6.5 walk), "loop": true,
-  "ground_speed_mps" (walk; planted-foot travel); rows = facings in rig order, columns = frames; frames[] entries carry
-  "facing", "index" (facing index), "frame". Same cell 176 / pivot 88,152; normal + parts passes per frame.
-- render_character.py: --clip/--frames; retarget = align rest dirs (X Bot T vs our A) then copy world orientation; store
-  per-frame matrix_basis and rotate only our rig per facing; constant ground offset so the lowest contact = 0.
-  pack_sheets.py multi-frame layout; validate_sheet multi-frame + a clip fixture. Probe: scratchpad retarget_probe.py.
-- QC to Lead: 1x + x4 separate, plus a 3-second clip as frames (S, SE, E, N folders); checks: foot slide vs
-  ground_speed, arm swing opposing legs, loop seam 7 -> 0. "Jogging" is a later optional clip (not now).
-## Evidence so far
-- #52 merged 2026-10-09 04:02 (freeze). Publish branch: assets 11, smoke 24 pass; lints 9/9; sheet validates; Godot imports it.
-- The published sheet is byte-identical to tests/fixtures/pipeline/sheets/good (same pipeline and inputs).
-## Open decisions
-- Palette master_draft is DRAFT: the sheet is re-rendered when the director approves a palette.
-- Placeholder head/hair layer (Lead asks the director).
-## Running jobs
-None.
+P1-ART-SLICE-CAST step 2: a 3 s gait loop at game speed, 1x and 2x, S/SE/E/NE, no foot slide. Orc: heavy, grounded.
+Vampyr: controlled, predatory, upright. The Vampyr renders BARE (Lead decision); the sword returns in step 3 behind check A.
+The orc keeps the axe only if it passes check A; otherwise render him bare and tell the Lead.
+Carry into step 3: orc tusks as tapered cones; the Vampyr cape hugs the back (curved section, no proud edge at 45 deg).
+## Lead-approved QA plan (2026-10-10, trimmed)
+A in render_character.py (DONE, needs one fix, below): kit-vs-body clearance 1 cm on every dense frame, except a piece's
+  "contact" bones (the axe lists RightHand, so the fingers may grip); direction "checks" in the kit json (claim, then
+  measured min_dot). Results go to render_meta clip.kit_checks; a fail exits 1 and renders nothing (kit_checks.json written).
+B: --pass layers (body clay, each kit group a flat label colour, DONE); 2x nearest crops of contact points at the key
+  frames (clip.key_frames: foot forward L/R, right hand forward/back) for each facing. Crop script NOT written yet;
+  outputs[].marks give the 1x pixel position of hands, hips and feet per frame.
+C: one line per prop in the QC note (claim -> result). D dropped (A measures it); kit docs must match the maths.
+E: findings go to the LEAD, never to a skill's learnings log (Lead, 2026-10-10: the Lead decides what goes to memory).
+  The step 2 report and this handoff both carry a "Findings for the lead" section (below), each item with evidence, or "none".
+## Check A evidence so far (logs D:\MERCS-vault\logs\2026-10-10_gait_*_A_*.log)
+- Old axe (d2d8f93 kit): edge leads dot -0.345 FAIL, head forward -0.644 FAIL: the director's "held backwards" caught.
+- Vampyr sword: scabbard -6.0 cm into LeftLeg FAIL, tip-trails axis dot 0.696 (< 0.9) FAIL, hilt and crossguard 1.3-1.7 cm
+  into the torso FAIL: the director's "tendrils" caught.
+- New axe (this branch): edge +0.796 PASS, head forward +0.559 PASS, head above grip 0.693 (needs 0.7) FAIL by a hair,
+  haft clearance -0.120 m "near RightForeArm" FAIL. OPEN: a stance probe (ray parity) shows the haft BUTT (fraction 0.0,
+  z 0.47 m) inside the body, i.e. probably the right THIGH, plus haft inside the fist (fractions 0.33-0.38, expected, the
+  grip). The nearest-bone label comes from the BVH polygon and may be wrong. Next: confirm with a layers-pass 2x crop at
+  dense frame 29 / 03; fix by shortening the haft below the fist or moving the grip down the haft; tilt the head up
+  slightly (or set the need to 0.65 with a claim) so "head above the grip" passes honestly.
+## Next, exactly
+1. Fix the axe (above) until check A passes; if it can't, render the orc bare and tell the Lead.
+2. Render colour and layers passes, S/SE/E/NE (facings 0-3), orc with axe_ kept, Vampyr with no kit.
+   Runner: scratchpad run_gait.sh (pass --python-exit-code 1 to Blender or a traceback exits 0; use `read -r`).
+3. pixelate.py to 1x, GIFs at 1x and 2x (3 s, the clip's fps; E row travels at ground_speed_mps over 0.25 m ticks), the
+   2x crops at the key frames, a QC note with one line per prop. Send to the Lead. Commit, rewrite this file, push, pause.
+## Findings for the lead (keep current; send with the step 2 report)
+- Caught a defect: check A's direction claims flagged the old axe as held backwards (edge dot -0.345, head-forward -0.644)
+  and the Vampyr scabbard tip leaning forward (axis dot 0.696 < 0.9). Evidence: logs 2026-10-10_gait_orc_color_A_orc_oldaxe,
+  _vampyr_color_A_vampyr_sword. Both were missed by eye by the art agent and the Lead in step 1.
+- Caught a defect: check A's clearance flagged the scabbard 6.0 cm inside the left leg (same vampyr log).
+- Earned its keep: two-bone leg IK onto the clip's ankles kept foot slide at 0.8 cm (orc) / 0.6 cm (Vampyr) while the hips
+  sway and drop; without it, hip changes drag planted feet (render_meta clip.foot_slide_m).
+- Tooling trap: Blender exits 0 on a Python traceback unless --python-exit-code 1; a failed check could pass a batch.
+- Tooling trap: Blender's 4D Vector.normalized() uses the xyz length only; it scaled bones up to 30x (probe3, this session).
+- Check A limit: a signed distance to the nearest surface misreads points beside an excluded contact part (the fist); it is
+  capped at 12 cm, and an open case (the axe haft) still needs a layers crop to confirm.
+## Done (committed)
+render_character.py: --clip/--frames/--loop-window/--kit-keep/--pass layers; Mixamo retarget plus posture lean; gait layer
+from bodies.json "gait" (swing_scale, hip sway/bounce/drop, cadence, hold_stance grip); two-bone leg IK on the clip's
+ankles; KitChecks; marks; key_frames. Measured slide: orc 0.8 cm, Vampyr 0.6 cm. Pipeline self-test 15/15.
+Orc kit: axe head forward (+20 X), blade on local -Y, spike +Y, contact + 3 checks. Vampyr kit: scabbard axis check only.
 ## Rules learnt the hard way (keep under 10 lines)
-- MPFB targets are shape keys: always measure `evaluated_get(depsgraph)`, never `mesh.vertices`.
-- `read_factory_settings` unloads MPFB; clear objects instead. Set `filepaths.save_version = 0`.
-- Only Merge & CI edits STATUS.md and DECISIONS.md (D-026): put state and decisions in the PR body.
-- Normal passes need view transform Raw and dither 0, or the data is tone-mapped and noisy.
-- Director: mixels are an automatic fail; every image and view uses one texel size; send 1x and 4x as separate files.
-- Godot runs leave .import churn: revert tracked, git clean -- '*.png.import'. node_classes.gd.uid is TRACKED now: never delete it.
-- A child pose bone inherits its parent's scale: compensate (hands 1.3/0.85).
-- Judge a pose fix side-on at 0 degrees before the 55-degree sprite; the steep view hides over-correction.
-- Mixamo export links expire in 300 s and the monitor can return the previous job: export one clip per call and download at once.
+- MPFB targets are shape keys: measure evaluated_get(depsgraph). The MPFB rig is offset (location z 0.75).
+- Blender 4D Vector.normalized() scales by its xyz length only: normalize a Quaternion as a Quaternion.
+- Moving or rotating the hips drags planted feet: re-solve the legs (IK) onto the clip's ankles.
+- Kit rot_deg: +X rotation leans a piece's +Z toward -Y (the body's front). Prove a direction by check A, never by the doc.
+- Gear in body clay reads as anatomy: review kit in the layers pass, at 2x, at the contact frames.
+- Blender returns exit 0 on a Python traceback unless --python-exit-code 1 is passed.
+- Only Merge & CI edits STATUS.md and DECISIONS.md. Director: no mixels; send 1x and 2x as separate files.
