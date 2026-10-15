@@ -159,11 +159,54 @@
       "resolve": 5,
       "initiative": 3,
       "presence": 2
+    },
+    "peasant_mob": {
+      "rabble": true,
+      "hp": 6,
+      "attack": 0,
+      "defense": 0,
+      "damage": 3,
+      "resolve": 2,
+      "initiative": 2
+    },
+    "starving_brigand": {
+      "rabble": true,
+      "gear": {"axe": true},
+      "hp": 6,
+      "attack": 1,
+      "defense": 0,
+      "damage": 3,
+      "resolve": 2,
+      "initiative": 3
+    },
+    "deserter": {
+      "rabble": true,
+      "gear": {"sword": true, "leather": true},
+      "hp": 7,
+      "attack": 1,
+      "defense": 0,
+      "damage": 4,
+      "resolve": 3,
+      "initiative": 3
+    },
+    "cultist": {
+      "rabble": true,
+      "gear": {"mace": true},
+      "hp": 7,
+      "attack": 1,
+      "defense": 0,
+      "damage": 4,
+      "resolve": 3,
+      "initiative": 2
     }
   },
   "gate": {
     "die_sides": 20,
     "talk_down_difficulty": 15,
     "shaken_morale": 30
+  },
+  "fight_length": {
+    "fights": 300,
+    "turn_cap": 300
   }
 }

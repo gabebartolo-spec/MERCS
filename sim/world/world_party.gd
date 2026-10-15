@@ -18,6 +18,9 @@ var budget := 0
 var away_until := 0
 ## Whether it saw the band on its last move (presentation marks a chasing party).
 var chasing := false
+## A hunter party's strength (Phase 5 C4, GrudgeParties): its encounter takes this line-up
+## (counting from 1) instead of a rolled one. 0 for every other party (saved only when set).
+var strength := 0
 
 
 static func make(party_id: String, party_type: String, at: Vector2i) -> WorldParty:
@@ -43,7 +46,7 @@ func send_away(day: int) -> void:
 
 
 func to_dict() -> Dictionary:
-	return {
+	var saved := {
 		"id": id,
 		"type": type,
 		"x": tile.x,
@@ -54,6 +57,9 @@ func to_dict() -> Dictionary:
 		"away_until": away_until,
 		"chasing": chasing,
 	}
+	if strength > 0:
+		saved["strength"] = strength
+	return saved
 
 
 ## Rebuilds the record; JSON turns every number into a float, so each is read back whole.
@@ -66,6 +72,7 @@ static func from_dict(saved: Dictionary) -> WorldParty:
 	party.budget = _num(saved, "budget")
 	party.away_until = _num(saved, "away_until")
 	party.chasing = saved.get("chasing", false) == true
+	party.strength = maxi(0, _num(saved, "strength"))
 	return party
 
 

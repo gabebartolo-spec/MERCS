@@ -204,13 +204,18 @@ func _check_targets() -> void:
 
 
 ## An enemy archer shoots a merc it sees from reach rather than walking; one whose sight is
-## shorter than the gap does not shoot (rule 6: the AI is not psychic).
+## shorter than the gap does not shoot (rule 6: the AI is not psychic). The battle's own
+## sight_cells is the same, so the archer who never saw him has no memory of him either.
 func _check_ai_shoots_what_it_sees() -> void:
 	var results: Array[String] = []
 	for sight: int in [GRID.x, 3]:
 		var archer := _armed("e", BattleUnit.ENEMY, Vector2i(6, ROW), "bow")
 		var merc := BattleUnit.make("m", BattleUnit.COMPANY, Vector2i(1, ROW), {"initiative": 1})
-		var battle := _battle([archer, merc], {})
+		var rules := _rules()
+		rules["sight_cells"] = sight
+		var fighters: Array[BattleUnit] = [archer, merc]
+		var battle := Battle.new()
+		battle.setup(rules, {"size": GRID, "blocked": {}}, fighters, Rng.from_seed(SEED))
 		results.append(str(BattleAi.choose(battle, archer, sight).get("type", "")))
 	(
 		_check

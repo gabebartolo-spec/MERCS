@@ -26,6 +26,9 @@ var panel: HubPanel = null
 ## The contracts' jobs on the map (Phase 5 C1): placed when a contract is taken, judged after
 ## every day and every fight.
 var jobs: Jobs = null
+## The hunters a grudge sends (Phase 5 C4): sent after the jobs are judged each day, settled
+## after each fight.
+var hunters: GrudgeParties = null
 ## The overworld's autosave (OverworldDirector.autosave: writes only under Ironman), called after
 ## each committed action so a quit cannot give the decision back (D-087).
 var autosave := Callable()
@@ -35,6 +38,8 @@ var talk := TermsPanel.new()
 ## column rows, `armoury_act` takes (action, id) of every "armoury*" action. Unset: no armoury.
 var armoury_rows := Callable()
 var armoury_act := Callable()
+## True while the overworld's triage stands: the hub stays shut until Continue (show_result).
+var waiting := Callable()
 
 var _layer: CanvasLayer = null
 var _inspected := ""
@@ -53,6 +58,8 @@ static func attach(game: SliceGame) -> HubDirector:
 	var map := game.overworld_director()
 	hub.begin(game.company_director().company, map.world, map.rng)
 	hub.autosave = map.autosave
+	map.after_fight = hub.show_result
+	hub.waiting = func() -> bool: return map.triage != ""
 	return hub
 
 
@@ -69,6 +76,7 @@ func begin(shared: Company, sim: WorldSim, stream: Rng) -> void:
 	talk.setup(company, world, _block(_read(HUB_DATA), "terms"))
 	var wages := _block(_read(CompanyDirector.ECONOMY_DATA), "wages")
 	_share_pct = Merc.whole(wages.get("share_pct", 0))
+	hunters = GrudgeParties.make(world, company)
 	if company.economy.board.is_empty() and company.economy.book.next_contract == 1:
 		company.economy.refresh_board(world.day, _site_ids(), rng)
 	_layer = CanvasLayer.new()
@@ -84,9 +92,9 @@ func is_open() -> bool:
 	return _layer != null and _layer.visible
 
 
-## Shows the hub (redrawn) or hides it; nothing is lost either way.
+## Shows the hub (redrawn) or hides it; nothing is lost either way. Not over a triage.
 func set_open(open: bool) -> void:
-	if _layer == null:
+	if _layer == null or (open and waiting.is_valid() and waiting.call()):
 		return
 	_layer.visible = open
 	talk.close()
@@ -101,6 +109,7 @@ func economy() -> Economy:
 
 func _on_day(day: int) -> void:
 	_judge().on_day(day)
+	_hunt().on_day(day)
 	company.economy.on_day(company.roster, day, _site_ids(), rng)
 	if is_open():
 		_show()
@@ -108,15 +117,21 @@ func _on_day(day: int) -> void:
 
 ## A fight's result was applied: a win leaves loot, and the men the enemy surrendered as
 ## prisoners (EncounterBattle.result "prisoners"; a wipe or a rout leaves none: Phase 4 ruling
-## Q-C; Phase 5 C5), and opens the hub.
+## Q-C; Phase 5 C5). All of it now, before the fight's autosave; the hub opens on it once the
+## triage is read (show_result).
 func _on_result(kind: String, result: Dictionary) -> void:
 	_judge().on_result(result)
+	_hunt().on_result(result)
 	if result.get("won", false) != true:
 		return
 	company.economy.take_loot(kind, rng, result)
 	var taken := EncounterBattle.taken(result)
 	if not taken.is_empty():
 		company.economy.captives.take(world.day, taken)
+
+
+## Opens the hub on a won fight's loot and prisoners (the overworld's Continue after the triage).
+func show_result() -> void:
 	_reaction = ""
 	set_open(true)
 
@@ -201,6 +216,12 @@ func _remember_contract() -> void:
 func _judge() -> Jobs:
 	jobs.memory = StoryDirector.memory_of(self)
 	return jobs
+
+
+## The hunters, about to act: a settled hunter fight leaves its sentence in the shared store.
+func _hunt() -> GrudgeParties:
+	hunters.memory = StoryDirector.memory_of(self)
+	return hunters
 
 
 func _decide(choice: String) -> void:

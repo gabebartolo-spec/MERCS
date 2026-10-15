@@ -29,24 +29,30 @@ const ILLEGAL_EVERY := 7
 ## 1337 and 31, the watch's fights, move because the watchmen's spears now strike from two
 ## cells over a friend's shoulder; 424242, 90210 and 2026 (bandits, no spears) are unchanged.
 ## Seed 9 added by P1c: the watch fight in which the orc's axe still splits a shield.
+## Re-pinned by the stall fix (claude/p4-ai-path): seeds 1, 1337, 424242, 90210 and 9 move
+## because a walker now picks the cell with the fewest steps to his target around the walls,
+## not the nearest in a straight line (the first move that differs sits beside a wall); the
+## memory of a foe out of sight moves none of them. 7, 2026 and 31 are unchanged.
 const GOLDEN := {
-	1: "0520476fe9c6c6672b753a5fbd891f27b0d71b3a9d6f5c6bc8c1d9568991a6fe",
+	1: "6cde8c2a5d03e772be1fe1c2b39036ea0c7c3de9f6434e83d17f1c60ac74f4ac",
 	7: "9210a2da2567c762a778735a4708c1e68fc6c4d9da8cbdc78012b11cbe1b4820",
-	1337: "152b652cd5dbbd6af5318ae5e7561ebf674f45cc7ef597a3f15289172c08e27d",
-	424242: "bf3230ebe0f05c1c125434487cc22361175371a00855f470d2d66a0fe74de4d7",
-	90210: "f27a6f66edc03844567d284ffc0f6913bc2766dc4a6d1f2ec15c8495d674168e",
+	1337: "30ef5f7ffc40a6b70a3604cf0abafecaba4e42689ce218173a53e915ced04907",
+	424242: "21cd486b938acdc0016a24f4d915cdb63986719fbcf9e7dabe6c506945ac6f01",
+	90210: "a6a6ecb962abb31ddc75062432eeeea458809ba1bb0075d3cbfc90b2bb118957",
 	2026: "f2cb429cb889c0d7abe14b9615f77a8df23049e6bfb4f68f6de85e3eee60f35e",
 	31: "ae3c9cb57c2012d6d0e46fae3305a48ab114387d3421d8107d9c9d458e258cb7",
-	9: "0c4a82ab40ce7940f22631dc8ac99c7565e44803a84232e987efb000a0d58303",
+	9: "adb75a319d33c1db878e4a2f10e25163106f26dc90f518daa7344b13a9b5c72f",
 }
 ## The same seven fights with every fighter's "gear" taken away hash to main's pins from before
 ## equipment physics (Phase 4 P1b): gear changes numbers, never the rolls or their order.
+## Seeds 1, 7, 1337, 424242 and 90210 re-pinned by the stall fix (the walk round walls, as
+## GOLDEN above); 2026 and 31 still hash as before P1b.
 const GEARLESS := {
-	1: "3299931e9bdb761e4059482a56a893ea1cc7edd80068325ddfa4b3cd166c509c",
-	7: "7568529f025b8ea2c47b985b30b29e5e221424b06cd42bfa23c4783ec7ef2150",
-	1337: "036b27068c601f3442f239d5e186a8064d14023fd0d74b38c96996d091f1b538",
-	424242: "a1b6cca7a1fba6c46516214e263cf2c1ccd37ecdd2b1ed581c583549305f43b3",
-	90210: "99c70224e351a57618f1687ead0e8d972c3cfa1901fbebb269198a1ab91b87a9",
+	1: "4272dce176f24f691163c42ba8496df414c701d843f23f946beff11e051ae39a",
+	7: "784137f43ce967094ba747ace6e9e54c4a244b85707344c28abacf2e80f94bd9",
+	1337: "714f07b4c4d3a744253788438cf8d07dac2e610f2777a7a49ceb7a6d5b576c5b",
+	424242: "855147942675c49943a8f2d3d32d52219887a295495479d4158df3f9e115fdbe",
+	90210: "3982a519c923999367c4785343db965657cafc57a4fcbe782b3dfe843e72cdc9",
 	2026: "5cd2331f919abb9568429914bd493e439fdb776daa16bdcbfc3d3e372cbc4c63",
 	31: "ac55cc7c4e59ae637676de3c515542566de606443c76050c5fed73a1103cb975",
 }
@@ -105,7 +111,7 @@ func _check_gearless() -> void:
 		var fight := _fight(seed_value, true)
 		var battle: Battle = fight["battle"]
 		same = same and _digest(battle) == str(GEARLESS[seed_value])
-	_check.call(same, "with every fighter's gear removed the golden fights hash as before P1b")
+	_check.call(same, "with every fighter's gear removed the golden fights hash as pinned")
 
 
 func _rules() -> Dictionary:

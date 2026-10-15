@@ -9,7 +9,12 @@ extends "res://tests/lib/runner.gd"
 ## each survive a quit with Ironman On; with Ironman Off none of them writes anything.
 ## The commits the first pass left open (tests/ironman_resume/gap_checks.gd): meeting an
 ## encounter, a storylet attempt, the captain's appointment and a recorded action's types.
-## Seeded by design: world seed 424270, a lone ambush or patrol three steps out, the battle played
+## Save order (tests/ironman_resume/save_order_checks.gd): a prisoner's fate and a won fight's
+## triage, each quit at its autosave and reopened in a new process, match the run played on;
+## B over a triage keeps the hub shut; a quit mid-walk reopens at the last day's end. Unsaved
+## (tests/ironman_resume/unsaved_checks.gd): no change without a following save, every input of
+## three scripted campaigns, and the guard shown to catch each way a change can miss its save.
+## Seeded by design: world seed 4, a lone ambush or patrol three steps out, the battle played
 ## by BattleAi on both sides (InputKit), the start of the Ironman suite's own fight.
 ##   godot --headless --path . --script tests/run_ironman_resume_tests.gd
 
@@ -20,9 +25,11 @@ const World := preload("res://tests/lib/world_fixture.gd")
 const SAVE_SYSTEM := preload("res://presentation/autoload/save_system.gd")
 const SitOutChecks := preload("res://tests/ironman_resume/sit_out_checks.gd")
 const GapChecks := preload("res://tests/ironman_resume/gap_checks.gd")
+const SaveOrderChecks := preload("res://tests/ironman_resume/save_order_checks.gd")
+const UnsavedChecks := preload("res://tests/ironman_resume/unsaved_checks.gd")
 const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const WINDOW_SIZE := Vector2i(1920, 1080)
-const SEED := 424270
+const SEED := 4
 const NEAR := 3
 const TAP_LIMIT := 8
 const SETTLE := 4
@@ -49,6 +56,12 @@ func run_checks() -> void:
 	var gaps := GapChecks.new()
 	gaps.setup(self, Callable(self, "check"))
 	await gaps.run()
+	var order := SaveOrderChecks.new()
+	order.setup(self, Callable(self, "check"))
+	await order.run()
+	var unsaved := UnsavedChecks.new()
+	unsaved.setup(self, Callable(self, "check"))
+	await unsaved.run()
 	_clear_save()
 	await process_frame
 
@@ -195,6 +208,7 @@ func _check_prisoner() -> void:
 	var game := await _spawn()
 	var hub := game.hub_director()
 	hub.world.result_hook.call("ambush", {"won": true, "prisoners": ["bandit_0"]})
+	hub.show_result()
 	await InputKit.frames(self, InputKit.LAYOUT_FRAMES)
 	var purse := hub.economy().purse + hub.economy().captives.ransom_coin()
 	await InputKit.click(self, hub.panel.button_for("prisoner", Economy.RANSOM))

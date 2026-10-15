@@ -35,7 +35,14 @@ The loop sketch's fighters, by id. The orc and the Vampyr are the director's ref
 - `leader`: losing this fighter costs `morale_loss_leader_down`.
 - `watchman`, `watch_sergeant`: the road patrol's fighters (Phase 2 M2, data/encounters.json); the sergeant leads.
 - `recruit_placeholder`: the loop's recruit until the director designs the cast member offered there.
+- `rabble`: true for the rabble kinds (Phase 5 C7, director Q-1 and 03:17: peasant mobs, deserters, cultists, starving brigands), a separate weak enemy: ill-armed (no armour but the deserter's leather, a farm axe or a cudgel, the mob bare-handed), low skill (attack 0-1, defense 0) and quick to break (resolve 2-3, under `morale_captain_fall.hold_resolve`; and a side routs after three of its men go down, `morale_loss_ally_down` against `rout_below`, however many it brought). They come 12-16 a fight where soldiers come 4-8 (`data/caps.json` `enemies_rabble`, `enemies_soldiers`). Every number of `peasant_mob`, `starving_brigand`, `deserter` and `cultist` is a PLACEHOLDER for the lead to tune after the director's playtest (C7 tunes nothing).
 
 ## gate
 - `die_sides`, `talk_down_difficulty`: the bandit lookout check: die + presence must reach the difficulty.
 - `shaken_morale`: morale the band starts without when its lookout is talked down (he slips away; on a failure he fights with them).
+
+## fight_length
+
+The fight-length audit (`tests/battle/length_checks.gd`): seeded random fights on a walled street, both sides played by the AI, must all end. Not a rule of play; a guard that no fight stalls.
+- `fights`: how many seeded fights the audit plays.
+- `turn_cap`: the most actions a fight may take before the audit calls it stalled.

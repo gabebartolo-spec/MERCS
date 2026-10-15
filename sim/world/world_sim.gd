@@ -114,6 +114,15 @@ func place_job(contract: Dictionary) -> String:
 	return Jobs.place(self, contract, _job_knobs, _rng)
 
 
+## A broken deal's hunters (GrudgeParties.place, Phase 5 C4) on the map near the deal's site
+## (`site_id`; the hub when unknown), on the Rng "grudge" stream; `strength` picks their
+## line-up. Their id, "" when no tile was free.
+func send_hunters(deal_id: String, strength: int, site_id: String = "") -> String:
+	var knobs := _dict(_party_knobs, GrudgeParties.TYPE)
+	var deal := {"deal": deal_id, "strength": strength, "site": site_id}
+	return GrudgeParties.place(self, deal, knobs, _rng)
+
+
 ## The party by id, or null.
 func party(party_id: String) -> WorldParty:
 	for found: WorldParty in parties:
@@ -255,14 +264,19 @@ func _pass_time(units: int) -> void:
 			return
 
 
-## The party's encounter: its type, and a line-up rolled on the "encounter" stream. False
-## when the data holds no line-up for the type.
+## The party's encounter: its type, and a line-up its place and day allow, rolled on the
+## "encounter" stream (LineupPick); a hunter party's strength picks its line-up instead, no roll.
+## False when the data holds no line-up for the type.
 func _raise_encounter(walker: WorldParty) -> bool:
 	var entry := _dict(_lineups, walker.type)
 	var lineups := _list(entry, "lineups")
-	if lineups.is_empty():
+	var place := TileRegion.TERRAIN_KEYS[region.terrain(band)]
+	var chosen := LineupPick.pick(lineups, place, day, _rng) if walker.strength <= 0 else []
+	if walker.strength > 0 and not lineups.is_empty():
+		chosen = LineupPick.fighters_of(lineups[mini(walker.strength, lineups.size()) - 1])
+	var enemies: Array = _whole_deep(chosen)
+	if enemies.is_empty():
 		return false
-	var enemies: Array = _whole_deep(lineups[_rng.roll(ENCOUNTER_STREAM, 0, lineups.size() - 1)])
 	encounter = {
 		"type": walker.type,
 		"party": walker.id,

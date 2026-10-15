@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Encounters",
-  "description": "data/encounters.json: the encounters the road can raise, one entry per type (Phase 2 M2). Each holds the possible enemy line-ups; fighter ids name entries in data/balance/battle.json \"fighters\". The numbers (chance, weights, toll, loot) are in data/balance/world.json \"encounters\".",
+  "description": "data/encounters.json: the encounters the road can raise, one entry per type (Phase 2 M2). Each holds the possible enemy line-ups; fighter ids name entries in data/balance/battle.json \"fighters\". The numbers (chance, weights, toll, loot) are in data/balance/world.json \"encounters\". A line-up is a list of fighters, or (Phase 5 C7) an object whose 'fighters' are the list and whose optional 'places' and 'from_day' say where and from which day it can come.",
   "type": "object",
   "required": [
     "encounters"
@@ -34,7 +34,11 @@
           "lineups": {
             "type": "array",
             "items": {
-              "type": "array",
+              "type": [
+                "array",
+                "object"
+              ],
+              "description": "A line-up: a list of fighters (anywhere, any day), or (Phase 5 C7) an object whose 'fighters' are the list, narrowed by 'places' (the terrain of the band's tile: road, plain, forest, hill) and 'from_day' (the first day it can come); either may be left out.",
               "items": {
                 "type": "object",
                 "required": [
@@ -54,6 +58,47 @@
                       "minimum": 0
                     }
                   }
+                }
+              },
+              "required": [
+                "fighters"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "fighters": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "fighter",
+                      "cell"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "fighter": {
+                        "type": "string",
+                        "pattern": "^[a-z]+(_[a-z]+)*$"
+                      },
+                      "cell": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      }
+                    }
+                  }
+                },
+                "places": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^(road|plain|forest|hill)$"
+                  }
+                },
+                "from_day": {
+                  "type": "integer",
+                  "minimum": 0
                 }
               }
             }
