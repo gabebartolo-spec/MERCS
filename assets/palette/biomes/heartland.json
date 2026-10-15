@@ -101,6 +101,13 @@
     "#674e64",
     "#94758a"
    ]
+  },
+  {
+   "name": "verdure_mid",
+   "purpose": "grass mass: one step between verdure_1 and verdure_2, luma ~69 (director, 2026-10-16: darken to match golden)",
+   "colours": [
+    "#40501d"
+   ]
   }
  ]
 }

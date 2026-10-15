@@ -2,12 +2,12 @@
   "_doc": "Biome palettes; heartland is look option B with its light.",
   "asset": "palette/biomes",
   "files": {
-    "heartland.gpl": "97eb069a5dcdfc30444f396a51e0595fc88396003a2e1f53862adca383d89e58",
-    "heartland.json": "f7740050675efccce2762259a0efb45a47bc72048d7c3485d74748fd073929c5",
-    "heartland_swatch.png": "eac57491a6bedb232ce742edfdffaf7820258b48681d7563ff5aad2490c4dd5f"
+    "heartland.gpl": "d4f85e137fdc086217a767152172a1dc1a1ec0b4bd42aff159fdea15b3df72ba",
+    "heartland.json": "d3855cb384227b23f1f6ff8f421e048d51da548b8716b52b60673b6536c8e8bc",
+    "heartland_swatch.png": "982f663e5c5dfe65eb807f2070a88b29a721dadd7a3db365960f93695d0e0234"
   },
   "produced_by": {
-    "tools/look/make_palettes.py": "4a3f0e16b09f2a26"
+    "tools/look/make_palettes.py": "4eea2198c65161a0"
   },
   "models": [],
   "licence_rows": [

@@ -2,7 +2,7 @@
 
   python tools/look/make_palettes.py
 
-Each option is one coherent set of named ramps (06_STYLE_ART.md section 2), 64 colours (heartland adds heather: 67). A ramp is
+Each option is one coherent set of named ramps (06_STYLE_ART.md section 2), 64 colours (heartland adds heather and verdure_mid: 68). A ramp is
 given by its darkest and lightest colour; the steps between are spaced evenly in OKLab, so lightness
 climbs evenly and any hue shift between the anchors (cool shadows, warm lights) is spread over the
 ramp. A ramp given as a list keeps those colours as they are (cloth pairs, heraldry, blood, fire).
@@ -36,6 +36,7 @@ PURPOSE = {
     "cloth_faded": "commoner and dark cloth: dull red pair, dull blue pair",
     "verdure": "grass, moss, leaves",
     "heather": "heather, ling and moor flowers: three dusty purples (director, 2026-10-16)",
+    "verdure_mid": "grass mass: one step between verdure_1 and verdure_2, luma ~69 (director, 2026-10-16: darken to match golden)",
     "heraldry": "faction colours only: crimson, gold, blue, white, yellow",
     "blood": "overlay only: two reds and a dried brown",
     "fire": "torch and ember accents",
@@ -69,6 +70,7 @@ OPTIONS = {
             "skin_neutral": ("#4c2d1f", "#e0b48f"), "skin_orc": ("#283016", "#9ba15c"),
             "skin_pale": ("#4b3d39", "#e1d3c2"), "verdure": ("#1e2a12", "#808c46"),
             "heather": ("#3d2a41", "#94758a"),
+            "verdure_mid": ["#40501d"],  # luma 69.4; kept clear of skin_orc (not the plain OKLab midpoint)
             "cloth_faded": ["#7a3a26", "#a0573a", "#37474f", "#59706f"],
             "heraldry": ["#8a1d1d", "#bb3a2c", "#d29a2a", "#22488a", "#ece3cf", "#e0b92c"],
             "blood": ["#5c1010", "#80201a", "#4c2a18"], "fire": ["#e07a28", "#f6c64a"],
@@ -137,7 +139,7 @@ def gpl(name: str, ramps: list[dict]) -> str:
 
 NL = chr(10)
 CORE = ["soot", "iron", "bone", "skin_neutral", "skin_orc", "skin_pale", "cloth_faded", "heraldry", "blood", "fire"]
-BIOME = ["slate", "soil", "timber", "verdure", "heather"]  # heather: biome-only, option B (2026-10-16)
+BIOME = ["slate", "soil", "timber", "verdure", "heather", "verdure_mid"]  # heather, verdure_mid: biome-only, option B (2026-10-16); appended so no index moves
 PICKED = "B"  # director, 2026-10-15: option B "Peat and Ochre" is the look target
 BIOME_NAME = "heartland"
 AUDIT = REPO / "docs" / "audits" / "look_target" / "options"

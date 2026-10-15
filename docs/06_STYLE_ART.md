@@ -32,7 +32,7 @@ world can change colour by biome while the mercs never do:
   landscapes) are new files with the same ramp names (director, 2026-10-15). No new biome without a
   director decision.
 - Every frame and asset is validated against core + one biome (`validate_palette.py`,
-  `validate_pixels.py --palette <biome>.json`); core + biome holds 48–72 colours (heartland: 44 + 23).
+  `validate_pixels.py --palette <biome>.json`); core + biome holds 48–72 colours (heartland: 44 + 24).
 - Built by `tools/look/make_palettes.py` (ramps spaced in OKLab between hand-set anchors); options A
   and C, not picked, are kept as review records in `docs/audits/look_target/options/`.
 
@@ -49,6 +49,7 @@ Ramps (5–6 steps each, 4 for `soot`):
 | `cloth_faded` dull reds, blues, greens | commoner clothing |
 | `verdure_cold` blue-greens | vegetation |
 | `heather` three dusty purples (biome) | heather and moor flowers (director, 2026-10-16: muted, low saturation, not fantasy-bright) |
+| `verdure_mid` one olive green (biome) | the grass mass, one step between `verdure_1` and `verdure_2` at luma ~69 so open grass matches the golden (director, 2026-10-16: "Darken to match golden"); kept clear of `skin_orc` so the orc does not vanish on grass |
 | `skin_1 … skin_6` | six skin ramps; sprites are rendered in one neutral skin ramp and the shader maps it to the merc's ramp by palette index (never free colour) |
 | `heraldry_*` | saturated faction colours: crimson/gold, blue/white, black/yellow (3 factions in the slice) |
 | `blood` | two reds and a brown for dried |
