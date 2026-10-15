@@ -5,7 +5,10 @@ extends "res://tests/lib/runner.gd"
 ## (C) never stack, each opening closes the other, and while either is up the map's own panel
 ## and header stay out from under it; a battle's intent labels never sit on the panel's text.
 ## Gap 5: a chasing party's ring is a second ring outside the token, wider than the band's
-## outline, in a colour no token or outline has.
+## outline, in a colour no token or outline has. The battle panel's blow buttons (Phase 4 P1c,
+## director 2026-10-16) are offered for exactly the foes the weapon action reaches
+## (Battle.targets) and each one's hover reads its chance as a percentage ("Hit 40%",
+## Battle.odds); the mouse is moved onto the button itself (tests/panels/odds_hover.gd).
 ## Seeded by design: world seed 424270 with a lone ambush (the wiring suite's); nothing rolls but
 ## the fight, which BattleAi plays.
 ##   godot --headless --path . --script tests/run_panels_tests.gd
@@ -13,6 +16,7 @@ extends "res://tests/lib/runner.gd"
 const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const World := preload("res://tests/lib/world_fixture.gd")
 const InputKit := preload("res://tests/lib/input_kit.gd")
+const OddsHover := preload("res://tests/panels/odds_hover.gd")
 const SAVE_SYSTEM := preload("res://presentation/autoload/save_system.gd")
 const WINDOW_SIZE := Vector2i(1920, 1080)
 const OUT := 3
@@ -40,6 +44,7 @@ func run_checks() -> void:
 	await _check_encounter_under_screen(KEY_B)
 	await _check_encounter_under_screen(KEY_C)
 	_check_chase_ring()
+	await OddsHover.new().run(self, check)
 	_clear_save()
 
 

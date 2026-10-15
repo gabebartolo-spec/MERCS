@@ -3,7 +3,8 @@ extends RefCounted
 ## How a company merc plays a turn, from the moves they have learnt (the vision: a merc's
 ## moves are how they fight). The enemy's plain line (BattleAi) is the base; a merc with
 ## "charge" runs at a foe in sight and strikes in the same turn instead of closing in over
-## two; a merc with "blood_price" pays his own health only on a foe beside him he saw wounded,
+## two; a merc with "blood_price" pays his own health only on a foe beside him he saw wounded
+## (never one his weapon reaches further off: the move is a blow beside him),
 ## and only while he can afford it. Deterministic and not psychic (rule 6): he knows of a foe
 ## only what BattleKnowledge gives BattleAi (who is within sight_cells, whether he looks
 ## wounded), knows his own health, and rolls nothing.
@@ -29,7 +30,11 @@ static func choose(battle: Battle, fighter: BattleUnit, rules: Dictionary) -> Di
 	var plain := BattleAi.choose(battle, fighter, sight)
 	if fighter.can_blood_price and plain.get("type") == battle.kit(fighter.id)[0]:
 		var target := battle.unit(str(plain["target"]))
-		if _worth_the_price(fighter, target, battle.move_def(BattleUnit.MOVE_BLOOD_PRICE)):
+		var beside := BattleGrid.adjacent(fighter.cell, target.cell)
+		if (
+			beside
+			and _worth_the_price(fighter, target, battle.move_def(BattleUnit.MOVE_BLOOD_PRICE))
+		):
 			return {"type": Battle.ACTION_BLOOD_PRICE, "target": target.id}
 	if fighter.can_charge and plain.get("type") == Battle.ACTION_MOVE:
 		var charge := _charge(battle, fighter, sight)
