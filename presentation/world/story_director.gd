@@ -135,9 +135,21 @@ func _link(overworld: OverworldDirector) -> void:
 	book.load_defs(_json(STORYLETS_DATA))
 	overworld.panel.chosen.connect(_on_overworld_choice)
 	if not _resumed.is_empty() and not _open:
-		_show_offer(_resumed)
+		if _resumable(_resumed):
+			_show_offer(_resumed)
+		else:
+			push_warning(
+				"StoryDirector: dropped a saved offer for an unknown storylet or no options"
+			)
 	_resumed = {}
 	_decisions_seen = book.company.economy.chronicle.size() if book.company != null else 0
+
+
+## Whether a saved offer can still be played: its storylet exists and it lists an attempt.
+func _resumable(held: Dictionary) -> bool:
+	var raw: Variant = held.get("attempts", [])
+	var attempts: Array = raw if raw is Array else []
+	return not attempts.is_empty() and not book.definition(str(held.get("id", ""))).is_empty()
 
 
 ## The hub's decisions (the economy's chronicle lines, {"day", "merc", "key": "prisoner.<choice>"})
@@ -179,9 +191,9 @@ func _show_scene() -> void:
 		params.merge(
 			{
 				"name": _name(str(option.get("merc", ""))),
-				"skill": option.get("skill", 0),
-				"odds": option.get("odds", 0),
-				"need": option.get("need", 0)
+				"skill": Injury.num(option, "skill"),
+				"odds": Injury.num(option, "odds"),
+				"need": Injury.num(option, "need")
 			}
 		)
 		choices.append(

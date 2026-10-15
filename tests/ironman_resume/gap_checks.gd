@@ -29,6 +29,7 @@ func run() -> void:
 	await meeting()
 	await storylet()
 	await offer()
+	await stale_offer()
 	await captain()
 	await captain_unmapped()
 	action_types()
@@ -112,6 +113,7 @@ func offer() -> void:
 	var shown := JSON.stringify(story.offer.get("cast", {}), "", true)
 	var rng_after := director.rng.state()
 	var up := story.is_open() and not story.offer.is_empty()
+	var fresh := _labels(story)
 	await _quit(game)
 	var again := await _reopen()
 	var back := again.get_node("StoryDirector") as StoryDirector
@@ -123,7 +125,54 @@ func offer() -> void:
 		again.overworld_director().rng.state() == rng_after,
 		"and the Rng stands where the cast pick left it"
 	)
+	var reloaded := _labels(back)
+	_check.call(
+		not fresh.is_empty() and reloaded == fresh,
+		(
+			"the reloaded offer's choice labels read exactly like the fresh ones (%s | %s)"
+			% [fresh, reloaded]
+		)
+	)
 	await _quit(again)
+
+
+## Ironman On: a save holding an offer for a storylet that no longer exists is dropped, not
+## resumed: the run loads with the map usable and no offer up.
+func stale_offer() -> void:
+	_clear_save()
+	_save_home()
+	var game := await _spawn()
+	var story := game.get_node("StoryDirector") as StoryDirector
+	var ids: Array[String] = []
+	for merc: Merc in game.company_director().company.roster:
+		ids.append(merc.id)
+	story.memory.on_death("fallen_comrade", ids, 2, Memory.KEY_COMRADE_DIED)
+	await InputKit.tap(_tree, KEY_M)
+	var director := game.overworld_director()
+	await InputKit.click(_tree, director.panel.button_for(OverworldDirector.REST))
+	await InputKit.frames(_tree, InputKit.LAYOUT_FRAMES)
+	story.offer["id"] = "st_removed"
+	director.autosave()
+	await _quit(game)
+	var again := await _reopen()
+	var back := again.get_node("StoryDirector") as StoryDirector
+	_check.call(
+		not back.is_open() and back.offer.is_empty() and again.overworld_director().panel.visible,
+		"a saved offer for a storylet that no longer exists is dropped: no offer, the map panel up"
+	)
+	await _quit(again)
+
+
+func _labels(story: StoryDirector) -> Array[String]:
+	var out: Array[String] = []
+	var shown := story.panel
+	var listed: Array = story.offer.get("attempts", [])
+	for raw: Variant in listed:
+		var option: Dictionary = raw if raw is Dictionary else {}
+		var role := str(option.get("role", ""))
+		var button := shown.button_for(StoryDirector.ATTEMPT_PREFIX + role)
+		out.append(button.text if button != null else "(none)")
+	return out
 
 
 ## Ironman On: appointing the captain survives a quit.
