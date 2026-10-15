@@ -20,11 +20,16 @@ Counted in applied actions since the hit. Blood goes fresh red, then dark red (t
 - `hit_s`: seconds a wounded fighter shows its bone-white flash frame (placeholder until the Art agent's hit frames).
 - `death_s`: the same for the fighter who falls; then the sprite goes and the body stays.
 
+## pool
+The death pool under a fallen fighter's torso (same two blood reds, drying with the splats).
+- `damage`: the blow size the pool's blot is grown from (a big one).
+- `seed`: added to the fall's order to seed the pool's shape.
+
 ## body
-- `cell_width_m`: the width of a cell's footprint; a lying body is shrunk to fit inside it (and inside its row's depth).
-- `margin_m`: gap kept to the footprint's edge and to the feet.
+- `cell_width_m`: the width of a cell's footprint; a lying body lies along this cell's diagonal at full figure size (never shrunk).
 - `feet_half_m`: half the ground a standing fighter's feet cover; a body never lies over it.
 - `probe_m`: the step used to measure how the camera foreshortens the ground at a mark, so its pixels match the figures'.
 
 ## lift
+- `pool_m`: the death pool, lowest (under the body).
 - `splat_m`, `body_m`: metres above the ground the splats and bodies lie, both above the side ring's top (0.022 m) so the ring does not hide them; the body is lower so blood lies over it.

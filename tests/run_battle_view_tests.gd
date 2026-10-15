@@ -9,6 +9,7 @@ extends "res://tests/lib/runner.gd"
 ## Seeded by design: Rng.from_seed with fixed seeds; both sides by BattleAi; no clock.
 ##   godot --headless --path . --script tests/run_battle_view_tests.gd
 
+const Bodies := preload("res://tests/lib/body_checks.gd")
 const Kit := preload("res://tests/lib/battle_view_kit.gd")
 const InputKit := preload("res://tests/lib/input_kit.gd")
 const Pic := preload("res://tests/lib/splat_pictures.gd")
@@ -136,8 +137,8 @@ func _check_fall(marks: BattleMarks, played: Played, tag: String) -> void:
 		var from: Vector2i = body["from"]
 		away = away and killer != null
 		if cell != from:
-			away = away and dir == marks.fall_dir(cell, from, 0)
-			away = away and Vector2(cell - from).dot(Vector2(dir)) > 0
+			away = away and Vector2(cell - from).dot(Vector2(dir)) >= 0.0
+			away = away and absi(dir.x) == 1 and absi(dir.y) == 1
 	check(away, "%s: each body lies head away from the fighter who struck it down" % tag)
 
 
@@ -203,12 +204,17 @@ func _check_pixels() -> void:
 	var fall := BattleMarks.new()
 	var here := Vector2i(3, 3)
 	var turned := (
-		fall.fall_dir(here, here + Vector2i.LEFT, 0) == Vector2i.RIGHT
-		and fall.fall_dir(here, here + Vector2i.RIGHT, 0) == Vector2i.LEFT
-		and fall.fall_dir(here, here + Vector2i.UP, 0) == Vector2i.DOWN
-		and fall.fall_dir(here, here + Vector2i.DOWN, 0) == Vector2i.UP
+		fall.fall_dir(here, here + Vector2i(-1, -1), 0) == Vector2i(1, 1)
+		and fall.fall_dir(here, here + Vector2i(1, 1), 0) == Vector2i(-1, -1)
+		and fall.fall_dir(here, here + Vector2i(1, -1), 0) == Vector2i(-1, 1)
+		and fall.fall_dir(here, here + Vector2i(-1, 1), 0) == Vector2i(1, -1)
+		and fall.fall_dir(here, here + Vector2i.LEFT, 0).x == 1
+		and fall.fall_dir(here, here + Vector2i.UP, 0).y == 1
 	)
-	check(turned, "a body falls east, west, south or north: away from where the blow came from")
+	check(
+		turned,
+		"a body falls to the diagonal of its cell pointing away from where the blow came from"
+	)
 	var marks := BattleMarks.new()
 	var fresh := marks.splat_image(3, 4, BattleMarks.FRESH)
 	var dry := marks.splat_image(3, 4, BattleMarks.DRY)
@@ -338,18 +344,20 @@ func _check_bodies(mounted: Kit.Mounted) -> void:
 func _check_footing(mounted: Kit.Mounted) -> void:
 	var view := mounted.view
 	var marks := view.marks
-	var inside := true
+	var inside := not marks.bodies.is_empty()
 	var clear := true
+	var full := true
+	var pooled := true
+	var texel := mounted.stage.texel_m()
 	for body: Dictionary in marks.bodies:
-		var rect := marks.body_rect(body)
-		var body_cell: Vector2i = body["cell"]
-		var area := marks.footprint(body_cell)
-		inside = inside and rect.size != Vector2.ZERO and area.encloses(rect)
-		for fighter: BattleUnit in view.battle.units:
-			if not fighter.down:
-				clear = clear and not rect.intersects(marks.feet_rect(fighter.cell))
+		inside = inside and Bodies.outside(marks, body, texel) == 0
+		clear = clear and Bodies.clear_of_feet(marks, body, view.battle)
+		full = full and Bodies.full_size(marks, body, texel)
+		pooled = pooled and Bodies.pool_under_torso(marks, body)
 	check(inside, "every body lies inside its own cell's footprint")
 	check(clear, "no body is drawn over a standing fighter's feet")
+	check(full, "a body keeps the living figure's full scale (pixel size and pixel count)")
+	check(pooled, "each death pool spreads from under its body's torso, below the body")
 	var living := 0
 	for fighter: BattleUnit in view.battle.units:
 		living += 0 if fighter.down else 1

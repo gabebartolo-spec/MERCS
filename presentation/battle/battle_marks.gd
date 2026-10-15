@@ -7,8 +7,9 @@ extends RefCounted
 ## its fighter fell on. Each splat is a small clustered pixel blot in the core palette's blood
 ## ramp (no speckle, no gradient), its shape seeded by the hit's number and damage; it goes
 ## fresh red, then dark red as actions pass (never brown), and never vanishes early. A body
-## is the fighter's own frame laid flat, head away from the killer (the axis the blow came along),
-## shrunk to fit inside its own cell and never over a standing fighter's feet, until the art
+## is the fighter's own frame laid flat, head away from the killer (the blow's direction),
+## at full size (a body is never smaller than the man), lying along a diagonal of its own cell and
+## never over a standing fighter's feet, a pool spreading from under its torso, until the art
 ## agent's fall frames replace it (placeholder). Every ground mark is drawn at the figures' pixel
 ## size on screen: a ground quad is stretched along the ground's depth by the ratio the camera
 ## foreshortens it there (measured by projecting, not assumed from the pitch), so its pixels
@@ -67,6 +68,8 @@ func record(
 				_lay(body, source, shown)
 	for splat: Dictionary in splats:
 		_age(splat)
+	for body: Dictionary in bodies:
+		_age_pool(body)
 
 
 ## The cells the splats lie on, in the order the hits happened.
@@ -92,6 +95,12 @@ func node_of(mark: Dictionary) -> Sprite3D:
 	if not _nodes.has(key):
 		return null
 	var found: Sprite3D = _nodes[key]
+	return found
+
+
+## The pool drawn under a body, or null.
+func pool_of(body: Dictionary) -> Sprite3D:
+	var found: Sprite3D = _nodes.get("pool_%s" % body["unit"], null)
 	return found
 
 
@@ -171,16 +180,20 @@ func _add_body(unit_id: String, events: Array[Dictionary], battle: Battle) -> Di
 	return body
 
 
-## The way a body lies: a unit step along the axis the killing blow came along, away from the
-## killer's cell (the sim's hit event names the killer; nothing is decided here). A blow from
-## nowhere (no killer, or the same cell) falls east or west by the order of the fall.
+## The way a body lies: a diagonal step of its cell (x and z each one way), away from the
+## killer's cell (the sim's hit event names the killer; nothing is decided here). An axis with no
+## difference (the blow came along the other axis, or from nowhere) is taken by the order of the
+## fall, so the same events always lay the same bodies.
 func fall_dir(victim: Vector2i, killer: Vector2i, order: int) -> Vector2i:
 	var away := victim - killer
-	if away == Vector2i.ZERO:
-		return Vector2i.RIGHT if order % PAIR == 0 else Vector2i.LEFT
-	if absi(away.x) >= absi(away.y):
-		return Vector2i.RIGHT if away.x > 0 else Vector2i.LEFT
-	return Vector2i.DOWN if away.y > 0 else Vector2i.UP
+	var even := order % PAIR == 0
+	var x := Vector2i.RIGHT.x if away.x > 0 else Vector2i.LEFT.x
+	var z := Vector2i.DOWN.y if away.y > 0 else Vector2i.UP.y
+	if away.x == 0:
+		x = Vector2i.RIGHT.x if even else Vector2i.LEFT.x
+	if away.y == 0:
+		z = Vector2i.UP.y if even else Vector2i.DOWN.y
+	return Vector2i(x, z)
 
 
 ## The ground a cell owns, in world metres (x, z): a cell wide, and from half way to the row
@@ -195,14 +208,25 @@ func footprint(cell: Vector2i) -> Rect2:
 	return Rect2(here.x - half, far, half * PAIR, near - far)
 
 
-## The ground a body's drawing covers, in world metres (x, z); an empty rect with no node.
-func body_rect(body: Dictionary) -> Rect2:
+## The ground points (x, z) of every solid pixel of a body's drawing; empty with no node.
+func body_points(body: Dictionary) -> PackedVector2Array:
+	var out := PackedVector2Array()
 	var sprite := node_of(body)
 	if sprite == null or sprite.texture == null:
-		return Rect2()
-	var size := Vector2(sprite.texture.get_size()) * sprite.pixel_size
-	size.y *= sprite.scale.z
-	return Rect2(Vector2(sprite.position.x, sprite.position.z) - size / PAIR, size)
+		return out
+	var image := sprite.texture.get_image()
+	var depth := sprite.pixel_size * sprite.scale.z
+	var half := Vector2(image.get_size()) / PAIR
+	for y: int in image.get_height():
+		for x: int in image.get_width():
+			if image.get_pixel(x, y).a >= BattleBody.OPAQUE:
+				out.append(
+					Vector2(
+						sprite.position.x + (x + 0.5 - half.x) * sprite.pixel_size,
+						sprite.position.z + (y + 0.5 - half.y) * depth
+					)
+				)
+	return out
 
 
 ## The feet of a fighter standing at this cell, in world metres (x, z): the ground a body must
@@ -213,46 +237,56 @@ func feet_rect(cell: Vector2i) -> Rect2:
 	return Rect2(here.x - half, here.z - half, half * PAIR, half * PAIR)
 
 
-## Puts the fighter's frame on the ground at its body's cell, inside the cell's footprint and
-## clear of the feet of whoever stands there (shrunk, never scaled off the pixel grid).
+## Puts the fighter's frame on the ground at full size, lying along the diagonal of its cell as
+## seen on screen (head to the corner away from the killer), with the death pool under its torso.
 func _lay(body: Dictionary, source: Sprite3D, shown: ShaderMaterial) -> void:
-	var dir: Vector2i = body["dir"]
-	var image := _lying(source, dir, shown)
-	if image == null:
+	var frame := _frame(source, shown)
+	if frame == null:
 		return
 	var cell: Vector2i = body["cell"]
+	var dir: Vector2i = body["dir"]
+	var image := BattleBody.turn(frame, _diagonal_angle(cell, dir))
 	var area := footprint(cell)
-	var feet := feet_rect(cell)
-	var texel := _stage.texel_m()
-	var feet_point: Vector3 = _ground.call(cell)
-	var depth := texel * _squash(feet_point)
-	# Room beside the feet: the cell's width, and the depth on the side the body lies on.
-	var margin := _data.num("body", "margin_m")
-	var behind := dir != Vector2i.DOWN
-	var room_z := (feet.position.y - area.position.y) if behind else (area.end.y - feet.end.y)
-	room_z -= margin
-	var room_x := area.size.x - PAIR * margin
-	var fit := minf(
-		1.0, minf(room_x / (image.get_width() * texel), room_z / (image.get_height() * depth))
-	)
-	if fit < 1.0:
-		var size := Vector2i(
-			maxi(1, floori(image.get_width() * fit)), maxi(1, floori(image.get_height() * fit))
-		)
-		image.resize(size.x, size.y, Image.INTERPOLATE_NEAREST)
 	var sprite := _sprite(_data.num("lift", "body_m"))
 	sprite.texture = ImageTexture.create_from_image(image)
-	var half_z := image.get_height() * depth / PAIR
-	var centre_z := feet.end.y + margin + half_z
-	if behind:
-		centre_z = feet.position.y - margin - half_z
-	sprite.position = Vector3(area.get_center().x, sprite.position.y, centre_z)
+	sprite.position = Vector3(area.get_center().x, sprite.position.y, area.get_center().y)
 	sprite.scale = Vector3(1.0, 1.0, _squash(sprite.position))
 	_nodes[_key(body)] = sprite
+	body["solid"] = BattleBody.solid(image)
+	body["source_solid"] = BattleBody.solid(frame)
+	var torso := BattleBody.torso(image)
+	var spot := Vector3(
+		sprite.position.x + torso.x * sprite.pixel_size,
+		sprite.position.y,
+		sprite.position.z + torso.y * sprite.pixel_size * sprite.scale.z
+	)
+	body["torso"] = Vector2(spot.x, spot.z)
+	var pool := _sprite(_data.num("lift", "pool_m"))
+	pool.texture = ImageTexture.create_from_image(_pool_image(body, FRESH))
+	pool.position = Vector3(spot.x, pool.position.y, spot.z)
+	pool.scale = Vector3(1.0, 1.0, _squash(pool.position))
+	_nodes["pool_%s" % body["unit"]] = pool
 
 
-## The fighter's frame as it stands, cropped to its pixels and turned flat; null with no frame.
-func _lying(source: Sprite3D, dir: Vector2i, shown: ShaderMaterial) -> Image:
+## The clockwise turn that points a standing frame's head along the cell's screen diagonal
+## towards the corner this step names.
+func _diagonal_angle(cell: Vector2i, dir: Vector2i) -> float:
+	var area := footprint(cell)
+	var camera := _stage.camera()
+	var centre := area.get_center()
+	var half := area.size / PAIR
+	var tail := camera.unproject_position(
+		Vector3(centre.x - dir.x * half.x, 0.0, centre.y - dir.y * half.y)
+	)
+	var head := camera.unproject_position(
+		Vector3(centre.x + dir.x * half.x, 0.0, centre.y + dir.y * half.y)
+	)
+	var along := head - tail
+	return atan2(along.x, -along.y)
+
+
+## The fighter's frame as it stands, cropped to its pixels; null with no frame.
+func _frame(source: Sprite3D, shown: ShaderMaterial) -> Image:
 	var material := shown if shown != null else source.material_override as ShaderMaterial
 	if material == null:
 		return null
@@ -267,15 +301,7 @@ func _lying(source: Sprite3D, dir: Vector2i, shown: ShaderMaterial) -> Image:
 	var used := frame.get_used_rect()
 	if used.size == Vector2i.ZERO:
 		return null
-	var cropped := frame.get_region(used)
-	# The frame stands head up (away from the camera); turn the head to the way it lies.
-	if dir == Vector2i.RIGHT:
-		cropped.rotate_90(CLOCKWISE)
-	elif dir == Vector2i.LEFT:
-		cropped.rotate_90(COUNTERCLOCKWISE)
-	elif dir == Vector2i.DOWN:
-		cropped.rotate_180()
-	return cropped
+	return frame.get_region(used)
 
 
 ## A stable key for a mark's node (its entry changes as it ages, so it cannot be the key).
@@ -293,6 +319,23 @@ func _age(splat: Dictionary) -> void:
 		sprite.texture = ImageTexture.create_from_image(
 			_splat.image(Merc.whole(splat["index"]), Merc.whole(splat["damage"]), level)
 		)
+
+
+## A death pool dries with the splats, by the age of its body's fall.
+func _age_pool(body: Dictionary) -> void:
+	var pool: Sprite3D = _nodes.get("pool_%s" % body["unit"], null)
+	if pool == null:
+		return
+	var level := age_of(body)
+	if level == Merc.whole(body.get("pool_level", FRESH)):
+		return
+	body["pool_level"] = level
+	pool.texture = ImageTexture.create_from_image(_pool_image(body, level))
+
+
+func _pool_image(body: Dictionary, level: int) -> Image:
+	var index := Merc.whole(_data.num("pool", "seed")) + bodies.find(body)
+	return _splat.image(index, Merc.whole(_data.num("pool", "damage")), level)
 
 
 ## A flat quad lying face up on the ground, one logical pixel per texel.

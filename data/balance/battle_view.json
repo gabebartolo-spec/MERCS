@@ -21,14 +21,18 @@
     "hit_s": 0.09,
     "death_s": 0.18
   },
+  "pool": {
+    "damage": 8,
+    "seed": 4000
+  },
   "body": {
     "cell_width_m": 1.0,
-    "margin_m": 0.04,
     "feet_half_m": 0.12,
     "probe_m": 0.1
   },
   "lift": {
     "splat_m": 0.06,
+    "pool_m": 0.03,
     "body_m": 0.05
   }
 }
