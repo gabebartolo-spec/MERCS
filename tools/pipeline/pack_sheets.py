@@ -50,9 +50,10 @@ def blit_strip(sheet: Image, frame: Image, k: int, size: int) -> None:
 
 
 def pack(body: str, layer: str, clip: str, render_dir: Path, pixel_dir: Path, out_dir: Path,
-         camera_file: Path = CAMERA_FILE, normal_dir: Path | None = None, stem: str = "") -> Path:
+         camera_file: Path = CAMERA_FILE, normal_dir: Path | None = None, stem: str = "",
+         pixelate_file: Path = PIXELATE_FILE) -> Path:
     cam = json.loads(camera_file.read_text(encoding="utf-8"))
-    pix = json.loads(PIXELATE_FILE.read_text(encoding="utf-8"))
+    pix = json.loads(pixelate_file.read_text(encoding="utf-8"))
     meta = json.loads((render_dir / "render_meta.json").read_text(encoding="utf-8"))
     pal = load_palette(REPO / pix["palette"])
     order = cam["facings"]["order"]
@@ -79,7 +80,7 @@ def pack(body: str, layer: str, clip: str, render_dir: Path, pixel_dir: Path, ou
     if normals is not None:
         write_png(out_dir / f"{stem}_normal.png", normals)
     inputs = dict(meta["inputs"])
-    inputs["pixelate_config"] = {"file": repo_rel(PIXELATE_FILE), "sha256": sha256_file(PIXELATE_FILE)}
+    inputs["pixelate_config"] = {"file": repo_rel(pixelate_file), "sha256": sha256_file(pixelate_file)}
     manifest = {
         "schema": SHEET_SCHEMA,
         "body": body,
@@ -128,8 +129,10 @@ def main(argv: list[str]) -> int:
     p.add_argument("--camera", type=Path, default=CAMERA_FILE)
     p.add_argument("--normal-dir", type=Path, default=None)
     p.add_argument("--stem", default="", help="output name (default <body>_<layer>_<clip>)")
+    p.add_argument("--pixelate-config", type=Path, default=PIXELATE_FILE, help="pixel-post config (its palette)")
     a = p.parse_args(argv)
-    path = pack(a.body, a.layer, a.clip, a.render_dir, a.pixel_dir, a.out, a.camera, a.normal_dir, a.stem)
+    path = pack(a.body, a.layer, a.clip, a.render_dir, a.pixel_dir, a.out, a.camera, a.normal_dir, a.stem,
+                a.pixelate_config.resolve())
     print(f"PACKED {path}")
     return 0
 

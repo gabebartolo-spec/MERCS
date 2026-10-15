@@ -1,0 +1,392 @@
+extends SceneTree
+## Look-target capture (Art, 2026-10-15): one palette option in the real street stage, on one
+## camera, light, pixel and outline rig. Runs the game's StreetStage (55-degree camera, 960 x 540
+## logical pixels, whole-screen pixel mode, lit sprites with normal maps), swaps the grey boxes for
+## the Blender kit (assets/look_target/kit, every face named pal:<ramp>:<step> and coloured from the
+## option's palette), applies the option's day or night light (assets/palette/options/<X>/look.json)
+## and snaps the whole frame to the option's palette (tools/look/palette_post.gdshader).
+## The map frame is the same stage at map scale: the merc density drops from 84 to MAP_HEIGHT_PX, so
+## the camera rail pulls back, and the map tiles and tokens stand in for the street.
+##
+##   APPDATA=<scratch> godot --path . --resolution 3840x2160 --script tools/look/look_target.gd \
+##     -- --option=A --scene=day|night|map --out=<png>
+
+const STAGE_SCENE := "res://presentation/world/street_stage.tscn"
+const OPTIONS_DIR := "res://assets/palette/options/%s/"
+const SPRITES_DIR := "res://assets/look_target/%s/sprites/"
+const STREET_KIT := "res://assets/look_target/kit/street_kit.glb"
+const MAP_KIT := "res://assets/look_target/kit/overworld_kit.glb"
+const POST_SHADER := "res://tools/look/palette_post.gdshader"
+const SCREEN_SCALE := 4
+const MAP_HEIGHT_PX := 20
+const SETTLE_FRAMES := 12
+const TILE_M := 4.0
+const ORC_AT := Vector3(-0.85, 0.0, 0.55)
+const VAMPYR_AT := Vector3(0.95, 0.0, 0.25)
+const TORCH_AT := Vector3(0.05, 2.06, 1.3)
+const FLAME_AT := Vector3(0.05, 2.06, 1.3)
+const BLOB_RADIUS_M := 0.27
+const SHADOW_BIAS := 0.08
+const SHADOW_NORMAL_BIAS := 2.5
+const SHADOW_DISTANCE_M := 120.0
+## Squared OKLab distance added to reserved colours, by ramp: heraldry and blood about 0.1 in
+## lightness or hue (only cloth painted in them keeps them); fire less, so the flame keeps
+## it but lit plate does not catch stray orange pixels.
+const RESERVED_PENALTY := {"heraldry": 0.012, "blood": 0.012, "fire": 0.004}
+## The rain's particle seed for these frames: stage.json's seed 7 drops a streak down the Vampyr's
+## body, which reads as a blade.
+const RAIN_SEED := 11
+const WINDOW_PX := Vector2i(3840, 2160)
+const STREET_FOCUS := Vector3(0.0, 0.0, -2.0)
+const MAP_ROWS: Array[String] = [
+	"FFFFFHHHHFFFFFHHHH",
+	"FFFFHHHPPPFFFFHHHH",
+	"FFFFFHPPPPPFFFFHHH",
+	"FFFFPPPPPPPPFFFFHH",
+	"FFFPPPPPTRRRRRRRRR",
+	"FFPPPPPPNPPPPPFFFF",
+	"RRRRRRRRNPPPPPFFFF",
+	"PPPPPPPPNPPPHHFFFH",
+	"PPPPPPPPNPPHHHFFHH",
+	"SSSSSPPPNPPPPPPFHH",
+	"WWWWWSSSNSSSSSSSPP",
+	"WWWWWWWWWWWWWWWWSS",
+	"WWWWWWWWWWWWWWWWWW",
+]
+const TILE_NAMES := {
+	"P": "tile_plain",
+	"R": "tile_road",
+	"N": "tile_road_ns",
+	"F": "tile_forest",
+	"H": "tile_hill",
+	"W": "tile_water",
+	"S": "tile_shore",
+	"T": "tile_plain",
+}
+const TURNABLE := "PFHW"
+const TOWN_TILE := Vector2i(8, 4)
+const TOWN_SCALE := 1.5
+const MAP_FOCUS := Vector3(0.0, 0.0, 4.0)
+const BAND_TILE := Vector2i(10, 6)
+const PARTY_TILE := Vector2i(4, 6)
+
+var _args := {}
+var _palette := {}
+var _look := {}
+var _stage: StreetStage = null
+
+
+func _initialize() -> void:
+	for arg: String in OS.get_cmdline_user_args():
+		var body := arg.trim_prefix("--")
+		_args[body.get_slice("=", 0)] = body.get_slice("=", 1)
+	_run.call_deferred()
+
+
+func _run() -> void:
+	var option: String = _args.get("option", "A")
+	var scene: String = _args.get("scene", "day")
+	_palette = _load_palette(OPTIONS_DIR % option + "palette.json")
+	_look = JSON.parse_string(FileAccess.get_file_as_string(OPTIONS_DIR % option + "look.json"))
+	var packed: PackedScene = load(STAGE_SCENE)
+	_stage = packed.instantiate() as StreetStage
+	_stage.auto_walk = false
+	_stage.integer_scale = SCREEN_SCALE
+	if scene == "night":
+		_stage.lighting = StreetStage.Lighting.RAIN_NIGHT
+	if scene == "map":
+		_stage.sprite_height_px = MAP_HEIGHT_PX
+	# The 4K TV frame: the game's 1920 x 1080 canvas at 2x is the logical 960 x 540 world at 4x; a
+	# 3840 x 2160 SubViewport holds it so the frame does not depend on the desktop's window limits.
+	var screen := SubViewport.new()
+	screen.size = WINDOW_PX
+	screen.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	root.add_child(screen)
+	screen.add_child(_stage)
+	await process_frame
+	_stage.street().visible = false
+	if scene == "map":
+		_build_map(option)
+	else:
+		_build_street(option, scene == "night")
+	_light(_block("night" if scene == "night" else "day"))
+	_post(option)
+	for _i: int in SETTLE_FRAMES:
+		await process_frame
+	await RenderingServer.frame_post_draw
+	var image := screen.get_texture().get_image()
+	var out: String = _args.get("out", "user://look.png")
+	DirAccess.make_dir_recursive_absolute(out.get_base_dir())
+	image.save_png(out)
+	print("LOOK_SAVED %s %dx%d" % [out, image.get_width(), image.get_height()])
+	quit(0)
+
+
+func _load_palette(path: String) -> Dictionary:
+	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var out := {}
+	for ramp: Dictionary in data["ramps"]:
+		var colours: Array = ramp["colours"]
+		for i: int in colours.size():
+			var hex: String = colours[i]
+			out["%s:%d" % [ramp["name"], i]] = Color.html(hex)
+	return out
+
+
+func _colour(key: String) -> Color:
+	return _palette.get(key, Color.MAGENTA)
+
+
+func _build_street(option: String, night: bool) -> void:
+	var kit: Node3D = (load(STREET_KIT) as PackedScene).instantiate()
+	_stage.world().add_child(kit)
+	_recolour(kit)
+	var post := kit.find_child("lantern_post", true, false) as GeometryInstance3D
+	if post != null:
+		post.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var dir := SPRITES_DIR % option
+	_stage.use_sheet(dir + "orc_look_%s.json" % option, "SE")
+	_stage.focus_on(STREET_FOCUS)
+	_stage.stand_at(ORC_AT)
+	var vampyr := _stage.add_merc(VAMPYR_AT)
+	_stage.show_frame_on(
+		vampyr, SheetFrame.from_manifest(dir + "vampyr_look_%s.json" % option, "SW")
+	)
+	for at: Vector3 in [ORC_AT, VAMPYR_AT]:
+		_blob(at)
+	if night:
+		var torch := _stage.world().get_node_or_null("Torch") as OmniLight3D
+		if torch != null:
+			torch.position = TORCH_AT
+			torch.light_color = _colour("fire:0")
+			torch.light_energy = _num(_block("night"), "torch_energy")
+			torch.omni_range = _num(_block("night"), "torch_range_m")
+		var flame := MeshInstance3D.new()
+		var ball := SphereMesh.new()
+		ball.radius = 0.07
+		ball.height = 0.16
+		ball.radial_segments = 6
+		ball.rings = 3
+		var hot := StandardMaterial3D.new()
+		hot.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		hot.albedo_color = _colour("fire:1")
+		ball.material = hot
+		flame.mesh = ball
+		flame.position = FLAME_AT
+		_stage.world().add_child(flame)
+		var rain := _stage.world().get_node_or_null("Rain") as GPUParticles3D
+		if rain != null:
+			rain.seed = RAIN_SEED
+			rain.restart()
+			var streak := rain.draw_pass_1 as QuadMesh
+			var wet := streak.material as StandardMaterial3D
+			wet.albedo_color = _colour(_str(_block("night"), "rain"))
+
+
+func _blob(at: Vector3) -> void:
+	var disc := MeshInstance3D.new()
+	var mesh := CylinderMesh.new()
+	mesh.top_radius = BLOB_RADIUS_M
+	mesh.bottom_radius = BLOB_RADIUS_M
+	mesh.height = 0.01
+	mesh.radial_segments = 12
+	var m := StandardMaterial3D.new()
+	m.albedo_color = _colour("soot:3")
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mesh.material = m
+	disc.mesh = mesh
+	disc.scale = Vector3(1.0, 1.0, 0.6)
+	disc.position = at + Vector3(0.0, 0.075, 0.0)
+	disc.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_stage.world().add_child(disc)
+
+
+func _build_map(option: String) -> void:
+	var kit: Node3D = (load(MAP_KIT) as PackedScene).instantiate()
+	_recolour(kit)
+	var holder := Node3D.new()
+	_stage.world().add_child(holder)
+	var rows := MAP_ROWS.size()
+	var cols := MAP_ROWS[0].length()
+	for j: int in rows:
+		for i: int in cols:
+			var key: String = TILE_NAMES[MAP_ROWS[j][i]]
+			var tile := kit.find_child(key, true, false) as Node3D
+			var copy := tile.duplicate() as Node3D
+			copy.position = _tile_centre(i, j, cols, rows)
+			if MAP_ROWS[j][i] in TURNABLE:
+				copy.rotation.y = PI / 2.0 * ((i * 7 + j * 13) % 4)
+			holder.add_child(copy)
+	var town := (kit.find_child("marker_town", true, false) as Node3D).duplicate() as Node3D
+	town.position = _tile_centre(TOWN_TILE.x, TOWN_TILE.y, cols, rows)
+	town.scale = Vector3.ONE * TOWN_SCALE
+	holder.add_child(town)
+	_stage.focus_on(MAP_FOCUS)
+	_stage.merc().visible = false
+	var dir := SPRITES_DIR % option
+	_token(
+		dir + "orc_token_%s.png" % option,
+		_tile_centre(BAND_TILE.x, BAND_TILE.y, cols, rows),
+		holder
+	)
+	_token(
+		dir + "vampyr_token_%s.png" % option,
+		_tile_centre(PARTY_TILE.x, PARTY_TILE.y, cols, rows),
+		holder
+	)
+	_banner(kit, "marker_banner_band", _tile_centre(BAND_TILE.x, BAND_TILE.y, cols, rows), holder)
+	_banner(
+		kit, "marker_banner_party", _tile_centre(PARTY_TILE.x, PARTY_TILE.y, cols, rows), holder
+	)
+	kit.free()
+
+
+func _tile_centre(i: int, j: int, cols: int, rows: int) -> Vector3:
+	return Vector3((i - cols / 2.0 + 0.5) * TILE_M, 0.0, (j - rows / 2.0 + 0.5) * TILE_M)
+
+
+func _banner(kit: Node3D, key: String, at: Vector3, holder: Node3D) -> void:
+	var pole := (kit.find_child(key, true, false) as Node3D).duplicate() as Node3D
+	pole.position = at + Vector3(0.75, 0.0, -0.2)
+	holder.add_child(pole)
+
+
+func _token(path: String, at: Vector3, holder: Node3D) -> void:
+	var image := Image.load_from_file(ProjectSettings.globalize_path(path))
+	var meta: Dictionary = JSON.parse_string(
+		FileAccess.get_file_as_string(path.get_basename() + ".json")
+	)
+	var pivot: Array = meta["pivot_px"]
+	var sprite := Sprite3D.new()
+	sprite.texture = ImageTexture.create_from_image(image)
+	sprite.centered = false
+	var px: float = pivot[0]
+	var py: float = pivot[1]
+	sprite.offset = Vector2(-px, py - image.get_height())
+	sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
+	sprite.shaded = false
+	sprite.no_depth_test = false
+	holder.add_child(sprite)
+	sprite.global_position = at
+	var camera := _stage.camera()
+	var forward: Vector3 = -camera.global_transform.basis.z
+	var depth := (at - camera.global_position).dot(forward)
+	sprite.pixel_size = _stage.texel_m() * depth / _stage.rail_distance_m()
+	var blob := MeshInstance3D.new()
+	var mesh := CylinderMesh.new()
+	mesh.top_radius = 0.5
+	mesh.bottom_radius = 0.5
+	mesh.height = 0.01
+	mesh.radial_segments = 10
+	var m := StandardMaterial3D.new()
+	m.albedo_color = _colour("soot:1")
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mesh.material = m
+	blob.mesh = mesh
+	blob.scale = Vector3(1.0, 1.0, 0.6)
+	blob.position = at + Vector3(0.0, 0.04, 0.0)
+	holder.add_child(blob)
+
+
+## Gives every surface named pal:<ramp>:<step> that palette colour: matte, flat, no specular.
+func _recolour(node: Node) -> void:
+	if node is MeshInstance3D:
+		var mi := node as MeshInstance3D
+		for s: int in mi.mesh.get_surface_count():
+			var source := mi.mesh.surface_get_material(s)
+			var tag := source.resource_name if source != null else ""
+			if not tag.begins_with("pal:"):
+				continue
+			var m := StandardMaterial3D.new()
+			m.albedo_color = _colour(tag.trim_prefix("pal:"))
+			m.roughness = 1.0
+			m.metallic_specular = 0.0
+			mi.set_surface_override_material(s, m)
+	for child: Node in node.get_children():
+		_recolour(child)
+
+
+func _light(spec: Dictionary) -> void:
+	var key := _stage.world().get_node("KeyLight") as DirectionalLight3D
+	key.rotation_degrees = Vector3(
+		-_num(spec, "elevation_degrees"), _num(spec, "azimuth_degrees"), 0.0
+	)
+	var c: Array = spec["color_rgb"]
+	key.light_color = _rgb(c)
+	key.light_energy = _num(spec, "energy")
+	key.shadow_enabled = true
+	key.shadow_bias = SHADOW_BIAS
+	key.shadow_normal_bias = SHADOW_NORMAL_BIAS
+	key.directional_shadow_max_distance = SHADOW_DISTANCE_M
+	var env := Environment.new()
+	env.background_mode = Environment.BG_COLOR
+	env.background_color = _colour(_str(spec, "sky"))
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	var a: Array = spec["ambient_rgb"]
+	env.ambient_light_color = _rgb(a)
+	env.ambient_light_energy = _num(spec, "ambient_energy")
+	(_stage.world().get_node("Ambient") as WorldEnvironment).environment = env
+
+
+func _post(_option: String) -> void:
+	var container := _stage.get_node("PixelScreen") as SubViewportContainer
+	var material := ShaderMaterial.new()
+	material.shader = load(POST_SHADER)
+	var labs := PackedVector3Array()
+	var rgbs := PackedVector3Array()
+	var penalty := PackedFloat32Array()
+	for key: String in _palette:
+		var col: Color = _palette[key]
+		rgbs.append(Vector3(col.r, col.g, col.b))
+		labs.append(_oklab(col))
+		var cost: float = RESERVED_PENALTY.get(key.get_slice(":", 0), 0.0)
+		penalty.append(cost)
+	material.set_shader_parameter("palette_rgb", rgbs)
+	material.set_shader_parameter("palette_lab", labs)
+	material.set_shader_parameter("palette_penalty", penalty)
+	material.set_shader_parameter("colour_count", rgbs.size())
+	material.set_shader_parameter("dither", _num(_block("post"), "dither"))
+	material.set_shader_parameter("logical_size", Vector2(_stage.logical_size()))
+	container.material = material
+
+
+func _oklab(col: Color) -> Vector3:
+	var r := _lin(col.r)
+	var g := _lin(col.g)
+	var b := _lin(col.b)
+	var l := pow(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b, 1.0 / 3.0)
+	var m := pow(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b, 1.0 / 3.0)
+	var s := pow(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b, 1.0 / 3.0)
+	return Vector3(
+		0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s,
+		1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s,
+		0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s
+	)
+
+
+func _lin(c: float) -> float:
+	return c / 12.92 if c <= 0.04045 else pow((c + 0.055) / 1.055, 2.4)
+
+
+func _block(name: String) -> Dictionary:
+	var block: Dictionary = _look.get(name, {})
+	return block
+
+
+func _num(block: Dictionary, key: String) -> float:
+	var value: float = block.get(key, 0.0)
+	return value
+
+
+func _str(block: Dictionary, key: String) -> String:
+	var value: String = block.get(key, "")
+	return value
+
+
+func _rgb(values: Array) -> Color:
+	var r: float = values[0]
+	var g: float = values[1]
+	var b: float = values[2]
+	return Color(r, g, b)

@@ -1,0 +1,68 @@
+GIMP Palette
+Name: MERCS look option B (Peat and Ochre)
+Columns: 6
+#
+ 23  18  15	soot_0
+ 38  30  25	soot_1
+ 53  43  36	soot_2
+ 69  57  47	soot_3
+ 52  57  61	slate_0
+ 79  82  81	slate_1
+109 109 103	slate_2
+139 137 125	slate_3
+171 166 147	slate_4
+ 43  43  42	iron_0
+ 74  73  70	iron_1
+108 106  99	iron_2
+144 141 130	iron_3
+182 177 163	iron_4
+ 43  28  17	soil_0
+ 70  49  31	soil_1
+ 99  72  46	soil_2
+130  97  62	soil_3
+162 122  78	soil_4
+ 50  31  15	timber_0
+ 80  56  30	timber_1
+112  82  46	timber_2
+147 110  63	timber_3
+182 139  81	timber_4
+142 125  93	bone_0
+165 149 116	bone_1
+189 174 140	bone_2
+214 199 164	bone_3
+239 225 189	bone_4
+ 76  45  31	skin_neutral_0
+111  76  56	skin_neutral_1
+147 109  84	skin_neutral_2
+185 144 113	skin_neutral_3
+224 180 143	skin_neutral_4
+ 40  48  22	skin_orc_0
+ 66  74  38	skin_orc_1
+ 94 102  55	skin_orc_2
+124 131  73	skin_orc_3
+155 161  92	skin_orc_4
+ 75  61  57	skin_pale_0
+110  95  88	skin_pale_1
+147 132 122	skin_pale_2
+185 171 157	skin_pale_3
+225 211 194	skin_pale_4
+122  58  38	cloth_faded_0
+160  87  58	cloth_faded_1
+ 55  71  79	cloth_faded_2
+ 89 112 111	cloth_faded_3
+ 30  42  18	verdure_0
+ 52  65  30	verdure_1
+ 76  89  43	verdure_2
+102 114  56	verdure_3
+128 140  70	verdure_4
+138  29  29	heraldry_0
+187  58  44	heraldry_1
+210 154  42	heraldry_2
+ 34  72 138	heraldry_3
+236 227 207	heraldry_4
+224 185  44	heraldry_5
+ 92  16  16	blood_0
+128  32  26	blood_1
+ 76  42  24	blood_2
+224 122  40	fire_0
+246 198  74	fire_1

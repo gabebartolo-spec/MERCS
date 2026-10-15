@@ -9,13 +9,13 @@
    "at": "mid",
    "offset_m": [
     0,
-    -0.02,
+    -0.04,
     0.02
    ],
    "size": [
-    0.62,
-    0.44,
-    0.56
+    0.68,
+    0.54,
+    0.62
    ]
   },
   "fauld": {
@@ -80,8 +80,8 @@
    "bone": "mixamorig:LeftForeArm",
    "at": "mid",
    "size": [
-    0.15,
-    0.15,
+    0.19,
+    0.19,
     0.75
    ],
    "along_bone": true
@@ -91,8 +91,8 @@
    "bone": "mixamorig:RightForeArm",
    "at": "mid",
    "size": [
-    0.15,
-    0.15,
+    0.19,
+    0.19,
     0.75
    ],
    "along_bone": true
@@ -102,8 +102,8 @@
    "bone": "mixamorig:LeftLeg",
    "at": "mid",
    "size": [
-    0.17,
-    0.17,
+    0.21,
+    0.21,
     0.8
    ],
    "along_bone": true
@@ -113,8 +113,8 @@
    "bone": "mixamorig:RightLeg",
    "at": "mid",
    "size": [
-    0.17,
-    0.17,
+    0.21,
+    0.21,
     0.8
    ],
    "along_bone": true
@@ -124,8 +124,8 @@
    "bone": "mixamorig:LeftUpLeg",
    "at": "mid",
    "size": [
-    0.24,
-    0.24,
+    0.31,
+    0.31,
     0.6
    ],
    "along_bone": true
@@ -135,8 +135,8 @@
    "bone": "mixamorig:RightUpLeg",
    "at": "mid",
    "size": [
-    0.24,
-    0.24,
+    0.31,
+    0.31,
     0.6
    ],
    "along_bone": true
@@ -158,9 +158,12 @@
    "top_size": 0.24
   },
   "axe_haft": {
+   "material": "timber",
    "shape": "cylinder",
    "group": "axe",
-   "contact": ["mixamorig:RightHand"],
+   "contact": [
+    "mixamorig:RightHand"
+   ],
    "bone": "mixamorig:RightHand",
    "offset_m": [
     0,
@@ -176,7 +179,9 @@
   "axe_blade": {
    "shape": "box",
    "group": "axe",
-   "contact": ["mixamorig:RightHand"],
+   "contact": [
+    "mixamorig:RightHand"
+   ],
    "bone": "mixamorig:RightHand",
    "offset_m": [
     0,
@@ -192,7 +197,9 @@
   "axe_spike": {
    "shape": "cone",
    "group": "axe",
-   "contact": ["mixamorig:RightHand"],
+   "contact": [
+    "mixamorig:RightHand"
+   ],
    "bone": "mixamorig:RightHand",
    "offset_m": [
     0,

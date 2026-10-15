@@ -1,0 +1,31 @@
+{
+  "_doc": "Look-target option B sprites: the orc and Vampyr stage-1 blockouts rendered by the sprite pipeline (CC0 MPFB bodies, Blender primitives for kit), reduced to the option's palette.",
+  "asset": "look_target/B/sprites",
+  "files": {
+    "orc_look_B.json": "87642bd8178a0a83dac17ad81e5b86775d4b022ae20414e714ac3d0e230aea7f",
+    "orc_look_B.png": "85e9e822c6b1fee39187c86203bf945af1b3c20318d5e61a9a48f87e90300d60",
+    "orc_look_B_normal.png": "4104688c81fc12e882e1867e8c17167d010ecefdbd11f7cdb8fdc7d5f026de89",
+    "orc_token_B.json": "a1da4839485cc375743333b2e7c3fe7d67abb7f9a5f0f85a03285b60f72fb1ab",
+    "orc_token_B.png": "989174e25a5121e4313971b83390d1915221cffa81c5eebeb45eca169a3a554e",
+    "vampyr_look_B.json": "cf5b90444c8fd3ce3a534fecb7ff65929d94b32fd4d05c86dd873f72265513fb",
+    "vampyr_look_B.png": "ad938ad022381dd395aaf7937e77ec538c22ea3cf02f78889de6c1fd051b5a3b",
+    "vampyr_look_B_normal.png": "c36ec865ad05c529af9857764b32ec720577aa83123b5a0514e99896bb9a59c3",
+    "vampyr_token_B.json": "a1da4839485cc375743333b2e7c3fe7d67abb7f9a5f0f85a03285b60f72fb1ab",
+    "vampyr_token_B.png": "d696c00c12a189e10510a7232353ea19340cb0af6f650914ea15c93d9e8edbf4"
+  },
+  "produced_by": {
+    "tools/pipeline/render_character.py": "d63ffb26d210188e",
+    "tools/pipeline/pixelate.py": "703232efdc481053",
+    "tools/pipeline/pack_sheets.py": "3fa9bc0dd2d20fb3",
+    "tools/look/build_sprites.py": "8fca4229f9ca88c8"
+  },
+  "models": [],
+  "licence_rows": [
+    "Blender",
+    "MPFB (MakeHuman Plugin for Blender)",
+    "Python, Pillow, NumPy"
+  ],
+  "seed": null,
+  "status": "DRAFT look-target option, not approved by the director",
+  "created": "2026-10-15"
+}

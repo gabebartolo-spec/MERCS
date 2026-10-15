@@ -104,3 +104,6 @@ here, or whose `models` list names a BANNED file.
 | Asset | Made from (licence rows) | Status | Provenance | Notes |
 |-------|--------------------------|--------|------------|-------|
 | `assets/sprites/mercs/average_m/average_m_body_rest` (.json, .png, _normal.png) | Blender, MPFB (CC0 base mesh and targets), Python | CLEARED | `average_m_body_rest.provenance.json` beside it | rendered by the sprite pipeline (no generative model, no clip); director's look pick 2026-10-09 (realistic, 84 px, 45° sprites in a 55° world); palette `master_draft` is still DRAFT, so the sheet is re-rendered when the palette is approved |
+| `assets/palette/options/{A,B,C}/` (palette .json/.gpl, swatch, look.json, pixelate.json) | Python | CLEARED | `provenance.json` in each folder | DRAFT look-target palettes (2026-10-15); review only until the director picks one |
+| `assets/look_target/kit/` (street_kit.glb, overworld_kit.glb) | Blender, Python | CLEARED | `provenance.json` beside them | modelled by script from primitives, no generative model; look-target prototype |
+| `assets/look_target/{A,B,C}/sprites/` (orc and Vampyr sheets, normals, map tokens) | Blender, MPFB (CC0 base mesh and targets), Python | CLEARED | `provenance.json` in each folder | stage-1 blockout bodies and kit, weapons left off; look-target prototype, re-rendered when the look is picked |

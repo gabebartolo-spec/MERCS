@@ -1,0 +1,44 @@
+{
+ "_doc": "Option B 'Peat and Ochre' lighting and post: low golden morning sun, warm brown ambient; night is a dim grey moon and a strong torch; light 4x4 ordered dither smooths the ramps.",
+ "day": {
+  "elevation_degrees": 35,
+  "azimuth_degrees": -50,
+  "color_rgb": [
+   1.0,
+   0.86,
+   0.66
+  ],
+  "energy": 1.35,
+  "ambient_rgb": [
+   0.58,
+   0.54,
+   0.46
+  ],
+  "ambient_energy": 0.62,
+  "sky": "bone:3"
+ },
+ "night": {
+  "elevation_degrees": 50,
+  "azimuth_degrees": -40,
+  "color_rgb": [
+   0.62,
+   0.62,
+   0.76
+  ],
+  "energy": 0.24,
+  "ambient_rgb": [
+   0.2,
+   0.18,
+   0.2
+  ],
+  "ambient_energy": 0.55,
+  "sky": "soot:1",
+  "torch_energy": 3.6,
+  "torch_range_m": 9.5,
+  "rain": "bone:0"
+ },
+ "post": {
+  "dither": 0.45
+ },
+ "schema": "mercs.look_option/1"
+}

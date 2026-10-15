@@ -1,0 +1,22 @@
+{
+  "_doc": "Look-target palette option B: hand-set ramp anchors, steps spaced in OKLab by script.",
+  "asset": "palette/options/B",
+  "files": {
+    "look.json": "07b5a4a45db8380761307200cbb116a421cbdb1cf0671c59a5c23fb2fbf0bb61",
+    "palette.gpl": "31dfefd7387f170745058ea75a80247b59a89b086d1a3805cb406568f740b5e5",
+    "palette.json": "ff899494e38c390a46ff7b3d4fc4bfa1ac6d15e5b5271bc2837550897150ebac",
+    "pixelate.json": "d45c8e4f7b04ed65a871ac1b36990966c21d4c8b010ea20ce3fc496e4cf7bac3",
+    "swatch.png": "3a5902f530a63887c524e4b19b0d59fdb339f550750bc37a839f53d4a15cdf57"
+  },
+  "produced_by": {
+    "tools/look/make_palettes.py": "12415640e5518654",
+    "tools/look/build_sprites.py": "8fca4229f9ca88c8"
+  },
+  "models": [],
+  "licence_rows": [
+    "Python, Pillow, NumPy"
+  ],
+  "seed": null,
+  "status": "DRAFT look-target option, not approved by the director",
+  "created": "2026-10-15"
+}

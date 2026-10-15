@@ -51,7 +51,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--variant", default="", help="variant in --proportions (default: its 'default')")
     p.add_argument("--kit", default="", help="stage gear kit json (tools/pipeline/kits/); blockout primitives on bones")
     p.add_argument("--kit-keep", default="", help="comma-separated kit piece name prefixes to keep (default all)")
-    p.add_argument("--pass", dest="render_pass", choices=("color", "normal", "parts", "layers"), default="color")
+    p.add_argument("--pass", dest="render_pass", choices=("color", "normal", "parts", "layers", "matid"), default="color")
     p.add_argument("--clip", default="", help="Mixamo FBX (vault) to retarget and sample; empty = rest pose")
     p.add_argument("--frames", type=int, default=8, help="frames sampled from one loop of --clip")
     p.add_argument("--loop-window", default="", help="LO-HI source frames: sample the best-matching sub-loop")
@@ -403,6 +403,7 @@ def apply_proportions(rig: bpy.types.Object, path: str, name: str, height_m: flo
 
 
 KIT_PREFIX = "kit_"
+DEFAULT_KIT_MATERIAL = "iron"  # a kit piece with no "material" is plate
 KIT_SHAPES = {"sphere": lambda: bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=8, radius=0.5),
               "box": lambda: bpy.ops.mesh.primitive_cube_add(size=1.0),
               "cylinder": lambda: bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.5, depth=1.0)}
@@ -446,6 +447,7 @@ def add_kit(rig: bpy.types.Object, path: str, keep: tuple[str, ...] = ()) -> dic
         obj = bpy.context.active_object
         obj.name = f"{KIT_PREFIX}{name}"
         obj["kit_group"] = piece.get("group", name)
+        obj["kit_material"] = piece.get("material", DEFAULT_KIT_MATERIAL)
         if piece.get("along_bone"):
             axis = (tail - head)
             size[2] *= axis.length
@@ -926,6 +928,39 @@ def apply_layers_pass(light: dict) -> dict:
     return groups
 
 
+MATID_COLOURS = {"skin": "#ff0000", "iron": "#00ff00", "timber": "#0000ff", "cloth": "#ffff00",
+                 "bone": "#ff00ff", "soot": "#00ffff", "leather": "#ff8000"}  # IDs, never shipped
+FEATURE_MATERIALS = (("tusk", "bone"), ("tooth", "bone"), ("teeth", "bone"), ("eye", "soot"), ("nail", "bone"))
+
+
+def apply_matid_pass() -> dict:
+    """Material IDs for the look target's ramp mapping: every mesh emits one flat ID colour (unlit, so a 1x
+    pixel's ID is exact): the body is skin, a kit piece its "material" (default iron), a body feature by name
+    (tusks bone). pixelate.py --matid maps each pixel's colour-pass shading step onto that material's ramp."""
+    out: dict = {}
+    for obj in bpy.data.objects:
+        if obj.type != "MESH":
+            continue
+        if obj.name.startswith(KIT_PREFIX):
+            key = obj.get("kit_material", DEFAULT_KIT_MATERIAL)
+        else:
+            low = obj.name.lower()
+            key = next((m for word, m in FEATURE_MATERIALS if word in low), "skin")
+        mat = bpy.data.materials.get(f"mercs_matid_{key}") or bpy.data.materials.new(f"mercs_matid_{key}")
+        mat.use_nodes = True
+        nodes = mat.node_tree.nodes
+        nodes.clear()
+        emit = nodes.new("ShaderNodeEmission")
+        emit.inputs["Color"].default_value = srgb_to_linear(MATID_COLOURS[key])
+        emit.inputs["Strength"].default_value = 1.0
+        outn = nodes.new("ShaderNodeOutputMaterial")
+        mat.node_tree.links.new(emit.outputs["Emission"], outn.inputs["Surface"])
+        obj.data.materials.clear()
+        obj.data.materials.append(mat)
+        out[obj.name] = key
+    return out
+
+
 def marks(rig: bpy.types.Object, cam: dict) -> dict:
     """1x cell pixel positions of MARK_BONES in the current render (QC crops find the contact points by these)."""
     from bpy_extras.object_utils import world_to_camera_view
@@ -994,6 +1029,8 @@ def main() -> None:
         apply_parts_pass()
     elif args.render_pass == "layers":
         layers = apply_layers_pass(light)
+    elif args.render_pass == "matid":
+        layers = apply_matid_pass()
     else:
         apply_material(light["body_material"])
     add_camera(cam)
