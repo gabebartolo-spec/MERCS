@@ -13,7 +13,7 @@ loop 8
 sim_world 11
 sim_encounters 11
 save 12
-effect 38
+effect 39
 overworld 14
 road 8
 company 21
