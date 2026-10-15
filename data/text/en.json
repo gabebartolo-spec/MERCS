@@ -154,6 +154,8 @@
   "hub.memory.prisoner.ransom": "{name} remembers the day the company sold a prisoner back for coin.",
   "hub.memory.prisoner.execute": "{name} remembers the day the company put a prisoner to death.",
   "hub.memory.prisoner.recruit": "{name} remembers the day the company took a prisoner on as one of its own.",
+  "hub.memory.standing.abandon": "{name} remembers the day the company walked away from a contract it had taken.",
+  "hub.memory.standing.grudge": "{name} remembers the day the company took the advance and walked away. Someone will not forget it.",
   "hub.close": "Close the hub",
   "injury.gash.name": "a gash",
   "injury.broken_arm.name": "a broken arm",
