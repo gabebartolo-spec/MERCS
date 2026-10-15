@@ -144,6 +144,18 @@ func _lines(merc: Merc) -> Array[String]:
 		var held := worn if worn != "" else Text.t("company.slot.empty")
 		slots.append(Text.t("company.slot." + slot, {"gear": held}))
 	lines.append("   ".join(slots))
+	lines.append_array(_memory_lines(merc))
+	return lines
+
+
+## What the merc remembers, one sentence a line (the story director holds the memories).
+func _memory_lines(merc: Merc) -> Array[String]:
+	var memory := StoryDirector.memory_of(self)
+	var entries: Array[Dictionary] = memory.of(merc.id) if memory != null else []
+	if entries.is_empty():
+		return [Text.t("company.memories_none")]
+	var lines: Array[String] = [Text.t("company.memories")]
+	lines.append_array(MemoryWords.lines(entries, company))
 	return lines
 
 

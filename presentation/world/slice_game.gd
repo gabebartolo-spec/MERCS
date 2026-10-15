@@ -70,8 +70,7 @@ func _ready() -> void:
 	_data = StageData.load_file(SLICE_DATA)
 	_stage = STAGE_SCENE.instantiate() as StreetStage
 	_stage.auto_walk = false
-	# The stage's logical screen (stage.json "pixel"), at the largest whole scale the window
-	# fits: x2 at 1080p, x4 at 4K.
+	# The stage's logical screen (stage.json "pixel"), at the largest whole scale that fits.
 	var stage_data := StageData.load_file(StreetStage.STAGE_DATA_PATH)
 	var logical_h := int(stage_data.num("pixel", "logical_height_px"))
 	_stage.integer_scale = maxi(
@@ -81,6 +80,7 @@ func _ready() -> void:
 	_setup_walkers()
 	_load_frames()
 	_build_hud()
+	StoryDirector.attach(self)
 	_sync()
 
 
