@@ -57,6 +57,10 @@ var ironman: bool:
 		_store.ironman = value
 ## The street battle on screen, else null.
 var view: BattleView = null
+## What opens after a won fight's triage is read (HubDirector.show_result); it only shows.
+var after_fight := Callable()
+## The triage after a road fight, shown until Continue; empty when none stands.
+var triage := ""
 
 var _layer: CanvasLayer = null
 var _store := CampaignSaves.new()
@@ -65,10 +69,7 @@ var _choosing := false
 var _walk: StageData = null
 var _walking := false
 var _wait_s := 0.0
-## The triage after a road fight, shown until Continue; empty when none stands.
-var _triage := ""
-## What waits for Continue: the hub's loot and prisoner (the world's result hook), so the
-## triage comes first.
+## What waits for Continue: only the hub shown on a won fight's result (applied at its end).
 var _after_triage := Callable()
 ## Set when the triage left nobody alive: the saved campaign is over and Continue ends it.
 var _ended := false
@@ -162,7 +163,7 @@ func in_fight() -> bool:
 func toggle() -> void:
 	if not is_open():
 		set_open(true)
-	elif in_fight() or _triage != "" or _ended:
+	elif in_fight() or triage != "" or _ended:
 		return
 	elif world.at == RegionGen.HUB_ID and world.encounter.is_empty():
 		set_open(false)
@@ -185,7 +186,7 @@ func set_open(open: bool) -> void:
 ## steps at once, a held key repeats (data/balance/overworld.json "walk"). Nothing while the
 ## map is hidden, a fight is on or an encounter stands.
 func walk(direction: Vector2i, delta: float) -> void:
-	var held := not world.encounter.is_empty() or _triage != "" or _ended or _choosing
+	var held := not world.encounter.is_empty() or triage != "" or _ended or _choosing
 	if not is_open() or in_fight() or held or direction == Vector2i.ZERO:
 		_walking = false
 		return
@@ -200,9 +201,10 @@ func walk(direction: Vector2i, delta: float) -> void:
 		_step(direction)
 
 
-## One step in the sim, then what it led to: an encounter's panel, the street at the hub's
-## gate, a site's line, or the map redrawn.
+## One step in the sim, then what it led to: an encounter's panel, the street at the hub's gate,
+## a site's line, or the map redrawn. Saved (Ironman) when it meets an encounter or ends a day.
 func _step(direction: Vector2i) -> void:
+	var day := world.day
 	if not world.step(direction):
 		var line := OverworldWords.blocked(world, direction)
 		if panel.shown_body() != line:
@@ -211,13 +213,14 @@ func _step(direction: Vector2i) -> void:
 	if not world.encounter.is_empty():
 		_walking = false
 		_show("")
-		autosave()
 	elif world.at == RegionGen.HUB_ID:
 		set_open(false)
 	elif panel.shown_body() != _place_line():
 		_show(_place_line())
 	else:
 		map.show_world(world)
+	if world.day != day or not world.encounter.is_empty():
+		autosave()
 
 
 ## What the panel says where the band stands: a site's line at a site, else how to walk.
@@ -240,7 +243,7 @@ func _on_choice(choice_id: String) -> void:
 			FieldCommand.set_out(company, choice_id == FIGHT_SIT_OUT)
 			_start_fight()
 		CONTINUE:
-			_triage = ""
+			triage = ""
 			if _ended:
 				panel.visible = false
 				wiped.emit(company, wounds.chronicle(), wounds.memory())
@@ -249,7 +252,6 @@ func _on_choice(choice_id: String) -> void:
 			if _after_triage.is_valid():
 				_after_triage.call()
 			_after_triage = Callable()
-			autosave()
 		TOLL:
 			world.pay_toll()
 			autosave()
@@ -262,17 +264,17 @@ func _on_choice(choice_id: String) -> void:
 			save_run()
 
 
-## Writes the run to the save on disk and says so. Refused, with nothing written, while a
-## fight is on or its triage stands: a fight lives only on screen (a save then would hold the
-## world after the blow-by-blow it cannot replay), so the save waits for Continue. The fight's
-## own panel is not touched (its buttons are the player's turn); the triage panel keeps its
-## Continue and gains the line that says why. True when written.
+## Writes the run to the save on disk and says so. Refused, with nothing written, while a fight
+## is on or its triage stands: a fight lives only on screen (a save then would hold the world
+## after the blow-by-blow it cannot replay), so the save waits for Continue. The fight's own panel
+## is untouched (its buttons are the player's turn); the triage panel keeps Continue and gains the
+## line that says why. True when written.
 func save_run() -> bool:
 	if in_fight():
 		return false
-	if _triage != "":
+	if triage != "":
 		var choices: Array[Dictionary] = [{"id": CONTINUE, "label": Text.t("wiring.continue")}]
-		var body := Text.t("world.panel.save_busy") + "\n" + _triage
+		var body := Text.t("world.panel.save_busy") + "\n" + triage
 		panel.present(Text.t("wiring.panel.title"), body, choices)
 		return false
 	var saved := _store.write()
@@ -306,7 +308,8 @@ func _start_fight(taken: Array[Dictionary] = []) -> void:
 		_on_fight_over()
 
 
-## The battle ended: the fighters leave the street, the sim applies the result, the map returns.
+## The battle ended: the fighters leave the street, the sim applies the result (the hub's loot,
+## prisoners and jobs with it, unless nobody is left), the map returns, and the run is saved last.
 func _on_fight_over() -> void:
 	_store.end_fight()
 	var result := EncounterBattle.result(view.battle)
@@ -315,16 +318,16 @@ func _on_fight_over() -> void:
 	view = null
 	var events := wounds.resolve()
 	FieldCommand.finish(company)
-	var kind := str(world.encounter.get("type", ""))
 	var hook := world.result_hook
-	world.result_hook = Callable()
+	if wounds.ended():
+		world.result_hook = Callable()
 	world.resolve_encounter(result)
 	world.result_hook = hook
-	_after_triage = hook.bind(kind, result) if hook.is_valid() else Callable()
+	_after_triage = after_fight if result.get("won", false) == true else Callable()
 	map.visible = true
 	if wounds.ended():
 		_end_campaign()
-	_triage = RoadFight.triage_body(_outcome_line(), events, wounds)
+	triage = RoadFight.triage_body(_outcome_line(), events, wounds)
 	_show(_outcome_line())
 	_show_triage()
 	if not _ended:
@@ -337,9 +340,13 @@ func autosave() -> void:
 	_store.autosave()
 
 
-## The company is dead to the last merc: the save is marked ended at once (so closing the game
-## here cannot resume it), the hub's loot and prisoner fall away, and Continue leads to the
-## last screen.
+## An observer that catches up on its own, run before every write (CampaignSaves "Save order").
+func before_save(observer: Callable) -> void:
+	_store.before_save(observer)
+
+
+## The company is dead to the last merc: the save is marked ended at once (closing the game here
+## cannot resume it), the hub's loot and prisoner fall away, and Continue leads to the last screen.
 func _end_campaign() -> void:
 	_ended = true
 	_after_triage = Callable()
@@ -348,10 +355,10 @@ func _end_campaign() -> void:
 
 ## The triage panel after a road fight: what happened to whom, and Continue to the map.
 func _show_triage() -> void:
-	if _triage == "":
+	if triage == "":
 		return
 	var choices: Array[Dictionary] = [{"id": CONTINUE, "label": Text.t("wiring.continue")}]
-	panel.present(Text.t("wiring.panel.title"), _triage, choices)
+	panel.present(Text.t("wiring.panel.title"), triage, choices)
 
 
 ## The last encounter log entry in words: what the company won, lost or paid.
