@@ -39,6 +39,7 @@ func suite_name() -> String:
 func run_checks() -> void:
 	_check_settings()
 	_check_text_size()
+	_check_no_function_keys()
 	_check_autoloads()
 	_check_scripts_compile()
 	await _check_main_scene()
@@ -60,6 +61,19 @@ func _check_text_size() -> void:
 	check(
 		size >= MIN_FONT_SIZE, "the base text size is at least %d, not %d" % [MIN_FONT_SIZE, size]
 	)
+
+
+## Director, 2026-10-15: "function buttons dont work on my keyboard": no command may need one.
+func _check_no_function_keys() -> void:
+	var paths: Array[String] = []
+	_collect_scripts("res://presentation", paths)
+	_collect_scripts("res://ui", paths)
+	var pattern := RegEx.create_from_string("KEY_F[0-9]")
+	var found: Array[String] = []
+	for path: String in paths:
+		if pattern.search(FileAccess.get_file_as_string(path)) != null:
+			found.append(path)
+	check(found.is_empty(), "no function key is bound in presentation or ui: %s" % [found])
 
 
 func _check_autoloads() -> void:
