@@ -128,13 +128,7 @@ func _check_triage_panel(game: SliceGame, director: OverworldDirector) -> void:
 			}
 		)
 		lines_ok = lines_ok and body.contains(line)
-	var xp_lines := 0
-	for merc: Merc in director.company.roster:
-		xp_lines += 1 if body.contains("%s: +" % director.company.name_of(merc.id)) else 0
-	_check.call(
-		xp_lines == director.company.roster.size() and body.contains(" XP"),
-		"triage panel: one XP line for each surviving merc: %s" % body.replace("\n", " | ")
-	)
+	_check_xp_lines(director, body)
 	var shared := StoryDirector.memory_of(director)
 	var hud: CanvasLayer = game.get(&"_hud")
 	_check.call(
@@ -152,6 +146,17 @@ func _check_triage_panel(game: SliceGame, director: OverworldDirector) -> void:
 			"triage panel: each death with its chronicle line, Continue only, no key help: %s"
 			% body.replace("\n", " | ")
 		)
+	)
+
+
+## The triage panel names each surviving merc with his XP gain.
+func _check_xp_lines(director: OverworldDirector, body: String) -> void:
+	var xp_lines := 0
+	for merc: Merc in director.company.roster:
+		xp_lines += 1 if body.contains("%s: +" % director.company.name_of(merc.id)) else 0
+	_check.call(
+		xp_lines == director.company.roster.size() and body.contains(" XP"),
+		"triage panel: one XP line for each surviving merc: %s" % body.replace("\n", " | ")
 	)
 
 
