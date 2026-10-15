@@ -2,7 +2,8 @@
 
   python tools/pipeline/palette_lib.py swatch tools/pipeline/palette/master_draft.json <out.png>
 
-A palette file is `mercs.palette/1`: an id, a status, and named ramps of #rrggbb colours. The
+A palette file is `mercs.palette/1`: an id, a status, and named ramps of #rrggbb colours. A biome
+palette also names its "core" file (relative path): loading it gives the core ramps, then its own. The
 colour index is the position in the flattened ramp list. The swatch is a review image: one row
 per ramp, the ramp name, its colours as squares, and the palette status in the title.
 """
@@ -66,6 +67,11 @@ def load_palette(path: Path | str) -> Palette:
     if data.get("schema") != PALETTE_SCHEMA:
         raise ValueError(f"{path}: schema is not {PALETTE_SCHEMA}")
     ramps = [(r["name"], [hex_to_rgb(c) for c in r["colours"]]) for r in data["ramps"]]
+    if "core" in data:  # a biome palette: the core ramps (never change) first, then the biome's own
+        core_path = (path.parent / data["core"]).resolve()
+        core = load_palette(core_path)
+        ramps = core.ramps + ramps
+        raw = core_path.read_bytes() + raw
     flat = [c for _, cs in ramps for c in cs]
     if len(set(flat)) != len(flat):
         raise ValueError(f"{path}: duplicate colours")

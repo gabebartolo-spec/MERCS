@@ -1,0 +1,134 @@
+{
+ "_doc": "Light and post for each look-target option (tools/look/make_palettes.py writes them beside the palettes). day/night: key light elevation, azimuth, colour, energy; ambient colour and energy; sky palette colour; night torch and rain colour. post.dither: ordered-dither strength in the palette snap (0 = none). B was picked by the director on 2026-10-15 and is the heartland biome.",
+ "options": {
+  "A": {
+   "_doc": "Option A 'Ash and Hearth' lighting and post: overcast-white day sun, cool grey ambient; night is a weak blue moon and one warm torch; no dither. Sun and ambient energy +5% (director, 2026-10-15: \"the lighting could stand to be 5% brighter\").",
+   "day": {
+    "elevation_degrees": 50,
+    "azimuth_degrees": -35,
+    "color_rgb": [
+     1.0,
+     0.95,
+     0.88
+    ],
+    "energy": 1.1025,
+    "ambient_rgb": [
+     0.62,
+     0.66,
+     0.72
+    ],
+    "ambient_energy": 0.7875,
+    "sky": "slate:4"
+   },
+   "night": {
+    "elevation_degrees": 55,
+    "azimuth_degrees": -30,
+    "color_rgb": [
+     0.55,
+     0.62,
+     0.85
+    ],
+    "energy": 0.294,
+    "ambient_rgb": [
+     0.16,
+     0.19,
+     0.28
+    ],
+    "ambient_energy": 0.5775,
+    "sky": "soot:0",
+    "torch_energy": 3.0,
+    "torch_range_m": 9.5,
+    "rain": "slate:2"
+   },
+   "post": {
+    "dither": 0.0
+   }
+  },
+  "B": {
+   "_doc": "Option B 'Peat and Ochre' lighting and post: low golden morning sun, warm brown ambient; night is a dim grey moon and a strong torch; light 4x4 ordered dither smooths the ramps. Sun and ambient energy +5% (director, 2026-10-15: \"the lighting could stand to be 5% brighter\").",
+   "day": {
+    "elevation_degrees": 35,
+    "azimuth_degrees": -50,
+    "color_rgb": [
+     1.0,
+     0.86,
+     0.66
+    ],
+    "energy": 1.4175,
+    "ambient_rgb": [
+     0.58,
+     0.54,
+     0.46
+    ],
+    "ambient_energy": 0.651,
+    "sky": "bone:3"
+   },
+   "night": {
+    "elevation_degrees": 50,
+    "azimuth_degrees": -40,
+    "color_rgb": [
+     0.62,
+     0.62,
+     0.76
+    ],
+    "energy": 0.252,
+    "ambient_rgb": [
+     0.2,
+     0.18,
+     0.2
+    ],
+    "ambient_energy": 0.5775,
+    "sky": "soot:1",
+    "torch_energy": 3.6,
+    "torch_range_m": 9.5,
+    "rain": "bone:0"
+   },
+   "post": {
+    "dither": 0.45
+   }
+  },
+  "C": {
+   "_doc": "Option C 'Clear Day' lighting and post: high bright noon sun with cool blue shadows; night is a blue moon with violet ambient and a torch; no dither. Sun and ambient energy +5% (director, 2026-10-15: \"the lighting could stand to be 5% brighter\").",
+   "day": {
+    "elevation_degrees": 60,
+    "azimuth_degrees": -30,
+    "color_rgb": [
+     1.0,
+     0.97,
+     0.92
+    ],
+    "energy": 1.6275,
+    "ambient_rgb": [
+     0.55,
+     0.62,
+     0.82
+    ],
+    "ambient_energy": 0.63,
+    "sky": "slate:4"
+   },
+   "night": {
+    "elevation_degrees": 55,
+    "azimuth_degrees": -30,
+    "color_rgb": [
+     0.5,
+     0.6,
+     1.0
+    ],
+    "energy": 0.336,
+    "ambient_rgb": [
+     0.15,
+     0.16,
+     0.34
+    ],
+    "ambient_energy": 0.63,
+    "sky": "soot:0",
+    "torch_energy": 3.0,
+    "torch_range_m": 9.5,
+    "rain": "slate:3"
+   },
+   "post": {
+    "dither": 0.0
+   }
+  }
+ }
+}

@@ -19,8 +19,24 @@ Consistency comes from contracts, not from prompts.
 
 ## 2. Palette contract
 
-Master palette `assets/palette/mercs_master.gpl` (GIMP format, also exported JSON). Target 48–64
-colours in named ramps of 5–6 steps each **[D: final count after samples]**:
+The master palette is look target B, "Peat and Ochre" (director, 2026-10-15), split in two so the
+world can change colour by biome while the mercs never do:
+
+- **Core** `assets/palette/core.json` (+ `.gpl`): the ramps that never change: `soot` (outline),
+  `iron`, `bone`, the skin ramps, `cloth_faded`, `heraldry`, `blood`, `fire`. The mercs' bodies and
+  gear and the UI subset draw only from core.
+- **Biome** `assets/palette/biomes/<name>.json` (+ `.gpl`, which includes the core colours): the
+  world's ramps (`slate` for stone, sky and water; `soil`; `timber`; `verdure`) plus the biome's
+  light (sun, ambient, sky, night torch and rain, post dither). The file names its core; loading a
+  biome gives core then biome. Today there is one biome, `heartland`; later biomes (kingdoms,
+  landscapes) are new files with the same ramp names (director, 2026-10-15). No new biome without a
+  director decision.
+- Every frame and asset is validated against core + one biome (`validate_palette.py`,
+  `validate_pixels.py --palette <biome>.json`); core + biome holds 48–64 colours (heartland: 44 + 20).
+- Built by `tools/look/make_palettes.py` (ramps spaced in OKLab between hand-set anchors); options A
+  and C, not picked, are kept as review records in `docs/audits/look_target/options/`.
+
+Ramps (5–6 steps each, 4 for `soot`):
 
 | Ramp | Purpose |
 |------|---------|
@@ -117,9 +133,16 @@ the same file.
 ## 8. Golden references
 
 `assets/golden/` holds, once approved: `street_day.png`, `street_rain_night.png`,
-`merc_sheet_average.png`, `merc_sheet_giant.png`, `portrait_sheet_01.png`, `battle_frame.png`,
-`inspect_screen.png`. Every asset PR shows its output beside the relevant golden image. A golden
-image changes only by director decision recorded in DECISIONS.md.
+`overworld_map.png`, `merc_sheet_average.png`, `merc_sheet_giant.png`, `portrait_sheet_01.png`,
+`battle_frame.png`, `inspect_screen.png`. Every asset PR shows its output beside the relevant golden
+image. A golden image changes only by director decision recorded in DECISIONS.md.
+
+Approved so far (look target B, heartland, director 2026-10-15): `street_day.png`,
+`street_rain_night.png`, `overworld_map.png`. They are stored at 1x logical size (960 x 540: one file
+pixel per art pixel, so they pass the no-mixel check); the game shows them at 4x on a 4K TV. They are
+captures of the real street stage by `tools/look/look_target.gd` (one camera, light, pixel and
+palette rig) with stage-1 blockout figures: they fix palette, light and finish, not figure shapes.
+Raw 3840 x 2160 frames are in the vault (`D:/MERCS-vault/renders/look_2026-10-15/`).
 
 ## 9. The review test
 

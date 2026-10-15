@@ -1,0 +1,19 @@
+{
+  "_doc": "Biome palettes; heartland is look option B with its light.",
+  "asset": "palette/biomes",
+  "files": {
+    "heartland.gpl": "92690b91e327b67d65c8d12414279cf7f9071155dd748dd245957aa209b4a7a7",
+    "heartland.json": "fcb56860684ec1f626a1cd9e4b459a33831664a568d23273f1585c2116c99e97",
+    "heartland_swatch.png": "d8906557099281391cf6769b9f664b563f046d5b80d58ff1571010ee6f15d1db"
+  },
+  "produced_by": {
+    "tools/look/make_palettes.py": "27119c6bd43da2bc"
+  },
+  "models": [],
+  "licence_rows": [
+    "Python, Pillow, NumPy"
+  ],
+  "seed": null,
+  "status": "APPROVED: look target B 'Peat and Ochre', director 2026-10-15",
+  "created": "2026-10-15"
+}

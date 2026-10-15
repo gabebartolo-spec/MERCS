@@ -1,0 +1,158 @@
+{
+ "_doc": "Look-target option A, 'Ash and Hearth': grim and muted: cool, low-chroma greys and browns; warmth only from fire and heraldry. Not picked (director chose B, 2026-10-15); kept as a review record. Built by tools/look/make_palettes.py.",
+ "schema": "mercs.palette/1",
+ "id": "look_option_A",
+ "name": "Ash and Hearth",
+ "status": "NOT PICKED",
+ "approved": false,
+ "ramps": [
+  {
+   "name": "soot",
+   "purpose": "outlines, iron shadow, charred wood, night",
+   "colours": [
+    "#121114",
+    "#201d20",
+    "#2e2a2c",
+    "#3d3739"
+   ]
+  },
+  {
+   "name": "slate",
+   "purpose": "stone, steel shadow, sky, water",
+   "colours": [
+    "#2e3540",
+    "#49505a",
+    "#666d75",
+    "#858b91",
+    "#a5aaae"
+   ]
+  },
+  {
+   "name": "iron",
+   "purpose": "mail, plate, blades",
+   "colours": [
+    "#292c30",
+    "#484b4d",
+    "#696c6d",
+    "#8d8f8e",
+    "#b2b3b0"
+   ]
+  },
+  {
+   "name": "soil",
+   "purpose": "ground, mud, leather lowlights",
+   "colours": [
+    "#231b15",
+    "#3a2f25",
+    "#524436",
+    "#6c5a47",
+    "#87715a"
+   ]
+  },
+  {
+   "name": "timber",
+   "purpose": "wood, thatch, leather",
+   "colours": [
+    "#2d2019",
+    "#473528",
+    "#634c38",
+    "#806448",
+    "#9e7d59"
+   ]
+  },
+  {
+   "name": "bone",
+   "purpose": "linen, plaster, bone, tusks",
+   "colours": [
+    "#867c6c",
+    "#9d9483",
+    "#b5ad9b",
+    "#cec6b4",
+    "#e7e0cd"
+   ]
+  },
+  {
+   "name": "skin_neutral",
+   "purpose": "the one skin ramp sprites render in; recoloured by index",
+   "colours": [
+    "#4a2e22",
+    "#6c4d3d",
+    "#906d59",
+    "#b69077",
+    "#ddb497"
+   ]
+  },
+  {
+   "name": "skin_orc",
+   "purpose": "the orc's skin (index-mapped from skin_neutral)",
+   "colours": [
+    "#242d1f",
+    "#3c4632",
+    "#576145",
+    "#727d5a",
+    "#8f9a70"
+   ]
+  },
+  {
+   "name": "skin_pale",
+   "purpose": "the Vampyr's skin (index-mapped from skin_neutral)",
+   "colours": [
+    "#463c45",
+    "#685e65",
+    "#8b8386",
+    "#b1aaa9",
+    "#d8d2cd"
+   ]
+  },
+  {
+   "name": "cloth_faded",
+   "purpose": "commoner and dark cloth: dull red pair, dull blue pair",
+   "colours": [
+    "#5e3530",
+    "#86524a",
+    "#36435a",
+    "#566780"
+   ]
+  },
+  {
+   "name": "verdure",
+   "purpose": "grass, moss, leaves",
+   "colours": [
+    "#1b2924",
+    "#2e3d36",
+    "#425349",
+    "#566a5d",
+    "#6c8172"
+   ]
+  },
+  {
+   "name": "heraldry",
+   "purpose": "faction colours only: crimson, gold, blue, white, yellow",
+   "colours": [
+    "#8e1b24",
+    "#b8323a",
+    "#c9962b",
+    "#23468c",
+    "#e9e6dc",
+    "#d9b92e"
+   ]
+  },
+  {
+   "name": "blood",
+   "purpose": "overlay only: two reds and a dried brown",
+   "colours": [
+    "#5c0f12",
+    "#7e1a1c",
+    "#4a2a1e"
+   ]
+  },
+  {
+   "name": "fire",
+   "purpose": "torch and ember accents",
+   "colours": [
+    "#d9762b",
+    "#f2c14e"
+   ]
+  }
+ ]
+}

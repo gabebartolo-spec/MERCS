@@ -23,6 +23,10 @@ tests/fixtures/pipeline/**/*.png -filter -diff -merge
 # Engine sprite sheets (pixel art, kilobytes each): plain git, so CI's checkout (no LFS) and
 # the exported build get the real PNGs and runs cost no LFS bandwidth. Big binaries stay LFS.
 assets/sprites/**/*.png -filter -diff -merge
+# Look-target sprites and palette swatches: the same reason (the assets suite and the pixel lint
+# read them in CI). The look-target .glb kits stay LFS (only the local capture tool loads them).
+assets/look_target/**/*.png -filter -diff -merge
+assets/palette/**/*.png -filter -diff -merge
 
 # Pixel validator fixtures (validate_pixels.py reads these)
 tests/fixtures/pixels/**/*.png -filter -diff -merge

@@ -26,3 +26,15 @@ description = "High-entropy sk- style API key"
 regex = '''\bsk-[A-Za-z0-9_-]{24,}'''
 entropy = 4.0
 keywords = ["sk-"]
+
+# Art provenance manifests list each file with its SHA-256. A file named *_token_* (a map token
+# sprite) puts the word "token" beside a 64-hex value, which the default generic-api-key rule reads
+# as a key. Excused only on a line that is exactly a quoted asset file name (.png/.json/.gpl/.glb)
+# and a lowercase SHA-256 (the provenance.json "files" shape): any other line in any file, including
+# a key in a provenance.json, still fails. No path rule: in gitleaks 8.24.3 (pinned by CI) a path in
+# the global [allowlist] excuses the whole file whatever "condition" says (tested locally), and
+# 8.24.3 ignores the newer [[allowlists]] / targetRules syntax.
+[allowlist]
+description = "SHA-256 file hashes in art provenance manifests"
+regexTarget = "line"
+regexes = ['''^\s*"[A-Za-z0-9_.-]+\.(png|json|gpl|glb)": "[0-9a-f]{64}",?\s*$''']

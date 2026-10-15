@@ -157,6 +157,24 @@ def case_pixels(name: str, extra: list[str], want: set[str]) -> list[str]:
     return problems
 
 
+def case_biome() -> list[str]:
+    """A biome palette brings its core (06 section 2): heartland = core ramps then the biome's, and a
+    golden frame passes against core + heartland but not against core alone."""
+    from palette_lib import load_palette
+    core = ROOT / "assets" / "palette" / "core.json"
+    biome = ROOT / "assets" / "palette" / "biomes" / "heartland.json"
+    golden = ROOT / "assets" / "golden" / "street_day.png"
+    problems = []
+    pal, base = load_palette(biome), load_palette(core)
+    if pal.ramps[:len(base.ramps)] != base.ramps or len(pal.colours) <= len(base.colours):
+        problems.append("heartland does not start with the core ramps")
+    if run(["tools/pipeline/validate_palette.py", "--palette", str(biome), str(golden)]).returncode != 0:
+        problems.append("street_day.png fails against core + heartland")
+    if run(["tools/pipeline/validate_palette.py", "--palette", str(core), str(golden)]).returncode != 1:
+        problems.append("street_day.png passes against core alone (the biome ramps are not being checked)")
+    return problems
+
+
 def main() -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -165,6 +183,7 @@ def main() -> int:
     results += [(f"pixels/{n}{'+palette' if e else ''}", case_pixels(n, e, w)) for n, e, w in PIXEL_CASES]
     results.append(("rebuild/byte-identical", case_rebuild()))
     results.append(("normals/reduce", case_normals()))
+    results.append(("palette/core+biome", case_biome()))
     width = max(len(label) for label, _ in results)
     for label, problems in results:
         if problems:

@@ -1,0 +1,201 @@
+{
+  "schema": "mercs.sheet/1",
+  "body": "orc",
+  "layer": "body",
+  "clip": "rest",
+  "image": "orc_look_A.png",
+  "image_pixel_sha256": "be81d5199b3891263184eb156bb7de8ceed610d4410f2e0792fc9b9bab9db62f",
+  "frame_w": 176,
+  "frame_h": 176,
+  "frame_count": 8,
+  "frames_per_facing": 1,
+  "facings": [
+    "S",
+    "SE",
+    "E",
+    "NE",
+    "N",
+    "NW",
+    "W",
+    "SW"
+  ],
+  "frames": [
+    {
+      "facing": "S",
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "w": 176,
+      "h": 176
+    },
+    {
+      "facing": "SE",
+      "index": 1,
+      "x": 176,
+      "y": 0,
+      "w": 176,
+      "h": 176
+    },
+    {
+      "facing": "E",
+      "index": 2,
+      "x": 352,
+      "y": 0,
+      "w": 176,
+      "h": 176
+    },
+    {
+      "facing": "NE",
+      "index": 3,
+      "x": 528,
+      "y": 0,
+      "w": 176,
+      "h": 176
+    },
+    {
+      "facing": "N",
+      "index": 4,
+      "x": 704,
+      "y": 0,
+      "w": 176,
+      "h": 176
+    },
+    {
+      "facing": "NW",
+      "index": 5,
+      "x": 880,
+      "y": 0,
+      "w": 176,
+      "h": 176
+    },
+    {
+      "facing": "W",
+      "index": 6,
+      "x": 1056,
+      "y": 0,
+      "w": 176,
+      "h": 176
+    },
+    {
+      "facing": "SW",
+      "index": 7,
+      "x": 1232,
+      "y": 0,
+      "w": 176,
+      "h": 176
+    }
+  ],
+  "pivot": {
+    "x": 88,
+    "y": 152,
+    "doc": "feet centre in frame pixels, the same in every frame"
+  },
+  "palette": {
+    "id": "look_option_A",
+    "file": "docs/audits/look_target/options/A/palette.json",
+    "sha256": "acd801952a9ffacc4584670e6f9cf4693f9b0d34dc414d9e0249bff3f4bc4b47",
+    "status": "NOT PICKED"
+  },
+  "provenance": {
+    "sources": [
+      {
+        "file": "facing_0_S.png",
+        "kind": "render_4x",
+        "sha256": "5d473ada1a619f1427c3fb825a12620069a7be2c582d7862ae794091f4a9cb7f"
+      },
+      {
+        "file": "facing_1_SE.png",
+        "kind": "render_4x",
+        "sha256": "40da9c0e10154ad5910158cf2a21a561765062c5d3910fc52a313cb5a54ec139"
+      },
+      {
+        "file": "facing_2_E.png",
+        "kind": "render_4x",
+        "sha256": "e9ed15e6d3f2e98bdfe0adc811016738c2699af42ac1948393aae7c253a525f6"
+      },
+      {
+        "file": "facing_3_NE.png",
+        "kind": "render_4x",
+        "sha256": "12ab0ef4f2cee28a35a5f4ddeb62886d7003eb429dbe262314696d0dbe5c2771"
+      },
+      {
+        "file": "facing_4_N.png",
+        "kind": "render_4x",
+        "sha256": "8b7d8fbaaa3bab8cbb6a943e55f703c3577584661bd56c1b0f37d529a19146dc"
+      },
+      {
+        "file": "facing_5_NW.png",
+        "kind": "render_4x",
+        "sha256": "51c55644a998ee0d7d34bbf7c722a972f0a7ea5b56198194f3ab2e7d303fe4d8"
+      },
+      {
+        "file": "facing_6_W.png",
+        "kind": "render_4x",
+        "sha256": "d65aca107b41c5af6f8b861b74b775997b72160775b74fd8c8608eeb8f3c75e4"
+      },
+      {
+        "file": "facing_7_SW.png",
+        "kind": "render_4x",
+        "sha256": "e53d9c98e1f3f3eecb62ef036bb068b1ba356c5441e9f38f88ba613f613f9a32"
+      }
+    ],
+    "inputs": {
+      "body_blend": {
+        "file": "tools/pipeline/bodies/orc.blend",
+        "sha256": "a552a626f4b1309b20ab98f654405e3f8918166d88916d93435940f87cac41df"
+      },
+      "camera_rig": {
+        "file": "tools/pipeline/camera_rig.json",
+        "sha256": "c67f2acbf991807339bc45b1ed927c0cecd04af73edd7d88819a6ffc0bb8cdc8"
+      },
+      "light_rig": {
+        "file": "tools/pipeline/light_rig.json",
+        "sha256": "c246e0a0750c346e72d157f94127d301898fdb47e488b8db81d938b3626212b3"
+      },
+      "render_script": {
+        "file": "tools/pipeline/render_character.py",
+        "sha256": "d63ffb26d210188e854d47161bfa98171a8c39b7f3ed353166ca8be31d7767c3"
+      },
+      "proportions": {
+        "file": "tools/pipeline/proportions.json",
+        "sha256": "f0722e47bb29a53294e8db4b691c13b6b03748567097f8a59c4a7f0ca0657d8a"
+      },
+      "kit": {
+        "file": "tools/pipeline/kits/orc_s1_blockout.json",
+        "sha256": "a2ba6d66c63c967c03d416136199cfefe8fde87cf9c924fd8890b6bca1b06119",
+        "pieces": 11,
+        "kept": [
+          "breastplate",
+          "fauld",
+          "pauldron",
+          "vambrace",
+          "greave",
+          "cuisse",
+          "gorget"
+        ]
+      },
+      "pixelate_config": {
+        "file": "docs/audits/look_target/options/A/pixelate.json",
+        "sha256": "f35642a1a9c2ee5dfbb360bb7c0d67a77a67d92081d98426b79c72eef7e83cb9"
+      }
+    },
+    "tools": {
+      "blender": "5.2.2 LTS",
+      "python": "3.14.7",
+      "scripts": {
+        "pngio.py": "c97d8df63884ddc60bfeb5ff6464c46b913c40f53939b6dcc7db856cffc6438c",
+        "palette_lib.py": "711b1376546d46903ae8e43c219b492e805d90475b04802248130a7273f20eed",
+        "pixelate.py": "703232efdc4810538c2bfcc3f630a7c0de49b1ca57b9a1a0d12ab4149906a1c2",
+        "pack_sheets.py": "3fa9bc0dd2d20fb392308554be9a3712820ea387a776b7a714825b6563af8c12"
+      }
+    },
+    "licence_rows": [
+      "Blender",
+      "MPFB (MakeHuman Plugin for Blender)",
+      "Python, Pillow, NumPy"
+    ]
+  },
+  "normal_image": "orc_look_A_normal.png",
+  "normal_image_pixel_sha256": "b48bd6b7911f308b1e26ffa6cc3cde2deb416f25be4506eeee150b0f7971468e",
+  "normal_doc": "camera-facing tangent space, OpenGL: R = screen right, G = screen up, B = toward camera, encoded n * 0.5 + 0.5; alpha copied from the colour frame"
+}
