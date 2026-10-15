@@ -84,13 +84,16 @@
           {"fighter": "watchman", "cell": [9, 2]},
           {"fighter": "watchman", "cell": [9, 6]}
         ],
-        [
-          {"fighter": "watch_sergeant", "cell": [10, 4]},
-          {"fighter": "watchman", "cell": [8, 3]},
-          {"fighter": "watchman", "cell": [8, 5]},
-          {"fighter": "watchman", "cell": [9, 2]},
-          {"fighter": "watchman", "cell": [9, 6]}
-        ],
+        {
+          "from_day": 8,
+          "fighters": [
+            {"fighter": "watch_sergeant", "cell": [10, 4]},
+            {"fighter": "watchman", "cell": [8, 3]},
+            {"fighter": "watchman", "cell": [8, 5]},
+            {"fighter": "watchman", "cell": [9, 2]},
+            {"fighter": "watchman", "cell": [9, 6]}
+          ]
+        },
         {
           "from_day": 8,
           "fighters": [
