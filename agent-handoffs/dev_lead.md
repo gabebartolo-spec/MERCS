@@ -51,6 +51,10 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
   branch merged). Deliverable: 2-3 labelled options (palette+light+post), each = street day, street
   night/rain at 4K in-engine, overworld strip at map scale; draft palettes in assets/palette/options/.
   Lead QCs (art-qa-critic) before the director sees boards; his pick becomes golden + master palette.
+- QUEUED after his palette pick: Texel Studio trial (director yes 2026-10-15) for map-scale
+  terrain tiles only: local Ollama, no concept-art (diffusion) step, palette-locked, licensing
+  register row CLEARED first (its licence: outputs ours, internal use ok, no resale as a service).
+  One strip from Texel vs the Blender rig, side by side, he picks. Rucol GAN repo rejected (no licence).
 Traps: never `export APPDATA` (breaks gh, git creds, Python user site for gdtoolkit); set it on
 the Godot command line only. gdlint/gdformat: `python -m gdtoolkit.linter|formatter`.
 Director 2026-10-15: agents talk tersely (memory-shared terse-agent-messages.md).
