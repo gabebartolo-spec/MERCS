@@ -55,6 +55,8 @@ var down := false
 var wounded := false
 ## The merc's resolve-flavoured social weight, read by visible checks (sim/story/checks.gd).
 var presence := 0
+## The merc's own resolve: at the captain's fall he holds at or above the rules' bar (BattleMorale).
+var resolve := 0
 ## The class of the weapon in hand (stats "weapon_class": sword, axe, spear, mace, bow; director
 ## Q-B, 2026-10-15, or battle.json "gear"; BattleGear.dress), "" for none; the action kit
 ## gives its weapon action (BattleKit) and BattleGear reads its blow.
@@ -100,6 +102,7 @@ static func make(unit_id: String, unit_side: int, at: Vector2i, stats: Dictionar
 	unit.is_leader = stats.get("leader", false) == true
 	unit.presence = _int(stats, "presence", 0)
 	BattleGear.dress(unit, stats)
+	unit.resolve = _int(stats, "resolve", 0)
 	for move: String in _listed_moves(stats.get("moves", [])):
 		unit.teach(move, true)
 	for flag: Variant in FLAGS:

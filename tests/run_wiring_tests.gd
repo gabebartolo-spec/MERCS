@@ -10,17 +10,16 @@ extends "res://tests/lib/runner.gd"
 ## GUI (tests/wiring/gui_checks.gd): real clicks and letter keys at 1920x1080: Fight on the
 ## road, the triage panel, Continue, the C screen marking the fallen as gone, Save, a fresh
 ## session that never fields the dead.
-## Seeded by design: sim fights use MercPlay on seeds 424332 (a permanent injury) and 424333
-## (the captain's death; both re-picked when equipment physics, Phase 4 P1b, moved the
-## fights); the GUI fight is an ambush met by walking, world seed 424270.
+## Seeded by design: sim fights use MercPlay on seeds 424251 (a permanent injury) and 424211
+## (the captain's death); the GUI fight is an ambush met by walking, world seed 424270.
 ##   godot --headless --path . --script tests/run_wiring_tests.gd
 
 const Kit := preload("res://tests/lib/wiring_kit.gd")
 const Fixture := preload("res://tests/lib/company_fixture.gd")
 const GuiChecks := preload("res://tests/wiring/gui_checks.gd")
 const WINDOW_SIZE := Vector2i(1920, 1080)
-const DEATH_SEED := 424333
-const SCAR_SEED := 424332
+const DEATH_SEED := 424211
+const SCAR_SEED := 424251
 const SCAR_ATTACK := -3
 const TEMPORARY_DAYS := 5
 ## The merc who goes down on SCAR_SEED (in plate, the Vampyr no longer does).
@@ -41,6 +40,7 @@ func run_checks() -> void:
 	_check_temporary_injury_heals()
 	_check_save_round_trip()
 	_check_no_save_revives()
+	_check_xp()
 	var gui := GuiChecks.new()
 	gui.setup(self, check)
 	await gui.run()
@@ -260,6 +260,58 @@ func _check_save_round_trip() -> void:
 		),
 		"save, reload, continue: the dead stay dead, the heir leads, chronicle and memories back"
 	)
+
+
+## D-095: experience from the fight. The captain's-death fight (seed 424264): every merc who
+## lived gets the fight's XP plus a kill's worth per enemy they put down, the dead get none,
+## a merc not fielded gets none, the battle stream is not touched, and it survives a save.
+func _check_xp() -> void:
+	var rng := Rng.from_seed(DEATH_SEED)
+	var held := Kit.led_by("vampyr")
+	var made := Kit.wounds(rng, "", {}, held)
+	var cells := _cells()
+	var spare_id: String = held.fighting_order().back()
+	cells.pop_back()
+	var units := made.units(cells, BattleUnit.COMPANY)
+	var battle := EncounterBattle.build(
+		Kit.pending(), Kit.scenario(), Kit.json(Fixture.BATTLE), rng, units
+	)
+	battle.set_hit_hook(made.hit_hook)
+	MercPlay.play_out(battle, Fixture.rules(), Kit.MAX_ACTIONS)
+	var events := made.resolve()
+	var paid := _paid(events, held, made)
+	check(
+		paid,
+		"fight XP: each survivor gets the fight's XP and a kill's worth per enemy downed, the dead none"
+	)
+	check(
+		held.member(spare_id) != null and held.member(spare_id).xp == 0,
+		"fight XP: a merc who did not fight gets none"
+	)
+	var model := Kit.reloaded(made, rng)
+	var same := model.ok and model.company != null
+	for merc: Merc in held.roster:
+		same = same and model.company.member(merc.id).xp == merc.xp
+	check(same, "fight XP: the experience is in the save and reloads the same")
+
+
+## Whether the xp events pay exactly what the data says: the fight's XP and a kill's worth per
+## enemy, to a living merc only, and at least one was paid.
+func _paid(events: Array[Dictionary], held: Company, made: CompanyWounds) -> bool:
+	var per_fight := held.xp_for_fight(0)
+	var per_kill := held.xp_for_fight(1) - per_fight
+	var paid := per_fight > 0 and per_kill > 0
+	var gains := 0
+	for event: Dictionary in events:
+		if event.get("type", "") != "xp":
+			continue
+		gains += 1
+		var gain := Merc.whole(event.get("gain", 0))
+		var merc := held.member(str(event.get("merc", "")))
+		paid = paid and merc != null and merc.xp == gain and gain >= per_fight
+		paid = paid and (gain - per_fight) % per_kill == 0
+		paid = paid and not made.chronicle().is_dead(str(event.get("merc", "")))
+	return paid and gains > 0
 
 
 func _check_no_save_revives() -> void:

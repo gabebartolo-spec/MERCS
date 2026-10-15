@@ -65,7 +65,8 @@ static func armour_initiative(gear: Dictionary, armour_class: String) -> int:
 	var armours: Variant = gear.get("armour", {})
 	var table: Dictionary = armours if armours is Dictionary else {}
 	var found: Variant = table.get(armour_class, {})
-	return BattleRules.read(found if found is Dictionary else {}, "initiative")
+	var picked: Dictionary = found if found is Dictionary else {}
+	return BattleRules.read(picked, "initiative")
 
 
 ## Rule 2: the defense an attacker must beat, the shield included while it is whole.

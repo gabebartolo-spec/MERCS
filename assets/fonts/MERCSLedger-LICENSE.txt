@@ -1,0 +1,7 @@
+MERCS Ledger (Regular, Display)
+
+An original pixel typeface drawn for MERCS (2026) by the project's art agent, after the
+hand-ruled company ledgers and carved tallies of a mercenary band: plain open letters with
+chisel-cut bar ends and pen flags. Drawn cell by cell as text bitmaps in
+tools/typeface/ledger/ and built with tools/typeface/build_font.py. Not derived from any
+existing font. Owned by the project.

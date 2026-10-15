@@ -12,8 +12,8 @@
 set -u
 cd "$(dirname "$0")/../.." || exit 1
 GODOT="${GODOT:-godot}"
-SEED="${SEED:-424308}"
-OTHER_SEED="${OTHER_SEED:-424316}"
+SEED="${SEED:-424310}"
+OTHER_SEED="${OTHER_SEED:-424311}"
 OUT="${1:-$(mktemp -d)}"
 CHECKPOINTS=(m1_world m2_encounter m5_triage m6_hub m3_office m7_memory m7_storylet)
 native() { if command -v cygpath > /dev/null 2>&1; then cygpath -w "$1"; else echo "$1"; fi; }

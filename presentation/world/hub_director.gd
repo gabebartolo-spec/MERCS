@@ -78,12 +78,15 @@ func _on_day(day: int) -> void:
 		_show()
 
 
-## A fight's result was applied: a win leaves loot and one prisoner, and opens the hub.
+## A fight's result was applied: a win leaves loot, and one prisoner when the enemy
+## surrendered men (EncounterBattle.result "prisoners"; a wipe or a rout leaves none: Phase 4
+## ruling Q-C), and opens the hub.
 func _on_result(kind: String, result: Dictionary) -> void:
 	if result.get("won", false) != true:
 		return
 	company.economy.take_loot(kind, rng)
-	company.economy.take_prisoner(world.day)
+	if not EncounterBattle.taken(result).is_empty():
+		company.economy.take_prisoner(world.day)
 	_reaction = ""
 	set_open(true)
 

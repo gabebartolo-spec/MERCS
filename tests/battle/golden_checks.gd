@@ -15,16 +15,31 @@ const GRID := Vector2i(12, 8)
 const MAX_TURNS := 300
 const ILLEGAL_EVERY := 7
 ## Pinned before the battle.gd split (claude/p4-plan-split); seed -> SHA-256 of the fight.
-## Re-pinned, every seed, by Phase 4 P1b (claude/p4-p1b-gear): the fighters gained gear classes
-## (armour soaks, shields, plate is slow, axes split shields), which moves every fight on purpose.
+## Re-pinned, all seven, by Phase 4 P5 (claude/p4-p5-ai): the enemy no longer picks the foe
+## beside it with the least exact health (rule 6) but the one it saw wounded, ties by id
+## (BattleKnowledge), so plans, blows and the fights after them move.
+## Re-pinned by Phase 4 P2 (morale, surrender, the captain's fall) on top of P5: seeds 1, 7,
+## 1337, 424242, 90210 and 2026 now end with the broken band's men running or surrendering
+## (and the chief's fall breaking his shaky bandits first); seed 31 is unchanged.
 const GOLDEN := {
-	1: "225bdb7bd12caa718630eaf72e1bece5fba947ea998298587558d4d5ba019850",
-	7: "a89edc7cce8aa326643419739819c4d784b27f87ba2d11a7db4cb9375f01cf17",
-	1337: "2e3ab1244366894b4be4aded8d29d2ade880f4799acfc8d3ca38435fd0c04a65",
-	424242: "d0222dfa4874e4913edb001dcc73a6df6436b76c2d49cbd03c16966b8048cb7e",
-	90210: "615b5d5d9f43204802b5195470e9a9ed5cb7a7ec5ae7116261bedde032b2afd2",
-	2026: "605c5c246ccb2d9b3f2029d03fe1f700893e38f3bbc873ce9c2a6dbf076d7ef7",
-	31: "22a3dc5b54ce9980a28672323a4e7ec076112054cc256a25be47f52d6e9c0335",
+	1: "3299931e9bdb761e4059482a56a893ea1cc7edd80068325ddfa4b3cd166c509c",
+	7: "7568529f025b8ea2c47b985b30b29e5e221424b06cd42bfa23c4783ec7ef2150",
+	1337: "036b27068c601f3442f239d5e186a8064d14023fd0d74b38c96996d091f1b538",
+	424242: "a1b6cca7a1fba6c46516214e263cf2c1ccd37ecdd2b1ed581c583549305f43b3",
+	90210: "99c70224e351a57618f1687ead0e8d972c3cfa1901fbebb269198a1ab91b87a9",
+	2026: "5cd2331f919abb9568429914bd493e439fdb776daa16bdcbfc3d3e372cbc4c63",
+	31: "ac55cc7c4e59ae637676de3c515542566de606443c76050c5fed73a1103cb975",
+}
+## The same seven fights with every fighter's "gear" taken away hash to main's pins from before
+## equipment physics (Phase 4 P1b): gear changes numbers, never the rolls or their order.
+const GEARLESS := {
+	1: "3299931e9bdb761e4059482a56a893ea1cc7edd80068325ddfa4b3cd166c509c",
+	7: "7568529f025b8ea2c47b985b30b29e5e221424b06cd42bfa23c4783ec7ef2150",
+	1337: "036b27068c601f3442f239d5e186a8064d14023fd0d74b38c96996d091f1b538",
+	424242: "a1b6cca7a1fba6c46516214e263cf2c1ccd37ecdd2b1ed581c583549305f43b3",
+	90210: "99c70224e351a57618f1687ead0e8d972c3cfa1901fbebb269198a1ab91b87a9",
+	2026: "5cd2331f919abb9568429914bd493e439fdb776daa16bdcbfc3d3e372cbc4c63",
+	31: "ac55cc7c4e59ae637676de3c515542566de606443c76050c5fed73a1103cb975",
 }
 const MARK := "golden_mark"
 
@@ -50,6 +65,7 @@ func run(check: Callable) -> void:
 		_note_coverage(battle, seen)
 	_check.call(hashes_ok, "every golden fight's event log and end state hash as pinned")
 	_check.call(replay_ok, "each golden fight's actions replayed into a fresh battle match it")
+	_check_gearless()
 	var covered := [
 		"rout",
 		"wipe",
@@ -58,13 +74,28 @@ func run(check: Callable) -> void:
 		MARK,
 		"shaken",
 		"ambush",
+		"surrender",
+		"captain_fall",
 		BattleGear.EVENT_SHIELD_BROKEN
 	]
 	var all_seen := covered.all(func(key: String) -> bool: return seen.has(key))
 	_check.call(
 		all_seen,
-		"the golden fights cover rout, wipe, both moves, hook, shaken, ambush, a split shield"
+		(
+			"the golden fights cover rout, wipe, both moves, hook, shaken, ambush, surrender, "
+			+ "captain's fall, a split shield"
+		)
 	)
+
+
+## Gear changes numbers, never rolls: without gear every fight is main's from before P1b.
+func _check_gearless() -> void:
+	var same := true
+	for seed_value: int in GEARLESS:
+		var fight := _fight(seed_value, true)
+		var battle: Battle = fight["battle"]
+		same = same and _digest(battle) == str(GEARLESS[seed_value])
+	_check.call(same, "with every fighter's gear removed the golden fights hash as before P1b")
 
 
 func _rules() -> Dictionary:
@@ -81,7 +112,7 @@ func _fighters(data: Dictionary) -> Dictionary:
 
 ## The same setup for a seed every time: the seed also picks the walls, the enemy band and
 ## whether it is an ambush or the band starts shaken.
-func _build(seed_value: int) -> Battle:
+func _build(seed_value: int, gearless := false) -> Battle:
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(BATTLE_DATA))
 	var data: Dictionary = parsed if parsed is Dictionary else {}
 	var stats := _fighters(data)
@@ -93,7 +124,7 @@ func _build(seed_value: int) -> Battle:
 		company_size = 2
 	for i: int in company_size:
 		var key: String = mine[mini(i, mine.size() - 1)]
-		var own: Dictionary = stats[key]
+		var own: Dictionary = _worn(stats[key], gearless)
 		var at := Vector2i(1 + i % 2, 1 + i)
 		fighters.append(BattleUnit.make("c%d" % i, BattleUnit.COMPANY, at, own))
 	var band: Array[String] = ["bandit_chief", "bandit"]
@@ -101,7 +132,7 @@ func _build(seed_value: int) -> Battle:
 		band = ["watch_sergeant", "watchman"]
 	for i: int in 6:
 		var key: String = band[0] if i == 0 else band[1]
-		var theirs: Dictionary = stats[key]
+		var theirs: Dictionary = _worn(stats[key], gearless)
 		var at := Vector2i(10 - i % 2, 1 + i)
 		fighters.append(BattleUnit.make("e%d" % i, BattleUnit.ENEMY, at, theirs))
 	var blocked := {}
@@ -119,6 +150,15 @@ func _build(seed_value: int) -> Battle:
 	return battle
 
 
+## A fighter's data, with its "gear" taken away when gearless.
+func _worn(fighter: Dictionary, gearless: bool) -> Dictionary:
+	if not gearless:
+		return fighter
+	var bare := fighter.duplicate()
+	bare.erase(BattleGear.GEAR_KEY)
+	return bare
+
+
 ## A hook that rolls nothing and marks each blow that puts a fighter down.
 func _hook(hit: Dictionary) -> Array:
 	if hit.get("down") == true:
@@ -127,8 +167,8 @@ func _hook(hit: Dictionary) -> Array:
 
 
 ## Plays a seed's fight to its end; {"battle", "actions"} (the actions the battle accepted).
-func _fight(seed_value: int) -> Dictionary:
-	var battle := _build(seed_value)
+func _fight(seed_value: int, gearless := false) -> Dictionary:
+	var battle := _build(seed_value, gearless)
 	var actions: Array[Dictionary] = []
 	for turn: int in MAX_TURNS:
 		if battle.is_over():
@@ -197,7 +237,16 @@ func _note_coverage(battle: Battle, seen: Dictionary) -> void:
 		var kind := str(event.get("type", ""))
 		if kind == Battle.ACTION_ATTACK:
 			seen[str(event.get("move", ""))] = true
-		elif kind in [MARK, "shaken", BattleGear.EVENT_SHIELD_BROKEN]:
+		elif (
+			kind
+			in [
+				MARK,
+				"shaken",
+				Battle.EVENT_SURRENDER,
+				Battle.EVENT_CAPTAIN_FALL,
+				BattleGear.EVENT_SHIELD_BROKEN
+			]
+		):
 			seen[kind] = true
 	var first := _first_act(battle)
 	var actor := battle.unit(str(first.get("unit", "")))
