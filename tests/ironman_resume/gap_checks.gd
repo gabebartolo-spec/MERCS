@@ -28,7 +28,9 @@ func setup(tree: SceneTree, check: Callable) -> void:
 func run() -> void:
 	await meeting()
 	await storylet()
+	await offer()
 	await captain()
+	await captain_unmapped()
 	action_types()
 
 
@@ -92,6 +94,38 @@ func storylet() -> void:
 	await _quit(again)
 
 
+## Ironman On: a storylet offered (its cast drawn from the Rng) is saved, so a quit can't have the
+## next rest draw another cast: the reload stands on the same offer and the same Rng.
+func offer() -> void:
+	_clear_save()
+	_save_home()
+	var game := await _spawn()
+	var story := game.get_node("StoryDirector") as StoryDirector
+	var ids: Array[String] = []
+	for merc: Merc in game.company_director().company.roster:
+		ids.append(merc.id)
+	story.memory.on_death("fallen_comrade", ids, 2, Memory.KEY_COMRADE_DIED)
+	await InputKit.tap(_tree, KEY_M)
+	var director := game.overworld_director()
+	await InputKit.click(_tree, director.panel.button_for(OverworldDirector.REST))
+	await InputKit.frames(_tree, InputKit.LAYOUT_FRAMES)
+	var shown := JSON.stringify(story.offer.get("cast", {}), "", true)
+	var rng_after := director.rng.state()
+	var up := story.is_open() and not story.offer.is_empty()
+	await _quit(game)
+	var again := await _reopen()
+	var back := again.get_node("StoryDirector") as StoryDirector
+	_check.call(
+		up and back.is_open() and JSON.stringify(back.offer.get("cast", {}), "", true) == shown,
+		"Ironman On, quit with a storylet offered: the reload shows the same offer and cast"
+	)
+	_check.call(
+		again.overworld_director().rng.state() == rng_after,
+		"and the Rng stands where the cast pick left it"
+	)
+	await _quit(again)
+
+
 ## Ironman On: appointing the captain survives a quit.
 func captain() -> void:
 	_clear_save()
@@ -118,10 +152,43 @@ func captain() -> void:
 	await _quit(again)
 
 
+## Ironman On: the captain appointed before the map was ever opened is saved too.
+func captain_unmapped() -> void:
+	_clear_save()
+	_save_home()
+	var game := await _spawn()
+	await InputKit.tap(_tree, KEY_C)
+	var screen := game.company_director()
+	var other := ""
+	for merc: Merc in screen.company.roster:
+		if merc.id != screen.company.captain_id:
+			other = merc.id
+			break
+	await InputKit.click(_tree, screen.panel.row_for(other))
+	await InputKit.click(_tree, screen.panel.appoint_button())
+	var named := screen.company.captain_id == other
+	await _quit(game)
+	var again := await _reopen()
+	_check.call(
+		named and again.company_director().company.captain_id == other,
+		"Ironman On, quit after appointing %s captain with the map never opened: it stays" % other
+	)
+	await _quit(again)
+
+
 ## A fight's recorded action keeps its number and its flag through the save's JSON.
 func action_types() -> void:
 	var record := FightRecord.make({}, [])
-	record.record({"type": "move", "to": Vector2i(2, 3), "steps": 4, "bold": true, "ratio": 0.5})
+	record.record(
+		{
+			"type": "move",
+			"to": Vector2i(2, 3),
+			"steps": 4,
+			"bold": true,
+			"ratio": 0.5,
+			"near": 2.000001
+		}
+	)
 	var parsed: Dictionary = JSON.parse_string(JSON.stringify(record.saved()))
 	var back := FightRecord.read(parsed)
 	var kept := back.size() == 1
@@ -129,6 +196,7 @@ func action_types() -> void:
 	var steps: Variant = action.get("steps")
 	var bold: Variant = action.get("bold")
 	var ratio: Variant = action.get("ratio")
+	var near: Variant = action.get("near")
 	_check.call(
 		kept and str(action.get("to")) == "(2, 3)" and str(action.get("type")) == "move",
 		"a recorded action keeps its text and its cell through the save"
@@ -142,6 +210,10 @@ func action_types() -> void:
 	_check.call(
 		typeof(ratio) == TYPE_FLOAT and str(ratio) == "0.5",
 		"a recorded fraction comes back a float"
+	)
+	_check.call(
+		typeof(near) == TYPE_FLOAT and str(near) == "2.000001",
+		"a recorded near-whole fraction (2.000001) is not rounded to an int"
 	)
 
 

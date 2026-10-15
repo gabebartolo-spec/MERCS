@@ -33,6 +33,8 @@ var _game: SliceGame = null
 var _layer: CanvasLayer = null
 var _linked: OverworldDirector = null
 var _open := false
+## An offer the save held, shown once the map is linked.
+var _resumed := {}
 ## How many of the economy's decision lines are already in the memories.
 var _decisions_seen := 0
 
@@ -72,6 +74,8 @@ func begin() -> void:
 			var kept: Variant = model.wounds.get("memories", {})
 			memory = Memory.restore(_dict(kept))
 			state = StoryletState.restore(model.story)
+			var held: Variant = model.story.get("offer", {})
+			_resumed = _dict(held)
 
 
 ## Whether the storylet's scene is on screen.
@@ -88,12 +92,17 @@ func try_fire(context: Dictionary) -> bool:
 	var made := book.offer(context)
 	if made.is_empty():
 		return false
+	_show_offer(made)
+	_linked.autosave()
+	return true
+
+
+func _show_offer(made: Dictionary) -> void:
 	offer = made
 	result = {}
 	_open = true
 	_linked.panel.visible = false
 	_show_scene()
-	return true
 
 
 ## The context a rest or an arrival gives, from the world as it stands.
@@ -125,6 +134,9 @@ func _link(overworld: OverworldDirector) -> void:
 	book.rng = overworld.rng
 	book.load_defs(_json(STORYLETS_DATA))
 	overworld.panel.chosen.connect(_on_overworld_choice)
+	if not _resumed.is_empty() and not _open:
+		_show_offer(_resumed)
+	_resumed = {}
 	_decisions_seen = book.company.economy.chronicle.size() if book.company != null else 0
 
 
@@ -205,8 +217,14 @@ func _close() -> void:
 		_linked.panel.visible = true
 
 
+## The save's optional blocks. With Ironman On an offer still up (cast drawn, no attempt yet) is
+## kept in the story block, so a quit can't have the next rest draw a different cast.
 func _extras() -> Dictionary:
-	return {"wounds": {"memories": memory.state()}, "story": state.state()}
+	var story := state.state()
+	var saves := get_node_or_null(SAVE_SYSTEM_PATH) as SAVE_SYSTEM
+	if _open and result.is_empty() and not offer.is_empty() and saves != null and saves.ironman:
+		story["offer"] = offer.duplicate(true)
+	return {"wounds": {"memories": memory.state()}, "story": story}
 
 
 func _options() -> Array[Dictionary]:
