@@ -2,7 +2,7 @@
  "_doc": "MERCS Ledger, the game's own pixel typeface (D-092). Drawn by hand as text bitmaps in tools/typeface/ledger/, built to exact grid squares by tools/typeface/build_font.py.",
  "asset": "fonts",
  "files": {
-  "MERCSLedger-Display.ttf": "9b4a49b87c2b44134c8011110d92c20b1aafb457129ed7ab2972645aab04f8d2",
+  "MERCSLedger-Display.ttf": "9c38a966f9e50520a7e012c06fe73732e49eb19079982fc55414aed82643629b",
   "MERCSLedger-LICENSE.txt": "55ffba96888b83bdecc29bd62084ea6bbb0ff37f17d6decc24eaf1a1975e39d6",
   "MERCSLedger-Regular.ttf": "413a189f8cd5f5d0e6fa66e7aca4defc1d7a4f7134bb0bdeabd8c16099584d65"
  },
@@ -10,7 +10,7 @@
   "tools/typeface/build_font.py": "a491d658b0b965fb",
   "tools/typeface/kern_check.py": "0a3a190debe21e29",
   "tools/typeface/ledger/display.kern.txt": "d9ee655cbc9aaa12",
-  "tools/typeface/ledger/display.txt": "d17609d055cd9fd4",
+  "tools/typeface/ledger/display.txt": "fe8a37f3d0239fe5",
   "tools/typeface/ledger/regular.kern.txt": "ba029dde68d3d9da",
   "tools/typeface/ledger/regular.txt": "40933c77f1d133ea"
  },
