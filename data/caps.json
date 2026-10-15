@@ -11,8 +11,9 @@
     "scenarios": 1,
     "mercs": 6,
     "recruits": 6,
-    "encounters": 2,
+    "encounters": 5,
     "locations": 2,
-    "actions": 10
+    "actions": 10,
+    "jobs": 4
   }
 }

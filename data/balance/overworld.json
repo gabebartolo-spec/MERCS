@@ -24,6 +24,10 @@
     "band": "heraldry:2",
     "ambush": "heraldry:1",
     "patrol": "heraldry:3",
+    "camp": "heraldry:1",
+    "charge": "heraldry:2",
+    "raiders": "heraldry:1",
+    "quarry": "heraldry:1",
     "site": "bone:4",
     "ring": "soot:0",
     "chase": "heraldry:4"

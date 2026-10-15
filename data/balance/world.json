@@ -50,6 +50,30 @@
       "speed_pct": 80,
       "wander_tiles": 7,
       "return_days": 4
+    },
+    "camp": {
+      "sight_tiles": 4,
+      "speed_pct": 80,
+      "wander_tiles": 2,
+      "return_days": 3
+    },
+    "charge": {
+      "sight_tiles": 99,
+      "speed_pct": 200,
+      "wander_tiles": 0,
+      "return_days": 0
+    },
+    "raiders": {
+      "sight_tiles": 8,
+      "speed_pct": 100,
+      "wander_tiles": 2,
+      "return_days": 3
+    },
+    "quarry": {
+      "sight_tiles": 4,
+      "speed_pct": 100,
+      "wander_tiles": 4,
+      "return_days": 3
     }
   },
   "encounters": {
@@ -62,5 +86,13 @@
       "win_supplies": 6,
       "loss_supplies": 4
     }
+  },
+  "jobs": {
+    "near_min_tiles": 3,
+    "near_max_tiles": 6,
+    "place_tries": 60,
+    "hold_days": 3,
+    "raid_min_tiles": 4,
+    "raid_max_tiles": 6
   }
 }

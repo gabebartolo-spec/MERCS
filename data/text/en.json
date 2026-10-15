@@ -226,5 +226,17 @@
   "end.title": "The company is no more",
   "end.intro": "Every mercenary of the company is dead. The campaign is over, and nothing brings them back. This is what is left of them.",
   "end.memory": "    {line}",
-  "end.begin": "Begin again"
+  "end.begin": "Begin again",
+  "hub.job.clear_bandits": "Clear the bandits",
+  "hub.job.escort": "Escort",
+  "hub.job.hold": "Hold the place",
+  "hub.job.hunt": "Hunt a man",
+  "memory.job.clear_bandits.done": "On day {day} we broke the bandits' camp, as the contract asked.",
+  "memory.job.clear_bandits.failed": "On day {day} the bandits' camp still stood, and the contract was lost.",
+  "memory.job.escort.done": "On day {day} we brought our charge safe to the place.",
+  "memory.job.escort.failed": "On day {day} we failed the man we were paid to escort.",
+  "memory.job.hold.done": "On day {day} we held the place and beat off the men who came for it.",
+  "memory.job.hold.failed": "On day {day} we could not hold the place.",
+  "memory.job.hunt.done": "On day {day} we ran down the man we were hunting.",
+  "memory.job.hunt.failed": "On day {day} the man we hunted got away."
 }

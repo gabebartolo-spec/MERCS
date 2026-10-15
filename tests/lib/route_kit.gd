@@ -1,7 +1,8 @@
 extends RefCounted
-## Four more whole-campaign routes for the replay checks (Phase 2 gate, structural evidence
+## More whole-campaign routes for the replay checks (Phase 2 gate, structural evidence
 ## gap 3), beside campaign_kit.gd's one winning route: a lost fight, a patrol's toll paid, a
-## second fight after a first, and the campaign's end (the last merc cut down). Each is the
+## second fight after a first, the campaign's end (the last merc cut down) and, since Phase 5
+## C1, a contract taken as a job and played until it is judged ("job"). Each is the
 ## wiring the game's directors do with no scene, every roll on the one Rng of `seed_value`, so
 ## two runs of one seed (in one process, or in two) must end in the same save, byte for byte.
 ## run(route, seed) returns {"save": JSON text, "stages": {stage: bool}}.
@@ -10,7 +11,8 @@ extends RefCounted
 const World := preload("res://tests/lib/world_fixture.gd")
 const Fixture := preload("res://tests/lib/company_fixture.gd")
 const Kit := preload("res://tests/lib/wiring_kit.gd")
-const ROUTES: Array[String] = ["loss", "toll", "second_fight", "wipe"]
+const JobKit := preload("res://tests/lib/job_kit.gd")
+const ROUTES: Array[String] = ["loss", "toll", "second_fight", "wipe", "job"]
 const OUT := 3
 const NEAR := 3
 const WALK_LIMIT := 40
@@ -22,6 +24,8 @@ const LAST: Array[String] = ["merc_6"]
 
 
 static func run(route: String, seed_value: int) -> Dictionary:
+	if route == "job":
+		return _job(seed_value)
 	var played := _start(route, seed_value)
 	var stages := {}
 	match route:
@@ -47,6 +51,17 @@ static func run(route: String, seed_value: int) -> Dictionary:
 	var saved := SaveModel.to_dict(
 		played.world, played.rng, played.company, played.wounds.state(), ended
 	)
+	return {"save": JSON.stringify(saved), "stages": stages}
+
+
+## Phase 5 C1: the first contract on the board taken as the job it was posted as (its own
+## type and deadline), played by tests/lib/job_kit.gd (every fight won) until it is judged.
+static func _job(seed_value: int) -> Dictionary:
+	var played := JobKit.begin(seed_value, "", true)
+	JobKit.play(played, true)
+	var verdict := "" if played.verdicts.is_empty() else str(played.verdicts[0].get("verdict"))
+	var stages := {"judged": not verdict.is_empty(), "done": verdict == Jobs.DONE}
+	var saved := SaveModel.to_dict(played.world, played.rng, played.company)
 	return {"save": JSON.stringify(saved), "stages": stages}
 
 
