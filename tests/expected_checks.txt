@@ -13,10 +13,10 @@ loop 8
 sim_world 11
 sim_encounters 11
 save 12
-effect 19
+effect 20
 overworld 14
 road 8
-company 12
+company 19
 inspect 9
 company_battle 5
 economy 34
@@ -31,4 +31,4 @@ campaign 6
 panels 11
 campaign_end 11
 ironman 12
-ironman_resume 22
+ironman_resume 24

@@ -10,6 +10,7 @@ extends "res://tests/lib/runner.gd"
 ##   godot --headless --path . --script tests/run_company_tests.gd
 
 const Fixture := preload("res://tests/lib/company_fixture.gd")
+const FieldChecks := preload("res://tests/company/field_checks.gd")
 const V0_FIXTURE := "res://tests/fixtures/save/v0.json"
 const WORLD_BALANCE := "res://data/balance/world.json"
 const SEED := 424242
@@ -32,6 +33,9 @@ func run_checks() -> void:
 	_check_experience_bar()
 	_check_moves_by_level()
 	_check_roster_cap()
+	var field := FieldChecks.new()
+	field.setup(Callable(self, "check"))
+	field.run()
 	_check_older_save_defaults()
 	_check_odd_saves()
 	await process_frame

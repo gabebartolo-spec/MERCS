@@ -15,6 +15,11 @@ var captain_id := ""
 ## The ids of the dead, buried here (mortality is final, hard rule 5): never on the roster
 ## again, not by add(), not by a save. The chronicle keeps the record of how they died.
 var fallen: Array[String] = []
+## True when the captain sits out the next fight and the field sergeant leads it (FieldCommand);
+## saved only while true, so an older save reads as the captain leading.
+var captain_out := false
+## data/balance/company.json "deploy": what sitting the captain out costs (FieldCommand).
+var deploy := {}
 ## The purse, wages, contracts, pack and hub (Phase 2 milestone 6); saved with the company.
 var economy: Economy = null
 
@@ -60,10 +65,7 @@ static func restore(saved: Dictionary, defs: Dictionary) -> Company:
 			merc.apply_state(saved_merc)
 	if company.roster.is_empty() and company.fallen.is_empty():
 		return Company.start(defs)
-	company.captain_id = str(saved.get("captain", ""))
-	if company.member(company.captain_id) == null:
-		company.captain_id = str(_section(defs, "mercs").get("starting_captain", ""))
-	company._mend_captain()
+	company._restore_office(saved, defs)
 	return company
 
 
@@ -130,17 +132,22 @@ func battle_units(
 		if merc != null:
 			var numbers: Variant = fit.get(merc.id, {})
 			var changed: Dictionary = numbers if numbers is Dictionary else {}
-			units.append(merc.to_battle_unit(side, cells[i], merc.id == captain_id, changed))
+			var leads := merc.id == FieldCommand.leader_id(self)
+			units.append(merc.to_battle_unit(side, cells[i], leads, changed))
 	return units
 
 
-## The roster's ids, the captain first, then the rest in roster order: who a fight fields.
+## The roster's ids, the leader first, then the rest in roster order: who a fight fields. The
+## leader is the captain; when the captain sits out (FieldCommand) they are left out and the
+## field sergeant leads.
 func fighting_order() -> Array[String]:
 	var ids: Array[String] = []
-	if member(captain_id) != null:
-		ids.append(captain_id)
+	var out := FieldCommand.is_out(self)
+	var leader := FieldCommand.leader_id(self)
+	if member(leader) != null:
+		ids.append(leader)
 	for merc: Merc in roster:
-		if merc.id != captain_id:
+		if merc.id != leader and not (out and merc.id == captain_id):
 			ids.append(merc.id)
 	return ids
 
@@ -174,18 +181,31 @@ func state() -> Dictionary:
 	var rows: Array[Dictionary] = []
 	for merc: Merc in roster:
 		rows.append(merc.state())
-	return {
+	var saved := {
 		"captain": captain_id,
 		"roster": rows,
 		"fallen": fallen.duplicate(),
 		"economy": economy.state()
 	}
+	if captain_out:
+		saved["captain_out"] = true
+	return saved
 
 
 ## A merc made from a recruit's data (data/recruits.json) for inspection before a hire; not on
 ## the roster. Null when the id is not a recruit.
 func preview(recruit_id: String) -> Merc:
 	return _make(recruit_id, _recruit_entries())
+
+
+## The captain's office as the save held it: a captain not on the roster is replaced by the
+## starting captain, else the first merc; sitting out stands only if a sergeant can stand in.
+func _restore_office(saved: Dictionary, defs: Dictionary) -> void:
+	captain_id = str(saved.get("captain", ""))
+	if member(captain_id) == null:
+		captain_id = str(_section(defs, "mercs").get("starting_captain", ""))
+	_mend_captain()
+	captain_out = saved.get("captain_out", false) == true and FieldCommand.can_sit_out(self)
 
 
 func _add(id: String) -> Merc:
@@ -230,6 +250,7 @@ func _read_rules(defs: Dictionary) -> void:
 	_defs = defs
 	var balance := _section(defs, "company")
 	_cap = Merc.whole(_section(balance, "roster").get("cap", 0))
+	deploy = _section(balance, "deploy")
 	_level_xp.clear()
 	var thresholds: Variant = _section(balance, "xp").get("level_xp", [])
 	if thresholds is Array:

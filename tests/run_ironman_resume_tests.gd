@@ -18,6 +18,7 @@ const Kit := preload("res://tests/lib/wiring_kit.gd")
 const End := preload("res://tests/lib/end_kit.gd")
 const World := preload("res://tests/lib/world_fixture.gd")
 const SAVE_SYSTEM := preload("res://presentation/autoload/save_system.gd")
+const SitOutChecks := preload("res://tests/ironman_resume/sit_out_checks.gd")
 const GapChecks := preload("res://tests/ironman_resume/gap_checks.gd")
 const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const WINDOW_SIZE := Vector2i(1920, 1080)
@@ -37,6 +38,9 @@ func run_checks() -> void:
 	root.size = WINDOW_SIZE
 	var whole := await _uninterrupted()
 	await _check_quit_after_a_fall(whole)
+	var sit_out := SitOutChecks.new()
+	sit_out.setup(self, Callable(self, "check"))
+	await sit_out.run()
 	await _check_toll(true)
 	await _check_toll(false)
 	await _check_rest_and_wages()
@@ -206,15 +210,35 @@ func _check_prisoner() -> void:
 
 
 ## A fresh session on the saved world, the map opened, the fight begun (Ironman On).
-func _fight_start(kind: String) -> SliceGame:
+func _fight_start(kind: String, fight_button: String = OverworldDirector.FIGHT) -> SliceGame:
 	_clear_save()
 	_save_world(true, kind)
 	var game := await _spawn()
 	await InputKit.tap(self, KEY_M)
 	var director := game.overworld_director()
 	await _walk_into(director)
-	await InputKit.click(self, director.panel.button_for(OverworldDirector.FIGHT))
+	await InputKit.click(self, director.panel.button_for(fight_button))
 	return game
+
+
+## Plays (company turns by real input, BattleAi's choice) until `round_number` is reached with the
+## fight still on; whether it stood there.
+func _play_to_round(director: OverworldDirector, round_number: int) -> bool:
+	var battle := director.view.battle
+	var data := World.json(InputKit.BATTLE_DATA)
+	var rules: Dictionary = data.get("rules", {})
+	var sight: int = rules.get("sight_cells", 0)
+	for _frame: int in InputKit.FIGHT_FRAMES:
+		if battle.is_over():
+			return false
+		if battle.round_number >= round_number:
+			return true
+		var actor := battle.current()
+		if actor.side == BattleUnit.COMPANY:
+			await InputKit._company_turn(self, director, BattleAi.choose(battle, actor, sight))
+		else:
+			await process_frame
+	return false
 
 
 ## Plays (company turns by real input, BattleAi's choice) until a company fighter is down; its id.
