@@ -77,7 +77,7 @@ var _stand_point := Vector3.ZERO
 var _frame: SheetFrame = null
 var _extras: Array[Sprite3D] = []
 var _extra_points: Array[Vector3] = []
-var _sprite_tint := Color.WHITE
+var _sprite_tint := Palette.NO_TINT
 
 @onready var _world: Node3D = %World
 @onready var _street: GridMap = %Street
@@ -260,7 +260,7 @@ func _show_frame(sprite: Sprite3D, frame: SheetFrame) -> void:
 	sprite.offset = Vector2(-frame.pivot.x, frame.pivot.y - frame.region.size.y)
 	var lit := lit_sprites and frame.normal != null
 	sprite.material_override = frame.lit_material() if lit else frame.unlit_material()
-	sprite.modulate = _sprite_tint if not lit else Color.WHITE
+	sprite.modulate = _sprite_tint if not lit else Palette.NO_TINT
 
 
 func _setup_path() -> void:
@@ -281,8 +281,8 @@ func _setup_path() -> void:
 func _setup_merc() -> void:
 	_merc_height_m = _data.num("sprite", "merc_height_m")
 	var width := int(_data.num("sprite", "texture_width_px"))
-	var fill := _data.grey("sprite", "fill_grey")
-	var outline := _data.grey("sprite", "outline_grey")
+	var fill := _data.colour("sprite", "fill")
+	var outline := _data.colour("sprite", "outline")
 	_frame = SheetFrame.capsule(width, sprite_height_px, fill, outline, lit_sprites)
 	_configure(_merc)
 	_apply_texel(_merc)
