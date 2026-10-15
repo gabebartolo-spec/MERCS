@@ -2,9 +2,9 @@
   "_comment": "Wounds, triage, death and succession (Phase 2 M5). Read by sim/merc/; injury.md explains each knob.",
   "triage": {
     "die_sides": 100,
-    "wound_upto": 40,
-    "temporary_upto": 70,
-    "permanent_upto": 90
+    "wound_upto": 30,
+    "temporary_upto": 52,
+    "permanent_upto": 67
   },
   "succession": {
     "successor_rank": 0,
