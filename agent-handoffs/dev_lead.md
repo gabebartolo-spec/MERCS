@@ -1,9 +1,9 @@
-# Dev Lead handoff, 2026-10-16 04:50 (desktop, personal account, "Game Studio Lead mercs")
+# Dev Lead handoff, 2026-10-16 08:15 (desktop, personal account, "Game Studio Lead mercs")
 Start: this file, CLAUDE.md, ~/.claude/memory-shared/MEMORY.md + co-lead-playbook.md, your brief
 (agent-briefs/DEV_LEAD_OPUS.md), docs/plans/phase4_combat.md, docs/plans/phase5_contracts.md ("Decided"),
 docs/DECISIONS.md D-091..D-112, ~/.claude/skills/ai-slop-art/SKILL.md. Then `git fetch`, `gh pr list`.
 
-## State: working overnight. Director asleep since ~03:20 ("dont ask me more questions im going to bed").
+## State: working. Usage limit killed all agents 04:50-07:20 (resumed from worktrees). Director asleep since ~03:20 ("dont ask me more questions im going to bed").
 Ask NOTHING until he writes again. Team calls are yours; taste calls go in the queue below.
 
 ## Who does what
@@ -23,24 +23,22 @@ all rulings: scratchpad p4_rulings.md (copy into briefs if the scratchpad is gon
   orc skin bar CIEDE2000 >= 18 vs grass mass; rough terrain lighter than grass.
 
 ## Merged tonight (all with review + CI green)
-#116 Ledger, #122-#127 combat depth (AI, morale, delegate, XP, kit, gear), #129 blood/bodies, #130 plan,
-#131 handoff, #132 C0 economy split, #133 blood spray + hit-stop, #134 C4 reputation, #135 C3 wages,
-#136 C2 negotiation, #137 board, #138 C1 jobs.
+#116 Ledger, #122-#127 combat depth, #129 blood/bodies, #130 plan, #132 C0, #133 spray+hit-stop, #134 C4 rep,
+#135 C3 wages, #136 C2 terms, #137 board, #138 C1 jobs, #139 P1c ranged, #142 C5 prisoners, #144 C6 loot/armoury,
+#146 C7 road/rabble/ledger, #143 C4 hunters (+ handoffs #131 #140 #141).
 
-## Open PRs and running agents (04:50)
-- #139 P1c ranged + spear reach: review APPROVE; builder adding the diagonal corner-gap fix (line_clear checks
-  side cells), then merge on green.
-- Stall fix builder (claude/p4-ai-path, starts after #139 merges): 29/300 random fights never ended (AI walk
-  stuck behind walls). PRIORITY before the playtest; adds a fight-length audit check.
-- #118 cast round 5 pushed (671f992); fresh critic running (crit118_r5). Lead concerns: orc head reads as a
-  box/bucket helm; skin pale sage; Vampyr dark cuirass reads as a hole.
-- Tiles B9 painter running (heather calmer |dx|<=10, rough 2-4 clumps + no fixed boulder, road_v2). Shipped
-  so far: grass, water, shore, forest. Palette branch claude/tiles-b6 (heather + verdure_mid_0; #118 also
-  carries it).
-- Contracts builders running: C5 prisoners (reaction data placeholder), C6 loot/armoury, C7 road + rabble +
-  ledger (line-ups by place/day), C4b hunters (one party per broken deal, fights once), C8 hub screens.
-- Follow-ups queued: GUI test click helpers press only "attack" (armed mercs press Wait since #126) -> click
-  kit[0] after #139; paired win-rate audit (watch spears now 2 cells).
+## Open PRs and running agents (08:15)
+- #147 stall fix (b934e60): review APPROVE on 920d0b5; a delta review (review147b) checks the later perf shortcut
+  (walk skips route search on wall-free fields). Merge refused for the builder as unreviewed: merge only after the
+  delta review PASSES, through mq.sh with the review recorded. Worktree p4-ai-path kept.
+- #148 Ironman save order: review148 running; then re-sync (conflicts with #143 story_director memory_key).
+- #145 C8 hub screens: lead QC PASS; DIRECTOR LOOK GATE pending (captures D:/MERCS-vault/renders/c8_hub_2026-10-16/).
+  Do NOT merge before his yes (I wrongly marked it done once; the permission system stopped it). Worktree c8 kept.
+- #118 cast: round 7 small fixes running (orc ear crease, 5 vampyr holes, E/W eye, golden 40,48,22 -> verdure_0).
+  Then lead QC (crops cast_r7_2026-10-16) and merge; golden change needs director's look at the 1x pair first.
+- Tiles B9 painter (tiles-b9b) running -> then fresh critic.
+- Follow-ups queued: GUI click helpers press only "attack"; paired win-rate audit (after #147); armoury buy/sell
+  screen (new UI, look gate); C2/C4 memory_key list is hand-written.
 
 ## Queued for the director (when HE writes; one at a time, with images)
 1. Pick mercs 3-6: MERCS-builds/merc_candidates_2026-10-16.md (12 drafts, 3 per slot).
