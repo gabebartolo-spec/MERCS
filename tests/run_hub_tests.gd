@@ -168,7 +168,7 @@ func _check_contract_and_hire() -> void:
 	await _click_button(panel.button_for("accept", id))
 	var taken := panel.button_for("accept", id)
 	check(
-		str(economy.contract(id)["accepted"]) == "true" and taken != null and taken.disabled,
+		str(economy.book.contract(id)["accepted"]) == "true" and taken != null and taken.disabled,
 		"a real click on a contract accepts it: the sim has it taken, the button is spent"
 	)
 	await _click_button(panel.button_for("inspect", "recruit_1"))
