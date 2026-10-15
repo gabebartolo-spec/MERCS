@@ -1,0 +1,34 @@
+{
+  "_comment": "Look B 'Peat and Ochre' on screen (presentation/palette.gd, presentation/ui_look.gd): which palette step each UI role draws in, as a reference 'ramp:index' into core.json or the biome file. 'contrast_pairs' lists every text role on the role it sits on; the look suite fails under 'min_contrast' (WCAG 2). look_ui.md explains each knob.",
+  "biome": "res://assets/palette/biomes/heartland.json",
+  "min_contrast": 4.5,
+  "outline_px": 6,
+  "roles": {
+    "panel_back": "soot:1",
+    "panel_edge": "soot:2",
+    "text": "bone:4",
+    "text_dim": "bone:1",
+    "text_outline": "soot:0",
+    "button_back": "soot:3",
+    "button_hover": "iron:1",
+    "button_pressed": "soot:0",
+    "button_disabled": "soot:1",
+    "button_focus": "fire:0",
+    "button_text": "bone:4",
+    "button_text_hover": "heraldry:4",
+    "button_text_pressed": "bone:3",
+    "button_text_disabled": "bone:1",
+    "bar_back": "soot:0",
+    "bar_fill": "heraldry:2",
+    "bar_edge": "soot:3"
+  },
+  "contrast_pairs": [
+    ["text", "panel_back"],
+    ["text_dim", "panel_back"],
+    ["button_text", "button_back"],
+    ["button_text_hover", "button_hover"],
+    ["button_text_pressed", "button_pressed"],
+    ["button_text_disabled", "button_disabled"],
+    ["text", "text_outline"]
+  ]
+}

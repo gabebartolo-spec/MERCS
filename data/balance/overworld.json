@@ -1,5 +1,5 @@
 {
-  "_comment": "The walkable overworld on screen (presentation/world/overworld_map.gd and overworld_director.gd): the map's scale and tokens in logical pixels (one texel grid with the street, D-035) and the placeholder terrain colours, and how a held walking key repeats. overworld.md explains each knob.",
+  "_comment": "The walkable overworld on screen (presentation/world/overworld_map.gd and overworld_director.gd): the map's scale and tokens in logical pixels (one texel grid with the street, D-035) and the terrain and token colours (palette references, look_ui.md), and how a held walking key repeats. overworld.md explains each knob.",
   "map": {
     "tile_px": 16,
     "band_radius_px": 6,
@@ -14,17 +14,17 @@
     "repeat_s": 0.12
   },
   "colours": {
-    "plain_rgb": [0.52, 0.6, 0.36],
-    "road_rgb": [0.7, 0.6, 0.42],
-    "forest_rgb": [0.2, 0.36, 0.2],
-    "hill_rgb": [0.56, 0.48, 0.34],
-    "water_rgb": [0.2, 0.34, 0.52],
-    "town_rgb": [0.34, 0.28, 0.26],
-    "band_rgb": [0.86, 0.68, 0.24],
-    "ambush_rgb": [0.72, 0.14, 0.12],
-    "patrol_rgb": [0.22, 0.32, 0.7],
-    "site_rgb": [0.95, 0.92, 0.84],
-    "ring_rgb": [0.08, 0.06, 0.06],
-    "chase_rgb": [1.0, 1.0, 1.0]
+    "plain": "verdure:2",
+    "road": "soil:4",
+    "forest": "verdure:0",
+    "hill": "soil:2",
+    "water": "slate:1",
+    "town": "slate:3",
+    "band": "heraldry:2",
+    "ambush": "heraldry:1",
+    "patrol": "heraldry:3",
+    "site": "bone:4",
+    "ring": "soot:0",
+    "chase": "heraldry:4"
   }
 }

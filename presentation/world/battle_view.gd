@@ -24,7 +24,6 @@ const HUD_MARGIN_PX := 12.0
 ## The gap in logical pixels between a fighter's head and the intent marker (a figure is
 ## the stage's sprite_height_px tall on screen wherever it stands), and the outline.
 const INTENT_GAP_PX := 18
-const OUTLINE_PX := 6
 ## The gap an intent marker keeps from the panel's edge when it is moved clear of it.
 const PANEL_GAP_PX := 6.0
 const NOWHERE := Vector2i(-1, -1)
@@ -211,12 +210,12 @@ func _refresh() -> void:
 		var ring: MeshInstance3D = _rings[fighter.id]
 		ring.position = world_point(fighter.cell) + Vector3.UP * _markers.num("markers", "lift_m")
 		var key := (
-			"down_rgb"
+			"down"
 			if fighter.down
-			else ("company_rgb" if fighter.side == BattleUnit.COMPANY else "enemy_rgb")
+			else ("company" if fighter.side == BattleUnit.COMPANY else "enemy")
 		)
 		var material := ring.material_override as StandardMaterial3D
-		material.albedo_color = _markers.rgb("markers", key)
+		material.albedo_color = _markers.colour("markers", key)
 
 
 func _ring() -> MeshInstance3D:
@@ -245,7 +244,7 @@ func _make_hud() -> void:
 
 func _hud_label() -> Label:
 	var label := Label.new()
-	label.add_theme_constant_override(&"outline_size", OUTLINE_PX)
+	UiLook.outlined(label)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hud.add_child(label)
 	return label

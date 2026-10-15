@@ -25,4 +25,4 @@ The loop example (L; `LoopDirector`, `SliceLoop`, `data/scenarios.json`).
 ## markers
 Placeholder side rings under each fighter in the loop's battle, until the hand-made cast's art says whose side a merc is on.
 - `radius_m`, `height_m`, `lift_m`: the flat ring's size and how far above the ground it floats (no z-fighting).
-- `company_rgb`, `enemy_rgb`, `down_rgb`: the company's gold, the enemy's red, and the dark ring where a fighter fell (their sprite is taken away).
+- `company`, `enemy`, `down` (palette references): the company's gold, the enemy's red, and the dark ring where a fighter fell (their sprite is taken away).
