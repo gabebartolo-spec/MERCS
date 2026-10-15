@@ -1,0 +1,78 @@
+{
+  "_comment": "The cast (Phase 2 milestone 3). Six mercenaries at stage 1 (D-066). The orc and the Vampyr are the director's reference pair: their battle numbers stay in data/balance/battle.json fighters (one source of truth), named here by stats_from, and the merc's own stats are laid over them. merc_3 to merc_6 are PLACEHOLDERS: the director authors names, species, roles, stats and gear; nothing here for them is a design. Moves are ids the battle sim knows (move, attack, charge, blood_price). Generic gear (D-066) fills the three slots for stats only and never shows on the sprite. Schema: data/schema/mercs.schema.json.",
+  "starting_captain": "orc",
+  "mercs": [
+    {
+      "id": "orc",
+      "name": "The Orc",
+      "species": "orc",
+      "role": "Big, bulky and mean. Charges in on pure aggression and relies on his gear to survive.",
+      "stats_from": "orc",
+      "stats": {"resolve": 6},
+      "moves_by_level": {"1": ["move", "attack", "charge"]},
+      "stage_1_gear": ["Battle axe", "Plate armour"],
+      "gear_slots": {"weapon": null, "armour": null, "trinket": null},
+      "look": "placeholder"
+    },
+    {
+      "id": "vampyr",
+      "name": "The Vampyr",
+      "species": "vampyr",
+      "role": "A regal dark knight whose bestial nature is barely contained. Spends his own health for combat bonuses, plays cautiously and times his all-ins.",
+      "stats_from": "vampyr",
+      "stats": {"resolve": 7},
+      "moves_by_level": {"1": ["move", "attack", "blood_price"]},
+      "stage_1_gear": ["Dark knight's arms and armour"],
+      "gear_slots": {"weapon": null, "armour": null, "trinket": null},
+      "look": "placeholder"
+    },
+    {
+      "id": "merc_3",
+      "name": "Unnamed 3",
+      "species": "",
+      "placeholder": true,
+      "role": "To be written by the director",
+      "stats": {"hp": 11, "attack": 2, "defense": 2, "damage": 5, "initiative": 3, "presence": 2, "resolve": 5},
+      "moves_by_level": {"1": ["move", "attack"]},
+      "stage_1_gear": [],
+      "gear_slots": {"weapon": null, "armour": null, "trinket": null},
+      "look": "placeholder"
+    },
+    {
+      "id": "merc_4",
+      "name": "Unnamed 4",
+      "species": "",
+      "placeholder": true,
+      "role": "To be written by the director",
+      "stats": {"hp": 11, "attack": 2, "defense": 2, "damage": 5, "initiative": 3, "presence": 2, "resolve": 5},
+      "moves_by_level": {"1": ["move", "attack"]},
+      "stage_1_gear": [],
+      "gear_slots": {"weapon": null, "armour": null, "trinket": null},
+      "look": "placeholder"
+    },
+    {
+      "id": "merc_5",
+      "name": "Unnamed 5",
+      "species": "",
+      "placeholder": true,
+      "role": "To be written by the director",
+      "stats": {"hp": 11, "attack": 2, "defense": 2, "damage": 5, "initiative": 3, "presence": 2, "resolve": 5},
+      "moves_by_level": {"1": ["move", "attack"]},
+      "stage_1_gear": [],
+      "gear_slots": {"weapon": null, "armour": null, "trinket": null},
+      "look": "placeholder"
+    },
+    {
+      "id": "merc_6",
+      "name": "Unnamed 6",
+      "species": "",
+      "placeholder": true,
+      "role": "To be written by the director",
+      "stats": {"hp": 11, "attack": 2, "defense": 2, "damage": 5, "initiative": 3, "presence": 2, "resolve": 5},
+      "moves_by_level": {"1": ["move", "attack"]},
+      "stage_1_gear": [],
+      "gear_slots": {"weapon": null, "armour": null, "trinket": null},
+      "look": "placeholder"
+    }
+  ]
+}
