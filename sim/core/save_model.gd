@@ -22,17 +22,24 @@ var world: WorldSim = null
 var rng: Rng = null
 ## Null unless from_dict() was given the company's data.
 var company: Company = null
+## The wounds block (Aftermath.state(): chronicle, memories, captain, injuries); {} in a
+## save made before it existed. Optional, so it needs no version of its own.
+var wounds := {}
 
 
 ## The Rng's seed and stream positions are written as strings: they are 64-bit ints, and
-## JSON holds a number as a double, exact only up to 2^53. The company is written when there
-## is one.
-static func to_dict(world_sim: WorldSim, source: Rng, held: Company = null) -> Dictionary:
+## JSON holds a number as a double, exact only up to 2^53. The company and the wounds block
+## are written when given.
+static func to_dict(
+	world_sim: WorldSim, source: Rng, held: Company = null, wounds_block: Dictionary = {}
+) -> Dictionary:
 	var saved := {
 		"version": VERSION, "rng": _rng_as_text(source.state()), "world": world_sim.state()
 	}
 	if held != null:
 		saved["company"] = held.state()
+	if not wounds_block.is_empty():
+		saved["wounds"] = wounds_block
 	return saved
 
 
@@ -53,6 +60,7 @@ static func from_dict(
 	else:
 		model.rng = Rng.from_seed(_num(_dict(balance, "world"), "seed"))
 	model.world = WorldSim.restore(_dict(current, "world"), balance, model.rng)
+	model.wounds = _dict(current, "wounds")
 	if not company_defs.is_empty():
 		model.company = Company.restore(_dict(current, "company"), company_defs)
 	model.ok = true

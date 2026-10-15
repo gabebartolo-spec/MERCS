@@ -13,9 +13,10 @@ loop 4
 sim_world 9
 sim_encounters 8
 save 11
-effect 7
+effect 9
 overworld 8
 road 7
 company 12
 inspect 9
 company_battle 5
+injury 29
