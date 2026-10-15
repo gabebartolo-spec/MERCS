@@ -1,4 +1,7 @@
 {
-  "_comment": "Empty until the phase that adds the first entry (08_ROADMAP.md). Schema: data/schema/traits.schema.json.",
-  "traits": []
+  "_comment": "Mercenary traits. Schema: data/schema/traits.schema.json. PLACEHOLDERS (Phase 5 C2, Q-8): a bargaining trait per merc that the director names; until he does, these two stand in so a step-in in contract talks can be built and tested. Their ids, numbers and holders are not a design. bargain: added to the merc's step-in roll (economy.json terms). held_by: the mercs (data/mercs.json ids) who have the trait; it moves to the merc's own entry in data/mercs.json once Q-8 is answered.",
+  "traits": [
+    {"id": "trait_placeholder_silver_tongue", "placeholder": true, "bargain": 3, "held_by": ["vampyr"]},
+    {"id": "trait_placeholder_hard_bargain", "placeholder": true, "bargain": 1, "held_by": ["orc"]}
+  ]
 }

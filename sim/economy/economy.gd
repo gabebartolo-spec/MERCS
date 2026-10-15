@@ -11,6 +11,7 @@ extends RefCounted
 ## parts each package grows live in modules:
 ## - ContractBook (contract_book.gd, `book`): the board, accept, complete, expire;
 ## - Prisoners (prisoners.gd, `captives`): the waiting prisoner and the four choices;
+## - Terms (terms.gd, `terms`): the ask, the employer's reply, the step-in (C2).
 ## - Payroll (payroll.gd, `payroll`): each merc's daily wage by level, his share of a
 ##   contract's pay, and who is owed what (Phase 5 C3).
 ## - Standing (standing.gd, `standing`): the name with each faction and the grudges (C4).
@@ -18,8 +19,8 @@ extends RefCounted
 ## through state() over a new one.
 ##
 ## defs: {"economy": data/balance/economy.json, "factions": data/factions.json, "equipment":
-## data/equipment.json, "recruits": data/recruits.json}. Missing data reads as nothing: no
-## coin, no wages, no board, no recruits, no gear.
+## data/equipment.json, "recruits": data/recruits.json, "traits": data/traits.json}. Missing
+## data reads as nothing: no coin, no wages, no board, no recruits, no gear, no bargaining.
 
 const RELEASE := Prisoners.RELEASE
 const RANSOM := Prisoners.RANSOM
@@ -36,6 +37,8 @@ var morale := 0
 var book := ContractBook.new()
 ## The prisoner a won fight leaves (take(day), ransom_coin(), can_recruit() are read there).
 var captives := Prisoners.new()
+## Negotiation (negotiate(); reputation(id), odds(merc_id), judge() are read there).
+var terms := Terms.new()
 ## The wages and the share by merc (day_wage(merc), dues are read there).
 var payroll := Payroll.new()
 ## The company's name with each faction and its grudges (reputation(faction) is read there).
@@ -173,15 +176,16 @@ func accept(id: String) -> bool:
 	return book.accept(id)
 
 
-## Completes an accepted contract: it pays its reward and leaves the board, and the mercs who
-## fought the job are owed their share of the pay, by level (Payroll.share); a share unpaid
-## counts as owed wages. False otherwise.
+## Completes an accepted contract: it pays its reward, less any advance already paid (C2),
+## and leaves the board; the mercs who fought the job are owed their share of the whole agreed
+## pay, advance included, by level (Payroll.share); a share unpaid counts as owed wages.
+## False otherwise.
 func complete(id: String, fought: Array[Merc] = []) -> bool:
 	var row := book.complete(id)
 	if row.is_empty():
 		return false
 	var reward := _num(row, "reward", 0)
-	purse += reward
+	purse += reward - _num(row, "advance", 0)
 	owed += payroll.share(reward, fought)
 	standing.completed(str(row.get("faction", "")))
 	return true
@@ -200,6 +204,17 @@ func abandon(id: String, company: Company, day: int) -> bool:
 	var key := "standing.grudge" if grew else "standing.abandon"
 	chronicle.append({"day": day, "merc": company.captain_id, "key": key})
 	return true
+
+
+## Negotiates a posted contract's terms (Terms). ask: {"price": total coin, "advance": the
+## coin of it paid now (the rest on return), "speaker": the merc id who steps in or "",
+## "day": today}; rng: the world's Rng ("terms" stream, rolled only by a step-in). The
+## employer accepts (the contract is taken, the advance paid), counters (his terms are kept on
+## the contract) or walks (it leaves the board, the name falls). Returns the reply and why.
+func negotiate(company: Company, id: String, ask: Dictionary, rng: Rng) -> Dictionary:
+	var talk := ask.duplicate()
+	talk["rng"] = rng
+	return terms.negotiate(self, company, id, talk)
 
 
 ## Loot from a won fight of this encounter type: coin to the purse, a piece of gear to the
@@ -284,6 +299,7 @@ func _read(defs: Dictionary) -> void:
 	captives.setup(_dict(_rules, "prisoner"), _recruits, _max_morale())
 	payroll.setup(_dict(_rules, "wages"))
 	standing.setup(_dict(_rules, "standing"))
+	terms.setup(_dict(_rules, "terms"), factions, _rows(_dict(defs, "traits"), "traits"), standing)
 
 
 static func _num(block: Dictionary, key: String, fallback: int) -> int:

@@ -43,3 +43,13 @@ One line per knob (docs/05_STYLE_CODE.md "Data"). Read by `sim/economy/` (Phase 
 - `abandon_dent`: name lost when the company abandons a contract it took.
 - `sizeable_advance`: percent of a contract's pay taken up front at or above which abandoning it grows a grudge (director: "half the pay or more", Q-16).
 - `grudge_growth`: how much a faction's grudge grows for each such deal; the hunters it sends grow with it (Q-15).
+
+## terms (Phase 5 C2: the ask, the employer's reply, the step-in; placeholder numbers, whole numbers)
+- `base_limit_pct`: the most any employer gives, in percent of the posted reward, before his regard and need.
+- `reputation_weight_pct`: percent of the company's name with the faction (standing `min` to `max`) added to his limit.
+- `need_weight_pct`: percent of the faction's pressure (data/factions.json) added to his limit.
+- `advance_cost_pct`: how much each coin of advance weighs against his limit, in percent of a coin paid on return.
+- `counter_band_pct`: how far past his limit (percent of the reward) an ask still gets a counter; beyond it he walks.
+- `die_sides`: the step-in check's die.
+- `step_in_difficulty`: the step-in succeeds when the roll plus the merc's bargaining reaches this.
+- `step_in_shift_pct`: how far a step-in moves the employer's limit (up on success, down on failure), in percent of the reward.
