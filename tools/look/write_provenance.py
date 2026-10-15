@@ -53,7 +53,10 @@ def main() -> None:
           "hand-repainted part by part in palette ramps (tools/look/cast_r3/); heads kept from the render. Round 4 "
           "(2026-10-16, tools/look/cast_r4/): the orc repainted inside the round-2 alpha (bulk back), skin on the "
           "green-grey skin_orc ramp, tusks in bone 3 (director: 'bulk and green-grey skin'); the Vampyr in his own "
-          "armour (slim spaulders, no fauld box) with a fanned cape; tokens are the SE frames at half scale.",
+          "armour (slim spaulders, no fauld box) with a fanned cape; tokens are the SE frames at half scale. Round 5 "
+          "(2026-10-16, tools/look/cast_r5/): the orc's heads hand-placed as planes (broad jaw, brow shelf, mouth, "
+          "tusks from the lower jaw), skin on the moss-hue skin_orc ramp, plate one iron step darker; the Vampyr's "
+          "armour darker with a cuirass ridge and the cape lining showing at the front; the orc token head by hand.",
           ["tools/pipeline/render_character.py", "tools/pipeline/kit_extras.py", "tools/pipeline/pixelate.py",
            "tools/pipeline/pack_sheets.py", "tools/pipeline/kits/orc_s1_blockout.json",
            "tools/pipeline/kits/vampyr_s1_blockout.json", "tools/look/build_sprites.py",
@@ -69,11 +72,15 @@ def main() -> None:
           "colours moved to their nearest verdure step, the orc figures' skin to the new ramp by index "
           "(tools/look/cast_r3/remap_golden.py). Round 4 (2026-10-16): the orc figures' skin follows the "
           "green-grey ramp by index; overworld lit grass flattened from a verdure_1/2 checker to verdure_2 "
-          "(lead call, stop-gap until the B7 tile re-render; director to approve) (tools/look/cast_r4/remap_golden.py).",
+          "(lead call, stop-gap until the B7 tile re-render; director to approve) (tools/look/cast_r4/remap_golden.py). "
+          "Round 5 (2026-10-16): overworld rebuilt from the approved golden with its lit grass on verdure_mid_0 and "
+          "no dark rims; orc figures' skin on the round-5 ramp by index; director to approve "
+          "(tools/look/cast_r5/remap_golden.py).",
           ["tools/look/look_target.gd", "tools/look/look_map.gd", "tools/look/palette_post.gdshader",
            "tools/look/build_look_kit.py",
            "tools/look/build_sprites.py", "tools/look/cast_r3/remap_golden.py",
-           "tools/look/cast_r4/remap_golden.py"], [blender, mpfb, py, "Godot Engine"],
+           "tools/look/cast_r4/remap_golden.py", "tools/look/cast_r5/remap_golden.py"],
+          [blender, mpfb, py, "Godot Engine"],
           approved)
 
 

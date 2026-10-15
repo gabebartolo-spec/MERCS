@@ -1,9 +1,9 @@
 {
-  "_doc": "Golden references (06 section 8), 1x logical (960 x 540): look_target.gd captures of the real StreetStage at 3840 x 2160 (exact 4x4 blocks), one pixel kept per block. Changes only by a director decision in DECISIONS.md. 2026-10-16 (director: grey-olive orc skin): grass pixels in the old skin_orc colours moved to their nearest verdure step, the orc figures' skin to the new ramp by index (tools/look/cast_r3/remap_golden.py). Round 4 (2026-10-16): the orc figures' skin follows the green-grey ramp by index; overworld lit grass flattened from a verdure_1/2 checker to verdure_2 (lead call, stop-gap until the B7 tile re-render; director to approve) (tools/look/cast_r4/remap_golden.py).",
+  "_doc": "Golden references (06 section 8), 1x logical (960 x 540): look_target.gd captures of the real StreetStage at 3840 x 2160 (exact 4x4 blocks), one pixel kept per block. Changes only by a director decision in DECISIONS.md. 2026-10-16 (director: grey-olive orc skin): grass pixels in the old skin_orc colours moved to their nearest verdure step, the orc figures' skin to the new ramp by index (tools/look/cast_r3/remap_golden.py). Round 4 (2026-10-16): the orc figures' skin follows the green-grey ramp by index; overworld lit grass flattened from a verdure_1/2 checker to verdure_2 (lead call, stop-gap until the B7 tile re-render; director to approve) (tools/look/cast_r4/remap_golden.py). Round 5 (2026-10-16): overworld rebuilt from the approved golden with its lit grass on verdure_mid_0 and no dark rims; orc figures' skin on the round-5 ramp by index; director to approve (tools/look/cast_r5/remap_golden.py).",
   "asset": "golden",
   "files": {
-    "overworld_map.png": "af36250d2a3f85f4e2d8b14077f52f68e95bc2bf8e54f23232a8ad1ddb7d74b2",
-    "street_day.png": "9123ed725a1181ebe1451e0f7394764a5ab8459ce42c4be96aacb5d0ec0e6b5d",
+    "overworld_map.png": "7e08efa4a68b16810baf684af582e8ac9975d2be46cbdac3e99116eae1dfdbcf",
+    "street_day.png": "a4278fc3313ade1ab49321f493fcac667fe48cb841c5c382fe03fb331787981a",
     "street_rain_night.png": "0376e96abc0f66bf5298def0f2a1ccb79f62c2b98bf97b16cdaeffd7274ee884"
   },
   "produced_by": {
@@ -13,7 +13,8 @@
     "tools/look/build_look_kit.py": "1dff31e8c379d67e",
     "tools/look/build_sprites.py": "fa6a36cfba532049",
     "tools/look/cast_r3/remap_golden.py": "cba07b1d0b653fd9",
-    "tools/look/cast_r4/remap_golden.py": "3f13c48617ed81d3"
+    "tools/look/cast_r4/remap_golden.py": "3f13c48617ed81d3",
+    "tools/look/cast_r5/remap_golden.py": "acddcb187f35fbae"
   },
   "models": [],
   "licence_rows": [

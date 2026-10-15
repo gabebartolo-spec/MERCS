@@ -1,5 +1,5 @@
 {
- "_doc": "MERCS biome palette 'heartland' (06 section 2): the core ramps (core.json) plus this biome's ground, stone and sky (slate), soil, timber and foliage, and its light. From look option B 'Peat and Ochre', picked by the director 2026-10-15. Other biomes (kingdoms, landscapes) are new files beside this one with the same ramp names.",
+ "_doc": "MERCS biome palette 'heartland' (06 section 2): the core ramps (core.json) plus this biome's ground, stone and sky (slate), soil, timber, foliage and heather, and its light. From look option B 'Peat and Ochre', picked by the director 2026-10-15. Other biomes (kingdoms, landscapes) are new files beside this one with the same ramp names.",
  "schema": "mercs.palette/1",
  "id": "mercs_biome_heartland",
  "status": "APPROVED",
@@ -91,6 +91,22 @@
     "#4c592b",
     "#667238",
     "#808c46"
+   ]
+  },
+  {
+   "name": "heather",
+   "purpose": "heather, ling and moor flowers: three dusty purples (director, 2026-10-16)",
+   "colours": [
+    "#3d2a41",
+    "#674e64",
+    "#94758a"
+   ]
+  },
+  {
+   "name": "verdure_mid",
+   "purpose": "grass mass: one step between verdure_1 and verdure_2, luma ~69 (director, 2026-10-16: darken to match golden)",
+   "colours": [
+    "#40501d"
    ]
   }
  ]
