@@ -51,8 +51,13 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
   branches claude/board-after-<n> or merge_eligibility refuses them.
 - Rejected tools today: Rucol GAN (no licence), gmattie Data-Pixels (hand-typed pixels, no use).
 - #89 M7 storylet+memory MERGED (optional story save block; placeholder words for him).
-- Wiring = PR #90 (green pre-#89): coder merging main + Aftermath uses story_director.memory +
-  Economy.accept memory line + field up to 6 mercs; then sim review + merge. Veto: no game-over on wipe.
+- #90 wiring MERGED (674c749): company (up to 6) fights parties, triage, dead stay dead.
+  ALL Phase 2 milestones built. Full-loop build: MERCS-builds/2026-10-15_loop_674c749 (his play).
+- Director 2026-10-15: company wipe -> "Campaign ends" (final chronicle screen). Coder: worktree
+  campaign-end, claude/campaign-end. LOG as a D-entry in the next board PR.
+- Gate pack coder: slice-m1, claude/p2-gate-pack: blocked-step feedback fix + docs/audits/
+  phase2_gate/ (what to play, veto table, placeholders, 4K captures, structural self-check).
+  Then: Concept Lead's structural audit (other account) + his one playthrough = the gate.
 - ART resumed (director "look target first"): Opus, art-look, claude/art-look-target (main + art
   branch merged). Deliverable: 2-3 labelled options (palette+light+post), each = street day, street
   night/rain at 4K in-engine, overworld strip at map scale; draft palettes in assets/palette/options/.
