@@ -12,7 +12,7 @@ extends Node
 
 const STORYLETS_DATA := "res://data/storylets.json"
 const WORLD_DATA := "res://data/balance/world.json"
-const NODE_NAME := "StoryDirector"
+const NODE_NAME := &"StoryDirector"
 const SAVE_SYSTEM := preload("res://presentation/autoload/save_system.gd")
 const SAVE_SYSTEM_PATH := ^"/root/SaveSystem"
 const CLOSE := "close"
@@ -47,7 +47,7 @@ static func attach(game: SliceGame) -> StoryDirector:
 ## The memories of the game this node belongs to (null when it has no story director).
 static func memory_of(from: Node) -> Memory:
 	var parent := from.get_parent()
-	var found := parent.get_node_or_null(NODE_NAME) if parent != null else null
+	var found := parent.get_node_or_null(NodePath(NODE_NAME)) if parent != null else null
 	return (found as StoryDirector).memory if found is StoryDirector else null
 
 
@@ -68,7 +68,7 @@ func begin() -> void:
 		var model := saves.load_game(_json(WORLD_DATA))
 		if model.ok:
 			var kept: Variant = model.wounds.get("memories", {})
-			memory = Memory.restore(kept if kept is Dictionary else {})
+			memory = Memory.restore(_dict(kept))
 			state = StoryletState.restore(model.story)
 
 
@@ -143,7 +143,7 @@ func _show_scene() -> void:
 	var choices: Array[Dictionary] = []
 	var options := _options()
 	for option: Dictionary in options:
-		var params := _names(offer.get("cast", {}))
+		var params := _names(_dict(offer.get("cast", {})))
 		params.merge(
 			{
 				"name": _name(str(option.get("merc", ""))),
@@ -158,7 +158,7 @@ func _show_scene() -> void:
 				"label": Text.t(_label_key(def, str(option.get("role", ""))), params)
 			}
 		)
-	var scene := Text.t(str(def.get("scene_key", "")), _names(offer.get("cast", {})))
+	var scene := Text.t(str(def.get("scene_key", "")), _names(_dict(offer.get("cast", {}))))
 	panel.present(Text.t(str(def.get("title_key", ""))), scene, choices)
 
 
@@ -168,7 +168,7 @@ func _show_outcome() -> void:
 		"roll": result.get("roll", 0), "need": result.get("need", 0), "sides": _sides(def)
 	}
 	var lines: Array[String] = [
-		Text.t(str(result.get("line_key", "")), _names(offer.get("cast", {}))),
+		Text.t(str(result.get("line_key", "")), _names(_dict(offer.get("cast", {})))),
 		Text.t("storylet.roll", roll_params),
 		Text.t("storylet.result.%s" % str(result.get("branch", "")))
 	]
@@ -200,17 +200,16 @@ func _options() -> Array[Dictionary]:
 
 
 func _label_key(def: Dictionary, role: String) -> String:
-	var check: Variant = def.get("check", {})
-	var attempts: Variant = (check as Dictionary).get("attempts", []) if check is Dictionary else []
+	var attempts: Variant = _dict(def.get("check", {})).get("attempts", [])
 	for raw: Variant in attempts if attempts is Array else []:
-		if raw is Dictionary and (raw as Dictionary).get("role", "") == role:
-			return str((raw as Dictionary).get("label_key", ""))
+		var option := _dict(raw)
+		if option.get("role", "") == role:
+			return str(option.get("label_key", ""))
 	return ""
 
 
 func _sides(def: Dictionary) -> int:
-	var check: Variant = def.get("check", {})
-	return Injury.num(check, "die_sides") if check is Dictionary else 0
+	return Injury.num(_dict(def.get("check", {})), "die_sides")
 
 
 ## {role: the merc's name} for every role in the cast, to fill the storylet's words.
@@ -229,3 +228,7 @@ func _name(merc_id: String) -> String:
 static func _json(path: String) -> Dictionary:
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
 	return parsed if parsed is Dictionary else {}
+
+
+static func _dict(value: Variant) -> Dictionary:
+	return value if value is Dictionary else {}

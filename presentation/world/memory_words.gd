@@ -7,7 +7,10 @@ extends RefCounted
 
 static func line(entry: Dictionary, company: Company) -> String:
 	var held: Variant = entry.get("params", {})
-	var params: Dictionary = (held as Dictionary).duplicate() if held is Dictionary else {}
+	var params := {}
+	if held is Dictionary:
+		var kept: Dictionary = held
+		params = kept.duplicate()
 	var about := str(params.get("about", entry.get("about", "")))
 	var merc := company.member(about) if company != null else null
 	params["name"] = merc.display_name if merc != null else about
