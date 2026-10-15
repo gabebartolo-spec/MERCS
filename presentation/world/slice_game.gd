@@ -171,7 +171,6 @@ func _on_screen_key(code: Key) -> void:
 		toggle_overworld()
 
 
-## C and B: opening one full screen closes the other, so two never stack.
 func _toggle_company() -> void:
 	if _hub != null and not company_open():
 		_hub.set_open(false)
@@ -361,11 +360,6 @@ func _build_hud() -> void:
 ## Places every merc and the camera, and shows each merc's current facing.
 func _sync() -> void:
 	_hud.visible = not (_paused())
-	# A screen the game opened by itself (the hub after a won fight) wins over the company's.
-	if company_open() and hub_open():
-		_company_director.set_open(false)
-	if _overworld != null:
-		_overworld.set_covered(company_open() or hub_open())
 	# From the fight on, the camera stays on the field and the street's walkers step aside.
 	var arena := _arena()
 	var fighting := arena != null

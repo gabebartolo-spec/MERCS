@@ -58,10 +58,6 @@ var _triage := ""
 ## What waits for Continue: the hub's loot and prisoner (the world's result hook), so the
 ## triage comes first.
 var _after_triage := Callable()
-## Whether the hub or the company screen stands over the map, and whether the panel was up
-## when it came (so closing the screen puts the panel back as it was).
-var _covered := false
-var _panel_was_up := false
 ## Set when the triage left nobody alive: the saved campaign is over and Continue ends it.
 var _ended := false
 
@@ -124,6 +120,7 @@ func begin() -> void:
 	panel = LoopPanel.new()
 	_layer.add_child(panel)
 	panel.chosen.connect(_on_choice)
+	add_child(MapCover.make(panel, map))
 	_show(_place_line())
 
 
@@ -160,20 +157,6 @@ func set_open(open: bool) -> void:
 	if open:
 		_show(_place_line())
 		_show_triage()
-
-
-## A screen (the hub, the company) stands over the map: the map's own panel and header step
-## out from under it, and come back as they were when it closes.
-func set_covered(covered: bool) -> void:
-	if _layer == null or covered == _covered:
-		return
-	_covered = covered
-	if covered:
-		_panel_was_up = panel.visible
-		panel.visible = false
-	else:
-		panel.visible = _panel_was_up
-	map.show_header(not covered)
 
 
 ## The walking keys' direction this frame (Vector2i.ZERO when none is held): a fresh press
