@@ -1,0 +1,102 @@
+class_name BattleGrid
+extends RefCounted
+## The battle's square grid (D-066: square grid, eight facings): its size, the blocked cells
+## (walls and props), 8-way steps that never cut a blocked or occupied corner, and the one
+## terrain feature of Phase 2, blocking: a fighter who steps next to a standing opponent is
+## engaged and his walk ends there, so a front-liner standing in front of a back-liner stops
+## attackers from walking past him to reach the one behind (the shieldman literally stands in
+## front of the archer; vision "Combat"). Every standing fighter blocks; there are no numbers.
+
+var size := Vector2i.ONE
+var blocked := {}
+
+
+## field: {"size": Vector2i, "blocked": {Vector2i: true}}.
+func setup(field: Dictionary) -> void:
+	var read_size: Variant = field.get("size", Vector2i.ONE)
+	size = read_size if read_size is Vector2i else Vector2i.ONE
+	var read_blocked: Variant = field.get("blocked", {})
+	blocked = read_blocked if read_blocked is Dictionary else {}
+
+
+## Cells the fighter may walk to within limit steps: a walk ends on the first cell next to a
+## standing opponent (engaged), though a fighter who starts engaged may step away.
+func reachable(fighter: BattleUnit, units: Array[BattleUnit], limit: int) -> Dictionary:
+	var reach := {fighter.cell: 0}
+	var frontier: Array[Vector2i] = [fighter.cell]
+	while not frontier.is_empty():
+		var from: Vector2i = frontier.pop_front()
+		var steps: int = reach[from]
+		if steps >= limit or (from != fighter.cell and engaged(from, fighter.side, units)):
+			continue
+		for step: Vector2i in steps_from(from, units):
+			if not reach.has(step):
+				reach[step] = steps + 1
+				frontier.append(step)
+	reach.erase(fighter.cell)
+	return reach
+
+
+## True when a standing fighter of the other side stands next to the cell.
+func engaged(cell: Vector2i, side: int, units: Array[BattleUnit]) -> bool:
+	for other: BattleUnit in units:
+		if other.side != side and not other.down and adjacent(cell, other.cell):
+			return true
+	return false
+
+
+## Free neighbouring cells, 8-way, never cutting a blocked or occupied corner.
+func steps_from(from: Vector2i, units: Array[BattleUnit]) -> Array[Vector2i]:
+	var out: Array[Vector2i] = []
+	for step: Vector2i in BattleUnit.FACINGS:
+		if not is_free(from + step, units):
+			continue
+		if (
+			step.x != 0
+			and step.y != 0
+			and not (
+				is_free(from + Vector2i(step.x, 0), units)
+				and is_free(from + Vector2i(0, step.y), units)
+			)
+		):
+			continue
+		out.append(from + step)
+	return out
+
+
+func is_free(cell: Vector2i, units: Array[BattleUnit]) -> bool:
+	if cell.x < 0 or cell.y < 0 or cell.x >= size.x or cell.y >= size.y or blocked.has(cell):
+		return false
+	for fighter: BattleUnit in units:
+		if fighter.cell == cell and not fighter.down:
+			return false
+	return true
+
+
+static func adjacent(a: Vector2i, b: Vector2i) -> bool:
+	return a != b and absi(a.x - b.x) <= 1 and absi(a.y - b.y) <= 1
+
+
+## Chebyshev distance: king moves on the 8-way grid.
+static func gap(a: Vector2i, b: Vector2i) -> int:
+	return maxi(absi(a.x - b.x), absi(a.y - b.y))
+
+
+## The facing (one of the eight) that looks from a towards b; keeps fallback when a == b.
+static func toward(a: Vector2i, b: Vector2i, fallback: Vector2i) -> Vector2i:
+	var facing := (b - a).sign()
+	return facing if facing != Vector2i.ZERO else fallback
+
+
+## Faces the nearest standing opponent (ties by id); keeps the facing when there is none.
+static func face_nearest(fighter: BattleUnit, units: Array[BattleUnit]) -> void:
+	var nearest: BattleUnit = null
+	for other: BattleUnit in units:
+		if other.side == fighter.side or other.down:
+			continue
+		var steps := gap(fighter.cell, other.cell)
+		var best := gap(fighter.cell, nearest.cell) if nearest != null else steps
+		if nearest == null or steps < best or (steps == best and other.id < nearest.id):
+			nearest = other
+	if nearest != null:
+		fighter.facing = toward(fighter.cell, nearest.cell, fighter.facing)
