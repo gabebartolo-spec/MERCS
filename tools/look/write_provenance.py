@@ -49,7 +49,9 @@ def main() -> None:
           "Orc and Vampyr stage-1 blockouts rendered by the sprite pipeline (CC0 MPFB bodies; plate as shells "
           "conformed to the body plus Blender primitives, kit_extras.py), reduced to core + heartland with the "
           "outline on the silhouette only, speckle merged and the tokens hand-edited (token_edits.json). "
-          "Cast fix after the slop audit of 2026-10-15.",
+          "Cast fix after the slop audit of 2026-10-15. Round 3 (2026-10-16): bodies, tokens and normal strips "
+          "hand-repainted part by part in palette ramps (tools/look/cast_r3/); heads kept from the render; orc "
+          "skin on the grey-olive skin_orc ramp (director 2026-10-16).",
           ["tools/pipeline/render_character.py", "tools/pipeline/kit_extras.py", "tools/pipeline/pixelate.py",
            "tools/pipeline/pack_sheets.py", "tools/pipeline/kits/orc_s1_blockout.json",
            "tools/pipeline/kits/vampyr_s1_blockout.json", "tools/look/build_sprites.py",
@@ -61,10 +63,13 @@ def main() -> None:
     write(REPO / "assets" / "golden",
           "Golden references (06 section 8), 1x logical (960 x 540): look_target.gd captures of the real "
           "StreetStage at 3840 x 2160 (exact 4x4 blocks), one pixel kept per block. Changes only by a director "
-          "decision in DECISIONS.md.",
+          "decision in DECISIONS.md. 2026-10-16 (director: grey-olive orc skin): grass pixels in the old skin_orc "
+          "colours moved to their nearest verdure step, the orc figures' skin to the new ramp by index "
+          "(tools/look/cast_r3/remap_golden.py).",
           ["tools/look/look_target.gd", "tools/look/look_map.gd", "tools/look/palette_post.gdshader",
            "tools/look/build_look_kit.py",
-           "tools/look/build_sprites.py"], [blender, mpfb, py, "Godot Engine"], approved)
+           "tools/look/build_sprites.py", "tools/look/cast_r3/remap_golden.py"], [blender, mpfb, py, "Godot Engine"],
+          approved)
 
 
 if __name__ == "__main__":

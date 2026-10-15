@@ -4,7 +4,7 @@
   "layer": "body",
   "clip": "rest",
   "image": "average_m_body_rest.png",
-  "image_pixel_sha256": "f34c7ea5315c124bc787db744850b24cc96594f3a02ee6e07cf9444b8f519bfa",
+  "image_pixel_sha256": "8214355bb96f42bf29012e70f59d18000791fb9161921533b7b58b172ce59fbb",
   "frame_w": 176,
   "frame_h": 176,
   "frame_count": 8,
@@ -93,7 +93,7 @@
   "palette": {
     "id": "mercs_biome_heartland",
     "file": "assets/palette/biomes/heartland.json",
-    "sha256": "71e24478eec0a3f8222103a10a8f42b8795948a70bdd54d8a310d0c2d0cb3844",
+    "sha256": "baeb6806d5b34992ab0e3503aa096770b61a08b824074ee96f9f3c95e2b952d7",
     "status": "APPROVED"
   },
   "provenance": {

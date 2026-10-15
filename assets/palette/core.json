@@ -52,11 +52,11 @@
    "name": "skin_orc",
    "purpose": "the orc's skin (index-mapped from skin_neutral)",
    "colours": [
-    "#283016",
-    "#424a26",
-    "#5e6637",
-    "#7c8349",
-    "#9ba15c"
+    "#37331e",
+    "#575236",
+    "#787250",
+    "#9c956c",
+    "#c1b989"
    ]
   },
   {

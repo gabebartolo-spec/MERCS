@@ -4,7 +4,7 @@
   "layer": "body",
   "clip": "rest",
   "image": "vampyr_look_heartland.png",
-  "image_pixel_sha256": "7480d4cfabddf17b3432cfb4b1873ff6740480da5ff0937ec2b949c195d36b28",
+  "image_pixel_sha256": "0579f4db39099e5e0766432fa1fd04732361c141d7ae88b2dfc170e5ebbced9f",
   "frame_w": 176,
   "frame_h": 176,
   "frame_count": 8,
@@ -93,7 +93,7 @@
   "palette": {
     "id": "mercs_biome_heartland",
     "file": "assets/palette/biomes/heartland.json",
-    "sha256": "71e24478eec0a3f8222103a10a8f42b8795948a70bdd54d8a310d0c2d0cb3844",
+    "sha256": "baeb6806d5b34992ab0e3503aa096770b61a08b824074ee96f9f3c95e2b952d7",
     "status": "APPROVED"
   },
   "provenance": {
@@ -202,6 +202,6 @@
     ]
   },
   "normal_image": "vampyr_look_heartland_normal.png",
-  "normal_image_pixel_sha256": "5dffcd43980191b12f9d019eaad6241e53ae644ed1e689ca330890d87bad5324",
+  "normal_image_pixel_sha256": "8d4fc242580b3297f51cdec071a5d7ee304a2bba670c75e89281df1104c44fe3",
   "normal_doc": "camera-facing tangent space, OpenGL: R = screen right, G = screen up, B = toward camera, encoded n * 0.5 + 0.5; alpha copied from the colour frame"
 }

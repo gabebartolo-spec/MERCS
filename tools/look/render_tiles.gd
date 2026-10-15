@@ -23,8 +23,11 @@ const FLAT := ":flat"
 const SHADOW_BIAS := 0.08
 const SHADOW_NORMAL_BIAS := 2.5
 const SHADOW_DISTANCE_M := 60.0
-## Same reserved-colour penalties as tools/look/look_target.gd.
-const RESERVED_PENALTY := {"heraldry": 0.012, "blood": 0.012, "fire": 0.004}
+## Same reserved-colour penalties as tools/look/look_target.gd (skin_orc excluded from the world).
+const SKIN_EXCLUDED := 4.0
+const RESERVED_PENALTY := {
+	"heraldry": 0.012, "blood": 0.012, "fire": 0.004, "skin_orc": SKIN_EXCLUDED
+}
 ## Output name, kit tile, and the tiles north and south of it (east and west are itself).
 const TILES: Array[Array] = [
 	["grass", "tile_plain", "", ""],

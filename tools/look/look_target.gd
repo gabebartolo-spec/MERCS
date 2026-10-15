@@ -35,10 +35,15 @@ const TOKEN_BLOB_M := 0.5
 const SHADOW_BIAS := 0.08
 const SHADOW_NORMAL_BIAS := 2.5
 const SHADOW_DISTANCE_M := 120.0
+## The world never snaps to a merc skin ramp: grass took skin_orc and hid the orc on the map
+## (director, 2026-10-16). Larger than any OKLab distance, so the colour is never the nearest.
+const SKIN_EXCLUDED := 4.0
 ## Squared OKLab distance added to reserved colours, by ramp: heraldry and blood about 0.1 in
 ## lightness or hue (only cloth painted in them keeps them); fire less, so the flame keeps
 ## it but lit plate does not catch stray orange pixels.
-const RESERVED_PENALTY := {"heraldry": 0.012, "blood": 0.012, "fire": 0.004}
+const RESERVED_PENALTY := {
+	"heraldry": 0.012, "blood": 0.012, "fire": 0.004, "skin_orc": SKIN_EXCLUDED
+}
 ## The rain's particle seed for these frames: stage.json's seed 7 drops a streak down the Vampyr's
 ## body, which reads as a blade.
 const RAIN_SEED := 11
