@@ -6,14 +6,21 @@ shader_type canvas_item;
 // distance: heraldry, blood and fire are reserved (06 section 2: saturated colour only on faction cloth
 // and flame),
 // so lit wood or mud never snaps to them. Deterministic: no noise, no time.
+// Dither gate (desloppify, 2026-10-15): with gate_low >= 0 the dither only acts where the source's
+// OKLab lightness varies by gate_low..gate_high across the pixel's neighbours gate_reach logical
+// pixels away, i.e. on a real gradient (torch fall-off); flat faces and hard edges snap plainly, so
+// a flat field never becomes a 1-px checkerboard. gate_low < 0 dithers everywhere (the old rule).
 
-const int MAX_COLOURS = 64;
+const int MAX_COLOURS = 72;
 uniform vec3 palette_lab[MAX_COLOURS];
 uniform vec3 palette_rgb[MAX_COLOURS];
 uniform float palette_penalty[MAX_COLOURS];
 uniform int colour_count = 0;
 uniform float dither = 0.0;
 uniform vec2 logical_size = vec2(960.0, 540.0);
+uniform float gate_low = -1.0;
+uniform float gate_high = 1.0;
+uniform float gate_reach = 2.0;
 
 vec3 to_linear(vec3 c) {
 	return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(vec3(0.04045), c));
@@ -39,7 +46,22 @@ void fragment() {
 	vec3 src = texture(TEXTURE, UV).rgb;
 	vec3 lab = to_oklab(clamp(src, 0.0, 1.0));
 	ivec2 cell = ivec2(floor(UV * logical_size));
-	lab.x += bayer4(cell) * dither * 0.08;
+	float amount = dither;
+	if (gate_low >= 0.0) {
+		vec2 step_uv = gate_reach / logical_size;
+		float lo = lab.x;
+		float hi = lab.x;
+		vec2 offsets[4] = vec2[](vec2(1.0, 0.0), vec2(-1.0, 0.0), vec2(0.0, 1.0), vec2(0.0, -1.0));
+		for (int k = 0; k < 4; k++) {
+			vec3 n = texture(TEXTURE, UV + offsets[k] * step_uv).rgb;
+			float l = to_oklab(clamp(n, 0.0, 1.0)).x;
+			lo = min(lo, l);
+			hi = max(hi, l);
+		}
+		float spread = hi - lo;
+		amount *= step(gate_low, spread) * step(spread, gate_high);
+	}
+	lab.x += bayer4(cell) * amount * 0.08;
 	float best = 1e9;
 	vec3 out_rgb = src;
 	for (int i = 0; i < MAX_COLOURS; i++) {

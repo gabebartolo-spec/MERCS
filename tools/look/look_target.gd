@@ -312,6 +312,15 @@ func _post(_option: String) -> void:
 	material.set_shader_parameter("palette_penalty", penalty)
 	material.set_shader_parameter("colour_count", rgbs.size())
 	material.set_shader_parameter("dither", _num(_block("post"), "dither"))
+	var post := _block("post")
+	if post.has("dither_gate"):  # [low, high, reach]: dither only on real gradients (shader doc)
+		var gate: Array = post["dither_gate"]
+		var low: float = gate[0]
+		var high: float = gate[1]
+		var reach: float = gate[2]
+		material.set_shader_parameter("gate_low", low)
+		material.set_shader_parameter("gate_high", high)
+		material.set_shader_parameter("gate_reach", reach)
 	material.set_shader_parameter("logical_size", Vector2(_stage.logical_size()))
 	container.material = material
 

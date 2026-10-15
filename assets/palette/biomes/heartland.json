@@ -6,7 +6,7 @@
  "approved": true,
  "core": "../core.json",
  "light": {
-  "_doc": "Option B 'Peat and Ochre' lighting and post: low golden morning sun, warm brown ambient; night is a dim grey moon and a strong torch; light 4x4 ordered dither smooths the ramps. Sun and ambient energy +5% (director, 2026-10-15: \"the lighting could stand to be 5% brighter\").",
+  "_doc": "Option B 'Peat and Ochre' lighting and post: low golden morning sun, warm brown ambient; night is a dim grey moon and a strong torch; no dither (desloppify, 2026-10-15: a 4x4 ordered dither on every flat face read as a 1-px checkerboard; plain nearest match keeps faces flat). Sun and ambient energy +5% (director, 2026-10-15: \"the lighting could stand to be 5% brighter\").",
   "day": {
    "elevation_degrees": 35,
    "azimuth_degrees": -50,
@@ -45,7 +45,7 @@
    "rain": "bone:0"
   },
   "post": {
-   "dither": 0.45
+   "dither": 0.0
   }
  },
  "ramps": [
@@ -55,8 +55,8 @@
    "colours": [
     "#34393d",
     "#4f5251",
-    "#6d6d67",
-    "#8b897d",
+    "#6a6d6c",
+    "#878a7d",
     "#aba693"
    ]
   },
@@ -64,8 +64,8 @@
    "name": "soil",
    "purpose": "ground, mud, leather lowlights",
    "colours": [
-    "#2b1c11",
-    "#46311f",
+    "#291d10",
+    "#43321f",
     "#63482e",
     "#82613e",
     "#a27a4e"
@@ -91,6 +91,16 @@
     "#4c592b",
     "#667238",
     "#808c46"
+   ]
+  },
+  {
+   "name": "water",
+   "purpose": "water depth and glints, around cloth_faded 2 (base) and 3 (light): deep, low, high, glint",
+   "colours": [
+    "#1c2a33",
+    "#2e3e48",
+    "#42565d",
+    "#a3b7ad"
    ]
   }
  ]

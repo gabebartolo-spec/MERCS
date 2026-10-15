@@ -35,6 +35,14 @@ const WATER := "W"
 const SHORE := "S"
 ## Shore tile variants (kit tile_shore_<n>), picked by a fixed hash like the banks.
 const SHORE_VARIANTS := 3
+## Grass variants (kit tile_plain, tile_plain_1, _2): different tuft clumps, so the grid does
+## not repeat.
+const PLAIN := "P"
+const PLAIN_VARIANTS := 3
+## Open water with only water around it (all eight neighbours, or the map edge) is deep (kit
+## tile_water_deep); each side facing shallower water gets a ragged fringe (kit deep_fringe_<n>).
+const DEEP_TILE := "tile_water_deep"
+const DEEP_FRINGES := 3
 ## Each tile copy is scaled up this much so neighbours overlap a few millimetres: exact edges left
 ## hairline cracks that showed the sky as a long pale line across the water.
 const TILE_OVERLAP := 1.002
@@ -58,12 +66,45 @@ static func lay(kit: Node3D, holder: Node3D) -> void:
 			var tile: String = TILE_NAMES[code]
 			if code == SHORE:
 				tile += "_%d" % ((i * 5 + j * 11) % SHORE_VARIANTS)
+			if code == PLAIN and (i * 3 + j * 7) % PLAIN_VARIANTS > 0:
+				tile += "_%d" % ((i * 3 + j * 7) % PLAIN_VARIANTS)
+			var deep := _deep(i, j)
+			if deep:
+				tile = DEEP_TILE
 			var copy := _piece(kit, tile, i, j, holder)
 			copy.scale = Vector3.ONE * TILE_OVERLAP
 			if code in TURNABLE:
 				copy.rotation.y = PI / 2.0 * ((i * 7 + j * 13) % 4)
 			if code == WATER or code == SHORE:
 				_banks(kit, i, j, holder)
+			if deep:
+				_fringes(kit, i, j, holder)
+
+
+## Whether (i, j) is water with water on all eight sides (the map's edge counts as water).
+static func _deep(i: int, j: int) -> bool:
+	for dj: int in range(-1, 2):
+		for di: int in range(-1, 2):
+			var x := i + di
+			var y := j + dj
+			if x < 0 or y < 0 or x >= ROWS[0].length() or y >= ROWS.size():
+				continue
+			if ROWS[y][x] != WATER:
+				return false
+	return true
+
+
+## A ragged deep fringe on each side of deep tile (i, j) that meets shallower water.
+static func _fringes(kit: Node3D, i: int, j: int, holder: Node3D) -> void:
+	for side: int in SIDES.size():
+		var n := Vector2i(i, j) + SIDES[side]
+		if n.x < 0 or n.y < 0 or n.x >= ROWS[0].length() or n.y >= ROWS.size():
+			continue
+		if _deep(n.x, n.y):
+			continue
+		var key := "deep_fringe_%d" % ((i * 5 + j * 11 + side * 3) % DEEP_FRINGES)
+		var fringe := _piece(kit, key, i, j, holder)
+		fringe.rotation.y = PI / 2.0 * side
 
 
 ## A bank on each edge of tile (i, j) where its water meets land; the map's outer edge is left open.

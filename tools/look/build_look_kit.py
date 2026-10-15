@@ -390,6 +390,15 @@ WATER_Y = -0.04
 BANK_VARIANTS = 3
 WATER_FACETS = [(1.01, P(*WATER, flat=True))]
 SHORE_VARIANTS = 3
+# The water ramp (director, 2026-10-15: "add water colours"), all unlit like the base: glints, a ragged band
+# of lighter shallows off every mud bank with a thin dark wet lip at the mud's edge, and deep water on open
+# water two tiles or more from land (look_map.gd picks tile_water_deep and its ragged fringes).
+GLINT = P("water", 3, flat=True)
+SHALLOWS = P("water", 2, flat=True)
+LIP = P("water", 1, flat=True)
+DEEP = P("water", 0, flat=True)
+DEEP_FRINGES = 3
+PLAIN_VARIANTS = 3
 
 
 def glints(o, n, seed, z_lo=-1.3, z_hi=1.3):
@@ -398,7 +407,7 @@ def glints(o, n, seed, z_lo=-1.3, z_hi=1.3):
         gx, gz = h(i, seed, 21) * 2.6 - 1.3, z_lo + h(i, seed, 22) * (z_hi - z_lo)
         for k in range(2):
             o.box((0.16 + 0.1 * h(i, k, 23), 0.04, 0.01), (gx + k * 0.32, gz + 0.04 * k, WATER_Y + 0.01),
-                  P("slate", 2, flat=True))
+                  GLINT)
 
 
 def reeds(o, x, z, k, n):
@@ -420,8 +429,19 @@ def bank(o, v, e=TILE / 2, x_lo=-TILE / 2 - 0.15, x_hi=TILE / 2 + 0.15):
     out = [0.2 + 0.55 * h(v, k, 51) for k in range(n + 1)]  # into the water, metres from the line
     mid = [o_ * (0.35 + 0.3 * h(v, k, 52)) for k, o_ in enumerate(out)]
     land = [0.04 + 0.36 * h(v, k, 53) ** 2 for k in range(n + 1)]  # back under the grass
+    lip = [o_ + 0.05 + 0.04 * h(v, k, 57) for k, o_ in enumerate(out)]
+    shallow = [li + 0.15 + 0.3 * h(v, k, 58) for k, li in enumerate(lip)]
     for k in range(n):
         x0, x1 = xs[k], xs[k + 1]
+        # Shallows and lip only inside the tile: past its edge lies a neighbour's grass, above which they'd show.
+        sx0, sx1 = max(x0, -TILE / 2), min(x1, TILE / 2)
+        if sx1 > sx0:
+            def at(vals, x):
+                return vals[k] + (vals[k + 1] - vals[k]) * (x - x0) / (x1 - x0)
+            o.poly([(sx0, e - at(shallow, sx0), 0.008), (sx1, e - at(shallow, sx1), 0.008),
+                    (sx1, e - at(lip, sx1), 0.008), (sx0, e - at(lip, sx0), 0.008)], SHALLOWS)
+            o.poly([(sx0, e - at(lip, sx0), 0.010), (sx1, e - at(lip, sx1), 0.010),
+                    (sx1, e - at(out, sx1), 0.010), (sx0, e - at(out, sx0), 0.010)], LIP)
         o.poly([(x0, e - out[k], 0.012), (x1, e - out[k + 1], 0.012), (x1, e - mid[k + 1], 0.012),
                 (x0, e - mid[k], 0.012)], P("soil", 1))
         o.poly([(x0, e - mid[k], 0.014), (x1, e - mid[k + 1], 0.014), (x1, e + land[k + 1], 0.014),
@@ -431,14 +451,42 @@ def bank(o, v, e=TILE / 2, x_lo=-TILE / 2 - 0.15, x_hi=TILE / 2 + 0.15):
         reeds(o, xs[k] + 0.2, e - out[k] * 0.6, v * 10 + c, 3)
 
 
+def tuft(o, x, z, k):
+    """A grass tuft: a small fan of three blades from one root, leaning a little away from the camera, so the
+    sun gives it a lit and a shadow side and a small cast shadow (a single cone read as a shapeless shard,
+    and a full star of thin blades as a scribble)."""
+    lean = (h(k, 61) - 0.5) * 0.6
+    for b in range(3):
+        ang = math.pi + lean + (b - 1) * 0.7 + 0.2 * (h(k, b, 62) - 0.5)
+        tilt = 0.3 + 0.2 * h(k, b, 63)
+        length = 0.3 + 0.1 * h(k, b, 64)
+        rot = Matrix.Rotation(ang, 4, "Z") @ Matrix.Rotation(tilt, 4, "X")
+        mid = rot @ Vector((0.0, 0.0, length / 2))
+        o.cone(0.11, 0.0, length, (x + mid.x, z + mid.y, mid.z), P("verdure", 3), segs=3, rot=rot)
+
+
+def pebble(o, x, z, k):
+    """A stone from above: a low six-sided chunk, its top slate 3 and its sides slate 1, both unlit so the warm
+    sun cannot snap it to a skin colour (a lit slate box read as a pink blob); it still casts a shadow."""
+    r = 0.22 + 0.08 * h(k, 71)
+    res = bmesh.ops.create_cone(o.bm, cap_ends=True, segments=6, radius1=r, radius2=r * 0.7, depth=0.14,
+                                matrix=Matrix.Translation(Vector((x, z, 0.07))) @ Matrix.Rotation(h(k, 72), 4, "Z"))
+    for f in {f for v in res["verts"] for f in v.link_faces}:
+        f.material_index = o.mi(P("slate", 3, flat=True) if f.normal.z > 0.9 else P("slate", 1, flat=True))
+
+
 def overworld(col):
     grass = [(1.01, P("verdure", 2))]
-    o = Obj("tile_plain")
-    tile_base(o, grass)
-    for i in range(9):  # tufts and stones break up the flat grass
-        o.cone(0.22, 0.0, 0.3, (h(i, 1) * 3.6 - 1.8, h(i, 2) * 3.6 - 1.8, 0.15), P("verdure", 3 if i % 3 else 1), segs=4)
-    o.box((0.18, 0.14, 0.08), (h(3, 5) * 3.0 - 1.5, h(4, 5) * 3.0 - 1.5, 0.04), P("slate", 3))
-    o.finish(col)
+    for v in range(PLAIN_VARIANTS):  # grass: a few clumps of tufts with bare grass between, and a stone or two
+        o = Obj("tile_plain" if v == 0 else f"tile_plain_{v}")
+        tile_base(o, grass)
+        for c in range(3 + v % 2):
+            cx, cz = h(v, c, 65) * 3.0 - 1.5, h(v, c, 66) * 3.0 - 1.5
+            for t in range(1 + int(h(v, c, 67) * 2)):
+                tuft(o, cx + (h(v, c, t, 68) - 0.5) * 1.0, cz + (h(v, c, t, 69) - 0.5) * 1.0, v * 100 + c * 10 + t)
+        for p in range(1 + v % 2):
+            pebble(o, h(v, p, 73) * 3.0 - 1.5, h(v, p, 74) * 3.0 - 1.5, v * 10 + p)
+        o.finish(col)
     o = Obj("tile_road")
     tile_base(o, grass)
     for i in range(8):  # a rutted dirt road along the tile's X axis
@@ -483,6 +531,20 @@ def overworld(col):
     tile_base(o, WATER_FACETS, y0=WATER_Y, n=4)
     glints(o, 3, 0)
     o.finish(col)
+    o = Obj("tile_water_deep")
+    tile_base(o, [(1.01, DEEP)], y0=WATER_Y, n=4)
+    glints(o, 2, 3)
+    o.finish(col)
+    for v in range(DEEP_FRINGES):  # deep water reaching ragged into a shallower neighbour (Godot turns it)
+        o = Obj(f"deep_fringe_{v}")
+        n = 9
+        xs = [-TILE / 2 + k * TILE / n for k in range(n + 1)]
+        reach = [0.25 + 0.9 * h(v, k, 81) ** 1.5 for k in range(n + 1)]
+        for k in range(n):
+            o.poly([(xs[k], TILE / 2 - 0.02, WATER_Y + 0.004), (xs[k + 1], TILE / 2 - 0.02, WATER_Y + 0.004),
+                    (xs[k + 1], TILE / 2 + reach[k + 1], WATER_Y + 0.004),
+                    (xs[k], TILE / 2 + reach[k], WATER_Y + 0.004)], DEEP)
+        o.finish(col)
     for v in range(SHORE_VARIANTS):
         o = Obj(f"tile_shore_{v}")  # water on the -Y half, grass on +Y, a ragged bank between
         tile_base(o, WATER_FACETS, y0=WATER_Y, n=4, rows=range(2))

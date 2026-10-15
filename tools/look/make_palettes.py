@@ -2,7 +2,7 @@
 
   python tools/look/make_palettes.py
 
-Each option is one coherent set of named ramps (06_STYLE_ART.md section 2), 64 colours. A ramp is
+Each option is one coherent set of named ramps (06_STYLE_ART.md section 2), 64 colours (B adds water: 68). A ramp is
 given by its darkest and lightest colour; the steps between are spaced evenly in OKLab, so lightness
 climbs evenly and any hue shift between the anchors (cool shadows, warm lights) is spread over the
 ramp. A ramp given as a list keeps those colours as they are (cloth pairs, heraldry, blood, fire).
@@ -38,6 +38,7 @@ PURPOSE = {
     "heraldry": "faction colours only: crimson, gold, blue, white, yellow",
     "blood": "overlay only: two reds and a dried brown",
     "fire": "torch and ember accents",
+    "water": "water depth and glints, around cloth_faded 2 (base) and 3 (light): deep, low, high, glint",
 }
 STEPS = {"soot": 4, "slate": 5, "iron": 5, "soil": 5, "timber": 5, "bone": 5, "skin_neutral": 5,
          "skin_orc": 5, "skin_pale": 5, "verdure": 5}
@@ -69,6 +70,7 @@ OPTIONS = {
             "cloth_faded": ["#7a3a26", "#a0573a", "#37474f", "#59706f"],
             "heraldry": ["#8a1d1d", "#bb3a2c", "#d29a2a", "#22488a", "#ece3cf", "#e0b92c"],
             "blood": ["#5c1010", "#80201a", "#4c2a18"], "fire": ["#e07a28", "#f6c64a"],
+            "water": ["#1c2a33", "#2e3e48", "#42565d", "#a3b7ad"],  # director, 2026-10-15: "add water colours"
         },
     },
     "C": {
@@ -134,15 +136,24 @@ def gpl(name: str, ramps: list[dict]) -> str:
 
 NL = chr(10)
 CORE = ["soot", "iron", "bone", "skin_neutral", "skin_orc", "skin_pale", "cloth_faded", "heraldry", "blood", "fire"]
-BIOME = ["slate", "soil", "timber", "verdure"]
+BIOME = ["slate", "soil", "timber", "verdure", "water"]
+# Desloppify (2026-10-15): steps of the picked palette that sat within 8 (max RGB channel) of another colour,
+# moved apart at the same OKLab lightness by the smallest hue/chroma shift that leaves every pair at least
+# 9 apart (slop_scan near-duplicates; the smallest move, so lit faces flip to other colours as little as
+# possible). The core (iron 4, blood 2) moves only where both colours of a pair are core.
+SEPARATED = {("slate", 2): "#6a6d6c", ("slate", 3): "#878a7d", ("soil", 0): "#291d10", ("soil", 1): "#43321f",
+             ("iron", 4): "#b4b1a6", ("blood", 2): "#4d2a16"}
 PICKED = "B"  # director, 2026-10-15: option B "Peat and Ochre" is the look target
 BIOME_NAME = "heartland"
 AUDIT = REPO / "docs" / "audits" / "look_target" / "options"
 LIGHTS = json.loads((HERE / "look_options.json").read_text(encoding="utf-8"))["options"]
 
 
-def ramps_of(opt: dict, names: list[str]) -> list[dict]:
-    return [{"name": n, "purpose": PURPOSE[n], "colours": ramp(opt["ramps"][n], STEPS.get(n, 0))} for n in names]
+def ramps_of(opt: dict, names: list[str], separated: dict | None = None) -> list[dict]:
+    out = [{"name": n, "purpose": PURPOSE[n], "colours": ramp(opt["ramps"][n], STEPS.get(n, 0))} for n in names]
+    for r in out:
+        r["colours"] = [(separated or {}).get((r["name"], i), c) for i, c in enumerate(r["colours"])]
+    return out
 
 
 def save(path: Path, data: dict, title: str) -> None:
@@ -175,14 +186,14 @@ def main() -> None:
                 "and fire. A biome palette adds the world's ramps. From look option B 'Peat and Ochre', picked "
                 "by the director 2026-10-15. Never reorder: colour index is the position in the flattened list.",
         "schema": "mercs.palette/1", "id": "mercs_core", "status": "APPROVED", "approved": True,
-        "ramps": ramps_of(opt, CORE)}, "MERCS core")
+        "ramps": ramps_of(opt, CORE, SEPARATED)}, "MERCS core")
     save(OUT.parent / "biomes" / f"{BIOME_NAME}.json", {
         "_doc": f"MERCS biome palette '{BIOME_NAME}' (06 section 2): the core ramps (core.json) plus this "
                 "biome's ground, stone and sky (slate), soil, timber and foliage, and its light. From look "
                 "option B 'Peat and Ochre', picked by the director 2026-10-15. Other biomes (kingdoms, "
                 "landscapes) are new files beside this one with the same ramp names.",
         "schema": "mercs.palette/1", "id": f"mercs_biome_{BIOME_NAME}", "status": "APPROVED", "approved": True,
-        "core": "../core.json", "light": LIGHTS[PICKED], "ramps": ramps_of(opt, BIOME)},
+        "core": "../core.json", "light": LIGHTS[PICKED], "ramps": ramps_of(opt, BIOME, SEPARATED)},
         f"MERCS biome {BIOME_NAME} (core + biome)")
 
 

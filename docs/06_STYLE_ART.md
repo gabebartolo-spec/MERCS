@@ -26,13 +26,15 @@ world can change colour by biome while the mercs never do:
   `iron`, `bone`, the skin ramps, `cloth_faded`, `heraldry`, `blood`, `fire`. The mercs' bodies and
   gear and the UI subset draw only from core.
 - **Biome** `assets/palette/biomes/<name>.json` (+ `.gpl`, which includes the core colours): the
-  world's ramps (`slate` for stone, sky and water; `soil`; `timber`; `verdure`) plus the biome's
+  world's ramps (`slate` for stone and sky; `soil`; `timber`; `verdure`; `water`) plus the biome's
   light (sun, ambient, sky, night torch and rain, post dither). The file names its core; loading a
   biome gives core then biome. Today there is one biome, `heartland`; later biomes (kingdoms,
   landscapes) are new files with the same ramp names (director, 2026-10-15). No new biome without a
   director decision.
 - Every frame and asset is validated against core + one biome (`validate_palette.py`,
-  `validate_pixels.py --palette <biome>.json`); core + biome holds 48–64 colours (heartland: 44 + 20).
+  `validate_pixels.py --palette <biome>.json`); core + biome holds 48–72 colours (heartland: 44 + 24; the cap rose from 64 for the water
+  ramp, director 2026-10-15: "add water colours"). No two colours sit within 8 of each other on any
+  RGB channel: near-duplicates are slop (`slop_scan.py`).
 - Built by `tools/look/make_palettes.py` (ramps spaced in OKLab between hand-set anchors); options A
   and C, not picked, are kept as review records in `docs/audits/look_target/options/`.
 
@@ -52,6 +54,7 @@ Ramps (5–6 steps each, 4 for `soot`):
 | `heraldry_*` | saturated faction colours: crimson/gold, blue/white, black/yellow (3 factions in the slice) |
 | `blood` | two reds and a brown for dried |
 | `fire` | torch and ember accents |
+| `water` | water depth around `cloth_faded` 2 (base) and 3: deep, low (wet lip at a bank), high (shallows), glint |
 
 Rules: heraldry ramps are the only high-saturation colours and appear only on faction cloth,
 shields and banners. World and bodies stay in the muted ramps. Blood is a shipped overlay colour,

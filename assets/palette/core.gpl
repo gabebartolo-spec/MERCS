@@ -10,7 +10,7 @@ Columns: 6
  74  73  70	iron_1
 108 106  99	iron_2
 144 141 130	iron_3
-182 177 163	iron_4
+180 177 166	iron_4
 142 125  93	bone_0
 165 149 116	bone_1
 189 174 140	bone_2
@@ -43,6 +43,6 @@ Columns: 6
 224 185  44	heraldry_5
  92  16  16	blood_0
 128  32  26	blood_1
- 76  42  24	blood_2
+ 77  42  22	blood_2
 224 122  40	fire_0
 246 198  74	fire_1
