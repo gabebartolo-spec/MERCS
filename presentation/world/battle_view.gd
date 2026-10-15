@@ -185,7 +185,7 @@ func _on_choice(choice_id: String) -> void:
 	if parts.size() > 1:
 		action["target"] = parts[1]
 	if parts.size() > 1 and battle.current().knows(parts[0]):
-		action["to"] = _landing(battle.current(), battle.unit(parts[1]), parts[0])
+		action["to"] = BattleLanding.cell(battle, battle.current(), battle.unit(parts[1]), parts[0])
 	_play(action)
 
 
@@ -225,7 +225,7 @@ func _actions(actor: BattleUnit) -> Array[Dictionary]:
 		if enemy.side == actor.side or enemy.down:
 			continue
 		var params := {"target": _name(enemy)}
-		if _adjacent(actor.cell, enemy.cell):
+		if BattleLanding.adjacent(actor.cell, enemy.cell):
 			out.append(
 				{
 					"id": battle.kit(actor.id)[0] + ":" + enemy.id,
@@ -233,33 +233,12 @@ func _actions(actor: BattleUnit) -> Array[Dictionary]:
 				}
 			)
 		for move: String in actor.moves:
-			if _landing(actor, enemy, move) != NOWHERE:
+			if BattleLanding.cell(battle, actor, enemy, move) != NOWHERE:
 				out.append(
 					{"id": move + ":" + enemy.id, "label": Text.t("battle.move." + move, params)}
 				)
 	out.append({"id": Battle.ACTION_WAIT, "label": Text.t("slice.battle.wait")})
 	return out
-
-
-## Where the actor uses a move on the enemy: where he stands when beside them, else the
-## nearest reachable cell beside them for a move that walks; NOWHERE when out of reach.
-func _landing(actor: BattleUnit, enemy: BattleUnit, move: String) -> Vector2i:
-	if enemy == null:
-		return NOWHERE
-	if _adjacent(actor.cell, enemy.cell):
-		return actor.cell
-	if battle.move_def(move).get("walk") != true:
-		return NOWHERE
-	var best := NOWHERE
-	var cells: Array = battle.reachable(actor).keys()
-	cells.sort()
-	for cell: Vector2i in cells:
-		if (
-			_adjacent(cell, enemy.cell)
-			and (best == NOWHERE or _gap(cell, actor.cell) < _gap(best, actor.cell))
-		):
-			best = cell
-	return best
 
 
 func _refresh() -> void:
@@ -396,11 +375,3 @@ func _field_mid() -> Vector2:
 		low = low.min(fighter.cell)
 		high = high.max(fighter.cell)
 	return Vector2(low + high) / 2.0
-
-
-static func _adjacent(a: Vector2i, b: Vector2i) -> bool:
-	return a != b and absi(a.x - b.x) <= 1 and absi(a.y - b.y) <= 1
-
-
-static func _gap(a: Vector2i, b: Vector2i) -> int:
-	return maxi(absi(a.x - b.x), absi(a.y - b.y))
