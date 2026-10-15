@@ -1,13 +1,14 @@
 class_name BattleAi
 extends RefCounted
 ## The enemy's plan for a round and its choice for one turn, from what it can see (CLAUDE.md
-## rule 6: the AI is not psychic). A fighter sees opponents within sight_cells (Chebyshev
-## distance) and nothing else: no hidden health, plans or loadouts. At the start of a round it
-## plans (intent): attack the most hurt seen opponent beside it, else advance on the closest
-## seen one, else hold. On its turn it attacks its planned target if beside it, else any seen
-## opponent beside it (a front-liner who engaged it), else walks to the reachable cell nearest
-## its planned target (the closest seen opponent when the plan is gone); else it waits.
-## Deterministic: no rolls, ties broken by unit id and cell.
+## rule 6: the AI is not psychic). Everything it knows of an opponent comes through
+## BattleKnowledge: who stands within sight_cells and whether each looks wounded; never exact
+## health, the other numbers, loadouts or plans. At the start of a round it plans (intent):
+## attack the most hurt-looking seen opponent beside it, else advance on the closest seen one,
+## else hold. On its turn it attacks its planned target if beside it, else the most
+## hurt-looking seen opponent beside it (a front-liner who engaged it), else walks to the
+## reachable cell nearest its planned target (the closest seen opponent when the plan is
+## gone); else it waits. Deterministic: no rolls, ties broken by unit id and cell.
 
 const INTENT_ATTACK := "attack"
 const INTENT_ADVANCE := "advance"
@@ -16,24 +17,24 @@ const INTENT_HOLD := "hold"
 
 ## The plan for this round: {"unit", "kind": attack | advance | hold, "target": id or ""}.
 static func intent(battle: Battle, fighter: BattleUnit, sight_cells: int) -> Dictionary:
-	var seen := _seen(battle, fighter, sight_cells)
+	var seen := BattleKnowledge.seen(battle, fighter, sight_cells)
 	if seen.is_empty():
 		return {"unit": fighter.id, "kind": INTENT_HOLD, "target": ""}
-	var target := _weakest_adjacent(fighter, seen)
+	var target := _most_hurt_adjacent(fighter, seen)
 	if target != null:
 		return {"unit": fighter.id, "kind": INTENT_ATTACK, "target": target.id}
 	return {"unit": fighter.id, "kind": INTENT_ADVANCE, "target": _closest(fighter.cell, seen).id}
 
 
 static func choose(battle: Battle, fighter: BattleUnit, sight_cells: int) -> Dictionary:
-	var seen := _seen(battle, fighter, sight_cells)
+	var seen := BattleKnowledge.seen(battle, fighter, sight_cells)
 	if seen.is_empty():
 		return {"type": Battle.ACTION_WAIT}
 	var planned := _planned(battle, fighter, seen)
 	var blow := battle.kit(fighter.id)[0]
 	if planned != null and BattleGrid.gap(fighter.cell, planned.cell) == 1:
 		return {"type": blow, "target": planned.id}
-	var target := _weakest_adjacent(fighter, seen)
+	var target := _most_hurt_adjacent(fighter, seen)
 	if target != null:
 		return {"type": blow, "target": target.id}
 	var goal := planned if planned != null else _closest(fighter.cell, seen)
@@ -71,24 +72,13 @@ static func _planned(battle: Battle, fighter: BattleUnit, seen: Array[BattleUnit
 	return null
 
 
-static func _seen(battle: Battle, fighter: BattleUnit, sight_cells: int) -> Array[BattleUnit]:
-	var seen: Array[BattleUnit] = []
-	for other: BattleUnit in battle.units:
-		if (
-			other.side != fighter.side
-			and not other.down
-			and BattleGrid.gap(fighter.cell, other.cell) <= sight_cells
-		):
-			seen.append(other)
-	return seen
-
-
-static func _weakest_adjacent(fighter: BattleUnit, seen: Array[BattleUnit]) -> BattleUnit:
+## The seen opponent beside the fighter who looks most hurt (BattleKnowledge), else null.
+static func _most_hurt_adjacent(fighter: BattleUnit, seen: Array[BattleUnit]) -> BattleUnit:
 	var pick: BattleUnit = null
 	for other: BattleUnit in seen:
 		if BattleGrid.gap(fighter.cell, other.cell) != 1:
 			continue
-		if pick == null or other.hp < pick.hp or (other.hp == pick.hp and other.id < pick.id):
+		if pick == null or BattleKnowledge.looks_worse(other, pick):
 			pick = other
 	return pick
 
