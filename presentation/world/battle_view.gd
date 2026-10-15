@@ -7,17 +7,19 @@ extends Node
 ## on a reachable cell moves; enemy turns play themselves after a short pause (BattleAi, which
 ## only acts on what it sees). A flat ring under each fighter says whose side they are on
 ## (placeholder until the hand-made cast's art carries it; slice.json "markers"); a downed
-## fighter's sprite goes and a dark ring marks where they fell. A strip at the top shows the
-## turn order from now (Battle.turn_order) and whether a side wavers; a word marker over each
-## enemy shows its intent for the round until it acts (Battle.intent). Placeholder look.
+## fighter's sprite goes and a dark ring marks where they fell. A strip along the bottom
+## left (clear of the help line at the top) shows the turn order from now
+## (Battle.turn_order) and whether a side wavers; a word marker over each enemy's head shows
+## its intent for the round until it acts (Battle.intent). Placeholder look.
 
 signal finished
 
 const MARKER_DATA := "res://data/balance/slice.json"
 const ENEMY_PAUSE_S := 0.45
 const HUD_MARGIN_PX := 12.0
-## How far above a fighter's feet the intent marker sits, and its outline for legibility.
-const INTENT_LIFT_M := 2.1
+## The gap in logical pixels between a fighter's head and the intent marker (a figure is
+## the stage's sprite_height_px tall on screen wherever it stands), and the outline.
+const INTENT_GAP_PX := 8
 const OUTLINE_PX := 6
 const NOWHERE := Vector2i(-1, -1)
 var battle: Battle = null
@@ -226,7 +228,6 @@ func _make_hud() -> void:
 	_hud = CanvasLayer.new()
 	add_child(_hud)
 	_order_label = _hud_label()
-	_order_label.position = Vector2(HUD_MARGIN_PX, HUD_MARGIN_PX)
 	for fighter: BattleUnit in battle.units:
 		if fighter.side == BattleUnit.ENEMY:
 			_intent_labels[fighter.id] = _hud_label()
@@ -250,6 +251,9 @@ func _refresh_hud() -> void:
 		if battle.is_shaken(side):
 			line += " " + Text.t("battle.shaken." + BattleUnit.SIDE_KEYS[side])
 	_order_label.text = line
+	var strip := _order_label.get_minimum_size()
+	var view := _order_label.get_viewport_rect().size
+	_order_label.position = Vector2(HUD_MARGIN_PX, view.y - strip.y - HUD_MARGIN_PX)
 	for unit_id: Variant in _intent_labels:
 		var label: Label = _intent_labels[unit_id]
 		var plan := battle.intent(str(unit_id))
@@ -270,10 +274,12 @@ func _place_intents() -> void:
 		scale = float(street_stage.screen_scale())
 	for unit_id: Variant in _intent_labels:
 		var label: Label = _intent_labels[unit_id]
-		var head := world_point(battle.unit(str(unit_id)).cell) + Vector3.UP * INTENT_LIFT_M
-		var at := camera.unproject_position(head) * scale
-		label.reset_size()
-		label.position = at - Vector2(label.size.x / 2.0, label.size.y)
+		var sprite: Sprite3D = _sprites[unit_id]
+		var head := camera.unproject_position(sprite.global_position)
+		head.y -= street_stage.sprite_height_px + INTENT_GAP_PX
+		var at := head * scale
+		var size := label.get_minimum_size()
+		label.position = at - Vector2(size.x / 2.0, size.y)
 
 
 func _field_far() -> Vector2i:
