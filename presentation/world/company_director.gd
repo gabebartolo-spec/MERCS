@@ -28,6 +28,8 @@ var company: Company = null
 ## What the company has suffered: injuries, the chronicle, the memories (the game's one).
 var wounds: CompanyWounds = null
 var panel: CompanyPanel = null
+## The overworld's autosave (writes only under Ironman), called after the captain is appointed.
+var autosave := Callable()
 
 var _layer: CanvasLayer = null
 var _selected := ""
@@ -112,6 +114,8 @@ func _pick(merc_id: String) -> void:
 
 func _appoint(merc_id: String) -> void:
 	company.appoint(merc_id)
+	if autosave.is_valid():
+		autosave.call()
 	_show()
 
 

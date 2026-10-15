@@ -83,6 +83,11 @@ static func _action(plain: Dictionary) -> Dictionary:
 		if value is Array:
 			var pair: Array = value
 			action[str(key)] = Vector2i(_whole(pair, 0), _whole(pair, 1))
+		elif value is int or value is bool:
+			action[str(key)] = value
+		elif value is float:
+			var number: float = value
+			action[str(key)] = int(number) if is_equal_approx(number, roundf(number)) else number
 		else:
 			action[str(key)] = str(value)
 	return action

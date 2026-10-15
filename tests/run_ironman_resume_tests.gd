@@ -7,6 +7,8 @@ extends "res://tests/lib/runner.gd"
 ## world, Rng, company and wounds as the uninterrupted fight. Every other decision is written
 ## the moment it is made: the toll paid, a rest day, wages paid, a hire and a prisoner's fate
 ## each survive a quit with Ironman On; with Ironman Off none of them writes anything.
+## The commits the first pass left open (tests/ironman_resume/gap_checks.gd): meeting an
+## encounter, a storylet attempt, the captain's appointment and a recorded action's types.
 ## Seeded by design: world seed 424270, a lone ambush or patrol three steps out, the battle played
 ## by BattleAi on both sides (InputKit), the start of the Ironman suite's own fight.
 ##   godot --headless --path . --script tests/run_ironman_resume_tests.gd
@@ -16,6 +18,7 @@ const Kit := preload("res://tests/lib/wiring_kit.gd")
 const End := preload("res://tests/lib/end_kit.gd")
 const World := preload("res://tests/lib/world_fixture.gd")
 const SAVE_SYSTEM := preload("res://presentation/autoload/save_system.gd")
+const GapChecks := preload("res://tests/ironman_resume/gap_checks.gd")
 const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const WINDOW_SIZE := Vector2i(1920, 1080)
 const SEED := 424270
@@ -39,6 +42,9 @@ func run_checks() -> void:
 	await _check_rest_and_wages()
 	await _check_hire()
 	await _check_prisoner()
+	var gaps := GapChecks.new()
+	gaps.setup(self, Callable(self, "check"))
+	await gaps.run()
 	_clear_save()
 	await process_frame
 

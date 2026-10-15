@@ -154,6 +154,7 @@ func _on_story_choice(choice_id: String) -> void:
 	elif choice_id.begins_with(ATTEMPT_PREFIX):
 		result = book.choose(offer, choice_id.trim_prefix(ATTEMPT_PREFIX))
 		if not result.is_empty():
+			_linked.autosave()
 			_show_outcome()
 
 
