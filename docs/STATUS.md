@@ -4,16 +4,16 @@ Cap: 150 lines. Edited only by the Merge & CI agent, in a board PR after each me
 merged PR's "Board and log" section (D-026, D-030). History rolls to `docs/archive/status_<month>.md`.
 
 ## Phase
-Current phase: **1 (art) and 2 (horizontal slice) in parallel (D-065)** (Phase 0 gate PASS WITH NOTES, D-027). Gate signer: Concept Lead.
+Current phase: **1 (art, look target first) and 2 (horizontal slice) in parallel (D-065)** (Phase 0 gate PASS WITH NOTES, D-027). Gate signer: Concept Lead.
 
 ## Agents
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | working | Phase 2 milestone 1 DONE (#75); milestone 2 in progress; awaiting the director's milestone 1 play review (F2 in the build) | claude/p2-m2-encounters | 2026-10-15 |
-| Merge & CI (Sonnet 5.5) | working | board PR after #75 (#72, #74, #75) | claude/board-after-75 | 2026-10-15 |
-| Art Factory (Opus 5.5) | awaiting director | paused; director 2026-10-15: keep Art paused, focus on the playable baseline; P1-ART-SLICE-CAST step 2 WIP on claude/art-slice-cast (art-publish worktree) | claude/art-slice-cast | 2026-10-15 |
-| Concept Lead (Fable 5.1) | working | interviewed the director on the horizontal-slice plan; roadmap rewrite (item 18) DONE in #74; leading Phase 2 under D-071 (milestone 1 in #75); next: milestone 2, travel and encounters, after the director's milestone review; Phase 2 structural audit at the gate | — | 2026-10-14 |
+| Dev Lead (Opus 5.5) | working | Phase 2 M1-M6 merged; M7 storylet (claude/p2-m7-storylet), walkable overworld (claude/p2-overworld-walk), wiring (claude/p2-wiring) in progress; coder cap 4 (D-072) | see Item column | 2026-10-15 |
+| Merge & CI (Sonnet 5.5) | working | board PR after #75-#87 (D-072..D-081) | claude/board-1015 | 2026-10-15 |
+| Art Factory (Opus 5.5) | working | resumed 2026-10-15 on the look target first (D-074); the cast WIP waits | claude/art-look-target | 2026-10-15 |
+| Concept Lead (Fable 5.1) | available | roadmap rewrite DONE (#74); handoff in #77 (open); Phase 2 structural audit at the gate | claude/concept-lead-handoff (#77) | 2026-10-15 |
 
 States: working · running a check · awaiting director · blocked · available.
 
@@ -63,20 +63,27 @@ States: working · running a check · awaiting director · blocked · available.
 19. Merge & CI: vision revision (#63, D-047..D-058) merged; #61 superseded. DONE.
 
 ### Phase 2 (horizontal slice, D-064)
-1. Dev Lead: milestone 1, map and world tick. DONE (#75).
-2. Dev Lead (builder): milestone 2, travel and encounters. Assigned (director 2026-10-15: start now while he plays milestone 1), branch claude/p2-m2-encounters.
+1. Milestone 1, map and world tick. DONE (#75).
+2. Milestone 2, travel and encounters. DONE (#80). Director: playtest success (D-076).
+3. Milestone 3, the cast and the company. DONE (#81); four mercs are placeholders.
+4. Milestone 4, battle skeleton (order, intent, morale rout, blocking). DONE (#85).
+5. Milestone 5, wounds, triage, death, chronicle, succession (sim). DONE (#82); wiring after M3/M4.
+6. Milestone 6, wages, contracts, loot, hiring, the prisoner choice. DONE (#87).
+7. Milestone 7, one storylet plus the memory system. In progress, claude/p2-m7-storylet.
+Extras: lint magic numbers are errors (#79); `tools/merge_eligibility.sh` (#78); 4K display fix (#83); gdlint required (#84); letter keys replace function keys (#86); walkable overworld (claude/p2-overworld-walk, in progress); wiring (claude/p2-wiring, in progress).
+Art: look target (claude/art-look-target, in progress) comes before the cast (D-074).
 
 ## Waiting on the director
-- Confirm or change the Lead's reversible sketch calls in the slice loop (#66): a talked-down lookout slips away and the band starts shaken; a failed talk means he fights with them; the defeated cannot be recruited (pending Q21); the recruit is a placeholder until you design that cast member.
-- `data/caps.json` gains `scenarios: 1` for the slice's one scenario (#66, set by your slice goal); veto if wrong.
-- Tripo threshold (D-060): confirm in writing that the ask threshold rises from 500 to 2,000 credits per session; until then 500 stands.
-- Milestone 1 review: play F2 in the build; carry on or wrong.
-- Confirm or reorder milestones 3 and 4 (Concept Lead's order).
-- Mixamo: 10 of 14 clips are in the vault (D-029 sign-in); the rest wait on the director's sign-in.
-- Allow or decline deleting the unmerged, superseded remote branches `claude/p1-crisp-snap` (664434c) and `claude/p1-frame-time` (7236cdc), and `claude/p1-sheet-export-load` (d520808, superseded by #49); the permission classifier refused the first two.
+- Author `merc_3` to `merc_6` (#81), the six recruits, the two factions and the generic items (#87); placeholders stand until then.
+- Confirm or reorder milestones 3 and 4 (both built).
+- Veto lists: #80, #81, #82, #85, #87 (calls in each PR body); `caps.json` gains `encounters`, `equipment`, `factions`, `recruits`, `scenarios`.
+- Pick the look target when Art shows it; the Texel Studio trial for terrain tiles waits on the pick (D-080).
+- Tripo threshold (D-060): confirm 500 -> 2,000 credits per session in writing; 500 stands.
+- Mixamo: 10 of 14 clips are in the vault; the rest wait on his sign-in (D-029).
+- Allow or decline deleting superseded remote branches `claude/p1-crisp-snap`, `claude/p1-frame-time`, `claude/p1-sheet-export-load`.
 
 ## Merge queue
-(empty)
+#77 open (Concept Lead handoff, docs). Nothing else open.
 
 ## GPU jobs
 (none)
@@ -85,7 +92,7 @@ States: working · running a check · awaiting director · blocked · available.
 0 / 10 GiB.
 
 ## Live worktrees
-4 / 4: `../MERCS-wt/art-publish` (branch claude/art-slice-cast), `../MERCS-wt/slice-m1`, `../MERCS-wt/board` (this board PR), `../MERCS-wt/p2-m2` (branch claude/p2-m2-encounters).
+5 / 4 (over; prune once their PRs merge): `../MERCS-wt/art-look` (claude/art-look-target), `../MERCS-wt/p2-m7`, `../MERCS-wt/p2-walk`, `../MERCS-wt/slice-m1` (claude/p2-wiring), `../MERCS-wt/board` (this PR).
 
 ## Logged for later (not assigned)
 - Phase 1, LOW, lint precision (Concept Lead review of #5): `strings.py` flags names in
