@@ -28,7 +28,8 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 
 
-## Shows a title, a body and choices: [{"id": String, "label": String}], in order.
+## Shows a title, a body and choices: [{"id": String, "label": String, "hint": String}], in
+## order; "hint" (optional) is the button's hover text.
 func present(title: String, body: String, choices: Array[Dictionary]) -> void:
 	_title.text = title
 	_body.text = body
@@ -42,6 +43,7 @@ func present(title: String, body: String, choices: Array[Dictionary]) -> void:
 		button.name = String(BUTTON_PREFIX) + choice_id
 		button.set_meta(META_ID, choice_id)
 		button.text = str(choice.get("label", ""))
+		button.tooltip_text = str(choice.get("hint", ""))
 		button.pressed.connect(chosen.emit.bind(choice_id))
 		_buttons.add_child(button)
 	visible = true

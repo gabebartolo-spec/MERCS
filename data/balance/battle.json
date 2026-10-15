@@ -66,7 +66,8 @@
           "reach": 1
         },
         "bow": {
-          "ranged": true
+          "ranged": true,
+          "reach": 6
         }
       },
       "technique": {
