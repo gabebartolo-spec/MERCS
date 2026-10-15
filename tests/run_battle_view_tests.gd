@@ -11,6 +11,7 @@ extends "res://tests/lib/runner.gd"
 
 const Kit := preload("res://tests/lib/battle_view_kit.gd")
 const InputKit := preload("res://tests/lib/input_kit.gd")
+const Pic := preload("res://tests/lib/splat_pictures.gd")
 const WINDOW_SIZE := Vector2i(1920, 1080)
 const SEEDS: Array[int] = [1009, 424242]
 const MAX_ACTIONS := 300
@@ -183,10 +184,10 @@ func _check_pictures() -> void:
 			for level: int in [BattleMarks.FRESH, BattleMarks.WET, BattleMarks.DRY]:
 				var image := marks.splat_image(index, damage, level)
 				ok.square = ok.square and image.get_size() == Vector2i(side, side)
-				var tones := _tones(image, allowed)
+				var tones := Pic.tones(image, allowed)
 				ok.ramp = ok.ramp and tones >= 0
 				ok.tones = ok.tones and tones >= 1 and tones <= 2
-				ok.specks = ok.specks and _smallest_clump(image) >= smallest
+				ok.specks = ok.specks and Pic.smallest_clump(image) >= smallest
 				if level == BattleMarks.FRESH:
 					varied[image.get_data().hex_encode()] = true
 	check(ok.square, "a splat's picture is a small odd square of whole pixels")
@@ -212,73 +213,13 @@ func _check_pixels() -> void:
 	var fresh := marks.splat_image(3, 4, BattleMarks.FRESH)
 	var dry := marks.splat_image(3, 4, BattleMarks.DRY)
 	check(fresh.get_data() != dry.get_data(), "old blood is a darker colour than fresh")
-	check(_lum(dry) < _lum(fresh), "darker means older: the old splat is darker than the fresh one")
+	check(
+		Pic.lum(dry) < Pic.lum(fresh),
+		"darker means older: the old splat is darker than the fresh one"
+	)
 	var big := marks.splat_image(3, MAX_DAMAGE, BattleMarks.FRESH)
 	var small := marks.splat_image(3, 1, BattleMarks.FRESH)
-	check(_solid(big) > _solid(small), "a harder blow leaves a bigger splat")
-
-
-## How many different colours a splat uses, or -1 if one is off the ramp or see-through.
-func _tones(image: Image, allowed: Array[Color]) -> int:
-	var tones := {}
-	for y: int in image.get_height():
-		for x: int in image.get_width():
-			var c := image.get_pixel(x, y)
-			if c.a == 0.0:
-				continue
-			if c.a != 1.0 or not allowed.has(c):
-				return -1
-			tones[c.to_html()] = true
-	return tones.size()
-
-
-func _lum(image: Image) -> float:
-	var total := 0.0
-	var n := 0
-	for y: int in image.get_height():
-		for x: int in image.get_width():
-			var c := image.get_pixel(x, y)
-			if c.a > 0.0:
-				total += c.get_luminance()
-				n += 1
-	return total / maxf(1.0, float(n))
-
-
-func _solid(image: Image) -> int:
-	var n := 0
-	for y: int in image.get_height():
-		for x: int in image.get_width():
-			if image.get_pixel(x, y).a > 0.0:
-				n += 1
-	return n
-
-
-## The size of the smallest 4-connected clump of solid pixels.
-func _smallest_clump(image: Image) -> int:
-	var seen := {}
-	var smallest := image.get_width() * image.get_height()
-	for y: int in image.get_height():
-		for x: int in image.get_width():
-			var start := Vector2i(x, y)
-			if image.get_pixelv(start).a > 0.0 and not seen.has(start):
-				smallest = mini(smallest, _clump(image, start, seen))
-	return smallest
-
-
-func _clump(image: Image, start: Vector2i, seen: Dictionary) -> int:
-	var size := 0
-	var queue: Array[Vector2i] = [start]
-	seen[start] = true
-	var bounds := Rect2i(Vector2i.ZERO, image.get_size())
-	while not queue.is_empty():
-		var cell: Vector2i = queue.pop_back()
-		size += 1
-		for step: Vector2i in BattleMarks.NEIGHBOURS:
-			var next := cell + step
-			if bounds.has_point(next) and image.get_pixelv(next).a > 0.0 and not seen.has(next):
-				seen[next] = true
-				queue.append(next)
-	return size
+	check(Pic.solid(big) > Pic.solid(small), "a harder blow leaves a bigger splat")
 
 
 ## The fight on the street with the player's turns as real clicks: nodes follow the log.
@@ -390,6 +331,13 @@ func _check_bodies(mounted: Kit.Mounted) -> void:
 		gone = gone and not sprite.visible
 	check(on_field, "each fallen fighter's body is on the field at the end of the fight")
 	check(gone, "a fallen fighter's standing sprite has gone, the body stays")
+	_check_footing(mounted)
+
+
+## Bodies fit their cell and keep off standing feet; only the living keep a base ring.
+func _check_footing(mounted: Kit.Mounted) -> void:
+	var view := mounted.view
+	var marks := view.marks
 	var inside := true
 	var clear := true
 	for body: Dictionary in marks.bodies:
@@ -402,15 +350,13 @@ func _check_bodies(mounted: Kit.Mounted) -> void:
 				clear = clear and not rect.intersects(marks.feet_rect(fighter.cell))
 	check(inside, "every body lies inside its own cell's footprint")
 	check(clear, "no body is drawn over a standing fighter's feet")
-	var rings := 0
-	for node: Node in mounted.stage.world().get_children():
-		var ring := node as MeshInstance3D
-		if ring != null and ring.mesh is CylinderMesh and ring.visible:
-			rings += 1
 	var living := 0
 	for fighter: BattleUnit in view.battle.units:
 		living += 0 if fighter.down else 1
-	check(rings == living, "a base ring under every living fighter and none under the dead")
+	check(
+		Pic.rings_shown(mounted.stage.world()) == living,
+		"a base ring under every living fighter and none under the dead"
+	)
 	check(_one_pixel_scale(mounted), "ground marks and figures show the same pixel size on screen")
 
 
@@ -420,26 +366,9 @@ func _one_pixel_scale(mounted: Kit.Mounted) -> bool:
 	var marks := mounted.view.marks
 	var camera := mounted.stage.camera()
 	for splat: Dictionary in marks.splats:
-		if not _same_pixels(camera, marks.node_of(splat)):
+		if not Pic.same_pixels(camera, marks.node_of(splat), PIXEL_TOLERANCE):
 			return false
 	return true
-
-
-func _same_pixels(camera: Camera3D, node: Sprite3D) -> bool:
-	var at := node.global_position
-	var origin := camera.unproject_position(at)
-	var texel := node.pixel_size
-	var wide := absf(camera.unproject_position(at + Vector3(texel, 0.0, 0.0)).x - origin.x)
-	var deep := absf(
-		camera.unproject_position(at + Vector3(0.0, 0.0, texel * node.scale.z)).y - origin.y
-	)
-	var basis := camera.global_transform.basis
-	var tall := absf(camera.unproject_position(at + basis.y * texel).y - origin.y)
-	var wide_figure := absf(camera.unproject_position(at + basis.x * texel).x - origin.x)
-	return (
-		absf(wide - wide_figure) <= PIXEL_TOLERANCE * wide_figure
-		and absf(deep - tall) <= PIXEL_TOLERANCE * tall
-	)
 
 
 func _last_hit_cell(battle: Battle, unit_id: String) -> Vector2i:
