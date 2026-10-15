@@ -4,8 +4,8 @@ extends "res://tests/lib/runner.gd"
 ## board, three recruits and the pack, and walking pauses; real rest clicks on the map make
 ## wages fall due and a real click pays them; real clicks accept a contract, inspect and hire
 ## a placeholder recruit (the F4 company shows the hire); a won fight (the world's result
-## applied) opens the hub on the loot line and the prisoner's four buttons, and a real click
-## on one decides it and shows the line the captain remembers; the wearer button and an equip
+## applied) opens the hub on the loot line and three fates (Q-12); a real click on one decides
+## it and shows the captain's and the most moved merc's lines; the wearer button and an equip
 ## click put gear on a merc and the battle numbers follow; away from the hub the wages,
 ## contracts and recruits give way to a line saying so; every button sits on the 1920x1080
 ## screen; the overworld's Save writes the economy and a fresh session reads it. Seeded: world.json.
@@ -127,23 +127,22 @@ func _check_wages_by_clicks() -> void:
 	await _rest_on_the_map()
 	var panel := _hub().panel
 	var economy := _economy()
-	var rules := _rules()
 	var per_day := economy.wage_per_day(_hub().company.roster)
+	var bill := (per_day + economy.armoury.upkeep(_hub().company.roster)) * REST_DAYS
 	var owed_words := Text.t(
-		"hub.wages.owed",
-		{"owed": per_day * REST_DAYS, "per_day": per_day, "count": 6, "days": REST_DAYS}
+		"hub.wages.owed", {"owed": bill, "per_day": per_day, "count": 6, "days": REST_DAYS}
 	)
 	var pay := panel.button_for("pay", "wages")
 	check(
 		(
-			economy.owed == per_day * REST_DAYS
+			economy.owed == bill
 			and panel.shown_text().contains(owed_words)
 			and pay != null
 			and not pay.disabled
 		),
 		(
-			"%d rest clicks on the map make %d coin of wages fall due, shown with a Pay button"
-			% [REST_DAYS, per_day * REST_DAYS]
+			"%d rest clicks on the map make %d coin of wages and upkeep fall due, with a Pay button"
+			% [REST_DAYS, bill]
 		)
 	)
 	var purse := economy.purse
@@ -152,8 +151,8 @@ func _check_wages_by_clicks() -> void:
 	check(
 		(
 			economy.owed == 0
-			and economy.purse == purse - per_day * REST_DAYS
-			and economy.morale == low + _w(rules["wages"]["paid_recovery"])
+			and economy.purse == purse - bill
+			and economy.morale == low + _w(_rules()["wages"]["paid_recovery"])
 			and panel.shown_text().contains(Text.t("hub.wages.clear"))
 			and panel.button_for("pay", "wages") == null
 		),
@@ -286,21 +285,21 @@ func _check_equip() -> void:
 func _check_prisoner_click() -> void:
 	var economy := _economy()
 	var company := _hub().company
-	var roster := company.roster.size()
-	var morale := economy.morale
-	await _click_button(_hub().panel.button_for("prisoner", Economy.RECRUIT))
-	var line := Text.t(
-		"hub.memory.prisoner.recruit", {"name": company.member(company.captain_id).display_name}
-	)
+	var purse := economy.purse + economy.captives.ransom_coin()
+	var reactor := economy.captives.reacting(company, Economy.RANSOM)
+	await _click_button(_hub().panel.button_for("prisoner", Economy.RANSOM))
+	var shown := _hub().panel.shown_text()
+	var said := func(id: String) -> String:
+		var name := company.member(id).display_name if id != "" else "-"
+		return Text.t("hub.memory.prisoner.ransom", {"name": name})
 	check(
 		(
-			company.roster.size() == roster + 1
-			and economy.morale == morale + _w(_rules()["prisoner"]["recruit_morale"])
-			and economy.prisoner.is_empty()
-			and _hub().panel.shown_text().contains(line)
+			economy.purse == purse
+			and shown.contains(str(said.call(company.captain_id)))
+			and shown.contains(str(said.call(reactor)))
 			and _prisoner_buttons() == 0
 		),
-		"a real click on Recruit adds a placeholder, lifts morale and shows the line remembered"
+		"a real click on Ransom brings the coin and shows the captain's and %s's lines" % reactor
 	)
 
 

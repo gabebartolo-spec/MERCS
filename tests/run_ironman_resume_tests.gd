@@ -196,15 +196,15 @@ func _check_prisoner() -> void:
 	var hub := game.hub_director()
 	hub.world.result_hook.call("ambush", {"won": true, "prisoners": ["bandit_0"]})
 	await InputKit.frames(self, InputKit.LAYOUT_FRAMES)
-	var roster := hub.company.roster.size()
-	await InputKit.click(self, hub.panel.button_for("prisoner", Economy.RECRUIT))
-	var decided := hub.economy().prisoner.is_empty() and hub.company.roster.size() == roster + 1
+	var purse := hub.economy().purse + hub.economy().captives.ransom_coin()
+	await InputKit.click(self, hub.panel.button_for("prisoner", Economy.RANSOM))
+	var decided := hub.economy().prisoner.is_empty() and hub.economy().purse == purse
 	await _quit(game)
 	var again := await _reopen()
 	var back := again.hub_director()
 	check(
-		decided and back.economy().prisoner.is_empty() and back.company.roster.size() == roster + 1,
-		"Ironman On, quit after the prisoner joins: the choice stays made"
+		decided and back.economy().prisoner.is_empty() and back.economy().purse == purse,
+		"Ironman On, quit after the prisoner is ransomed: the choice and its coin stay made"
 	)
 	await _quit(again)
 
