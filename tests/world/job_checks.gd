@@ -31,7 +31,9 @@ func run(check: Callable) -> void:
 	_check_lost_fights()
 	_check_escort_lost_on_the_way()
 	_check_deadline()
-	_check_deadline_with_advance()
+	_check_deadline_with_advance(true)
+	_check_deadline_with_advance(false)
+	_check_escort_on_deadline_day()
 	_check_stray_party()
 	_check_reload_continues()
 	_check_old_contract()
@@ -149,7 +151,10 @@ func _check_deadline() -> void:
 				and _verdict(played) == Jobs.FAILED
 				and not _job_party_on_map(played)
 				and played.company.economy.purse == purse
-				and played.company.economy.standing.reputation(faction) < name_before
+				and (
+					played.company.economy.standing.reputation(faction)
+					== name_before - _standing_rule("fail_dent")
+				)
 			),
 			(
 				"a hunt still running past its deadline (day %d) fails: quarry gone, unpaid, name dented"
@@ -159,34 +164,74 @@ func _check_deadline() -> void:
 	)
 
 
-## Taken with an advance, a lapsed deadline is abandonment (the board's expiry, C2), never
-## also judged failed here: no verdict, no dent from the jobs, and the party leaves as a stray.
-func _check_deadline_with_advance() -> void:
+## Taken with an advance (row "advance", C2), a lapsed job is the contract abandoned (lead,
+## 2026-10-16): verdict "abandoned", the abandon dent once and never the failed dent on top,
+## the purse (and so the advance) kept, the party gone; a grudge only when the advance is
+## sizeable (half the pay or more, Q-16).
+func _check_deadline_with_advance(sizeable: bool) -> void:
 	var played := JobKit.begin(SEED, "hunt", true)
 	var row := played.company.economy.book.contract(str(played.contract.get("id")))
 	row["deadline"] = SHORT_DEADLINE
-	row["advance"] = Merc.whole(row.get("reward", 0))
+	var reward := Merc.whole(row.get("reward", 0))
+	row["advance"] = reward if sizeable else 1
 	var faction := str(played.contract.get("faction", ""))
 	var standing := played.company.economy.standing
 	var name_before := standing.reputation(faction)
+	var purse := played.company.economy.purse
 	for _day: int in WAIT_DAYS:
 		played.world.rest()
+	var grudge := standing.grudges.has(faction)
 	_check.call(
 		(
-			played.verdicts.is_empty()
-			and standing.reputation(faction) >= name_before - _abandon_dent()
+			_verdict(played) == Jobs.ABANDONED
+			and standing.reputation(faction) == name_before - _standing_rule("abandon_dent")
+			and played.company.economy.purse == purse
 			and played.company.economy.book.contract(str(played.contract.get("id"))).is_empty()
 			and not _job_party_on_map(played)
+			and grudge == sizeable
 		),
-		"a hunt taken with an advance that lapses is not judged failed (no double dent), party gone"
+		(
+			(
+				"a hunt with an advance of %d of %d that lapses is abandoned: one abandon"
+				+ " dent, purse kept, party gone, grudge %s"
+			)
+			% [row.get("advance"), reward, grudge]
+		)
 	)
 
 
-## The most one abandonment dents (data/balance/economy.json "standing"): the board's expiry
-## may abandon the contract (C2), the jobs must add nothing on top.
-static func _abandon_dent() -> int:
+## The escort that stands at the site with its charge when its deadline day ends is done: the
+## deadline day itself counts (review of #138).
+func _check_escort_on_deadline_day() -> void:
+	var played := JobKit.begin(SEED, "escort", true)
+	var site := played.world.region.entrance(str(played.contract.get("site", "")))
+	var row := played.company.economy.book.contract(str(played.contract.get("id")))
+	var guard := 0
+	while TileRegion.gap(played.world.band, site) > 1 and guard < JobKit.MOVES:
+		played.move(true)
+		guard += 1
+	var deadline := played.world.day
+	row["deadline"] = deadline
+	while played.verdicts.is_empty() and guard < JobKit.MOVES:
+		played.move(true)
+		guard += 1
+	var day := -1 if played.verdicts.is_empty() else Merc.whole(played.verdicts[0].get("day"))
+	(
+		_check
+		. call(
+			_verdict(played) == Jobs.DONE and day == deadline + 1,
+			(
+				"an escort reaching the site on its deadline day (%d) is done as that day ends (%s on %d)"
+				% [deadline, _verdict(played), day]
+			)
+		)
+	)
+
+
+## A number from data/balance/economy.json "standing".
+static func _standing_rule(key: String) -> int:
 	var standing: Dictionary = Fixture.json(Fixture.ECONOMY).get("standing", {})
-	return Merc.whole(standing.get("abandon_dent", 0))
+	return Merc.whole(standing.get(key, 0))
 
 
 ## A job's contract taken off the board some other way: its party leaves on the next day.
