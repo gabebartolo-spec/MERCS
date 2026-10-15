@@ -1,11 +1,11 @@
 {
-  "_comment": "The walkable overworld on screen (presentation/world/overworld_map.gd and overworld_director.gd): the map's scale, the tokens and the placeholder terrain colours, and how a held walking key repeats. overworld.md explains each knob.",
+  "_comment": "The walkable overworld on screen (presentation/world/overworld_map.gd and overworld_director.gd): the map's scale and tokens in logical pixels (one texel grid with the street, D-035) and the placeholder terrain colours, and how a held walking key repeats. overworld.md explains each knob.",
   "map": {
-    "tile_px": 32,
-    "band_radius_px": 12,
-    "party_radius_px": 10,
-    "site_radius_px": 7,
-    "ring_width_px": 3
+    "tile_px": 16,
+    "band_radius_px": 6,
+    "party_radius_px": 5,
+    "site_radius_px": 3,
+    "ring_width_px": 1
   },
   "walk": {
     "first_repeat_s": 0.25,

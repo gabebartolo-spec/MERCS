@@ -1,7 +1,8 @@
 extends "res://tests/lib/runner.gd"
 ## Overworld suite (Phase 2, the walkable overworld: OverworldDirector, OverworldMap, the
-## SaveSystem autoload). Real input events reach the game through Input.parse_input_event,
-## never a handler call, with the root at 1920 x 1080. A real M leaves the street for the map:
+## SaveSystem autoload). The map is one texel grid with the street (D-035). Real input events
+## reach the game through Input.parse_input_event, never a handler call, with the root at
+## 1920 x 1080. A real M leaves the street for the map:
 ## a marker per site, the band's token at the view's centre on the hub's gate, Rest and Save
 ## and no travel buttons; a held key does not walk the street's merc while it is open; a tap
 ## of S walks the band one tile and the map scrolls under it; a held S repeats, a tile at a
@@ -31,6 +32,7 @@ func run_checks() -> void:
 	_clear_save()
 	var game := await _spawn()
 	await _check_open(game)
+	await _check_texel_grid(game)
 	await _check_walking_paused(game)
 	await _check_tap_walks(game)
 	await _check_hold_repeats(game)
@@ -97,7 +99,54 @@ func _check_open(game: SliceGame) -> void:
 func _token_centred(director: OverworldDirector) -> bool:
 	var token := director.map.company_marker().get_global_rect().get_center()
 	var middle := director.map.get_global_rect().get_center()
-	return token.distance_to(middle) <= 1.0
+	# Snapped to whole logical pixels: within one logical pixel (each way) of the middle.
+	return token.distance_to(middle) <= 2.0 * director.map.pixel_scale()
+
+
+## One texel grid (D-035): the map is drawn at 1x in a logical viewport shown at a whole-number
+## scale with nearest filtering; no canvas item under the map is scaled; the band's token sits
+## on a whole logical pixel.
+func _check_texel_grid(game: SliceGame) -> void:
+	var map := game.overworld_director().map
+	var view := map.pixel_view()
+	var shown := map.pixel_container()
+	var scale := map.pixel_scale()
+	var wrong: Array[String] = []
+	for item: CanvasItem in _canvas_items(game.overworld_director()):
+		var scaled: Vector2 = item.get(&"scale")
+		if scaled != Vector2.ONE:
+			wrong.append("%s scale %s" % [item.name, scaled])
+		var inside := view.is_ancestor_of(item) or item == shown
+		if inside and item.texture_filter != CanvasItem.TEXTURE_FILTER_NEAREST:
+			wrong.append("%s filter %d" % [item.name, item.texture_filter])
+	var token := map.company_marker().position
+	check(
+		(
+			wrong.is_empty()
+			and scale >= 1
+			and shown.stretch_shrink == scale
+			and Vector2i(shown.size) == view.size * scale
+			and (
+				view.canvas_item_default_texture_filter
+				== Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
+			)
+			and is_zero_approx(fmod(token.x, scale))
+			and is_zero_approx(fmod(token.y, scale))
+		),
+		(
+			"the map is one texel grid: %s logical at x%d, nearest, nothing scaled (wrong: %s)"
+			% [view.size, scale, wrong]
+		)
+	)
+
+
+func _canvas_items(under: Node) -> Array[CanvasItem]:
+	var found: Array[CanvasItem] = []
+	for child: Node in under.get_children():
+		if child is CanvasItem:
+			found.append(child as CanvasItem)
+		found.append_array(_canvas_items(child))
+	return found
 
 
 func _check_walking_paused(game: SliceGame) -> void:
