@@ -1,0 +1,1 @@
+{"starting_captain": "orc", "mercs": [{"id": "orc", "name": "The Orc", "species": "orc", "role": "Charges in.", "stats_from": "orc", "stats": {"resolve": 6}, "moves_by_level": {"1": ["move", "attack", "charge"], "2": ["wait"]}, "stage_1_gear": ["Battle axe"], "gear_slots": {"weapon": null, "armour": "arm_plate", "trinket": null}, "look": "placeholder"}]}

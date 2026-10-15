@@ -10,7 +10,9 @@ extends Node
 ## which the camera watches the fight and walking pauses. F2 opens the overworld map
 ## (OverworldDirector): the region, the company's day and supplies, and the road choices;
 ## walking pauses while it is open, and F2 again or Escape hides it. The director lives
-## for the session, so a day travelled and not yet saved is there when the map reopens.
+## for the session, so a day travelled and not yet saved is there when the map reopens. F4
+## opens the company (CompanyDirector): the roster, the captain, one merc's details; the
+## Company it shows is the one the overworld saves.
 ## Presentation only: nothing here is random, and walking the hub decides no outcome.
 
 const STAGE_SCENE := preload("res://presentation/world/street_stage.tscn")
@@ -60,6 +62,8 @@ var _help: Label = null
 var _frame_label: Label = null
 var _loop: LoopDirector = null
 var _overworld: OverworldDirector = null
+var _company: Company = null
+var _company_director: CompanyDirector = null
 
 
 func _ready() -> void:
@@ -113,7 +117,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	var click := event as InputEventMouseButton
 	if click != null and click.pressed and click.button_index == MOUSE_BUTTON_LEFT:
-		if _overworld_open():
+		if _overworld_open() or company_open():
 			return
 		var cell := ground_cell_at(click.position)
 		if not cell.has(&"cell"):
@@ -156,10 +160,20 @@ func _on_key(key: InputEventKey) -> void:
 		_help.visible = not _help.visible
 	elif code == KEY_F3:
 		_frame_label.visible = not _frame_label.visible
-	elif code == KEY_F5:
+	else:
+		_on_screen_key(code)
+
+
+## The keys that start or close a screen: F5 the loop, F2 the map, F4 the company, Escape.
+func _on_screen_key(code: Key) -> void:
+	if code == KEY_F5:
 		start_loop()
 	elif code == KEY_F2:
 		toggle_overworld()
+	elif code == KEY_F4:
+		toggle_company()
+	elif code == KEY_ESCAPE and company_open():
+		_company_director.set_open(false)
 	elif code == KEY_ESCAPE and _overworld_open():
 		end_overworld()
 
@@ -195,6 +209,7 @@ func end_loop() -> void:
 func toggle_overworld() -> void:
 	if _overworld == null:
 		_overworld = OverworldDirector.new()
+		_overworld.company = company()
 		add_child(_overworld)
 		_overworld.begin()
 		return
@@ -211,13 +226,39 @@ func end_overworld() -> void:
 		_overworld.set_open(false)
 
 
+## The company the game plays with: the save on disk's, else the starting six; made on first
+## use and shared with the overworld, which saves it.
+func company() -> Company:
+	if _company == null:
+		_company = CompanyDirector.load_company(self)
+	return _company
+
+
+## Shows the company screen over the street, or hides it when it is open.
+func toggle_company() -> void:
+	if _company_director == null:
+		_company_director = CompanyDirector.new()
+		add_child(_company_director)
+		_company_director.begin(company())
+		return
+	_company_director.set_open(not _company_director.is_open())
+
+
+func company_director() -> CompanyDirector:
+	return _company_director
+
+
+func company_open() -> bool:
+	return _company_director != null and _company_director.is_open()
+
+
 func _overworld_open() -> bool:
 	return _overworld != null and _overworld.is_open()
 
 
 ## Walking waits while the loop example or the overworld map has the player's attention.
 func _paused() -> bool:
-	return _loop != null or _overworld_open()
+	return _loop != null or _overworld_open() or company_open()
 
 
 func _held_direction() -> Vector2i:
