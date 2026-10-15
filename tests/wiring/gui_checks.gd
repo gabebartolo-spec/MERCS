@@ -128,6 +128,13 @@ func _check_triage_panel(game: SliceGame, director: OverworldDirector) -> void:
 			}
 		)
 		lines_ok = lines_ok and body.contains(line)
+	var xp_lines := 0
+	for merc: Merc in director.company.roster:
+		xp_lines += 1 if body.contains("%s: +" % director.company.name_of(merc.id)) else 0
+	_check.call(
+		xp_lines == director.company.roster.size() and body.contains(" XP"),
+		"triage panel: one XP line for each surviving merc: %s" % body.replace("\n", " | ")
+	)
 	var shared := StoryDirector.memory_of(director)
 	var hud: CanvasLayer = game.get(&"_hud")
 	_check.call(

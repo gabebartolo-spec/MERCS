@@ -41,6 +41,7 @@ func run_checks() -> void:
 	var off := await _fight(false)
 	_check_quit_after_fight(on, off)
 	_check_same_outcomes(on, off)
+	_check_xp_saved(on, off)
 	await _check_quit_mid_fight()
 	var last: SliceGame = off["game"]
 	last.queue_free()
@@ -220,6 +221,39 @@ func _check_quit_after_fight(on: Dictionary, off: Dictionary) -> void:
 		),
 		"Ironman Off reloads everyone who was alive; On wrote a save as the fight started"
 	)
+
+
+## D-095: the fight's experience is committed with the triage, so with Ironman On a quit at the
+## triage or after Continue reloads every survivor with it; Off reloads the pre-fight numbers.
+func _check_xp_saved(on: Dictionary, off: Dictionary) -> void:
+	var before := _xp_of(str(on["before"]))
+	var at_triage := _xp_of(str(on["at_triage"]))
+	var after := _xp_of(str(on["after"]))
+	var survivors := 0
+	var kept := true
+	for id: String in after:
+		survivors += 1
+		kept = kept and Merc.whole(after[id]) > Merc.whole(before.get(id, 0))
+		kept = kept and at_triage.get(id, -1) == after[id]
+	check(
+		survivors > 0 and kept,
+		"Ironman On, quit at the triage or after Continue: every survivor keeps the fight's XP"
+	)
+	check(
+		_xp_of(str(off["after"])) == _xp_of(str(off["before"])),
+		"Ironman Off, quit after the fight: the pre-fight experience comes back"
+	)
+
+
+## {merc id: xp} a save on disk holds for the living.
+func _xp_of(text: String) -> Dictionary:
+	var saved: Dictionary = JSON.parse_string(text)
+	var model := SaveModel.from_dict(saved, World.data(), CompanyDirector.defs())
+	var held := {}
+	if model.company != null:
+		for merc: Merc in model.company.roster:
+			held[merc.id] = merc.xp
+	return held
 
 
 func _check_same_outcomes(on: Dictionary, off: Dictionary) -> void:

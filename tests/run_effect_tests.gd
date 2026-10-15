@@ -28,6 +28,7 @@ const EXPECTED_IDS: Array[String] = [
 	"storylet_memory",
 	"campaign_end",
 	"levels",
+	"xp_from_fights",
 ]
 
 

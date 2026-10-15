@@ -38,6 +38,7 @@ func run_checks() -> void:
 	_check_temporary_injury_heals()
 	_check_save_round_trip()
 	_check_no_save_revives()
+	_check_xp()
 	var gui := GuiChecks.new()
 	gui.setup(self, check)
 	await gui.run()
@@ -257,6 +258,58 @@ func _check_save_round_trip() -> void:
 		),
 		"save, reload, continue: the dead stay dead, the heir leads, chronicle and memories back"
 	)
+
+
+## D-095: experience from the fight. The captain's-death fight (seed 424264): every merc who
+## lived gets the fight's XP plus a kill's worth per enemy they put down, the dead get none,
+## a merc not fielded gets none, the battle stream is not touched, and it survives a save.
+func _check_xp() -> void:
+	var rng := Rng.from_seed(DEATH_SEED)
+	var held := Kit.led_by("vampyr")
+	var made := Kit.wounds(rng, "", {}, held)
+	var cells := _cells()
+	var spare_id: String = held.fighting_order().back()
+	cells.pop_back()
+	var units := made.units(cells, BattleUnit.COMPANY)
+	var battle := EncounterBattle.build(
+		Kit.pending(), Kit.scenario(), Kit.json(Fixture.BATTLE), rng, units
+	)
+	battle.set_hit_hook(made.hit_hook)
+	MercPlay.play_out(battle, Fixture.rules(), Kit.MAX_ACTIONS)
+	var events := made.resolve()
+	var paid := _paid(events, held, made)
+	check(
+		paid,
+		"fight XP: each survivor gets the fight's XP and a kill's worth per enemy downed, the dead none"
+	)
+	check(
+		held.member(spare_id) != null and held.member(spare_id).xp == 0,
+		"fight XP: a merc who did not fight gets none"
+	)
+	var model := Kit.reloaded(made, rng)
+	var same := model.ok and model.company != null
+	for merc: Merc in held.roster:
+		same = same and model.company.member(merc.id).xp == merc.xp
+	check(same, "fight XP: the experience is in the save and reloads the same")
+
+
+## Whether the xp events pay exactly what the data says: the fight's XP and a kill's worth per
+## enemy, to a living merc only, and at least one was paid.
+func _paid(events: Array[Dictionary], held: Company, made: CompanyWounds) -> bool:
+	var per_fight := held.xp_for_fight(0)
+	var per_kill := held.xp_for_fight(1) - per_fight
+	var paid := per_fight > 0 and per_kill > 0
+	var gains := 0
+	for event: Dictionary in events:
+		if event.get("type", "") != "xp":
+			continue
+		gains += 1
+		var gain := Merc.whole(event.get("gain", 0))
+		var merc := held.member(str(event.get("merc", "")))
+		paid = paid and merc != null and merc.xp == gain and gain >= per_fight
+		paid = paid and (gain - per_fight) % per_kill == 0
+		paid = paid and not made.chronicle().is_dead(str(event.get("merc", "")))
+	return paid and gains > 0
 
 
 func _check_no_save_revives() -> void:
