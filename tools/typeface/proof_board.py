@@ -132,13 +132,87 @@ def zoom(src, box, k, out):
     return out
 
 
+SCENES = ["slice.arrive", "world.encounter.ambush", "slice.gate", "slice.fate", "slice.return"]
+HEAD_CONFUSION = ["Il1| O0 rn m", "cl d S5 Z2 B8", "HP SP c e r s9", "Attack Defense", "Recruits Rerruits",
+                  "Q O 0 8 0800 1048", "4 3 44 33 ! ? %", "“Aye,” he said.", "AV Ve Fa Po LT"]
+HEADS = ["world.ironman.title", "end.title", "hub.prisoner.title", "slice.contract.title"]
+
+
+def scene_panel(display, regular, out_png, label):
+    """A 4K half-screen panel: real en.json scene headers (Display 42 -> 84 px) over their body text
+    (Regular 28 -> 56 px), then more headers and two names. Returns (image, blended pixel count)."""
+    W, H = 1900, 2040
+    im = Image.new("RGB", (W, H), SOOT1)
+    d = ImageDraw.Draw(im)
+    head = ImageFont.truetype(display, 42 * STRETCH)
+    body = ImageFont.truetype(regular, 28 * STRETCH)
+    x, y, pw = 40, 30, W - 80
+    d.text((x, y), label, font=body, fill=BONE_MID)
+    y += 34 * STRETCH + 10
+    for key in SCENES:
+        d.text((x, y), EN[key + ".title"], font=head, fill=GOLD)
+        y += 51 * STRETCH
+        body_text = EN.get(key + ".body", "").replace("{day}", "14")
+        for ln in wrap(d, body_text, body, pw)[:2]:
+            d.text((x, y), ln, font=body, fill=BONE_HI)
+            y += 34 * STRETCH
+        y += 12
+    for text in [EN[k] for k in HEADS] + [t("company.fallen.title", name="Hedda"),
+                                          t("company.header", name="The Orc", level=3),
+                                          t("world.header", day=14, supplies=1048)]:
+        d.text((x, y), text, font=head, fill=GOLD)
+        y += 51 * STRETCH
+    im = im.crop((0, 0, W, min(H, y + 20)))
+    im.save(out_png)
+    drawn = {tuple(int(h[i:i + 2], 16) for i in (1, 3, 5)) for h in (SOOT1, GOLD, BONE_HI, BONE_MID)}
+    return im, sum(n for n, c in im.getcolors(1 << 24) if c not in drawn)
+
+
+def board_v2(a, out):
+    """Old Display beside the new one on the same real scene headers, then the confusion lines
+    of the new Display and the Regular at 4x of the 4K screen (nearest neighbour)."""
+    A, ba = scene_panel(a.old_display, a.regular, out / "panel_display_old.png", "A  Display before (round 1)")
+    B, bb = scene_panel(a.display, a.regular, out / "panel_display_new.png", "B  Display now (grit)")
+    zooms = []
+    for path, px, label in ((a.display, 42, "Display now, 84 px on 4K, 4x"),
+                            (a.old_display, 42, "Display before, 84 px on 4K, 4x"),
+                            (a.regular, 28, "Regular (body), 56 px on 4K, 4x")):
+        f = ImageFont.truetype(path, px * STRETCH)
+        lines = (CONFUSION + ["Q O 0 8 0800 1048 ! ? % 100%", "“Aye,” he said. AV Ve Fa Po LT"]
+                 if px == 28 else HEAD_CONFUSION)
+        lh = px * STRETCH * 17 // 14
+        strip = Image.new("RGB", (940, lh * len(lines) + 16), SOOT1)
+        ds = ImageDraw.Draw(strip)
+        for i, ln in enumerate(lines):
+            ds.text((8, 8 + i * lh), ln, font=f, fill=BONE_HI)
+        zooms.append((label, strip.resize((strip.width * 4, strip.height * 4), Image.NEAREST)))
+    lab = ImageFont.truetype(a.regular, 28 * STRETCH)
+    Wb = 3840 + 60
+    Hb = 40 + max(A.height, B.height) + sum(z.height + 120 for _, z in zooms) + 40
+    board = Image.new("RGB", (Wb, Hb), "#0b0908")
+    db = ImageDraw.Draw(board)
+    board.paste(A, (20, 20))
+    board.paste(B, (20 + 1940, 20))
+    y = 40 + max(A.height, B.height)
+    for label, z in zooms:
+        db.text((20, y + 20), label + " (whole strip)", font=lab, fill=GOLD)
+        board.paste(z, (20, y + 110))
+        y += z.height + 120
+    board.save(out / "board_v2.png")
+    print("board_v2", out / "board_v2.png", board.size, "blended pixels: old panel", ba, "new panel", bb)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", required=True)
     ap.add_argument("--regular", default=str(ROOT / "assets/fonts/MERCSLedger-Regular.ttf"))
     ap.add_argument("--display", default=str(ROOT / "assets/fonts/MERCSLedger-Display.ttf"))
-    ap.add_argument("--ref", required=True, help="reference face (Tiny5) for the comparison")
+    ap.add_argument("--ref", default="", help="reference face (Tiny5) for the round-1 comparison board")
+    ap.add_argument("--old-display", default="", help="a previous Display build: draw board_v2 (old vs new)")
     a = ap.parse_args()
+    if a.old_display:
+        board_v2(a, Path(a.out))
+        return
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     ours = {"label": "MERCS Ledger", "body": a.regular, "body_px": 28, "title": a.display,

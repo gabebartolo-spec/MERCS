@@ -13,7 +13,14 @@ Grid: 100 font units per pixel, 14 pixels to the em, so 1400 units per em; the l
 Optional file beside the source: <style>.kern.txt, lines "T o -1" (whole pixels).
 Prints what it built and what a reviewer should know: characters the game shows that the
 font lacks, digits that are not all one width (numbers would jitter as they change).
+It also runs the touch test (kern_check.py) on the cut's own kern file and fails on any contact.
 Needs fontTools and skia-pathops (pip install fonttools skia-pathops).
+
+Size rule for the PR that wires the face into the theme (not wired here): the font is only clean
+at multiples of 14 px. Body text 28 px, headings (Display) 42 px at 1080p logical (56 / 84 px on
+the 4K TV). Any other size blends: the theme's current default_font_size = 24 blends about 1650
+pixels per line. That PR should add a smoke check that every font size it sets is % 14 == 0, and
+turn subpixel positioning off (hinting none) so glyphs land on whole pixels.
 """
 
 import argparse
@@ -163,7 +170,7 @@ def write_provenance(folder: Path) -> None:
         "asset": "fonts",
         "files": {p.name: sha(p) for p in sorted(folder.iterdir()) if p.name != "provenance.json"
                   and not p.name.endswith(".import")},
-        "produced_by": {p.relative_to(ROOT).as_posix(): sha(p)[:16] for p in [me] + sources},
+        "produced_by": {p.relative_to(ROOT).as_posix(): sha(p)[:16] for p in [me, me.parent / "kern_check.py"] + sources},
         "models": [],
         "licence_rows": ["Python, Pillow, NumPy", "fontTools, skia-pathops"],
         "seed": None,
@@ -275,6 +282,13 @@ def main() -> int:
     if missing:
         print("  MISSING %d characters: %s" % (len(missing), "".join(missing)))
         return 1
+    if not args.src:
+        from kern_check import contacts
+        bad = contacts(args.style)
+        if bad:
+            print("  %d CONTACTS (kern_check.py --style %s): %s" % (
+                len(bad), args.style, " ".join("%s%s" % (a, b) for a, b, _, _ in bad[:20])))
+            return 1
     return 0
 
 

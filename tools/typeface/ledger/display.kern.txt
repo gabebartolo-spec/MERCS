@@ -1,30 +1,45 @@
-# MERCS Ledger Regular kerning, in whole pixels (stays on the grid).
-# Only pairs where the drawn shapes leave a visible hole at the game's text.
-T a -1
-T c -1
-T e -1
-T o -1
-T s -1
-T u -1
-T r -1
-T y -1
+# MERCS Ledger Display kerning, in whole pixels, derived from the Display's own outlines
+# (its serifs and 2-px strokes leave different holes from the Regular's): each pair was set
+# from tools/typeface/kern_check.py --style Display --air, to the tightest value that still
+# leaves one clear pixel (no edge or corner contact; build_font.py fails on any).
+# Left at 0 because -1 would touch: L O (the chisel tick), P e, P o (the bowl's corner).
+T a -2
+T c -2
+T e -2
+T o -2
+T s -2
+T u -2
+T r -2
+T y -2
 T . -1
-T , -1
-L T -1
-L V -1
-L Y -1
-A T -1
-A V -1
-A Y -1
+T , -2
+A T -2
+A V -2
+A Y -2
+A v -1
+L T -2
+L V -2
+L Y -2
 V a -1
 V e -1
 V o -1
-Y a -1
+Y a -2
 Y e -1
 Y o -1
-P . -1
-P , -1
-F . -1
-F , -1
+W a -1
+P a -1
+P . -2
+P , -2
+F a -2
+F e -1
+F o -1
+F i -1
+F u -1
+F r -1
+F y -1
+F . -2
+F , -2
+F ; -1
+F : -1
 r . -1
 r , -1

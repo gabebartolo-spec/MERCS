@@ -1,5 +1,9 @@
 # MERCS Ledger Regular kerning, in whole pixels (stays on the grid).
-# Only pairs where the drawn shapes leave a visible hole at the game's text.
+# Only pairs where the drawn shapes leave a visible hole at the game's text, and only as far as
+# the touch test allows: no ink of one glyph within one pixel (edge or corner) of the next.
+# Checked by tools/typeface/kern_check.py --style Regular (build_font.py fails on any contact).
+# Left at 0 because -1 would touch: A V (A's leg meets V's stem), V e, V o, F l, P e, P o,
+# L O C S y o (L's chisel tick fills the corner; L was narrowed one column instead).
 T a -1
 T c -1
 T e -1
@@ -10,21 +14,28 @@ T r -1
 T y -1
 T . -1
 T , -1
-L T -1
+L T -2
 L V -1
-L Y -1
+L Y -2
 A T -1
-A V -1
 A Y -1
 V a -1
-V e -1
-V o -1
 Y a -1
 Y e -1
 Y o -1
+P a -1
 P . -1
 P , -1
-F . -1
-F , -1
+F a -2
+F e -1
+F o -1
+F i -1
+F u -1
+F r -1
+F y -1
+F . -2
+F , -2
+F ; -1
+F : -1
 r . -1
 r , -1
