@@ -41,8 +41,7 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
 - Pending from him: author merc_3..merc_6; confirm/reorder M3/M4; the veto lists in #80-#82.
 
 ## Running (builder subagents of this session; they die with it)
-- #81 M3 company MERGED (save v2, F4). #83 4K MERGED. #84 (gdlint required in merge_eligibility;
-  smoke gdformat fix; main's gdlint is red until it lands): auto-merge watcher in this session.
+- #81 M3 company MERGED (save v2, F4). #83 4K MERGED. #84 MERGED (gdlint is a required merge check).
 - M5 = PR #82 (sim review PASS): coder told to merge main after #84, then merge #82.
 - M4 battle skeleton (Opus): `../MERCS-wt/slice-m1`, claude/p2-m4-battle.
 - Walkable overworld (Opus): `../MERCS-wt/p2-walk`, claude/p2-overworld-walk (told: slice_game.gd
@@ -68,10 +67,11 @@ Wiring after merges: company -> encounters, M4 hit hook -> M5 injuries, a triage
 data 96, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 13, slice 15, battle 14,
 loop 4, sim_world 9, save 7, effect 4, overworld 8.
 
-## Worktrees (7 / 4: OVER CAP - ask the director to allow removals)
-art-publish (paused), display-4k (#84), p2-m3 (merged; plain remove refused: untracked files),
-p2-m5, p2-m6, p2-walk, slice-m1 (M4). `git worktree remove --force` is refused by the permission
-classifier; the director must allow it or remove them himself.
+## Worktrees (4 / 4)
+p2-m5 (#82), p2-m6 (M6), p2-walk (overworld), slice-m1 (M4). Director allowed forced removals of
+finished worktrees (2026-10-15). Art's worktree was removed while paused (branch
+claude/art-slice-cast pushed at 99b3fdf): on resume `git worktree add ../MERCS-wt/art-publish
+claude/art-slice-cast` and fix the path in art.md if needed.
 
 ## Co-lead playbook
 playbook: nothing new (2026-10-15; no worker findings yet).
