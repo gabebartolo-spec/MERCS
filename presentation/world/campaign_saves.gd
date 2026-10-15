@@ -3,9 +3,9 @@ extends RefCounted
 ## How the overworld's campaign is written to the one save on disk (SaveSystem). Save by hand
 ## writes it in either mode. Ironman (D-087: quitting can't undo a death or a lost fight) also
 ## writes it by itself right after every decision the player commits: a fight's start and each
-## action in it, the fight's end (its result, loot and prisoners applied), the toll, a rest day
-## and the hub's actions. During a fight the save is the fight's starting save with the actions
-## taken since (FightRecord), so a reload rebuilds the same battle and replays it to the same turn.
+## action in it, the fight's end (its result, loot and prisoners applied), the toll, a rest day,
+## a walked day and the hub's actions. During a fight the save is the fight's starting save with
+## the actions taken since (FightRecord), so a reload rebuilds the battle and replays it to the turn.
 ## Writing only reads the run; nothing here draws from the Rng or decides anything.
 ##
 ## Save order (Ironman: a quit resumes the exact state): an autosave is the LAST thing a
@@ -13,7 +13,9 @@ extends RefCounted
 ## same call: no hook parked in a Callable for a later input, nothing left for a later frame.
 ## An observer that catches up on its own (the story director turning the economy's chronicle
 ## into memories each frame) registers with `before_save` and runs before every write.
-## Guarded by tools/lint/save_order.py and tests/ironman_resume/save_order_checks.gd.
+## A step on the map is saved when it meets an encounter or ends a day (lead ruling under D-087).
+## Guarded at runtime by tests/lib/save_watch.gd (no change without a save), with
+## tests/ironman_resume/save_order_checks.gd and the tripwire tools/lint/save_order.py.
 
 const SAVE_SYSTEM := preload("res://presentation/autoload/save_system.gd")
 

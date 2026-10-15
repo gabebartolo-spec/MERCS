@@ -20,6 +20,10 @@ bodies are checked). Branches of the same `if` or `match` that cannot run after 
 (presentation/world/campaign_saves.gd, "Save order"). Scans presentation/ and ui/; comments
 and strings never trigger a rule.
 
+This lint is a tripwire, not the guard: it reads one function at a time and is easily fooled (a
+lambda, bindv, a field, call_deferred, a timer, a helper that saves; review of #148). The guard is
+the runtime check tests/lib/save_watch.gd (ironman_resume suite): no change without a save.
+
 Usage: python tools/lint/save_order.py [--root DIR]
 """
 from __future__ import annotations
