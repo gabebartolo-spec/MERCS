@@ -1,6 +1,6 @@
 # battle.json — battle knobs
 
-One line per knob (docs/05_STYLE_CODE.md "Data"). Read by `sim/battle/` (`battle.gd`, `battle_ai.gd`,
+One line per knob (docs/05_STYLE_CODE.md "Data"). Read by `sim/battle/` (through `battle_rules.gd`; `battle_ai.gd`,
 `battle_morale.gd`, `battle_unit.gd`); Phase 2 milestone 4 (D-064, D-066) grew it from the slice's sketch. Spec: `docs/specs/art_direction_slice.md` §2a step 6. Counters come from
 combat roles and each merc's own abilities, never a type chart (vision, 2026-10-09); Phase 3 deepens these numbers.
 
