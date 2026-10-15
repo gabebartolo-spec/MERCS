@@ -14,8 +14,10 @@ extends RefCounted
 ## in the economy's chronicle). An ask past the walk line ends the offer: the contract leaves
 ## the board and the faction thinks less of the company.
 ##
-## The faction's name is C4's standing (sim/economy/standing.gd). Until C4 merges it is the
-## stub below, a number per faction, saved by the economy only once one has moved.
+## The faction's name is C4's standing (sim/economy/standing.gd, PR #134). Until C4 merges it
+## is the STUB below, with C4's names: reputation(faction) and walked(faction); a number per
+## faction, saved by the economy only once one has moved. When C4 lands, these two calls go to
+## economy.standing and the stub, its rules and its "standing_stub" save key are deleted.
 ## Rules: data/balance/economy.json "terms". No node, no clock, no file.
 
 const STREAM := "terms"
@@ -55,10 +57,10 @@ func reputation(faction_id: String) -> int:
 	return Merc.whole(stub_reputation.get(faction_id, _rule("reputation_start")))
 
 
-## Moves the company's name with a faction by `change`, inside 0 to "reputation_max".
-func dent(faction_id: String, change: int) -> void:
+## STUB until C4: the faction's employer walked from an ask; the name dents by "walk_dent".
+func walked(faction_id: String) -> void:
 	stub_reputation[faction_id] = clampi(
-		reputation(faction_id) + change, 0, _rule("reputation_max")
+		reputation(faction_id) - _rule("walk_dent"), 0, _rule("reputation_max")
 	)
 
 
@@ -139,7 +141,7 @@ func negotiate(
 			row["counter_advance"] = result["counter_advance"]
 		WALK:
 			economy.book.board.erase(row)
-			dent(str(row.get("faction", "")), -_rule("walk_dent"))
+			walked(str(row.get("faction", "")))
 	return result
 
 
@@ -155,14 +157,14 @@ func restore(saved: Dictionary) -> void:
 			stub_reputation[str(key)] = clampi(Merc.whole(value), 0, _rule("reputation_max"))
 
 
-## The deal is struck: the advance is paid now, and the contract's reward becomes what it
-## still pays on return; the agreed terms stay on the record for presentation to word.
+## The deal is struck: the advance is paid now; the contract's reward becomes the agreed price
+## and "advance" what of it was paid up front (Economy.complete pays the rest on return; C4's
+## Standing.sizeable reads the two); the posted reward stays as "terms_posted".
 func _agree(economy: Economy, row: Dictionary, price: int, advance: int) -> void:
 	row["accepted"] = true
 	row["terms_posted"] = Merc.whole(row.get("reward", 0))
-	row["terms_price"] = price
-	row["terms_advance"] = advance
-	row["reward"] = price - advance
+	row["reward"] = price
+	row["advance"] = advance
 	row.erase("counter_price")
 	row.erase("counter_advance")
 	economy.purse += advance

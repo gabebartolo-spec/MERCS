@@ -130,9 +130,10 @@ func _check_accept_pays() -> void:
 			_reply(reply) == Terms.ACCEPT
 			and row.get("accepted") == true
 			and economy.purse == purse + advance
+			and Merc.whole(row.get("advance", -1)) == advance
 		),
 		(
-			"an accepted ask takes the contract and pays the advance now (%s, purse %d)"
+			"an accepted ask is taken, its advance paid now and kept on the row (%s, purse %d)"
 			% [reply, economy.purse]
 		)
 	)
