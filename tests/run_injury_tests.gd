@@ -34,12 +34,15 @@ func run_checks() -> void:
 	_check_thresholds()
 	_check_triage_seeded()
 	_check_ladder_effects()
+	_check_permanent_effects()
 	_check_apply_is_copy()
 	_check_aftermath_death()
 	_check_aftermath_injuries()
 	_check_succession()
+	_check_succession_passed_over()
 	_check_mortality_final()
 	_check_save_reload()
+	_check_old_save_defaults()
 	await process_frame
 
 
@@ -140,6 +143,12 @@ func _check_ladder_effects() -> void:
 		),
 		"a wound costs nothing and has healed by the end of its day"
 	)
+
+
+func _check_permanent_effects() -> void:
+	var defs := Kit.defs()
+	var merc := Kit.merc("m_a", 3)
+	var wound := Injury.apply(merc, "inj_gash", DAY, defs)
 	var eyeless := Injury.apply(merc, "inj_lost_eye", DAY, defs)
 	var later := Injury.expire(eyeless, DAY * MANY)
 	var permanent := Injury.definition_of_kind(defs, "permanent")
@@ -267,6 +276,10 @@ func _check_succession() -> void:
 		),
 		"the dissenting voice remembers the dissent as well as the death"
 	)
+
+
+func _check_succession_passed_over() -> void:
+	var rules: Dictionary = Kit.rules().get("succession", {})
 	var other := Kit.aftermath(SEED, ALL_DIE)
 	other.captain_id = "m_b"
 	var both := other.resolve(Kit.battle_log(["m_b", "m_c"], "bandit_1"), Kit.company())
@@ -362,6 +375,13 @@ func _check_save_reload() -> void:
 		Injury.layers(survivor, Kit.defs()) == ["injury_lost_eye"] and not back.injuries.has("m_b"),
 		"a permanent injury survives a save and reload"
 	)
+
+
+func _check_old_save_defaults() -> void:
+	var world_balance := Kit.json(WORLD_BALANCE)
+	var world := WorldSim.new()
+	var rng := Rng.from_seed(SEED)
+	world.start(world_balance, rng)
 	var old_save := SaveModel.to_dict(world, rng)
 	old_save.erase("wounds")
 	var old := SaveModel.from_dict(old_save, world_balance)
