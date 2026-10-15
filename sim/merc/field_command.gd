@@ -46,14 +46,14 @@ static func leader_id(company: Company) -> String:
 
 
 ## What a choice costs, from the data, before the fight: {"leader": id, "dip": morale the
-## company starts the fight without, "xp": experience the fight earns each merc it fields}.
+## company starts the fight without}. Fight experience is not paid here (D-095: survive and
+## kills, CompanyWounds); a captain who sits out is not fielded, so it never reaches him.
 ## `out` is the choice being weighed, not the standing one.
 static func preview(company: Company, out: bool) -> Dictionary:
 	var sits := out and can_sit_out(company)
 	return {
 		"leader": sergeant(company) if sits else company.captain_id,
 		"dip": _num(company, "captain_out_morale_dip") if sits else 0,
-		"xp": _num(company, "fight_xp"),
 	}
 
 
@@ -63,17 +63,6 @@ static func apply(company: Company, battle: Battle) -> void:
 	var dip: int = preview(company, is_out(company))["dip"]
 	if dip > 0:
 		battle.lower_morale(BattleUnit.COMPANY, dip)
-
-
-## After a fight: each merc fielded and still on the roster earns the fight's experience (the
-## captain who sat out was never fielded, so earns none). Returns the ids whose level rose.
-static func award(company: Company, fielded: Array[String]) -> Array[String]:
-	var raised: Array[String] = []
-	var amount: int = preview(company, false)["xp"]
-	for merc_id: String in fielded:
-		if company.gain(merc_id, amount):
-			raised.append(merc_id)
-	return raised
 
 
 ## The choice is spent with the fight: the captain leads the next one unless asked again.

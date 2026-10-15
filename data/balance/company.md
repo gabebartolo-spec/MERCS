@@ -10,7 +10,6 @@ One line per knob (docs/05_STYLE_CODE.md "Data"). Read by `sim/merc/company.gd` 
 
 ## deploy
 - `captain_out_morale_dip`: morale the company starts a fight without when the captain sits it out and the field sergeant leads (director Q-F, "no XP, small morale dip"). Battle morale starts at 100 and the company is shaken below 75, so the dip stays small by itself; the pre-fight line shows it before the choice. A captain who leads has no dip.
-- `fight_xp`: experience each merc a fight fielded (and still on the roster after it) earns, win or lose; a captain who sat out was not fielded and earns none. First-pass number.
 
 ## campaign_end
 - `memories_shown`: how many of a fallen merc's own memories the last screen of a campaign lists under their chronicle line (the screen opens when the whole company is dead).

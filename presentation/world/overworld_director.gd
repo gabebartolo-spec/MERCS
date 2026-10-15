@@ -310,12 +310,10 @@ func _start_fight(taken: Array[Dictionary] = []) -> void:
 func _on_fight_over() -> void:
 	_store.end_fight()
 	var result := EncounterBattle.result(view.battle)
-	var fielded := wounds.fielded.duplicate()
 	view.clear()
 	view.queue_free()
 	view = null
 	var events := wounds.resolve()
-	FieldCommand.award(company, fielded)
 	FieldCommand.finish(company)
 	var kind := str(world.encounter.get("type", ""))
 	var hook := world.result_hook

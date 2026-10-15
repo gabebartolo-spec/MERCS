@@ -19,8 +19,7 @@ func setup(suite: Object, check: Callable) -> void:
 
 ## Ironman On, the captain sits out (P4): the fight starts with the sergeant leading and the
 ## company's morale dipped; a quit and reload stands at the same turn with the same choice;
-## finished, the captain earned nothing, the fielded earned the fight's experience, and the
-## choice is spent.
+## finished, the captain earned nothing and the choice is spent.
 func run() -> void:
 	var game: SliceGame = await _suite.call(
 		"_fight_start", "ambush", OverworldDirector.FIGHT_SIT_OUT
@@ -44,7 +43,7 @@ func run() -> void:
 			% dip
 		)
 	)
-	await _finished(back, captain, sergeant)
+	await _finished(back, captain)
 	await _suite.call("_quit", again)
 
 
@@ -61,17 +60,11 @@ func _started_as_promised(
 	)
 
 
-## The reloaded fight played out: the captain who sat out earned nothing, the sergeant earned the
-## fight's experience (if still on the roster), and the choice is spent.
-func _finished(back: OverworldDirector, captain: String, sergeant: String) -> void:
+## The reloaded fight played out: the captain who sat out earned nothing and the choice is
+## spent.
+func _finished(back: OverworldDirector, captain: String) -> void:
 	var captain_xp := back.company.member(captain).xp
-	var sergeant_xp := back.company.member(sergeant).xp
 	await _suite.call("_finish", back)
-	var fought := back.company.member(sergeant)
-	var earned := Merc.whole(back.company.deploy.get("fight_xp", 0))
 	var rested := back.company.member(captain)
 	var spent := rested != null and rested.xp == captain_xp and not back.company.captain_out
-	spent = spent and (fought == null or fought.xp == sergeant_xp + earned)
-	_check.call(
-		spent, "the captain who sat out earned no experience, the fielded earned %d" % earned
-	)
+	_check.call(spent, "the captain who sat out earned no experience and the choice is spent")

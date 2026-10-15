@@ -4,7 +4,8 @@ extends "res://tests/lib/effect_case.gd"
 ## scenario's band, both sides played by MercPlay. "on": the captain leads and fights; "off":
 ## the captain sits out and the field sergeant leads. The outcome names who led, the morale
 ## the company started with (what the player sees before the fight), the fighters fielded, the
-## fight's length and the experience each earned, so the two read differently.
+## fight's length and how many rounds it took (the captain earns no experience by sitting out:
+## he is not fielded), so the two read differently.
 
 const Fixture := preload("res://tests/lib/company_fixture.gd")
 const SEED := 424242
@@ -25,20 +26,16 @@ static func outcome(out: bool) -> String:
 	FieldCommand.set_out(company, out)
 	var fight := fight_of(company)
 	var battle: Battle = fight["battle"]
-	var captain := company.member(company.captain_id)
-	var xp_before := captain.xp
 	var fielded: Array[String] = fight["fielded"]
-	FieldCommand.award(company, fielded)
 	FieldCommand.finish(company)
 	return (
-		"%s led, company morale %d at the start, %d fielded, %s in %d rounds, captain +%d xp"
+		"%s led, company morale %d at the start, %d fielded, %s in %d rounds"
 		% [
 			fight["leader"],
 			fight["start_morale"],
 			fielded.size(),
 			"won" if battle.winner == BattleUnit.COMPANY else "lost",
 			battle.round_number,
-			captain.xp - xp_before,
 		]
 	)
 
