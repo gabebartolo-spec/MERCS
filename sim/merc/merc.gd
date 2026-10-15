@@ -27,6 +27,8 @@ var xp := 0
 var items := {}
 
 var _moves_by_level := {}
+## Stat -> whole points gained per level above the first (data/mercs.json "growth").
+var _growth := {}
 var _level_xp: Array[int] = []
 
 
@@ -50,6 +52,8 @@ static func make(def: Dictionary, fighters: Dictionary, level_xp: Array[int]) ->
 		merc.stats.merge(laid_over, true)
 	var learnt: Variant = def.get("moves_by_level", {})
 	merc._moves_by_level = learnt if learnt is Dictionary else {}
+	var grows: Variant = def.get("growth", {})
+	merc._growth = grows if grows is Dictionary else {}
 	var gear_line: Variant = def.get("stage_1_gear", [])
 	if gear_line is Array:
 		for item: Variant in gear_line:
@@ -64,9 +68,34 @@ static func make(def: Dictionary, fighters: Dictionary, level_xp: Array[int]) ->
 
 
 ## A stat by key (hp, attack, defense, damage, initiative, presence, resolve); 0 if absent.
-## The generic gear in the slots adds its bonus (D-066: stats only).
+## Each level above the first adds the merc's growth for it (D-094); the generic gear in the
+## slots adds its bonus (D-066: stats only).
 func stat(key: String) -> int:
-	return whole(stats.get(key, 0)) + bonus(key)
+	return whole(stats.get(key, 0)) + grown(key) + bonus(key)
+
+
+## What the levels reached add to one stat: growth per level times the levels above the first.
+func grown(key: String) -> int:
+	return whole(_growth.get(key, 0)) * (level() - 1)
+
+
+## What the next level brings, from data: {"level": n, "growth": {stat: points}, "moves":
+## [ids new at that level]}; {} at the highest level.
+func next_level() -> Dictionary:
+	var at := level() + 1
+	if at > max_level():
+		return {}
+	var gains := {}
+	for key: Variant in _growth:
+		if whole(_growth[key]) != 0:
+			gains[str(key)] = whole(_growth[key])
+	var fresh: Array[String] = []
+	var learnt: Variant = _moves_by_level.get(str(at), [])
+	if learnt is Array:
+		for move: Variant in learnt:
+			if str(move) not in moves():
+				fresh.append(str(move))
+	return {"level": at, "growth": gains, "moves": fresh}
 
 
 ## What the gear in the slots adds to one stat.
