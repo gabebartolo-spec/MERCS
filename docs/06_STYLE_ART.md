@@ -32,7 +32,7 @@ world can change colour by biome while the mercs never do:
   landscapes) are new files with the same ramp names (director, 2026-10-15). No new biome without a
   director decision.
 - Every frame and asset is validated against core + one biome (`validate_palette.py`,
-  `validate_pixels.py --palette <biome>.json`); core + biome holds 48–72 colours (heartland: 44 + 21).
+  `validate_pixels.py --palette <biome>.json`); core + biome holds 48–65 colours (heartland: 44 + 21).
 - Built by `tools/look/make_palettes.py` (ramps spaced in OKLab between hand-set anchors); options A
   and C, not picked, are kept as review records in `docs/audits/look_target/options/`.
 
