@@ -3,8 +3,11 @@ extends "res://tests/lib/runner.gd"
 ## same dictionary; a run continued from a reload matches the uninterrupted run, also when
 ## the save has been through JSON; a save missing optional keys reads with defaults and is
 ## ok; a save from a newer version is refused with an error code; a version 0 fixture
-## (fixtures/save/v0.json) migrates to the current version and keeps its state.
-## Seeded by design: Rng.from_seed(424242) only.
+## (fixtures/save/v0.json) migrates to the current version and keeps its state. Encounters
+## (Phase 2 M2, no version bump: one new key with a default): a road's standing encounter
+## survives a save through JSON and the run continues exactly as the uninterrupted one; an
+## older save without the key loads with no encounter.
+## Seeded by design: Rng.from_seed(424242) and 424243 only.
 ##   godot --headless --path . --script tests/run_save_tests.gd
 
 const BALANCE := "res://data/balance/world.json"
@@ -16,6 +19,8 @@ const SPLIT := 3
 const BIG_STATE := 9007199254740993
 const HUGE_STATE := 4611686018427387905
 const WORLD_STREAM := "world"
+const ENCOUNTERS := "res://data/encounters.json"
+const ROAD_SEED := 424243
 
 
 func suite_name() -> String:
@@ -30,6 +35,8 @@ func run_checks() -> void:
 	_check_newer_version_refused()
 	_check_migrate_v0()
 	_check_rng_exact_through_json()
+	_check_encounter_through_json()
+	_check_old_save_has_no_encounter()
 	await process_frame
 
 
@@ -183,4 +190,57 @@ func _check_rng_exact_through_json() -> void:
 	check(
 		exact,
 		"a stream position above 2^53 comes back from JSON identical and rolls the same next number"
+	)
+
+
+## A world at a road's standing encounter on ROAD_SEED, its line-ups loaded.
+func _met(rng: Rng) -> WorldSim:
+	var world := _world(rng)
+	var lineups: Array = _json(ENCOUNTERS).get("encounters", [])
+	world.set_lineups(lineups)
+	world.travel_to(world.destinations()[0])
+	return world
+
+
+## The run stopped by an encounter, saved as JSON text, read back and carried on (win, then
+## the next road) matches the run that never stopped.
+func _check_encounter_through_json() -> void:
+	var whole := _met(Rng.from_seed(ROAD_SEED))
+	var paused_rng := Rng.from_seed(ROAD_SEED)
+	var paused := _met(paused_rng)
+	var parsed: Variant = JSON.parse_string(JSON.stringify(SaveModel.to_dict(paused, paused_rng)))
+	var reread: Dictionary = parsed if parsed is Dictionary else {}
+	var model := SaveModel.from_dict(reread, _balance())
+	var lineups: Array = _json(ENCOUNTERS).get("encounters", [])
+	model.world.set_lineups(lineups)
+	var standing := (
+		model.ok
+		and not model.world.encounter.is_empty()
+		and JSON.stringify(model.world.state()) == JSON.stringify(whole.state())
+	)
+	for world: WorldSim in [whole, model.world]:
+		world.resolve_encounter({"won": true})
+		world.travel_to(world.destinations()[0])
+	check(
+		standing and JSON.stringify(model.world.state()) == JSON.stringify(whole.state()),
+		"a pending encounter survives a save through JSON and the run continues as the uninterrupted one"
+	)
+
+
+func _check_old_save_has_no_encounter() -> void:
+	var from_v0 := SaveModel.from_dict(_json(V0_FIXTURE), _balance())
+	var rng := Rng.from_seed(SEED)
+	var current := SaveModel.to_dict(_world(rng), rng)
+	var world_block: Dictionary = current.get("world", {})
+	world_block.erase("encounter")
+	var without_key := SaveModel.from_dict(current, _balance())
+	check(
+		(
+			from_v0.ok
+			and from_v0.world.encounter.is_empty()
+			and without_key.ok
+			and without_key.world.encounter.is_empty()
+			and without_key.world.travel_to(without_key.world.destinations()[0])
+		),
+		"a save from before encounters, and a v1 save without the key, load with no encounter"
 	)
