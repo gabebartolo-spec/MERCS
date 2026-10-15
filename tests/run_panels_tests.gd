@@ -24,6 +24,9 @@ const SETTLE := 8
 
 var _clear_all := true
 var _turns_seen := 0
+var _apart := true
+var _one_line_each := true
+var _on_screen := true
 
 
 func suite_name() -> String:
@@ -111,8 +114,7 @@ func _check_fight_and_screens() -> void:
 		not direct and not _saved() and director.in_fight(),
 		"save_run() called directly in the middle of a fight returns false and writes nothing"
 	)
-	_clear_all = true
-	_turns_seen = 0
+	_reset_readable()
 	var won := await InputKit.finish_fight(self, director, _on_turn.bind(director))
 	await InputKit.frames(self, InputKit.LAYOUT_FRAMES)
 	check(
@@ -122,6 +124,7 @@ func _check_fight_and_screens() -> void:
 			% _turns_seen
 		)
 	)
+	_check_readable()
 	await _check_triage_save(director)
 	await InputKit.click(self, director.panel.button_for(OverworldDirector.CONTINUE))
 	await InputKit.frames(self, InputKit.LAYOUT_FRAMES)
@@ -163,6 +166,31 @@ func _check_encounter_under_screen(code: Key) -> void:
 	game.queue_free()
 	await process_frame
 	_clear_save()
+
+
+func _reset_readable() -> void:
+	_clear_all = true
+	_apart = true
+	_one_line_each = true
+	_on_screen = true
+	_turns_seen = 0
+
+
+func _check_readable() -> void:
+	check(
+		_apart,
+		(
+			"over %d turns no two fighters' sprites overlapped on screen (neighbouring cells too)"
+			% _turns_seen
+		)
+	)
+	check(
+		_one_line_each and _on_screen,
+		(
+			"over %d turns each enemy's intent is one distinct line in the lane, fully on screen"
+			% _turns_seen
+		)
+	)
 
 
 func _check_triage_save(director: OverworldDirector) -> void:
@@ -228,21 +256,47 @@ func _on_turn(director: OverworldDirector) -> void:
 
 
 func _intents_clear_of_panel(director: OverworldDirector) -> bool:
+	var view := director.view
 	var panel_rect := director.panel.get_global_rect()
-	var seen := 0
-	var clear := true
-	for unit: BattleUnit in director.view.battle.units:
+	var lane := view.lane_rect()
+	var texts := {}
+	for unit: BattleUnit in view.battle.units:
 		if unit.side != BattleUnit.ENEMY:
 			continue
-		var label := director.view.intent_label(unit.id)
+		var label := view.intent_label(unit.id)
 		if label == null or not label.visible:
 			continue
-		seen += 1
-		var rect := Rect2(label.global_position, label.get_minimum_size())
-		if _overlaps(rect, panel_rect):
-			clear = false
-			printerr("intent %s %s over panel %s" % [unit.id, rect, panel_rect])
-	return clear
+		if texts.has(label.text):
+			_one_line_each = false
+			printerr("duplicate intent line: %s" % label.text)
+		texts[label.text] = true
+	if not texts.is_empty() and not Rect2(Vector2.ZERO, Vector2(WINDOW_SIZE)).encloses(lane):
+		_on_screen = false
+		printerr("intent lane %s leaves the screen" % lane)
+	_check_apart(view)
+	if not texts.is_empty() and _overlaps(lane, panel_rect):
+		printerr("intent lane %s over panel %s" % [lane, panel_rect])
+		return false
+	return true
+
+
+## No two standing fighters' sprite rectangles share a pixel.
+func _check_apart(view: BattleView) -> void:
+	var rects := view.sprite_rects()
+	var ids := rects.keys()
+	for i: int in ids.size():
+		for j: int in range(i + 1, ids.size()):
+			var a: BattleUnit = view.battle.unit(str(ids[i]))
+			var b: BattleUnit = view.battle.unit(str(ids[j]))
+			if a.down or b.down:
+				continue
+			var ra: Rect2 = rects[ids[i]]
+			var rb: Rect2 = rects[ids[j]]
+			if ra.intersects(rb):
+				_apart = false
+				printerr(
+					"sprites overlap: %s %s %s and %s %s %s" % [a.id, a.cell, ra, b.id, b.cell, rb]
+				)
 
 
 func _check_chase_ring() -> void:

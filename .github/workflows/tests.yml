@@ -89,6 +89,9 @@ jobs:
     if: needs.plan.outputs.code == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    # Shard 2 is the perf suite (tests/run_perf_tests.gd): reported, never blocking, because
+    # CI runners vary in speed. A red perf shard is a prompt to look, not a stop.
+    continue-on-error: ${{ matrix.shard == '2' }}
     strategy:
       fail-fast: false # a red shard should not hide the others' results
       matrix: ${{ fromJSON(needs.plan.outputs.shards) }}

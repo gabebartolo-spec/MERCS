@@ -14,9 +14,9 @@ and `tools/capture/capture_stage.gd`. Spec: `docs/specs/phase1_visual_proof.md` 
 - `door_size_m`, `door_cell`, `door_offset_z_m`: the interior door marker, a thin box on the street face of the far house left of the alley; the offset slides it from its cell centre (cells are centred at +0.5) to sit just proud of that face; positive is toward the camera.
 
 ## shades
-- `ground`, `house`, `well`, `cart`, `door`: grey level (0–1) of each placeholder box's material.
-- `interior_wall`: grey of the interior room's wall boxes.
-- `sky`: flat background grey.
+- `ground`, `house`, `well`, `cart`, `door`: palette reference of each placeholder box's material.
+- `interior_wall`: palette reference of the interior room's wall boxes.
+- `sky`: flat background colour (palette reference).
 
 ## light
 - `elevation_degrees`: the key light's angle above the horizon (45°).
@@ -27,16 +27,16 @@ and `tools/capture/capture_stage.gd`. Spec: `docs/specs/phase1_visual_proof.md` 
 ## dusk
 The slice's T key steps day → dusk → night (`StageLighting`). Low warm sun from camera-left, rosy ambient.
 - `light`: the key and ambient as in `rain_night.light` (`ambient_rgb` a colour).
-- `sky_rgb`, `sprite_tint_rgb`: dusk background and the unshaded sprite's tint. Torches burn at dusk and night.
+- `sky` (palette reference), `sprite_tint_rgb`: dusk background and the unshaded sprite's tint. Torches burn at dusk and night.
 
 ## rain_night
 Night for `StageLighting` too; rain is a separate toggle there.
 Used when the stage's `lighting` export is RAIN_NIGHT (sample set 2, spec §4); DAY uses `light` and `shades.sky`.
 - `light`: the moonlight key and ambient, as in `light` above, but `ambient_rgb` is a colour (cool blue) instead of a grey.
-- `sky_rgb`: the flat night background colour.
+- `sky`: the flat night background colour.
 - `sprite_tint_rgb`: the sprite is unshaded, so night darkens it by this modulate colour instead of by light; without it the merc glows like day.
 - `torch`: one warm `OmniLight3D` by the well: `position_m`, `color_rgb`, `energy`, `range_m`. Geometry only; the unshaded sprite does not pick it up.
-- `rain`: falling streaks (`GPUParticles3D`): `amount`, the emission box `centre_m` and `area_m` (full size, metres), `fall_m_s`, `lifetime_s`, `streak_m` (quad width × height), `color_rgb`, and the fixed particle `seed` so captures repeat.
+- `rain`: falling streaks (`GPUParticles3D`): `amount`, the emission box `centre_m` and `area_m` (full size, metres), `fall_m_s`, `lifetime_s`, `streak_m` (quad width × height), `colour` (palette reference), and the fixed particle `seed` so captures repeat.
 
 ## camera
 - `fov_degrees`: perspective field of view (35°).
@@ -47,13 +47,14 @@ Used when the stage's `lighting` export is RAIN_NIGHT (sample set 2, spec §4); 
 ## sprite
 - `merc_height_m`: the standing body height (1.78 m, `reference_height_m` in the camera rig). One texel (pixel_size) is `merc_height_m × cos(pitch) / sprite_height_px` of the image plane, and the sprite is stretched by `1 / cos(pitch)` on Y so the figure stands this tall in the world and foreshortens back to `sprite_height_px` on screen.
 - `texture_width_px`: width of the generated capsule texture; its height is the exported sprite height.
-- `fill_grey`, `outline_grey`: the capsule's fill and 1-px outline grey levels.
+- `fill`, `outline`: the capsule's fill and 1-px outline (palette references).
 - `walk_speed_m_s`: how fast the placeholder walks its loop.
 - `path_xz`: the walk loop as x, z pairs in metres; the loop closes back to the first point. Laid out for the director's 55° / 56 px camera (2026-10-08), which sees about x −7…7 and z −6…3 of the street: the merc passes behind the well (z −0.5), round its right side and back in front of it (z 2.5).
 
 ## pixel
 - `logical_width_px`, `logical_height_px`: the whole-screen mode SubViewport size (960 × 540, the director's density pick 2026-10-09; it was 640 × 360).
 - `integer_scale`: the whole-screen scale to the 1920 × 1080 window (2; the slice picks ×4 itself on a 4K window).
+- `fight_zoom`: in a fight the logical viewport is this many times larger and its scale this many times smaller (2: 1920 by 1080 logical at x1, x2 on a 4K window), so six fighters a side, a figure's height apart, fit on screen with every texel still a whole number of window pixels.
 
 ## capture
 - `settle_frames`: frames rendered before a still is saved.

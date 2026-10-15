@@ -43,7 +43,7 @@ func _ready() -> void:
 	_data = StageData.load_file(DATA)
 	_tile = maxi(1, int(_data.num("map", "tile_px")))
 	for key: String in TileRegion.TERRAIN_KEYS:
-		_terrain_colours.append(_data.rgb("colours", key + "_rgb"))
+		_terrain_colours.append(_data.colour("colours", key))
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	clip_contents = true
 	_fit()
@@ -100,6 +100,7 @@ func show_world(world: WorldSim) -> void:
 		if marker.get_child_count() == 0:
 			var label := Label.new()
 			label.text = site_name(site)
+			UiLook.outlined(label)
 			label.position = Vector2(marker.size.x + MARGIN_PX / 2.0, -marker.size.y)
 			marker.add_child(label)
 	for party: WorldParty in world.parties:
@@ -181,7 +182,7 @@ func _place(token: Control, tile: Vector2i, radius: int) -> void:
 func _draw_map() -> void:
 	if _world == null:
 		return
-	_canvas.draw_rect(Rect2(Vector2.ZERO, _canvas.size), _terrain_colours[TileRegion.Terrain.WATER])
+	_canvas.draw_rect(Rect2(Vector2.ZERO, _canvas.size), _colour("void"))
 	var first := (-_origin / _tile).max(Vector2i.ZERO)
 	var last := (_viewport.size - _origin) / _tile + Vector2i.ONE
 	last = last.min(Vector2i(_world.region.width, _world.region.height))
@@ -222,7 +223,7 @@ func _draw_chase_ring(tile: Vector2i) -> void:
 
 
 func _colour(key: String) -> Color:
-	return _data.rgb("colours", key + "_rgb")
+	return _data.colour("colours", key)
 
 
 ## The ring round a party that has seen the band, as drawn: {"radius", "width", "colour"}.
@@ -234,19 +235,19 @@ static func chase_ring() -> Dictionary:
 		# draw_arc centres the stroke on the radius: the ring's inner edge clears the token by `gap`.
 		"radius": data.num("map", "party_radius_px") + gap + width / 2.0,
 		"width": width,
-		"colour": data.rgb("colours", "chase_rgb")
+		"colour": data.colour("colours", "chase")
 	}
 
 
 ## The thin outline round the band's token: {"width", "colour"}.
 static func outline() -> Dictionary:
 	var data := StageData.load_file(DATA)
-	return {"width": data.num("map", "ring_width_px"), "colour": data.rgb("colours", "ring_rgb")}
+	return {"width": data.num("map", "ring_width_px"), "colour": data.colour("colours", "ring")}
 
 
 ## A token's colour by key ("band", a party type, "site"), and a party token's radius.
 static func token_colour(key: String) -> Color:
-	return StageData.load_file(DATA).rgb("colours", key + "_rgb")
+	return StageData.load_file(DATA).colour("colours", key)
 
 
 static func token_radius(_type: String) -> float:

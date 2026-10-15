@@ -9,7 +9,8 @@
       "role": "Big, bulky and mean. Charges in on pure aggression and relies on his gear to survive.",
       "stats_from": "orc",
       "stats": {"resolve": 6},
-      "moves_by_level": {"1": ["move", "attack", "charge"]},
+      "moves_by_level": {"1": ["move", "attack", "charge"], "3": ["blood_price"]},
+      "growth": {"hp": 2, "attack": 1},
       "stage_1_gear": ["Battle axe", "Plate armour"],
       "gear_slots": {"weapon": null, "armour": null, "trinket": null},
       "look": "placeholder"
@@ -21,7 +22,8 @@
       "role": "A regal dark knight whose bestial nature is barely contained. Spends his own health for combat bonuses, plays cautiously and times his all-ins.",
       "stats_from": "vampyr",
       "stats": {"resolve": 7},
-      "moves_by_level": {"1": ["move", "attack", "blood_price"]},
+      "moves_by_level": {"1": ["move", "attack", "blood_price"], "2": ["charge"]},
+      "growth": {"defense": 1, "initiative": 1},
       "stage_1_gear": ["Dark knight's arms and armour"],
       "gear_slots": {"weapon": null, "armour": null, "trinket": null},
       "look": "placeholder"
@@ -33,7 +35,8 @@
       "placeholder": true,
       "role": "To be written by the director",
       "stats": {"hp": 11, "attack": 2, "defense": 2, "damage": 5, "initiative": 3, "presence": 2, "resolve": 5},
-      "moves_by_level": {"1": ["move", "attack"]},
+      "moves_by_level": {"1": ["move", "attack"], "2": ["charge"]},
+      "growth": {"hp": 1},
       "stage_1_gear": [],
       "gear_slots": {"weapon": null, "armour": null, "trinket": null},
       "look": "placeholder"
@@ -45,7 +48,8 @@
       "placeholder": true,
       "role": "To be written by the director",
       "stats": {"hp": 11, "attack": 2, "defense": 2, "damage": 5, "initiative": 3, "presence": 2, "resolve": 5},
-      "moves_by_level": {"1": ["move", "attack"]},
+      "moves_by_level": {"1": ["move", "attack"], "2": ["blood_price"]},
+      "growth": {"attack": 1},
       "stage_1_gear": [],
       "gear_slots": {"weapon": null, "armour": null, "trinket": null},
       "look": "placeholder"
@@ -57,7 +61,8 @@
       "placeholder": true,
       "role": "To be written by the director",
       "stats": {"hp": 11, "attack": 2, "defense": 2, "damage": 5, "initiative": 3, "presence": 2, "resolve": 5},
-      "moves_by_level": {"1": ["move", "attack"]},
+      "moves_by_level": {"1": ["move", "attack"], "3": ["charge"]},
+      "growth": {"hp": 1},
       "stage_1_gear": [],
       "gear_slots": {"weapon": null, "armour": null, "trinket": null},
       "look": "placeholder"
@@ -69,7 +74,8 @@
       "placeholder": true,
       "role": "To be written by the director",
       "stats": {"hp": 11, "attack": 2, "defense": 2, "damage": 5, "initiative": 3, "presence": 2, "resolve": 5},
-      "moves_by_level": {"1": ["move", "attack"]},
+      "moves_by_level": {"1": ["move", "attack"], "3": ["blood_price"]},
+      "growth": {"defense": 1},
       "stage_1_gear": [],
       "gear_slots": {"weapon": null, "armour": null, "trinket": null},
       "look": "placeholder"
