@@ -213,7 +213,10 @@ func _check_appoint_saved() -> void:
 func _check_experience_bar() -> void:
 	var company := _company()
 	var merc := company.member("orc")
-	var steps: Array[bool] = [merc.gain(9), merc.gain(1), merc.gain(-50)]
+	var xp: Dictionary = Fixture.json(Fixture.COMPANY).get("xp", {})
+	var level_xp: Array = xp.get("level_xp", [])
+	var two := Merc.whole(level_xp[1])
+	var steps: Array[bool] = [merc.gain(two - 1), merc.gain(1), merc.gain(-50)]
 	var bar_at_two: Dictionary = merc.bar()
 	merc.gain(500)
 	var top: Dictionary = merc.bar()
@@ -224,7 +227,7 @@ func _check_experience_bar() -> void:
 			and merc.level() == 5
 			and merc.level() == merc.max_level()
 			and _is(bar_at_two.get("xp"), 0)
-			and _is(bar_at_two.get("span"), 15)
+			and _is(bar_at_two.get("span"), Merc.whole(level_xp[2]) - two)
 			and _is(top.get("span"), 0)
 			and raised.size() == STARTING_IDS.size() - 1
 			and company.member("vampyr").level() == 3

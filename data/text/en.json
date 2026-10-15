@@ -212,6 +212,8 @@
   "wiring.outcome.wound": "{name} went down and got up again: {injury}.",
   "wiring.outcome.temporary": "{name} went down with {injury}, and is fit again on day {day}.",
   "wiring.outcome.permanent": "{name} went down and lives, but with {injury} for good. {role}",
+  "wiring.xp": "{name}: +{gain} XP",
+  "wiring.level_up": "{name} reaches level {level}.",
   "wiring.cause_unknown": "an unseen hand",
   "wiring.continue": "Continue",
   "company.injuries": "Injuries: {list}",

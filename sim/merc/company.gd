@@ -26,6 +26,8 @@ var economy: Economy = null
 var _defs := {}
 var _cap := 0
 var _level_xp: Array[int] = []
+var _xp_per_fight := 0
+var _xp_per_kill := 0
 
 
 ## A new company of the starting six (every merc in data, in order, up to the cap), the
@@ -109,6 +111,12 @@ func appoint(id: String) -> bool:
 func gain(id: String, amount: int) -> bool:
 	var merc := member(id)
 	return merc != null and merc.gain(amount)
+
+
+## The experience a merc earns from a fight they lived through, having put down `kills`
+## enemies (data/balance/company.json xp.per_fight and xp.per_kill, D-095).
+func xp_for_fight(kills: int) -> int:
+	return _xp_per_fight + _xp_per_kill * maxi(0, kills)
 
 
 ## Experience to everyone on the roster; the ids whose level rose.
@@ -252,6 +260,8 @@ func _read_rules(defs: Dictionary) -> void:
 	_cap = Merc.whole(_section(balance, "roster").get("cap", 0))
 	deploy = _section(balance, "deploy")
 	_level_xp.clear()
+	_xp_per_fight = Merc.whole(_section(balance, "xp").get("per_fight", 0))
+	_xp_per_kill = Merc.whole(_section(balance, "xp").get("per_kill", 0))
 	var thresholds: Variant = _section(balance, "xp").get("level_xp", [])
 	if thresholds is Array:
 		for threshold: Variant in thresholds:
