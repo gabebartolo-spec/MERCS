@@ -7,7 +7,7 @@ extends RefCounted
 
 const CLOSE := &"close"
 const ACTIONS: Array[StringName] = [
-	&"map", &"company", &"loop", &"help", &"frame_time", &"time_of_day", &"rain"
+	&"map", &"company", &"hub", &"loop", &"help", &"frame_time", &"time_of_day", &"rain"
 ]
 
 var _by_code: Dictionary = {}

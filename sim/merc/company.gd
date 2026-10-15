@@ -7,10 +7,13 @@ extends RefCounted
 ## Nothing here rolls (no stream), so a company has no seed. No Node, no file access.
 ##
 ## defs, the data a company is made from: {"mercs": data/mercs.json, "fighters":
-## data/balance/battle.json "fighters", "company": data/balance/company.json}.
+## data/balance/battle.json "fighters", "company": data/balance/company.json}, and for the
+## economy (see Economy) "economy", "factions", "equipment" and "recruits" (all optional).
 
 var roster: Array[Merc] = []
 var captain_id := ""
+## The purse, wages, contracts, pack and hub (Phase 2 milestone 6); saved with the company.
+var economy: Economy = null
 
 var _defs := {}
 var _cap := 0
@@ -22,6 +25,7 @@ var _level_xp: Array[int] = []
 static func start(defs: Dictionary) -> Company:
 	var company := Company.new()
 	company._read_rules(defs)
+	company.economy = Economy.make(defs)
 	for id: String in company._catalogue():
 		company.add(id)
 	company.captain_id = str(_section(defs, "mercs").get("starting_captain", ""))
@@ -39,6 +43,7 @@ static func restore(saved: Dictionary, defs: Dictionary) -> Company:
 		return Company.start(defs)
 	var company := Company.new()
 	company._read_rules(defs)
+	company.economy = Economy.restore(_section(saved, "economy"), defs)
 	for row: Variant in rows:
 		if not row is Dictionary:
 			continue
@@ -111,23 +116,50 @@ func battle_units(ids: Array[String], cells: Array[Vector2i], side: int) -> Arra
 	return units
 
 
-## What the save keeps: who holds the office and each merc's experience and gear.
+## What the save keeps: who holds the office, each merc's experience and gear, and the
+## economy (purse, wages, contracts, pack, hired recruits).
 func state() -> Dictionary:
 	var rows: Array[Dictionary] = []
 	for merc: Merc in roster:
 		rows.append(merc.state())
-	return {"captain": captain_id, "roster": rows}
+	return {"captain": captain_id, "roster": rows, "economy": economy.state()}
+
+
+## A merc made from a recruit's data (data/recruits.json) for inspection before a hire; not on
+## the roster. Null when the id is not a recruit.
+func preview(recruit_id: String) -> Merc:
+	return _make(recruit_id, _recruit_entries())
 
 
 func _add(id: String) -> Merc:
 	if member(id) != null or roster.size() >= _cap:
 		return null
-	for def: Dictionary in _entries():
+	var merc := _make(id, _entries())
+	if merc == null:
+		merc = _make(id, _recruit_entries())
+	if merc != null:
+		roster.append(merc)
+	return merc
+
+
+func _make(id: String, defs: Array[Dictionary]) -> Merc:
+	for def: Dictionary in defs:
 		if str(def.get("id", "")) == id:
 			var merc := Merc.make(def, _section(_defs, "fighters"), _level_xp)
-			roster.append(merc)
+			merc.items = economy.items()
 			return merc
 	return null
+
+
+func _recruit_entries() -> Array[Dictionary]:
+	var entries: Array[Dictionary] = []
+	var listed: Variant = _section(_defs, "recruits").get("recruits", [])
+	if listed is Array:
+		for entry: Variant in listed:
+			if entry is Dictionary:
+				var def: Dictionary = entry
+				entries.append(def)
+	return entries
 
 
 func _mend_captain() -> void:

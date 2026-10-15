@@ -31,6 +31,10 @@ var log: Array[Dictionary] = []
 ## The encounter a party raised and nobody has settled yet, or {}: {"type", "party", "day",
 ## "enemy_first", "enemies": [{"fighter", "cell"}]}. While it stands the band cannot move.
 var encounter: Dictionary = {}
+## Callables the hub's economy registers (Phase 2 M6, not saved): day_hook.call(day) after every
+## day's tick; result_hook.call(encounter type, result) after a fight's result is applied.
+var day_hook := Callable()
+var result_hook := Callable()
 ## The region's sites in placement order (the hub first).
 var sites: Array[WorldSite] = []
 var region: TileRegion = null
@@ -127,6 +131,8 @@ func resolve_encounter(result: Dictionary) -> bool:
 		if site(haven) != null:
 			band = region.entrance(haven)
 			at = haven
+	if result_hook.is_valid():
+		result_hook.call(kind, result)
 	return true
 
 
@@ -265,6 +271,8 @@ func _tick() -> void:
 	log.append({"step": "tick", "day": day, "supplies": supplies})
 	if supplies == 0:
 		log.append({"step": "starving", "day": day})
+	if day_hook.is_valid():
+		day_hook.call(day)
 
 
 ## Day zero at the hub's entrance with the balance's supplies, on a freshly laid region.

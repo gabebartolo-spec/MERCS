@@ -1,1 +1,1 @@
-{"equipment": [{"id": "wpn_arming_sword"}, {"id": "arm_gambeson"}]}
+{"equipment": [{"id": "wpn_arming_sword", "name": "Arming sword", "slot": "weapon", "bonus": {"damage": 1}}, {"id": "trk_charm", "name": "Charm", "slot": "trinket", "bonus": {}}]}

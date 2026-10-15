@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Recruits",
+  "description": "data/recruits.json: the mercenaries the hub offers for hire (D-066). Placeholders named Recruit N until the director authors them; the entry shape is a mercs.json entry without stats_from. A hire costs the coin in data/balance/economy.json.",
+  "type": "object",
+  "required": [
+    "recruits"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "recruits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "species",
+          "role",
+          "stats",
+          "moves_by_level",
+          "stage_1_gear",
+          "gear_slots",
+          "look",
+          "placeholder"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^recruit_[0-9]+$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "species": {
+            "type": "string"
+          },
+          "placeholder": {
+            "type": "boolean"
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1
+          },
+          "stats": {
+            "type": "object",
+            "required": [
+              "hp",
+              "attack",
+              "defense",
+              "damage",
+              "initiative",
+              "presence",
+              "resolve"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "hp": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "attack": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "defense": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "damage": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "initiative": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "presence": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "resolve": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "moves_by_level": {
+            "type": "object",
+            "additionalProperties": false,
+            "patternProperties": {
+              "^[1-9][0-9]*$": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$"
+                }
+              }
+            }
+          },
+          "stage_1_gear": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "gear_slots": {
+            "type": "object",
+            "required": [
+              "weapon",
+              "armour",
+              "trinket"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "weapon": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "armour": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "trinket": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "look": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}
