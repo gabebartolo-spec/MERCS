@@ -41,7 +41,15 @@ var max_hp := 1
 var attack := 0
 var defense := 0
 var damage := 1
-var initiative := 0
+## Initiative from the fighter's data; armour may slow him (gear_initiative, BattleGear rule 4).
+var initiative: int:
+	get:
+		return base_initiative + gear_initiative
+	set(value):
+		base_initiative = value
+var base_initiative := 0
+## What the armour adds to initiative (plate: slower), set by BattleGear.fit at setup.
+var gear_initiative := 0
 var is_leader := false
 var down := false
 var wounded := false
@@ -50,13 +58,18 @@ var presence := 0
 ## The merc's own resolve: at the captain's fall he holds at or above the rules' bar (BattleMorale).
 var resolve := 0
 ## The class of the weapon in hand (stats "weapon_class": sword, axe, spear, mace, bow; director
-## Q-B, 2026-10-15), "" for none; the action kit gives its weapon action (BattleKit).
+## Q-B, 2026-10-15, or battle.json "gear"; BattleGear.dress), "" for none; the action kit
+## gives its weapon action (BattleKit) and BattleGear reads its blow.
 var weapon_class := ""
 ## Learnt moves taken into this fight, by id, in loadout order (at most "loadout_max").
 var moves: Array[String] = []
 ## Added to this fighter's next attack only, then cleared (the Vampyr's blood price).
 var next_attack_bonus := 0
 var next_damage_bonus := 0
+## The armour worn (BattleGear.ARMOURS: leather, mail, plate), "" for none; shield is true
+## while the fighter carries a whole one (an axe can split it). Both dressed by BattleGear.
+var armour_class := ""
+var shield := false
 
 ## The sketch's flags, kept as views of the loadout.
 var can_charge: bool:
@@ -88,8 +101,8 @@ static func make(unit_id: String, unit_side: int, at: Vector2i, stats: Dictionar
 	unit.initiative = _int(stats, "initiative", 0)
 	unit.is_leader = stats.get("leader", false) == true
 	unit.presence = _int(stats, "presence", 0)
+	BattleGear.dress(unit, stats)
 	unit.resolve = _int(stats, "resolve", 0)
-	unit.weapon_class = str(stats.get("weapon_class", ""))
 	for move: String in _listed_moves(stats.get("moves", [])):
 		unit.teach(move, true)
 	for flag: Variant in FLAGS:

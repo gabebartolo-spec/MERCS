@@ -97,6 +97,7 @@ func _check_kit_shape() -> void:
 	var data := _json(BATTLE_DATA)
 	var kinds: Dictionary = data.get("fighters", {})
 	var orc_stats: Dictionary = kinds.get("orc", {})
+	# The orc's data carries his axe (battle.json "gear", P1b), so his weapon action is "axe".
 	var plain := _unit("o", BattleUnit.COMPANY, Vector2i(1, 1), orc_stats)
 	var spear_stats := orc_stats.duplicate()
 	spear_stats["weapon_class"] = "spear"
@@ -108,7 +109,7 @@ func _check_kit_shape() -> void:
 	var battle := _battle([plain, spearman, odd, learner, bandit])
 	var shapes := [battle.kit("o"), battle.kit("s"), battle.kit("f"), battle.kit("l")]
 	var want := [
-		["attack", "charge"], ["spear", "charge"], ["attack"], ["attack", "charge", "blood_price"]
+		["axe", "charge"], ["spear", "charge"], ["attack"], ["attack", "charge", "blood_price"]
 	]
 	_check.call(
 		shapes == want and battle.kit("nobody").is_empty(),

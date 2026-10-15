@@ -66,6 +66,7 @@ func setup(rules: Dictionary, field: Dictionary, fighters: Array[BattleUnit], rn
 	_rules.setup(rules)
 	_grid.setup(field)
 	units = fighters
+	_resolver.fit(_rules, fighters)
 	_turns.setup(fighters, _morale)
 	_morale.setup(rules)
 	_resolver.setup(_rules, rng, _morale)
@@ -191,6 +192,14 @@ func standing(side: int) -> Dictionary:
 func kit(unit_id: String) -> Array[String]:
 	var fighter := unit(unit_id)
 	return _actions.kit.of(fighter) if fighter != null else []
+
+
+## What the current fighter's attack or learnt move on action "target" would be, computed and
+## never rolled (BattleResolver.odds: the roll needed, the chance, the damage range after the
+## armour, whether a shield can split); {} when the target is not a foe.
+func odds(action: Dictionary) -> Dictionary:
+	var target := unit(str(action.get("target", "")))
+	return _resolver.odds(current(), target, move_def(str(action.get("type", ""))))
 
 
 ## A new round: each standing enemy who has not broken plans what it will do from what it

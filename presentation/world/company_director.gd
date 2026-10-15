@@ -210,7 +210,7 @@ static func lines(merc: Merc) -> Array[String]:
 	lines.append(merc.role)
 	var stats: Array[String] = []
 	for key: String in STAT_KEYS:
-		stats.append(Text.t("company.stat." + key, {"value": merc.stat(key)}))
+		stats.append(Text.t("company.stat." + key, {"value": shown_stat(merc, key)}))
 	lines.append("   ".join(stats))
 	var moves: Array[String] = []
 	for move: String in merc.moves():
@@ -225,6 +225,16 @@ static func lines(merc: Merc) -> Array[String]:
 		slots.append(Text.t("company.slot." + slot, {"gear": held}))
 	lines.append("   ".join(slots))
 	return lines
+
+
+## A stat as the screen shows it: initiative is the one he acts at in a fight, his armour's
+## slowness counted (Merc.fighting_initiative, the same rule the battle applies).
+static func shown_stat(merc: Merc, key: String) -> int:
+	if key == "initiative":
+		var found: Variant = _json(BATTLE_DATA).get("rules", {})
+		var rules: Dictionary = found if found is Dictionary else {}
+		return merc.fighting_initiative(rules)
+	return merc.stat(key)
 
 
 ## What the merc remembers, one sentence a line (the story director holds the memories).

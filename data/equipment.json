@@ -1,10 +1,10 @@
 {
-  "_comment": "Generic gear (Phase 2 milestone 6, D-066): stats only, a few slots (weapon, armour, trinket), never drawn on the sprite or portrait. PLACEHOLDER items and first numbers: the director names and tunes them. bonus adds to the merc's own numbers (hp, attack, defense, damage, initiative, presence). Schema: data/schema/equipment.schema.json.",
+  "_comment": "Generic gear (Phase 2 milestone 6, D-066): stats only, a few slots (weapon, armour, trinket), never drawn on the sprite or portrait. PLACEHOLDER items and first numbers: the director names and tunes them. bonus adds to the merc's own numbers (hp, attack, defense, damage, initiative, presence). class (weapons and armour only) is the battle class (rules.gear in data/balance/battle.json); it applies only when the merc's own gear line names no class for that slot, so the look still shows the fighting (D-066). Schema: data/schema/equipment.schema.json.",
   "equipment": [
-    {"id": "wpn_iron_blade", "name": "Iron blade", "slot": "weapon", "bonus": {"damage": 1}},
-    {"id": "wpn_hunting_spear", "name": "Hunting spear", "slot": "weapon", "bonus": {"attack": 1}},
-    {"id": "arm_padded_coat", "name": "Padded coat", "slot": "armour", "bonus": {"defense": 1}},
-    {"id": "arm_mail_shirt", "name": "Mail shirt", "slot": "armour", "bonus": {"defense": 1, "hp": 2}},
+    {"id": "wpn_iron_blade", "name": "Iron blade", "slot": "weapon", "class": "sword", "bonus": {"damage": 1}},
+    {"id": "wpn_hunting_spear", "name": "Hunting spear", "slot": "weapon", "class": "spear", "bonus": {"attack": 1}},
+    {"id": "arm_padded_coat", "name": "Padded coat", "slot": "armour", "class": "leather", "bonus": {"defense": 1}},
+    {"id": "arm_mail_shirt", "name": "Mail shirt", "slot": "armour", "class": "mail", "bonus": {"defense": 1, "hp": 2}},
     {"id": "trk_lucky_knot", "name": "Lucky knot", "slot": "trinket", "bonus": {"presence": 1}},
     {"id": "trk_wolf_tooth", "name": "Wolf tooth", "slot": "trinket", "bonus": {"initiative": 1}}
   ]
