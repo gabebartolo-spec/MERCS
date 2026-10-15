@@ -64,7 +64,7 @@ OPTIONS = {
         "ramps": {
             "soot": ("#17120f", "#45392f"), "slate": ("#34393d", "#aba693"), "iron": ("#2b2b2a", "#b6b1a3"),
             "soil": ("#2b1c11", "#a27a4e"), "timber": ("#321f0f", "#b68b51"), "bone": ("#8e7d5d", "#efe1bd"),
-            "skin_neutral": ("#4c2d1f", "#e0b48f"), "skin_orc": ("#37331e", "#c1b989"),
+            "skin_neutral": ("#4c2d1f", "#e0b48f"), "skin_orc": ["#2e3428", "#485240", "#6b7a68", "#8d9b80", "#b2bc9c"],
             "skin_pale": ("#4b3d39", "#e1d3c2"), "verdure": ("#1e2a12", "#808c46"),
             "cloth_faded": ["#7a3a26", "#a0573a", "#37474f", "#59706f"],
             "heraldry": ["#8a1d1d", "#bb3a2c", "#d29a2a", "#22488a", "#ece3cf", "#e0b92c"],

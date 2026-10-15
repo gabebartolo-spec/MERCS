@@ -1,17 +1,17 @@
 {
-  "_doc": "Orc and Vampyr stage-1 blockouts rendered by the sprite pipeline (CC0 MPFB bodies; plate as shells conformed to the body plus Blender primitives, kit_extras.py), reduced to core + heartland with the outline on the silhouette only, speckle merged and the tokens hand-edited (token_edits.json). Cast fix after the slop audit of 2026-10-15. Round 3 (2026-10-16): bodies, tokens and normal strips hand-repainted part by part in palette ramps (tools/look/cast_r3/); heads kept from the render; orc skin on the grey-olive skin_orc ramp (director 2026-10-16).",
+  "_doc": "Orc and Vampyr stage-1 blockouts rendered by the sprite pipeline (CC0 MPFB bodies; plate as shells conformed to the body plus Blender primitives, kit_extras.py), reduced to core + heartland with the outline on the silhouette only, speckle merged and the tokens hand-edited (token_edits.json). Cast fix after the slop audit of 2026-10-15. Round 3 (2026-10-16): bodies, tokens and normal strips hand-repainted part by part in palette ramps (tools/look/cast_r3/); heads kept from the render. Round 4 (2026-10-16, tools/look/cast_r4/): the orc repainted inside the round-2 alpha (bulk back), skin on the green-grey skin_orc ramp, tusks in bone 3 (director: 'bulk and green-grey skin'); the Vampyr in his own armour (slim spaulders, no fauld box) with a fanned cape; tokens are the SE frames at half scale.",
   "asset": "look_target/heartland/sprites",
   "files": {
-    "orc_look_heartland.json": "87d3cc76fbf50d46f156d977b5f7c235e8df180c22714a4c0727255ae72c4baa",
-    "orc_look_heartland.png": "cdc6992c50962ea81a367bf07ab90d6a15e04c23e84306f3953a1ea9cf67b8e6",
-    "orc_look_heartland_normal.png": "ce2031f09bce1a40593e376d2b64f8e52d4c916e967a266f34b3d9539534660e",
+    "orc_look_heartland.json": "ad759a755b3d3c5b2276bfb1a3f14baf469a212ec26090c698d8b01a5ac97e10",
+    "orc_look_heartland.png": "2ebf08e12f133d36521d50874f0a7b22df128ad7b0c7ad1f203fd59ca747f6a3",
+    "orc_look_heartland_normal.png": "9bed744fd0bed9db3d7d0c8a742580d8ce735861a1d99933c5f0da493b66af1e",
     "orc_token_heartland.json": "4f5645c4f632cb62bd820948cf098b9361215f0d2e5c03e377c91d5201f52c2c",
-    "orc_token_heartland.png": "2cf09f8b420e2d1991f0eda5fc54baa80731babc97a0388a8fe5da1a20ef72d2",
-    "vampyr_look_heartland.json": "bf8b10cc1073eaf480fb5cb74584f734be9feac8992a756cfffbfbe966f6c791",
-    "vampyr_look_heartland.png": "f3b71db42c4477b417956a5737c3d2ed97127e1c458af4864fc05dd1cac7002e",
-    "vampyr_look_heartland_normal.png": "abab44a0a2d3ea2fb9e62143f6ca1de99735ff4595a7a16e29f3cac0fbdd4e38",
+    "orc_token_heartland.png": "8619885340e328d0a4a228d344d1c9c958b3838513287a0938ce5d5a66444c69",
+    "vampyr_look_heartland.json": "94276b6d47550404887a4a3287b59bb970a7aec5363b6c9fa2b6dcd4367714fb",
+    "vampyr_look_heartland.png": "ece81cdcd72e7e2e7873fe927935c167f7a46f3cfa7b880a9d0c8b535edcb8d3",
+    "vampyr_look_heartland_normal.png": "7efc56e930e837532f0b8cba2ac68062637c2006da10eb43f58d7d4f842be7dc",
     "vampyr_token_heartland.json": "4f5645c4f632cb62bd820948cf098b9361215f0d2e5c03e377c91d5201f52c2c",
-    "vampyr_token_heartland.png": "684474d449ec4b50b13e572ec91a256a26a1fbc8d691d7e67484adc30574c46e"
+    "vampyr_token_heartland.png": "dcc8a4a975f70597010940d31f6cc009c957eca1c82893814d26f587ea1a0b0f"
   },
   "produced_by": {
     "tools/pipeline/render_character.py": "c99e31ff5a17ed08",

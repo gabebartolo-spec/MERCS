@@ -4,7 +4,7 @@
   "layer": "body",
   "clip": "rest",
   "image": "average_m_body_rest.png",
-  "image_pixel_sha256": "8214355bb96f42bf29012e70f59d18000791fb9161921533b7b58b172ce59fbb",
+  "image_pixel_sha256": "8ac1b54b08c72ea54f2b08893977cf478259d5fd6a9d6c3acc397f1a0d506d8d",
   "frame_w": 176,
   "frame_h": 176,
   "frame_count": 8,
@@ -93,7 +93,7 @@
   "palette": {
     "id": "mercs_biome_heartland",
     "file": "assets/palette/biomes/heartland.json",
-    "sha256": "baeb6806d5b34992ab0e3503aa096770b61a08b824074ee96f9f3c95e2b952d7",
+    "sha256": "09d74b29cdc8ebc94bc6daea1102e6c2b806a194cf4a5abce606704d51f77e50",
     "status": "APPROVED"
   },
   "provenance": {
@@ -182,6 +182,6 @@
     ]
   },
   "normal_image": "average_m_body_rest_normal.png",
-  "normal_image_pixel_sha256": "acc6e23708b3c6c183682c533da955fb69ae3b3b3d34762b9ee4feaa137042d7",
+  "normal_image_pixel_sha256": "a6f2236246340a70e1f33ff5df2880fe2130e48b5e7946bad386e3ed3e37f758",
   "normal_doc": "camera-facing tangent space, OpenGL: R = screen right, G = screen up, B = toward camera, encoded n * 0.5 + 0.5; alpha copied from the colour frame"
 }

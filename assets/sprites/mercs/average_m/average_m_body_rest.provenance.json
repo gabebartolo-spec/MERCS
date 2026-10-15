@@ -2,11 +2,11 @@
   "_doc": "Provenance manifest (docs/10_LICENSING_REGISTER.md 'Provenance manifest'): covers the three files of this sheet. Rendered by the sprite pipeline from the CC0 MPFB base body; no generative model touched it.",
   "asset": "sprites/mercs/average_m/average_m_body_rest.json",
   "files": {
-    "average_m_body_rest.json": "f60800f53fb71e6ed9a70ac97d69d32c310dabadfcd49a10f3377d8e8ad68bf6",
-    "average_m_body_rest.png": "3adc83bb66f1eaed4e4a2cf6ab7b5a1aef9f0d83f217784823cf75b74b30bcdd",
-    "average_m_body_rest_normal.png": "5823a78a7f0db880378088f8f25325e45d9929d88c273bc5aff42bb2b168ca74"
+    "average_m_body_rest.json": "ad7605136b6ab0e81f264caafa8fd00210d85bb927788dc0e18ae7faca7054d3",
+    "average_m_body_rest.png": "118f2e297044ad9922e3ede058e872092ef7db3801a689443112c66964858c3b",
+    "average_m_body_rest_normal.png": "afbafb558545076ed1eede46d888c527520ae644936a80f674007a6ea99e10af"
   },
-  "produced_by": "tools/pipeline/render_character.py, pixelate.py, pack_sheets.py (branch claude/art-cast-fix): re-run on the locked palette after the slop audit of 2026-10-15, outline on the silhouette only (no --parts inner lines); round 3 (2026-10-16): hand edits in skin_neutral only (arm shadow lines S/E/NW, back planes NW/NE, E thigh clumped), tools/look/cast_r3/avg_paint.py; alpha and normal strip unchanged",
+  "produced_by": "tools/pipeline/render_character.py, pixelate.py, pack_sheets.py (branch claude/art-cast-fix): re-run on the locked palette after the slop audit of 2026-10-15, outline on the silhouette only (no --parts inner lines); round 3 (2026-10-16): hand edits in skin_neutral only (arm shadow lines S/E/NW, back planes NW/NE, E thigh clumped), tools/look/cast_r3/avg_paint.py; round 4 (2026-10-16, tools/look/cast_r4/avg_paint.py): arm line carried down the forearm and a 1-px gap at the hand on SE/SW (19 px of alpha, the normal strip's alpha follows), E arm one line and thigh in two planes",
   "inputs": {
     "body_blend": "tools/pipeline/bodies/average_m.blend@95326b38dcd40621",
     "camera_rig": "tools/pipeline/camera_rig.json@c67f2acbf9918073",

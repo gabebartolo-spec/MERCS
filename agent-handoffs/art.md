@@ -1,13 +1,13 @@
 # Art handoff, 2026-10-15 AEDT
 Start from this file, CLAUDE.md, your brief, and the Lead ("main") messages. Load art-qa-critic before any visual review.
 
-## State: cast fix round 3 pushed on PR #118 (claude/art-cast-fix), awaiting a fresh critic. No jobs running.
-Round 3 (2026-10-16, critic `scratchpad/crit118/CRITIC.md`): orc + Vampyr bodies, tokens and normal strips hand-repainted
-part by part (`tools/look/cast_r3/`, README there; heads kept from the render; reruns pixel-identical), average_m hand
-edits. Director ruling 02:44: skin_orc ramp now grey-olive #37331e..#c1b989 (OKLab, make_palettes anchor); goldens'
-grass moved off skin_orc to nearest verdure (`remap_golden.py`); look_target.gd/render_tiles.gd give skin_orc a
-SKIN_EXCLUDED penalty so captures never snap world pixels to it. Sheet + token use skin_orc 2..3 only (dE >= 15.4 vs
-every verdure step). Crops: `D:/MERCS-vault/renders/cast_r3_2026-10-16/`. Not done: goldens still show the stale orc.
+## State: cast fix round 4 pushed on PR #118 (claude/art-cast-fix), awaiting a fresh critic. No jobs running.
+Round 4 (2026-10-16, critic `scratchpad/crit118_r3/CRITIC.md`, `tools/look/cast_r4/` + README): orc repainted inside
+the round-2 alpha (bulk back), skin_orc green-grey #2e3428 #485240 #6b7a68 #8d9b80 #b2bc9c (critic ramp, steps 2-3
+lifted for the lead rule CIEDE2000 >= 12 and dE76 >= 15 vs every grass incl. verdure_mid_0; sheet uses steps 2-4),
+tusks bone 3; Vampyr own armour (slim spaulders, no fauld box), fanned cape, no eye rings; tokens = SE at half scale;
+average_m arm gaps SE/SW, E thigh planes; overworld golden lit grass flat verdure_2 (director to approve; re-render
+with B7 tiles later). Crops: `D:/MERCS-vault/renders/cast_r4_2026-10-16/`.
 Branch `claude/art-look-target` (worktree `MERCS-wt/art-look`), PR "art: lock look B Peat and Ochre as master palette
 and golden references". Lock-B layout (supersedes the option paths below):
 - `assets/palette/core.{json,gpl}` (44 colours that never change: soot, iron, bone, skins, cloth, heraldry, blood,

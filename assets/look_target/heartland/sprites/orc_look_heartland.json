@@ -4,7 +4,7 @@
   "layer": "body",
   "clip": "rest",
   "image": "orc_look_heartland.png",
-  "image_pixel_sha256": "de03f7c81d02d501dbf3344686faa30b54a2dd4bbd521bfe9f6c6bfc811a4997",
+  "image_pixel_sha256": "4102d7bc92d964d878f614d06c73c541190c3534bc85a635bdb56e65de22293c",
   "frame_w": 176,
   "frame_h": 176,
   "frame_count": 8,
@@ -93,7 +93,7 @@
   "palette": {
     "id": "mercs_biome_heartland",
     "file": "assets/palette/biomes/heartland.json",
-    "sha256": "baeb6806d5b34992ab0e3503aa096770b61a08b824074ee96f9f3c95e2b952d7",
+    "sha256": "09d74b29cdc8ebc94bc6daea1102e6c2b806a194cf4a5abce606704d51f77e50",
     "status": "APPROVED"
   },
   "provenance": {
@@ -207,6 +207,6 @@
     ]
   },
   "normal_image": "orc_look_heartland_normal.png",
-  "normal_image_pixel_sha256": "9f791142849ae3d70a54caf50dcfd3074f8251f5225eac9ca92c05450e7cb91d",
+  "normal_image_pixel_sha256": "cc54c08f2f41cc6a2e2ebaa575681bb8e3dba12cf644aee50d5b4d467410f863",
   "normal_doc": "camera-facing tangent space, OpenGL: R = screen right, G = screen up, B = toward camera, encoded n * 0.5 + 0.5; alpha copied from the colour frame"
 }

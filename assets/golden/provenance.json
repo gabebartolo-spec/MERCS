@@ -1,10 +1,10 @@
 {
-  "_doc": "Golden references (06 section 8), 1x logical (960 x 540): look_target.gd captures of the real StreetStage at 3840 x 2160 (exact 4x4 blocks), one pixel kept per block. Changes only by a director decision in DECISIONS.md. 2026-10-16 (director: grey-olive orc skin): grass pixels in the old skin_orc colours moved to their nearest verdure step, the orc figures' skin to the new ramp by index (tools/look/cast_r3/remap_golden.py).",
+  "_doc": "Golden references (06 section 8), 1x logical (960 x 540): look_target.gd captures of the real StreetStage at 3840 x 2160 (exact 4x4 blocks), one pixel kept per block. Changes only by a director decision in DECISIONS.md. 2026-10-16 (director: grey-olive orc skin): grass pixels in the old skin_orc colours moved to their nearest verdure step, the orc figures' skin to the new ramp by index (tools/look/cast_r3/remap_golden.py). Round 4 (2026-10-16): the orc figures' skin follows the green-grey ramp by index; overworld lit grass flattened from a verdure_1/2 checker to verdure_2 (lead call, stop-gap until the B7 tile re-render; director to approve) (tools/look/cast_r4/remap_golden.py).",
   "asset": "golden",
   "files": {
-    "overworld_map.png": "e9d8ea6ecaf6456960daf5619c9c5236481dbc8a08f1dfeaa1130c9489556a0a",
-    "street_day.png": "f2f22c5aee45f54258ea58e608b4037afcbfe465da4d5d1daf3881192fb1da60",
-    "street_rain_night.png": "f09d5436c3a96fb5c84f70c21ed6158d2aae81900ce79daa9f21c15ed356c4a5"
+    "overworld_map.png": "b7d8b4f7ed404541b4c0bd67f40848439c0d3dec8e8c3a97f16229a84685d7cb",
+    "street_day.png": "485356a063e15c34335c839c13d4397ec3e6df93eb5d78de97bebfcdf8d5fac5",
+    "street_rain_night.png": "0376e96abc0f66bf5298def0f2a1ccb79f62c2b98bf97b16cdaeffd7274ee884"
   },
   "produced_by": {
     "tools/look/look_target.gd": "33a0374d5b27d829",
@@ -12,7 +12,8 @@
     "tools/look/palette_post.gdshader": "dbe475862921b525",
     "tools/look/build_look_kit.py": "1dff31e8c379d67e",
     "tools/look/build_sprites.py": "fa6a36cfba532049",
-    "tools/look/cast_r3/remap_golden.py": "cba07b1d0b653fd9"
+    "tools/look/cast_r3/remap_golden.py": "cba07b1d0b653fd9",
+    "tools/look/cast_r4/remap_golden.py": "3f13c48617ed81d3"
   },
   "models": [],
   "licence_rows": [
