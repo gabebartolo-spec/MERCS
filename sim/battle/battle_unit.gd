@@ -41,7 +41,15 @@ var max_hp := 1
 var attack := 0
 var defense := 0
 var damage := 1
-var initiative := 0
+## Initiative from the fighter's data; armour may slow him (gear_initiative, BattleGear rule 4).
+var initiative: int:
+	get:
+		return base_initiative + gear_initiative
+	set(value):
+		base_initiative = value
+var base_initiative := 0
+## What the armour adds to initiative (plate: slower), set by BattleGear.fit at setup.
+var gear_initiative := 0
 var is_leader := false
 var down := false
 var wounded := false
@@ -52,6 +60,11 @@ var moves: Array[String] = []
 ## Added to this fighter's next attack only, then cleared (the Vampyr's blood price).
 var next_attack_bonus := 0
 var next_damage_bonus := 0
+## Equipment classes (BattleGear): one of BattleGear.WEAPONS and ARMOURS, or "" for none;
+## shield is true while the fighter carries a whole one (an axe can split it).
+var weapon_class := ""
+var armour_class := ""
+var shield := false
 
 ## The sketch's flags, kept as views of the loadout.
 var can_charge: bool:
@@ -83,6 +96,7 @@ static func make(unit_id: String, unit_side: int, at: Vector2i, stats: Dictionar
 	unit.initiative = _int(stats, "initiative", 0)
 	unit.is_leader = stats.get("leader", false) == true
 	unit.presence = _int(stats, "presence", 0)
+	BattleGear.dress(unit, stats)
 	for move: String in _listed_moves(stats.get("moves", [])):
 		unit.teach(move, true)
 	for flag: Variant in FLAGS:

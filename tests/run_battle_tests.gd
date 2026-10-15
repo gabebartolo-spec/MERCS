@@ -21,6 +21,7 @@ const SURE_HIT := 100
 const FAR := Vector2i(9, 7)
 const SkeletonChecks := preload("res://tests/battle/skeleton_checks.gd")
 const GoldenChecks := preload("res://tests/battle/golden_checks.gd")
+const GearChecks := preload("res://tests/battle/gear_checks.gd")
 
 
 func suite_name() -> String:
@@ -39,6 +40,7 @@ func run_checks() -> void:
 	_check_checks()
 	SkeletonChecks.new().run(check)
 	GoldenChecks.new().run(check)
+	GearChecks.new().run(check)
 	await process_frame
 
 

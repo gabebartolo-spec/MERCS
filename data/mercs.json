@@ -1,5 +1,5 @@
 {
-  "_comment": "The cast (Phase 2 milestone 3). Six mercenaries at stage 1 (D-066). The orc and the Vampyr are the director's reference pair: their battle numbers stay in data/balance/battle.json fighters (one source of truth), named here by stats_from, and the merc's own stats are laid over them. merc_3 to merc_6 are PLACEHOLDERS: the director authors names, species, roles, stats and gear; nothing here for them is a design. Moves are ids the battle sim knows (move, attack, charge, blood_price). Generic gear (D-066) fills the three slots for stats only and never shows on the sprite. Schema: data/schema/mercs.schema.json.",
+  "_comment": "The cast (Phase 2 milestone 3). Six mercenaries at stage 1 (D-066). The orc and the Vampyr are the director's reference pair: their battle numbers stay in data/balance/battle.json fighters (one source of truth), named here by stats_from, and the merc's own stats are laid over them. merc_3 to merc_6 are PLACEHOLDERS: the director authors names, species, roles, stats and gear; nothing here for them is a design. Moves are ids the battle sim knows (move, attack, charge, blood_price). gear_line names the battle classes of the merc's own weapon and armour (Phase 4 P1b; the orc is axe and plate per the vision; the Vampyr's sword and plate are a PLACEHOLDER for the director). Generic gear (D-066) fills the three slots for stats only and never shows on the sprite. Schema: data/schema/mercs.schema.json.",
   "starting_captain": "orc",
   "mercs": [
     {
@@ -11,6 +11,7 @@
       "stats": {"resolve": 6},
       "moves_by_level": {"1": ["move", "attack", "charge"]},
       "stage_1_gear": ["Battle axe", "Plate armour"],
+      "gear_line": {"weapon": "axe", "armour": "plate"},
       "gear_slots": {"weapon": null, "armour": null, "trinket": null},
       "look": "placeholder"
     },
@@ -23,6 +24,7 @@
       "stats": {"resolve": 7},
       "moves_by_level": {"1": ["move", "attack", "blood_price"]},
       "stage_1_gear": ["Dark knight's arms and armour"],
+      "gear_line": {"weapon": "sword", "armour": "plate"},
       "gear_slots": {"weapon": null, "armour": null, "trinket": null},
       "look": "placeholder"
     },

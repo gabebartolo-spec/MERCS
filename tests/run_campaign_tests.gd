@@ -6,13 +6,14 @@ extends "res://tests/lib/runner.gd"
 ## for byte, and from another seed does not; every stage of it really happened; the final save
 ## reads back and writes the same; the version 2 fixture (fixtures/save/v2.json) loads with its
 ## company, wounds and story; a memory sentence names a comrade who died by name, never by id.
-## Seeded by design: campaign seeds 424308 and 424316 (each has a death in its fight).
+## Seeded by design: campaign seeds 424309 and 424316 (each has a death in its fight; 424309
+## replaced 424308 when equipment physics, Phase 4 P1b, moved its fight).
 ##   godot --headless --path . --script tests/run_campaign_tests.gd
 
 const Campaign := preload("res://tests/lib/campaign_kit.gd")
 const Fixture := preload("res://tests/lib/company_fixture.gd")
 const World := preload("res://tests/lib/world_fixture.gd")
-const SEED := 424308
+const SEED := 424309
 const OTHER_SEED := 424316
 const V2_FIXTURE := "res://tests/fixtures/save/v2.json"
 const MERC_ID_PREFIX := "merc_"

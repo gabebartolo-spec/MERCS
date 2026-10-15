@@ -12,6 +12,10 @@
     "mercs": 6,
     "recruits": 6,
     "encounters": 2,
-    "locations": 2
+    "locations": 2,
+    "weapon_classes": 5,
+    "armour_classes": 3,
+    "shields": 1,
+    "bows": 1
   }
 }

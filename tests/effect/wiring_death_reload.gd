@@ -1,11 +1,11 @@
 extends "res://tests/lib/effect_case.gd"
-## wiring_death_reload: the road fight of seed 424264, saved as JSON and read back, then the
+## wiring_death_reload: the road fight of seed 424333, saved as JSON and read back, then the
 ## next fight's line-up from the reloaded company. With the hook the captain died: the reloaded
 ## company never fields him and another captain leads; without it the captain is fielded as
 ## captain again.
 
 const Kit := preload("res://tests/lib/wiring_kit.gd")
-const SEED := 424264
+const SEED := 424333
 
 
 func id() -> String:

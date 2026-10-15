@@ -1,11 +1,11 @@
 extends "res://tests/lib/effect_case.gd"
-## wiring_hook: the same road fight on the same seed (424264, MercPlay on both sides, the
+## wiring_hook: the same road fight on the same seed (424333, MercPlay on both sides, the
 ## slice band), the company's hit hook set or not. The fight itself is identical; what the
 ## company is afterwards differs: with the hook the captain falls in the triage, the office
 ## passes on and the chronicle has him, without it everyone is as before.
 
 const Kit := preload("res://tests/lib/wiring_kit.gd")
-const SEED := 424264
+const SEED := 424333
 
 
 func id() -> String:

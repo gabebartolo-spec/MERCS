@@ -10,18 +10,21 @@ extends "res://tests/lib/runner.gd"
 ## GUI (tests/wiring/gui_checks.gd): real clicks and letter keys at 1920x1080: Fight on the
 ## road, the triage panel, Continue, the C screen marking the fallen as gone, Save, a fresh
 ## session that never fields the dead.
-## Seeded by design: sim fights use MercPlay on seeds 424251 (a permanent injury) and 424264
-## (the captain's death); the GUI fight is an ambush met by walking, world seed 424270.
+## Seeded by design: sim fights use MercPlay on seeds 424332 (a permanent injury) and 424333
+## (the captain's death; both re-picked when equipment physics, Phase 4 P1b, moved the
+## fights); the GUI fight is an ambush met by walking, world seed 424270.
 ##   godot --headless --path . --script tests/run_wiring_tests.gd
 
 const Kit := preload("res://tests/lib/wiring_kit.gd")
 const Fixture := preload("res://tests/lib/company_fixture.gd")
 const GuiChecks := preload("res://tests/wiring/gui_checks.gd")
 const WINDOW_SIZE := Vector2i(1920, 1080)
-const DEATH_SEED := 424264
-const SCAR_SEED := 424251
+const DEATH_SEED := 424333
+const SCAR_SEED := 424332
 const SCAR_ATTACK := -3
 const TEMPORARY_DAYS := 5
+## The merc who goes down on SCAR_SEED (in plate, the Vampyr no longer does).
+const TEMPORARY_MERC := "merc_3"
 
 
 func suite_name() -> String:
@@ -211,14 +214,14 @@ func _check_permanent_injury_fielded() -> void:
 func _check_temporary_injury_heals() -> void:
 	var rng := Rng.from_seed(SCAR_SEED)
 	var made := Kit.wounds(rng, "temporary")
-	var base := made.company.member("vampyr").stat("attack")
+	var base := made.company.member(TEMPORARY_MERC).stat("attack")
 	Kit.fight(made, rng, true)
-	var hurt := made.injuries_of("vampyr").size()
-	var now := _attack_of(made, "vampyr")
+	var hurt := made.injuries_of(TEMPORARY_MERC).size()
+	var now := _attack_of(made, TEMPORARY_MERC)
 	made.day += TEMPORARY_DAYS
-	var healed := _attack_of(made, "vampyr")
+	var healed := _attack_of(made, TEMPORARY_MERC)
 	check(
-		hurt == 1 and now < base and healed == base and made.injuries_of("vampyr").is_empty(),
+		hurt == 1 and now < base and healed == base and made.injuries_of(TEMPORARY_MERC).is_empty(),
 		(
 			"a temporary injury cuts the next fight's attack (%d from %d) and heals on its day"
 			% [now, base]

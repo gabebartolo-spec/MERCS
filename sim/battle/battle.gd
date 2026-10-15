@@ -60,6 +60,7 @@ func setup(rules: Dictionary, field: Dictionary, fighters: Array[BattleUnit], rn
 	_rules.setup(rules)
 	_grid.setup(field)
 	units = fighters
+	_resolver.fit(_rules, fighters)
 	_turns.setup(fighters)
 	_morale.setup(rules)
 	_resolver.setup(_rules, rng, _morale)
@@ -168,6 +169,14 @@ func apply(action: Dictionary) -> Array[Dictionary]:
 ## The definition of a learnt move (battle.json "rules" "moves"), or {}.
 func move_def(move: String) -> Dictionary:
 	return _rules.move_def(move)
+
+
+## What the current fighter's attack or learnt move on action "target" would be, computed and
+## never rolled (BattleResolver.odds: the roll needed, the chance, the damage range after the
+## armour, whether a shield can split); {} when the target is not a foe.
+func odds(action: Dictionary) -> Dictionary:
+	var target := unit(str(action.get("target", "")))
+	return _resolver.odds(current(), target, move_def(str(action.get("type", ""))))
 
 
 ## A new round: each standing enemy plans what it will do from what it can see.
