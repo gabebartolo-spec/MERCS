@@ -55,8 +55,9 @@ Ramps (5–6 steps each, 4 for `soot`):
 
 Rules: heraldry ramps are the only high-saturation colours and appear only on faction cloth,
 shields and banners. World and bodies stay in the muted ramps. Blood is a shipped overlay colour,
-not part of base sprites. The UI uses a 10-colour subset defined in `UiKit.gd` that is drawn from
-the same file.
+not part of base sprites. The UI draws from the same files: its roles (panel, text, button, bar) are
+references in `data/balance/look_ui.json`, read through `presentation/palette.gd`, the one colour
+lookup (the look suite fails on any colour in presentation/ or ui/ that is not in the palette).
 
 ## 3. Render contract (characters)
 
