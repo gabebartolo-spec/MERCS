@@ -1,8 +1,8 @@
 extends "res://tests/lib/runner.gd"
 ## Economy-in-the-company suite (Phase 2 milestone 6: Economy held by Company, Merc gear
 ## bonuses, SaveModel, the WorldSim hooks). A generic item in a slot changes the merc's battle
-## numbers; hiring spends coin, obeys the roster cap and never offers a recruit twice; each
-## prisoner choice moves the company's state and leaves a line the captain remembers; the
+## numbers; hiring spends coin, obeys the roster cap and never offers a recruit twice; the
+## prisoners from the fight and their three fates are tests/economy/prisoner_checks.gd; the
 ## economy survives a save through JSON and a save from before it reads with the new-game
 ## values; the world's day and result hooks reach it. Wages, contracts and loot are the
 ## economy suite; the screen is the hub suite.
@@ -11,6 +11,7 @@ extends "res://tests/lib/runner.gd"
 
 const Fixture := preload("res://tests/lib/company_fixture.gd")
 const StandingChecks := preload("res://tests/economy/standing_checks.gd")
+const PrisonerChecks := preload("res://tests/economy/prisoner_checks.gd")
 const V1_FIXTURE := "res://tests/fixtures/save/v1.json"
 const WORLD_BALANCE := "res://data/balance/world.json"
 const SEED := 424242
@@ -26,12 +27,11 @@ func suite_name() -> String:
 func run_checks() -> void:
 	_check_equip()
 	_check_hiring()
-	_check_prisoner_choices()
-	_check_prisoner_refusals()
 	_check_save_round_trip()
 	_check_older_save()
 	_check_world_hooks()
 	StandingChecks.new().run(check)
+	PrisonerChecks.new().run(check)
 	await process_frame
 
 
@@ -131,78 +131,6 @@ func _check_hiring() -> void:
 	check(
 		company.roster.size() <= company.cap(),
 		"hiring stops at the roster cap, roster %d" % company.roster.size()
-	)
-
-
-func _prisoner_company() -> Company:
-	var company := _company()
-	company.economy.captives.take(3)
-	return company
-
-
-func _check_prisoner_choices() -> void:
-	var start := _company()
-	var after := {}
-	for choice: String in Economy.CHOICES:
-		var company := _prisoner_company()
-		check(company.economy.decide_prisoner(company, choice, 4), "%s is decided" % choice)
-		var economy := company.economy
-		after[choice] = Vector3i(company.roster.size(), economy.purse, economy.morale)
-		var note: Dictionary = economy.chronicle[0]
-		check(
-			(
-				economy.prisoner.is_empty()
-				and str(note["merc"]) == company.captain_id
-				and str(note["key"]) == "prisoner." + choice
-				and Merc.whole(note["day"]) == 4
-			),
-			"%s leaves the captain a remembered line and no prisoner waiting" % choice
-		)
-	var base := Vector3i(start.roster.size(), start.economy.purse, start.economy.morale)
-	var released: Vector3i = after["release"]
-	var ransomed: Vector3i = after["ransom"]
-	var executed: Vector3i = after["execute"]
-	var recruited: Vector3i = after["recruit"]
-	check(
-		released.z > base.z and released.x == base.x and released.y == base.y,
-		"releasing lifts morale and changes no coin or roster: %s" % [released]
-	)
-	check(
-		ransomed.y > base.y and ransomed.z < released.z,
-		"ransoming brings coin and less morale than releasing"
-	)
-	check(executed.z < base.z, "executing costs the company its morale")
-	check(
-		recruited.x == base.x + 1 and recruited.y == base.y,
-		"recruiting adds a placeholder to the roster for free"
-	)
-	var distinct := {}
-	for choice: String in after:
-		distinct[str(after[choice])] = true
-	check(distinct.size() == Economy.CHOICES.size(), "the four choices leave four company states")
-
-
-func _check_prisoner_refusals() -> void:
-	var company := _company()
-	check(not company.economy.decide_prisoner(company, "release", 1), "no prisoner, no decision")
-	company.economy.captives.take(1)
-	check(not company.economy.decide_prisoner(company, "hang", 1), "an unknown choice is refused")
-	company.economy.purse = company.economy.hire_cost() * company.cap()
-	while company.roster.size() < company.cap():
-		company.economy.hire(company, str(company.economy.offers()[0]["id"]))
-	check(
-		(
-			not company.economy.decide_prisoner(company, "recruit", 1)
-			and not company.economy.prisoner.is_empty()
-		),
-		"a full roster cannot take the prisoner: the choice stays open"
-	)
-	var next := _company()
-	next.economy.captives.take(1)
-	next.economy.captives.take(9)
-	check(
-		Merc.whole(next.economy.prisoner["day"]) == 1,
-		"a second prisoner does not replace the one waiting"
 	)
 
 

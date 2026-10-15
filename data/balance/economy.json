@@ -28,7 +28,19 @@
     "release_morale": 5,
     "ransom_morale": -2,
     "execute_morale": -6,
-    "recruit_morale": 3
+    "ransom_by_fighter": {
+      "bandit": 15,
+      "bandit_spearman": 15,
+      "bandit_chief": 40,
+      "watchman": 20,
+      "watch_sergeant": 35
+    },
+    "reactions_placeholder": true,
+    "reactions": {
+      "release": {"merc_3": 3, "vampyr": -2},
+      "ransom": {"merc_4": 2, "vampyr": 1},
+      "execute": {"merc_5": -4, "vampyr": 3}
+    }
   },
   "standing": {
     "start": 50,

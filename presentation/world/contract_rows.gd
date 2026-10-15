@@ -1,13 +1,12 @@
 class_name ContractRows
 extends RefCounted
 ## The hub's contract rows (Phase 5 C8, docs/plans/phase5_contracts.md): the board, each posted
-## contract by its job's name with a button to talk terms (TermsPanel; the pay is negotiated,
-## never taken as posted), and each contract the company has taken, with what was agreed and a
-## button to walk away from it. Walking away asks once more, saying what it costs: the name
-## with the faction falls, and after a sizeable advance (Standing.sizeable) the faction will
-## send men after the company. Words only: the hub acts on the buttons. Taken contracts are
-## shown anywhere; posted ones at the hub. Words: data/text/en.json "hub.contract*" and
-## "hub.abandon.*".
+## contract in words by its job's name, then its own button to talk terms (TermsPanel; the pay is
+## negotiated, never taken as posted), and each contract the company has taken, with what was
+## agreed and a button to walk away from it. Walking away asks once more, saying what it costs: the
+## name with the faction falls, and after a sizeable advance (Standing.sizeable) the faction will
+## send men after the company. Words only: the hub acts on the buttons. Taken contracts are shown
+## anywhere; posted ones at the hub. Words: data/text/en.json "hub.contract*" and "hub.abandon.*".
 
 ## The panel actions these rows raise.
 const TALK := "talk"
@@ -31,7 +30,8 @@ static func rows(
 			rows.append_array(_abandon_rows(company, row, id == confirm, params))
 			shown += 1
 		elif at_hub:
-			rows.append(HubPanel.button_row(TALK, id, Text.t("hub.contract.talk", params), true))
+			rows.append(HubPanel.line(HubPanel.LABEL, Text.t("hub.contract.posted", params)))
+			rows.append(HubPanel.button_row(TALK, id, Text.t("hub.contract.talk"), true))
 			shown += 1
 	if shown == 0:
 		rows.append(HubPanel.line(HubPanel.LABEL, Text.t("hub.contracts.none")))

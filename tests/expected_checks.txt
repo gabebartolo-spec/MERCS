@@ -20,14 +20,14 @@ company 21
 inspect 10
 company_battle 5
 economy 78
-economy_company 62
+economy_company 70
 hub 12
 hub_terms 13
 injury 29
 wiring 19
 hub_fight 2
 story 60
-story_gui 17
+story_gui 18
 campaign 12
 panels 15
 campaign_end 11

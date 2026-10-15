@@ -116,13 +116,21 @@ func _job_words(row: Dictionary) -> String:
 func _check_board_names_jobs() -> void:
 	await InputKit.frames(self, InputKit.LAYOUT_FRAMES)
 	var named := 0
+	var shown: Array[String] = []
+	for label: Node in _panel().find_children("*", "Label", true, false):
+		shown.append((label as Label).text)
 	for row: Dictionary in _economy().board:
 		var button := _panel().button_for(ContractRows.TALK, str(row["id"]))
-		if button != null and button.text.begins_with(_job_words(row)):
+		var line := Text.t(
+			"hub.contract.posted", ContractRows.words(_hub().company, _hub().world, row)
+		)
+		var own := button != null and button.text == Text.t("hub.contract.talk")
+		if own and line.begins_with(_job_words(row)) and line in shown:
 			named += 1
+	var count := _economy().board.size()
 	check(
-		named == _economy().board.size() and named >= 2,
-		"the board names each contract by its job: %d of %d" % [named, _economy().board.size()]
+		named == count and named >= 2,
+		"the board words each job, Talk terms its own button: %d of %d" % [named, count]
 	)
 	_check_on_screen("board")
 	await _shot("1_board")
