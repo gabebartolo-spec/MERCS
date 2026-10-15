@@ -33,6 +33,8 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
 - "why do you only have 1 agent. get busy" -> run every slot (shared memory
   run-the-team-at-full-width.md).
 - "4 coders" (raises D-071's two-coder cap to four; log it in the next board PR body).
+- #80 milestone 2 MERGED (44cd728; sim review PASS posted on the PR; nine veto calls in its body).
+  Build: MERCS-builds/2026-10-15_m2_44cd728/MERCS.exe; awaiting his M2 play + 3/4 order call.
 - Merged since: #78 tools/merge_eligibility.sh (use it before every merge), #79 magic numbers
   are lint errors from Phase 2 (caps phase 2).
 - Milestone 1 played: "milestone 1 is played. its good" (2026-10-15, 16:58) = carry on;
@@ -41,7 +43,6 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
   2's review: confirm or reorder milestones 3 and 4.
 
 ## Running (builder subagents of this session; they die with it)
-- M2 encounters: `../MERCS-wt/p2-m2`, claude/p2-m2-encounters (Sonnet).
 - M3 company (four placeholder mercs for him to author): `../MERCS-wt/p2-m3`, claude/p2-m3-company.
 - M4 battle skeleton (Opus): `../MERCS-wt/slice-m1`, claude/p2-m4-battle. Keeps Battle's API.
 - M5 wounds/triage/death/chronicle/succession, sim only, keyed by merc id:
@@ -50,6 +51,7 @@ Wiring after merges: company -> encounters, M4 hit hook -> M5 injuries, a triage
 If this session died: respawn each from its worktree with the same brief shape.
 
 ## Next for the lead
+0. Fourth coder slot is free: start M6 (hub, economy, recruitment) the moment M3 merges.
 1. Review M2 and M3 PRs (mercs-sim-review on the save keys, fixtures failing first, real taps),
    merge on green (merge_eligibility.sh once it lands), fetch the build, ask him to play.
 2. Record his milestone verdicts the same turn; ask him to author the four placeholder mercs
@@ -63,8 +65,8 @@ If this session died: respawn each from its worktree with the same brief shape.
 data 96, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 13, slice 15, battle 14,
 loop 4, sim_world 9, save 7, effect 4, overworld 8.
 
-## Worktrees (5 / 4: over cap by one, see below)
-p2-m2, p2-m3, p2-m5, slice-m1 (M4), art-publish (Art paused; clean, branch pushed at 99b3fdf).
+## Worktrees (4 / 4)
+p2-m3, p2-m5, slice-m1 (M4), art-publish (Art paused; clean, branch pushed at 99b3fdf).
 Removing art-publish with --force (only .godot/.import untracked) was refused by the permission
 classifier; ask the director to allow it or accept 5 while four coders run.
 
