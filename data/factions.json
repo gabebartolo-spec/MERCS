@@ -1,4 +1,7 @@
 {
-  "_comment": "Empty until the phase that adds the first entry (08_ROADMAP.md). Schema: data/schema/factions.schema.json.",
-  "factions": []
+  "_comment": "The two factions in tension (Phase 2 milestone 6, D-066). PLACEHOLDERS: the director names them and writes who they are; nothing here is a design. pressure (1 to 100) is how hard each presses the region now: contracts are drawn from the factions weighted by it, so the harder faction posts more of them. Schema: data/schema/factions.schema.json.",
+  "factions": [
+    {"id": "fac_placeholder_a", "name": "Faction A", "placeholder": true, "pressure": 70},
+    {"id": "fac_placeholder_b", "name": "Faction B", "placeholder": true, "pressure": 30}
+  ]
 }
