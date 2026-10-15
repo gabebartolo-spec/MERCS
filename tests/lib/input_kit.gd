@@ -47,8 +47,10 @@ static func tap(tree: SceneTree, code: Key) -> void:
 
 ## Plays a road fight on screen to its end: the company's turns as BattleAi picks them, through
 ## the panel (attacks and waits are real clicks, a move calls click_cell()), the enemy's turns
-## waited out. True when the company won.
-static func finish_fight(tree: SceneTree, director: OverworldDirector) -> bool:
+## waited out. `on_turn` (optional) is called before each company turn. True when the company won.
+static func finish_fight(
+	tree: SceneTree, director: OverworldDirector, on_turn: Callable = Callable()
+) -> bool:
 	var battle := director.view.battle
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(BATTLE_DATA))
 	var data: Dictionary = parsed if parsed is Dictionary else {}
@@ -59,6 +61,8 @@ static func finish_fight(tree: SceneTree, director: OverworldDirector) -> bool:
 			break
 		var actor := battle.current()
 		if actor.side == BattleUnit.COMPANY:
+			if on_turn.is_valid():
+				on_turn.call()
 			await _company_turn(tree, director, BattleAi.choose(battle, actor, sight))
 		else:
 			await tree.process_frame

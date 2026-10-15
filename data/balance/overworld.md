@@ -8,9 +8,11 @@ director judges it in play.
 All in logical pixels: the map is drawn at 1x on the same texel grid as the street (data/balance/stage.json "pixel", 960 x 540 shown x2 at 1080p) with nearest filtering, never scaled (D-035).
 - `tile_px`: the side of one map tile.
 - `band_radius_px`: the band's token (a gold disc with a dark ring).
-- `party_radius_px`: a party's token, coloured by its type (a dark ring while it is chasing the band).
+- `party_radius_px`: a party's token, coloured by its type (a pale second ring outside it while it is chasing the band).
 - `site_radius_px`: a site's marker on its entrance tile.
-- `ring_width_px`: the width of the rings round the band and round a chasing party.
+- `ring_width_px`: the width of the thin dark outline round the band's token.
+- `chase_ring_gap_px`: the clear gap between a chasing party's token and its chase ring.
+- `chase_ring_width_px`: the width of the chase ring (wider than the outline, so it reads at 4K).
 
 ## walk
 - `first_repeat_s`: a held walking key takes its first step at once and its second after this long.
@@ -22,4 +24,5 @@ Placeholder colours, as red, green, blue from 0 to 1.
 - `band_rgb`: the band's token (the company's colour on the street's battle rings).
 - `ambush_rgb`, `patrol_rgb`: bandits' and a patrol's tokens, by encounter type.
 - `site_rgb`: a site's marker.
-- `ring_rgb`: the rings round the band and round a chasing party.
+- `ring_rgb`: the outline round the band.
+- `chase_rgb`: the chase ring round a party that has seen the band (white, a colour no token, marker or outline shares).

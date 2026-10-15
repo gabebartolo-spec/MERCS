@@ -110,6 +110,11 @@ func show_world(world: WorldSim) -> void:
 	_canvas.queue_redraw()
 
 
+## Shows or hides the header (day, supplies).
+func show_header(shown: bool) -> void:
+	_header_back.visible = shown
+
+
 ## The marker for a site id, or null (tests read its rect).
 func marker_for(site_id: String) -> Control:
 	return _markers.get_node_or_null(NodePath(String(MARKER_PREFIX) + site_id)) as Control
@@ -192,10 +197,14 @@ func _draw_map() -> void:
 	var party_radius := _data.num("map", "party_radius_px")
 	for party: WorldParty in _world.parties:
 		if party.active(_world.day):
-			_draw_token(party.tile, party_radius, _colour(party.type), party.chasing)
+			_draw_token(party.tile, party_radius, _colour(party.type), false)
+			if party.chasing:
+				_draw_chase_ring(party.tile)
 	_draw_token(_world.band, _data.num("map", "band_radius_px"), _colour("band"), true)
 
 
+## A token, with a thin dark outline when `ringed` (the band's). A party that has seen the band
+## also wears the chase ring: a second, wider ring outside the token (chase_ring()).
 func _draw_token(tile: Vector2i, radius: float, colour: Color, ringed: bool) -> void:
 	var centre := Vector2(tile_centre(tile))
 	_canvas.draw_circle(centre, radius, colour)
@@ -204,8 +213,44 @@ func _draw_token(tile: Vector2i, radius: float, colour: Color, ringed: bool) -> 
 		_canvas.draw_arc(centre, radius, 0.0, TAU, RING_POINTS, _colour("ring"), ring)
 
 
+func _draw_chase_ring(tile: Vector2i) -> void:
+	var ring := chase_ring()
+	var radius: float = ring["radius"]
+	var width: float = ring["width"]
+	var colour: Color = ring["colour"]
+	_canvas.draw_arc(Vector2(tile_centre(tile)), radius, 0.0, TAU, RING_POINTS, colour, width)
+
+
 func _colour(key: String) -> Color:
 	return _data.rgb("colours", key + "_rgb")
+
+
+## The ring round a party that has seen the band, as drawn: {"radius", "width", "colour"}.
+static func chase_ring() -> Dictionary:
+	var data := StageData.load_file(DATA)
+	var gap := data.num("map", "chase_ring_gap_px")
+	var width := data.num("map", "chase_ring_width_px")
+	return {
+		# draw_arc centres the stroke on the radius: the ring's inner edge clears the token by `gap`.
+		"radius": data.num("map", "party_radius_px") + gap + width / 2.0,
+		"width": width,
+		"colour": data.rgb("colours", "chase_rgb")
+	}
+
+
+## The thin outline round the band's token: {"width", "colour"}.
+static func outline() -> Dictionary:
+	var data := StageData.load_file(DATA)
+	return {"width": data.num("map", "ring_width_px"), "colour": data.rgb("colours", "ring_rgb")}
+
+
+## A token's colour by key ("band", a party type, "site"), and a party token's radius.
+static func token_colour(key: String) -> Color:
+	return StageData.load_file(DATA).rgb("colours", key + "_rgb")
+
+
+static func token_radius(_type: String) -> float:
+	return StageData.load_file(DATA).num("map", "party_radius_px")
 
 
 func _fit() -> void:

@@ -54,6 +54,10 @@ var _triage := ""
 ## What waits for Continue: the hub's loot and prisoner (the world's result hook), so the
 ## triage comes first.
 var _after_triage := Callable()
+## Whether the hub or the company screen stands over the map, and whether the panel was up
+## when it came (so closing the screen puts the panel back as it was).
+var _covered := false
+var _panel_was_up := false
 
 
 ## A director for the slice's street, added under `game` and begun (the map shown).
@@ -152,6 +156,20 @@ func set_open(open: bool) -> void:
 		_show_triage()
 
 
+## A screen (the hub, the company) stands over the map: the map's own panel and header step
+## out from under it, and come back as they were when it closes.
+func set_covered(covered: bool) -> void:
+	if _layer == null or covered == _covered:
+		return
+	_covered = covered
+	if covered:
+		_panel_was_up = panel.visible
+		panel.visible = false
+	else:
+		panel.visible = _panel_was_up
+	map.show_header(not covered)
+
+
 ## The walking keys' direction this frame (Vector2i.ZERO when none is held): a fresh press
 ## steps at once, a held key repeats (data/balance/overworld.json "walk"). Nothing while the
 ## map is hidden, a fight is on or an encounter stands.
@@ -227,8 +245,25 @@ func _on_choice(choice_id: String) -> void:
 			world.rest()
 			_show(_place_line())
 		SAVE:
-			var saved := _saves().save_game(world, rng, company, wounds.state())
-			_show(Text.t("world.panel.saved" if saved else "world.panel.save_failed"))
+			save_run()
+
+
+## Writes the run to the save on disk and says so. Refused, with nothing written, while a
+## fight is on or its triage stands: a fight lives only on screen (a save then would hold the
+## world after the blow-by-blow it cannot replay), so the save waits for Continue. The fight's
+## own panel is not touched (its buttons are the player's turn); the triage panel keeps its
+## Continue and gains the line that says why. True when written.
+func save_run() -> bool:
+	if in_fight():
+		return false
+	if _triage != "":
+		var choices: Array[Dictionary] = [{"id": CONTINUE, "label": Text.t("wiring.continue")}]
+		var body := Text.t("world.panel.save_busy") + "\n" + _triage
+		panel.present(Text.t("wiring.panel.title"), body, choices)
+		return false
+	var saved := _saves().save_game(world, rng, company, wounds.state())
+	_show(Text.t("world.panel.saved" if saved else "world.panel.save_failed"))
+	return saved
 
 
 ## Hides the map over the street and starts the battle the standing encounter leads into.

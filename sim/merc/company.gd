@@ -153,10 +153,10 @@ func bury(id: String) -> bool:
 	return true
 
 
-## A merc's name from the data, on the roster or not (the dead keep theirs); the id when the
-## data has none.
+## A merc's name from the data, on the roster or not (the dead keep theirs; so do the recruits
+## hired and lost); the id when the data has none.
 func name_of(id: String) -> String:
-	for def: Dictionary in _entries():
+	for def: Dictionary in _entries() + _recruit_entries():
 		if str(def.get("id", "")) == id:
 			return str(def.get("name", id))
 	return id

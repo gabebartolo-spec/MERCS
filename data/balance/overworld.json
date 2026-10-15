@@ -5,7 +5,9 @@
     "band_radius_px": 6,
     "party_radius_px": 5,
     "site_radius_px": 3,
-    "ring_width_px": 1
+    "ring_width_px": 1,
+    "chase_ring_gap_px": 1,
+    "chase_ring_width_px": 2
   },
   "walk": {
     "first_repeat_s": 0.25,
@@ -22,6 +24,7 @@
     "ambush_rgb": [0.72, 0.14, 0.12],
     "patrol_rgb": [0.22, 0.32, 0.7],
     "site_rgb": [0.95, 0.92, 0.84],
-    "ring_rgb": [0.08, 0.06, 0.06]
+    "ring_rgb": [0.08, 0.06, 0.06],
+    "chase_rgb": [1.0, 1.0, 1.0]
   }
 }
