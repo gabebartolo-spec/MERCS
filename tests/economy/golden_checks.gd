@@ -31,6 +31,10 @@ const SEEDS := {
 ## ("job", drawn on the new "jobs" stream after the board's own draws), so all ten saves gain
 ## that key and a "jobs" stream position; with both stripped each hashes as P1b left it.
 ## C1 also added the "job" route (route_kit.gd).
+## Re-pinned by Phase 5 C5 (claude/c5-prisoners): win/424310 only. Its fight leaves one
+## surrendered man, released at the hub; the release is now remembered by the merc who reacts
+## most strongly (merc_3, economy.json "prisoner" "reactions") beside the captain, so the save
+## gains that one chronicle line and memory. 6e3ccee3... -> a9086cba...; the rest hold.
 ## Re-pinned by Phase 5 C7 (claude/c7-road): the road's line-ups grew to 4-8 soldiers (or
 ## 12-16 rabble off the road) and are drawn from those the place and day allow, so every route
 ## that meets an encounter on the map fights a bigger band; toll (paid, no fight), job and
