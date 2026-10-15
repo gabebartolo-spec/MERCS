@@ -7,8 +7,11 @@ extends Node
 ## the frame time; the door in the street leads to the one interior and back. Numbers come
 ## from data/balance/slice.json and stage.json, text from data/text. F5 starts (or restarts)
 ## the loop example (LoopDirector): panels, then a battle on an open patch of street during
-## which the camera watches the fight and walking pauses. Presentation only:
-## nothing here is random, and walking the hub decides no outcome.
+## which the camera watches the fight and walking pauses. F2 opens the overworld map
+## (OverworldDirector): the region, the company's day and supplies, and the road choices;
+## walking pauses while it is open, and F2 again or Escape hides it. The director lives
+## for the session, so a day travelled and not yet saved is there when the map reopens.
+## Presentation only: nothing here is random, and walking the hub decides no outcome.
 
 const STAGE_SCENE := preload("res://presentation/world/street_stage.tscn")
 const SLICE_DATA := "res://data/balance/slice.json"
@@ -56,6 +59,7 @@ var _frame_ms := 0.0
 var _help: Label = null
 var _frame_label: Label = null
 var _loop: LoopDirector = null
+var _overworld: OverworldDirector = null
 
 
 func _ready() -> void:
@@ -91,7 +95,7 @@ func _process(delta: float) -> void:
 ## Advances every walker by delta seconds and redraws. Deterministic for the same inputs.
 func step(delta: float) -> void:
 	_clock += delta
-	player.hold(Vector2i.ZERO if _loop != null else _held_direction())
+	player.hold(Vector2i.ZERO if _paused() else _held_direction())
 	player.advance(delta)
 	_use_doors()
 	for i: int in crowd.size():
@@ -109,6 +113,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	var click := event as InputEventMouseButton
 	if click != null and click.pressed and click.button_index == MOUSE_BUTTON_LEFT:
+		if _overworld_open():
+			return
 		var cell := ground_cell_at(click.position)
 		if not cell.has(&"cell"):
 			return
@@ -152,6 +158,10 @@ func _on_key(key: InputEventKey) -> void:
 		_frame_label.visible = not _frame_label.visible
 	elif code == KEY_F5:
 		start_loop()
+	elif code == KEY_F2:
+		toggle_overworld()
+	elif code == KEY_ESCAPE and _overworld_open():
+		end_overworld()
 
 
 ## Starts the loop example from its seed (slice.json "loop"), ending any pass in progress.
@@ -177,6 +187,37 @@ func end_loop() -> void:
 	_loop = null
 	_stage.set_conditions(StageLighting.TimeOfDay.DAY, false)
 	_shown.clear()
+
+
+## Shows the overworld map over the street, or hides it when it is open. The first F2
+## creates the director (which continues the save on disk, if any); later ones show and
+## hide the same one, so the run stays as it is until the player saves.
+func toggle_overworld() -> void:
+	if _overworld == null:
+		_overworld = OverworldDirector.new()
+		add_child(_overworld)
+		_overworld.begin()
+		return
+	_overworld.set_open(not _overworld.is_open())
+
+
+func overworld_director() -> OverworldDirector:
+	return _overworld
+
+
+## Hides the map; the run it holds stays for the next F2.
+func end_overworld() -> void:
+	if _overworld != null:
+		_overworld.set_open(false)
+
+
+func _overworld_open() -> bool:
+	return _overworld != null and _overworld.is_open()
+
+
+## Walking waits while the loop example or the overworld map has the player's attention.
+func _paused() -> bool:
+	return _loop != null or _overworld_open()
 
 
 func _held_direction() -> Vector2i:
