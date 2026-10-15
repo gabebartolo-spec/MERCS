@@ -1,7 +1,7 @@
-# battle.json — sketch battle knobs
+# battle.json — battle knobs
 
-One line per knob (docs/05_STYLE_CODE.md "Data"). Read by `sim/battle/battle.gd` and
-`sim/battle/battle_ai.gd`. Spec: `docs/specs/art_direction_slice.md` §2a step 6. Counters come from
+One line per knob (docs/05_STYLE_CODE.md "Data"). Read by `sim/battle/` (`battle.gd`, `battle_ai.gd`,
+`battle_morale.gd`, `battle_unit.gd`); Phase 2 milestone 4 (D-064, D-066) grew it from the slice's sketch. Spec: `docs/specs/art_direction_slice.md` §2a step 6. Counters come from
 combat roles and each merc's own abilities, never a type chart (vision, 2026-10-09); Phase 3 deepens these numbers.
 
 ## rules
@@ -10,15 +10,17 @@ combat roles and each merc's own abilities, never a type chart (vision, 2026-10-
 - `hit_base`: an attack hits when die + attacker's attack ≥ this + defender's defense (11: an even fight hits half the time).
 - `morale_start`: each side's morale when the fight begins.
 - `morale_loss_ally_down`, `morale_loss_leader_down`: morale a side loses when one of its fighters goes down, and more when it is the leader.
-- `surrender_below`: a side whose morale falls below this while it still has fighters up surrenders; the fight ends with living enemies.
-- `blood_price_hp`, `blood_price_attack`, `blood_price_damage`: the Vampyr's blood price: hp he pays (never his last point) and what it adds to that attack's roll and damage.
-- `sight_cells`: how far a fighter sees (Chebyshev cells); the enemy only acts on fighters it can see.
+- `sight_cells`: how far a fighter sees (Chebyshev cells); the enemy plans and acts only on fighters it can see.
+- `loadout_max`: how many learnt moves a fighter takes into a fight (D-066: up to four); extra moves are left out, last first.
+- `morale_sides`: each side's (`company`, `enemy`) morale thresholds. `shaken_below`: below this the side is shaken (shown to the player; no roll changes yet). `rout_below`: below this, with fighters still up, the side routs and the fight ends with them alive (the main non-HP ending).
+- Blocking, the one terrain feature of Phase 2 (D-066), has no knob: a walk ends on the first cell next to a standing opponent, so a front-liner in front of a back-liner stops attackers reaching him.
+- `moves`: the learnt moves by id, each a few knobs; a fighter may use one only if it is in their loadout. `walk`: may walk (as a move) before the attack, in the same turn. `hp_cost`: health paid first, never the last point. `attack_bonus`, `damage_bonus`: added to that one attack's roll and damage. `charge` is the orc's (pure aggression); `blood_price` is the Vampyr's (health as energy).
 
 ## fighters
 The loop sketch's fighters, by id. The orc and the Vampyr are the director's reference pair (brainstorm 2026-10-09); their numbers are a sketch to read the playstyles, not balance. Names live in `data/text/en.json`.
 - `hp`, `attack`, `defense`, `damage`, `initiative`: as in `rules`.
 - `presence`: weight in social checks (talking the lookout down).
-- `ability_charge`: walks and attacks in one turn (the orc: pure aggression). `ability_blood_price`: may pay hp to power an attack (the Vampyr: health as energy).
+- `moves`: the fighter's loadout, `{move_id: true}`, in order (ids from `rules.moves`; at most `loadout_max`).
 - `leader`: losing this fighter costs `morale_loss_leader_down`.
 - `recruit_placeholder`: the loop's recruit until the director designs the cast member offered there.
 

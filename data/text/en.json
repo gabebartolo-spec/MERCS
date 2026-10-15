@@ -58,5 +58,14 @@
   "world.choice.travel": "To {site}, {days} days on the road",
   "world.choice.travel_one": "To {site}, a day on the road",
   "world.choice.rest": "Rest a day",
-  "world.choice.save": "Save"
+  "world.choice.save": "Save",
+  "battle.order": "Turn order: {names}",
+  "battle.order.separator": " > ",
+  "battle.shaken.company": "The company wavers.",
+  "battle.shaken.enemy": "The bandits waver.",
+  "battle.intent.attack": "Attacks {target}",
+  "battle.intent.advance": "Advances on {target}",
+  "battle.intent.hold": "Holds",
+  "battle.move.charge": "Charge {target}",
+  "battle.move.blood_price": "Blood price on {target}"
 }

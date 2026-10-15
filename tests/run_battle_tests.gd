@@ -4,8 +4,10 @@ extends "res://tests/lib/runner.gd"
 ## independent and survive a save; a seeded fight replays to the same event log and another
 ## seed gives another; moves respect range, walls and other fighters; attacks need an
 ## adjacent enemy; a hit wounds and a fighter at 0 hp goes down and costs morale (more for a
-## leader); low morale surrenders with fighters still standing; the enemy waits when it
-## sees no one. Seeded by design: every roll comes from Rng.from_seed with a fixed seed.
+## leader); low morale routs a side with fighters still standing; the enemy waits when it
+## sees no one. Phase 2 milestone 4's checks (facings, turn order, intent, loadout, the hit
+## hook, blocking, shaken, the event log) live in tests/battle/skeleton_checks.gd.
+## Seeded by design: every roll comes from Rng.from_seed with a fixed seed.
 ##   godot --headless --path . --script tests/run_battle_tests.gd
 
 const BATTLE_DATA := "res://data/balance/battle.json"
@@ -16,6 +18,7 @@ const MAX_TURNS := 200
 const STREAM_PROBE := 32
 const SURE_HIT := 100
 const FAR := Vector2i(9, 7)
+const SkeletonChecks := preload("res://tests/battle/skeleton_checks.gd")
 
 
 func suite_name() -> String:
@@ -32,6 +35,7 @@ func run_checks() -> void:
 	_check_charge()
 	_check_blood_price()
 	_check_checks()
+	SkeletonChecks.new().run(check)
 	await process_frame
 
 
@@ -162,15 +166,17 @@ func _check_morale_and_surrender() -> void:
 		lost == leader_loss and leader.down,
 		"the leader going down costs the leader's morale loss (%d), not %d" % [leader_loss, lost]
 	)
-	_check_surrender(rules, leader_loss)
+	_check_rout(rules, leader_loss)
 
 
-## A shaken band starts just above surrender, so losing its leader breaks it while one
+## A shaken band starts just above its rout line, so losing its leader breaks it while one
 ## bandit still stands.
-func _check_surrender(rules: Dictionary, leader_loss: int) -> void:
-	var shaken := rules.duplicate()
-	var surrender_below: int = rules.get("surrender_below", 0)
-	shaken["morale_start"] = surrender_below + leader_loss - 1
+func _check_rout(rules: Dictionary, leader_loss: int) -> void:
+	var shaken := rules.duplicate(true)
+	var sides: Dictionary = rules.get("morale_sides", {})
+	var enemy: Dictionary = sides.get("enemy", {})
+	var rout_below: int = enemy.get("rout_below", 0)
+	shaken["morale_start"] = rout_below + leader_loss - 1
 	var surrender := Battle.new()
 	var pair: Array[BattleUnit] = [
 		BattleUnit.make(
@@ -185,15 +191,16 @@ func _check_surrender(rules: Dictionary, leader_loss: int) -> void:
 	pair[1].is_leader = true
 	surrender.setup(shaken, {"size": GRID, "blocked": {}}, pair, Rng.from_seed(SEED))
 	var events := surrender.apply({"type": Battle.ACTION_ATTACK, "target": "b1"})
-	var surrendered := events.any(func(e: Dictionary) -> bool: return e.get("type") == "surrender")
+	var routed := events.any(func(e: Dictionary) -> bool: return e.get("type") == Battle.EVENT_ROUT)
 	check(
 		(
-			surrendered
+			routed
 			and surrender.is_over()
+			and surrender.routed == BattleUnit.ENEMY
 			and surrender.surrendered == BattleUnit.ENEMY
 			and not surrender.unit("b2").down
 		),
-		"a side whose morale falls below surrender_below surrenders with a fighter still standing"
+		"a side whose morale falls below its rout_below routs with a fighter still standing"
 	)
 
 
@@ -261,8 +268,10 @@ func _check_charge() -> void:
 
 func _check_blood_price() -> void:
 	var rules := _rules()
-	var cost: int = rules.get("blood_price_hp", 0)
-	var bonus: int = rules.get("blood_price_attack", 0)
+	var moves: Dictionary = rules.get("moves", {})
+	var price: Dictionary = moves.get(Battle.ACTION_BLOOD_PRICE, {})
+	var cost: int = price.get("hp_cost", 0)
+	var bonus: int = price.get("attack_bonus", 0)
 	var vampyr := _fighter("vampyr", "v", BattleUnit.COMPANY, Vector2i(1, 1))
 	var bandit := _fighter("bandit", "b", BattleUnit.ENEMY, Vector2i(2, 1))
 	var battle := _duel(vampyr, bandit)

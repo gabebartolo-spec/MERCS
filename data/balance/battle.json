@@ -7,11 +7,28 @@
     "morale_start": 100,
     "morale_loss_ally_down": 30,
     "morale_loss_leader_down": 50,
-    "surrender_below": 35,
     "sight_cells": 8,
-    "blood_price_hp": 3,
-    "blood_price_attack": 4,
-    "blood_price_damage": 3
+    "loadout_max": 4,
+    "morale_sides": {
+      "company": {
+        "shaken_below": 75,
+        "rout_below": 35
+      },
+      "enemy": {
+        "shaken_below": 75,
+        "rout_below": 35
+      }
+    },
+    "moves": {
+      "charge": {
+        "walk": true
+      },
+      "blood_price": {
+        "hp_cost": 3,
+        "attack_bonus": 4,
+        "damage_bonus": 3
+      }
+    }
   },
   "fighters": {
     "orc": {
@@ -21,7 +38,9 @@
       "damage": 6,
       "initiative": 2,
       "presence": 1,
-      "ability_charge": true,
+      "moves": {
+        "charge": true
+      },
       "leader": true
     },
     "vampyr": {
@@ -31,7 +50,9 @@
       "damage": 5,
       "initiative": 4,
       "presence": 4,
-      "ability_blood_price": true
+      "moves": {
+        "blood_price": true
+      }
     },
     "bandit": {
       "hp": 8,
