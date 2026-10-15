@@ -15,14 +15,17 @@ const GRID := Vector2i(12, 8)
 const MAX_TURNS := 300
 const ILLEGAL_EVERY := 7
 ## Pinned before the battle.gd split (claude/p4-plan-split); seed -> SHA-256 of the fight.
+## Re-pinned, all seven, by Phase 4 P5 (claude/p4-p5-ai): the enemy no longer picks the foe
+## beside it with the least exact health (rule 6) but the one it saw wounded, ties by id
+## (BattleKnowledge), so plans, blows and the fights after them move.
 const GOLDEN := {
-	1: "16b8ede468ac6d2a2c5b910a38948ce83c842e562f3676db3072c1f44a463fc2",
-	7: "cb8f59423e39e245274404ec1f16e030741fc4e4a219c594cedf06a6bc1ea249",
-	1337: "45ae4825e004e7b6a7f14dbfd353d0aa227f92e5f804e670d21d7a0430a50cb4",
-	424242: "012743ab46899dffc95dcc47151ffa141ad40f41132d864f4e1f29beee2773f4",
-	90210: "0b1bb2e42043019ed2510ac39a08b8442cce489a5916f095093976abc8c89486",
-	2026: "3f1ba36c1b7018738efc33263ed50824139a94037eceb16af4b44d2a84ddb25e",
-	31: "4f7c3ae850981a983eddbf65fbc8195fc28e1b8ae6e91dde4fbbab2be3b145b2",
+	1: "96ac7f0cdcc02663af1d3e3bd702f5dd6c324c11abc82e9d232a2a1482f49c37",
+	7: "31bc8b7f0deeb01cc01da293a0e43fe14e2b241c19e47c8d072f48df258c437e",
+	1337: "b5091dc1e2240133614b61bbaaf29f08701c2ab77d13077e4c248667659e31b0",
+	424242: "a89399317d62cb8bdc90f1d4c6568398aa79a4b7a352ea46e8bb78b05c2657f0",
+	90210: "fac4d9f90e51a8a3cacee2187171a235170bff0dd0d568decd74096bbb02b7a1",
+	2026: "232f42b609260a525fa9b89de8bbb47b44e6cc2befde5979beefa43d316036cd",
+	31: "ac55cc7c4e59ae637676de3c515542566de606443c76050c5fed73a1103cb975",
 }
 const MARK := "golden_mark"
 
