@@ -14,11 +14,14 @@ const GoldenChecks := preload("res://tests/economy/golden_checks.gd")
 const TermsChecks := preload("res://tests/economy/terms_checks.gd")
 const TermsDealChecks := preload("res://tests/economy/terms_deal_checks.gd")
 const PayrollChecks := preload("res://tests/economy/payroll_checks.gd")
+const ArmouryChecks := preload("res://tests/economy/armoury_checks.gd")
 const SEED := 424242
 const OTHER_SEED := 7
 const WEEK := 7
 const BOARDS := 40
 const SITES: Array[String] = ["site_1", "site_2", "site_3"]
+## A won fight's result: two fallen watchmen and a bandit, the classes they carried (Phase 5 C6).
+const FALLEN := {"won": true, "fallen_gear": ["spear", "mail", "spear", "mail", "sword", "leather"]}
 
 
 func suite_name() -> String:
@@ -38,6 +41,7 @@ func run_checks() -> void:
 	TermsChecks.new().run(check)
 	TermsDealChecks.new().run(check)
 	PayrollChecks.new().run(check)
+	ArmouryChecks.new().run(check)
 	await process_frame
 
 
@@ -121,8 +125,14 @@ func _check_wages_fall_due() -> void:
 	_day(company, 2)
 	_day(company, 3)
 	check(
-		company.economy.owed == per_day * 3 and company.economy.unpaid_days == 3,
-		"three days unpaid owe three days of wages, owed %d" % company.economy.owed
+		(
+			company.economy.owed == (per_day + company.economy.armoury.upkeep(company.roster)) * 3
+			and company.economy.unpaid_days == 3
+		),
+		(
+			"three days unpaid owe three days of wages and armour upkeep, owed %d"
+			% company.economy.owed
+		)
 	)
 	company.add("recruit_1")
 	check(
@@ -295,17 +305,14 @@ func _check_contract_lifecycle() -> void:
 
 func _check_loot() -> void:
 	var rules: Dictionary = Fixture.json(Fixture.ECONOMY)["loot"]["patrol"]
-	var items: Array[String] = []
-	for entry: Variant in Fixture.json(Fixture.EQUIPMENT)["equipment"]:
-		var def: Dictionary = entry
-		items.append(str(def["id"]))
+	var items := _worn_ids()
 	var seen: Array[String] = []
 	var bounded := true
 	var gear := 0
 	for seed_value: int in range(1, BOARDS):
 		var economy := _company().economy
 		var purse := economy.purse
-		var loot := economy.take_loot("patrol", Rng.from_seed(seed_value))
+		var loot := economy.take_loot("patrol", Rng.from_seed(seed_value), FALLEN)
 		seen.append(JSON.stringify(loot))
 		bounded = (
 			bounded
@@ -316,9 +323,19 @@ func _check_loot() -> void:
 			and economy.inventory.size() == (0 if loot["item"] == "" else 1)
 		)
 		gear += 0 if loot["item"] == "" else 1
-	check(bounded, "loot coin stays in the data's range and gear goes to the pack")
+	check(bounded, "loot coin stays in the data's range and worn gear goes to the pack")
 	check(gear > 0 and gear < BOARDS - 1, "some fights leave gear and some do not: %d" % gear)
 	_check_loot_determinism(seen)
+
+
+## The worn forms' ids in data/equipment.json: what loot can leave (Phase 5 C6).
+func _worn_ids() -> Array[String]:
+	var items: Array[String] = []
+	for entry: Variant in Fixture.json(Fixture.EQUIPMENT)["equipment"]:
+		var def: Dictionary = entry
+		if def.has("worn"):
+			items.append(str(def["worn"]["id"]))
+	return items
 
 
 func _check_loot_determinism(seen: Array[String]) -> void:

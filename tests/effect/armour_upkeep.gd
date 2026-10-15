@@ -1,9 +1,10 @@
 extends "res://tests/lib/effect_case.gd"
 ## armour_upkeep: armour is strong but costly (Phase 5 C6, director 2026-10-16: "price and
 ## upkeep"). The starting company on seed 424242 lives ten days, the captain paying the whole
-## day's bill each day from a purse that covers it; once with the orc in his plate, once with the orc in leather. The
-## upkeep of the armour worn on the roster is on the day's bill (data/balance/economy.json
-## "armoury" "upkeep"), so the purse after ten days differs by the plate's upkeep.
+## day's bill each day from a purse that covers it; once with the orc in his plate, once with
+## the orc in leather. The upkeep of the armour worn on the roster is on the day's bill
+## (data/balance/economy.json "armoury" "upkeep"), so the purse after ten days differs by the
+## plate's upkeep over leather's.
 
 const Fixture := preload("res://tests/lib/company_fixture.gd")
 const SEED := 424242

@@ -127,23 +127,22 @@ func _check_wages_by_clicks() -> void:
 	await _rest_on_the_map()
 	var panel := _hub().panel
 	var economy := _economy()
-	var rules := _rules()
 	var per_day := economy.wage_per_day(_hub().company.roster)
+	var bill := (per_day + economy.armoury.upkeep(_hub().company.roster)) * REST_DAYS
 	var owed_words := Text.t(
-		"hub.wages.owed",
-		{"owed": per_day * REST_DAYS, "per_day": per_day, "count": 6, "days": REST_DAYS}
+		"hub.wages.owed", {"owed": bill, "per_day": per_day, "count": 6, "days": REST_DAYS}
 	)
 	var pay := panel.button_for("pay", "wages")
 	check(
 		(
-			economy.owed == per_day * REST_DAYS
+			economy.owed == bill
 			and panel.shown_text().contains(owed_words)
 			and pay != null
 			and not pay.disabled
 		),
 		(
-			"%d rest clicks on the map make %d coin of wages fall due, shown with a Pay button"
-			% [REST_DAYS, per_day * REST_DAYS]
+			"%d rest clicks on the map make %d coin of wages and upkeep fall due, with a Pay button"
+			% [REST_DAYS, bill]
 		)
 	)
 	var purse := economy.purse
@@ -152,8 +151,8 @@ func _check_wages_by_clicks() -> void:
 	check(
 		(
 			economy.owed == 0
-			and economy.purse == purse - per_day * REST_DAYS
-			and economy.morale == low + _w(rules["wages"]["paid_recovery"])
+			and economy.purse == purse - bill
+			and economy.morale == low + _w(_rules()["wages"]["paid_recovery"])
 			and panel.shown_text().contains(Text.t("hub.wages.clear"))
 			and panel.button_for("pay", "wages") == null
 		),

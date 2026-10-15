@@ -1,12 +1,12 @@
 extends "res://tests/lib/effect_case.gd"
 ## loot_gear: loot is the gear the fallen enemies carried, worn (Phase 5 C6, director Q-11: one
-## point weaker, worth less), and gear changes a fight. Ten won patrols on seed 424242: once
+## point weaker, worth less), and gear changes a fight. Ten won patrols on seed 424243: once
 ## over fallen watchmen (spear and mail, data/balance/battle.json), once over fallen men who
 ## carried nothing. The pack is put on merc_3, who then fights the same band on the same seed.
 ## Beating a mail-wearing enemy yields worn mail; beating an unarmoured one does not.
 
 const Fixture := preload("res://tests/lib/company_fixture.gd")
-const SEED := 424242
+const SEED := 424243
 const FIGHT_SEED := 424271
 const WINS := 10
 const WHO := "merc_3"

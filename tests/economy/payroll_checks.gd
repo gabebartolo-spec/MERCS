@@ -46,6 +46,12 @@ func _share_pot(reward: int) -> int:
 	return reward * Merc.whole(_wages().get("share_pct", 0)) / Payroll.PERCENT
 
 
+## The armour upkeep owed over `days` by the starting roster (Phase 5 C6): on the day's bill,
+## owed to the armourer, not to any man.
+func _upkeep(economy: Economy, days: int) -> int:
+	return economy.armoury.upkeep(_company().roster) * days
+
+
 func _sum(dues: Dictionary) -> int:
 	var total := 0
 	for id: Variant in dues:
@@ -159,7 +165,10 @@ func _share_is_owed_wages() -> void:
 	var shared: Economy = runs[true]
 	var unshared: Economy = runs[false]
 	_check.call(
-		shared.owed > unshared.owed and shared.owed == _sum(shared.payroll.dues),
+		(
+			shared.owed > unshared.owed
+			and shared.owed == _sum(shared.payroll.dues) + _upkeep(shared, DAYS)
+		),
 		(
 			"a share unpaid counts as owed wages, by man: owed %d, dues %s"
 			% [shared.owed, shared.payroll.dues]
@@ -214,7 +223,10 @@ func _old_save() -> void:
 	economy.on_day(company.roster, 1, SITES, Rng.from_seed(SEED))
 	var day := economy.wage_per_day(company.roster)
 	_check.call(
-		_sum(economy.payroll.dues) == day and economy.owed == Merc.whole(saved["owed"]) + day,
+		(
+			_sum(economy.payroll.dues) == day
+			and economy.owed == Merc.whole(saved["owed"]) + day + _upkeep(economy, 1)
+		),
 		"and from then on each day's wages are owed by name"
 	)
 	economy.purse = economy.owed

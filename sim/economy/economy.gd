@@ -15,6 +15,7 @@ extends RefCounted
 ## - Payroll (payroll.gd, `payroll`): each merc's daily wage by level, his share of a
 ##   contract's pay, and who is owed what (Phase 5 C3).
 ## - Standing (standing.gd, `standing`): the name with each faction and the grudges (C4).
+## - Armoury (armoury.gd, `armoury`): worn forms, prices, buying and selling, armour upkeep (C6).
 ## The facade keeps at most 14 public methods; a package prefers a module or a field read
 ## through state() over a new one.
 ##
@@ -44,13 +45,15 @@ var terms := Terms.new()
 var payroll := Payroll.new()
 ## The company's name with each faction and its grudges (reputation(faction) is read there).
 var standing := Standing.new()
+## Gear as coin (sell(), sale_price(), upkeep(roster), stock() are read there).
+var armoury := Armoury.new()
 ## The posted contracts: Contracts records plus "id" ("ctr_<n>"). Held by the book.
 var board: Array[Dictionary]:
 	get:
 		return book.board
 	set(value):
 		book.board = value
-## Generic gear ids in the pack, unequipped (one entry per piece).
+## Generic gear ids in the pack, unequipped (one entry per piece; a worn piece by its own id).
 var inventory: Array[String] = []
 ## Recruit ids ever hired, so a recruit who is later lost is never offered again.
 var hired: Array[String] = []
@@ -140,12 +143,13 @@ func wage_per_day(roster: Array[Merc]) -> int:
 	return payroll.wage_per_day(roster)
 
 
-## A day has passed. Each merc's wage falls due; wages (and any share) unpaid past the grace
+## A day has passed. Each merc's wage falls due, and the upkeep of the armour the roster fights
+## in (Armoury, owed with the wages); wages (and any share) unpaid past the grace
 ## cost morale; old contracts lapse; and a fresh board is posted when none stands or the last
 ## has aged out. site_ids: the places a contract may name; rng: the world's Rng ("contracts"
 ## stream).
 func on_day(roster: Array[Merc], day: int, site_ids: Array[String], rng: Rng) -> void:
-	owed += payroll.fall_due(roster)
+	owed += payroll.fall_due(roster) + armoury.upkeep(roster)
 	unpaid_days += 1
 	if unpaid_days > _rule("wages", "grace_days"):
 		morale = maxi(0, morale - _rule("wages", "morale_loss_per_day"))
@@ -218,19 +222,23 @@ func negotiate(company: Company, id: String, ask: Dictionary, rng: Rng) -> Dicti
 	return terms.negotiate(self, company, id, talk)
 
 
-## Loot from a won fight of this encounter type: coin to the purse, a piece of gear to the
-## pack. Rolled on the Rng "loot" stream. Returns {"coin", "item"}.
+## Loot from a won fight of this encounter type: coin to the purse, and maybe a worn piece of
+## the gear the fallen carried (result: EncounterBattle.result, its "fallen_gear") to the pack.
+## Rolled on the Rng "loot" stream. Returns {"coin", "item"}.
 func take_loot(kind: String, rng: Rng, result: Dictionary = {}) -> Dictionary:
-	var _fallen := result
-	var ids: Array[String] = []
-	for id: Variant in _items:
-		ids.append(str(id))
-	last_loot = Loot.roll(_dict(_rules, "loot"), kind, ids, rng)
+	var pool := armoury.spoils(Loot.fallen_gear(result))
+	last_loot = Loot.roll(_dict(_rules, "loot"), kind, pool, rng)
 	purse += _num(last_loot, "coin", 0)
 	var item := str(last_loot.get("item", ""))
 	if item != "":
 		inventory.append(item)
 	return last_loot.duplicate()
+
+
+## Buys a piece the town sells into the pack, for its price (Armoury.buy; selling is
+## armoury.sell). False (and no change) when it is not sold or the purse falls short.
+func buy(item_id: String) -> bool:
+	return armoury.buy(self, item_id)
 
 
 ## The recruits on offer: unhired entries of data/recruits.json, in order, up to the offer count.
@@ -297,6 +305,7 @@ func _read(defs: Dictionary) -> void:
 	_recruits = _rows(_dict(defs, "recruits"), "recruits")
 	for def: Dictionary in _rows(_dict(defs, "equipment"), "equipment"):
 		_items[str(def.get("id", ""))] = def
+	armoury.setup(_dict(_rules, "armoury"), _items)
 	book.setup(_dict(_rules, "contracts"), factions, _rows(_dict(defs, "jobs"), "jobs"))
 	captives.setup(_dict(_rules, "prisoner"), _recruits, _max_morale())
 	payroll.setup(_dict(_rules, "wages"))

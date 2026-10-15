@@ -31,19 +31,24 @@ const SEEDS := {
 ## ("job", drawn on the new "jobs" stream after the board's own draws), so all ten saves gain
 ## that key and a "jobs" stream position; with both stripped each hashes as P1b left it.
 ## C1 also added the "job" route (route_kit.gd).
+## Re-pinned by Phase 5 C6 (claude/c6-armoury): armour upkeep goes on the day's bill, so every
+## route where the plated orc or Vampyr is on the roster when a day ticks owes more (win, toll,
+## second_fight, job/424316); loot is drawn from the fallen's gear, so second_fight/424316's
+## first win (only the chief's mace fell: no piece) skips the pick and its second fight's loot
+## rolls move. loss and wipe (the orc and Vampyr are dead) and job/424308 (no day ticks) hold.
 const GOLDEN := {
-	"win/424310": "6e3ccee3237ce098c920f80dc6908cc41f64ba2403d1880cdd395e98614aa81d",
-	"win/424311": "e98f9d247a6b8190b4674119a691bf6c7149bcfb2d28af524a71be0940c490d5",
+	"win/424310": "78bcba40d2d9935e264e1cc38b0318920e7f194c406e6314210ee553749c5252",
+	"win/424311": "17afc3759f22468bd32a194872b128bee1b5d5754d23c2dc18f0fdb3761a867e",
 	"loss/424308": "78527d9fb2aeea09260487d334b9cf12c1a433219f7ff89de46564a9ed4daf1c",
 	"loss/424316": "ae1491173ccf7b35563033ab048932fe88b7f9e34b0a41d32b40520df5a03e9b",
-	"toll/424308": "f7854fd802c0402b11b5db2308d06987f6c919bfc4131c39b4677ca6bbdfe58f",
-	"toll/424316": "17feb8d953f76ef6c83866a38e3495b25339802f083bb4d238335984d1128f81",
-	"second_fight/424308": "0762f7879397ed9955107c5af9aeb6e31b29d48d556f295cd8483dd1f6a0b66f",
-	"second_fight/424316": "e6816ca2d36d71209df1ff9d97879127e51d177f0e81a6bd5f0148db231423c3",
+	"toll/424308": "6f97c63c31c7cdfb03baaa5448afd92670b8eff5ca12eddeff3aa2bdcb7a237a",
+	"toll/424316": "84a0597763a649f8d644d6499dfe34a8e5e5819a63ced8ff4db6ff5af0f5c32a",
+	"second_fight/424308": "103cd6e36d52f8077fc5dd802e9374d0130abef94290398d4d69467346cb1de7",
+	"second_fight/424316": "594df2ada0769fa67cf4f0e2bb5d46be6af7827b7812fd90a5f7b5c88b262d4e",
 	"wipe/424308": "c2a1651d45788bdf39496e475bd3408d4f021f5fd1c1167f75c7d4be8b8b3bcb",
 	"wipe/424316": "052a22183247a44ae3feb842e7d98f0dbb0d355a1dd08c7e4e99145b4e4bde9c",
 	"job/424308": "17748c59ae8ea3b7a71d4af78836d37084877417e699dfa05fcef4486130f2c1",
-	"job/424316": "468e33572bdfc88f0221c974e6bac8bf834d876660fce1eefc472a410ce79f6e",
+	"job/424316": "5173a1b21a140efe63db148bc7f21ddb990b170587ea6f374c471a22d8dda873",
 }
 
 
