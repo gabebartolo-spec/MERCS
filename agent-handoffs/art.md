@@ -15,16 +15,30 @@ and golden references". Lock-B layout (supersedes the option paths below):
 - check_assets_pixels.py checks assets/look_target/heartland and assets/golden against heartland; self-test 24/24.
 - Pipeline default pixelate.json still points at master_draft (average_m sheet + fixtures): switching is a separate step.
 
-## Desloppify (director 2026-10-15 "NO SLOP"), branch claude/art-desloppify, no PR yet; awaiting lead
-- Board + evidence: D:/MERCS-vault/renders/desloppify_2026-10-15/ (board_{day,night,map}.png, x1/, frames_4k/,
-  scan_summary.json, qc/ crops, render.sh, flip.py). A = re-render, byte-identical to the 3 goldens.
-- B = dither 0 (gate variants Bg/Bg2 tried: dither only on gradients came out as streaks, worse). Isolated px
-  31.2/30.1/22.0% -> 0.9/2.8/0.9% (map/day/night). Map mean OKLab L -2% (grass snaps to verdure 2).
-- C = B + 6 colours separated at same L (min shift, every pair > 8) + water ramp (68 colours, cap now 72)
-  + map kit: shallows/lip/deep/glints, tuft fans, chunk stones. Near-dups 0. Lit faces flip to other
-  colours: dE>0.04 on 0.9/2.4% (day/night) of pixels; night dirt reads slightly yellower.
-- Goldens unchanged: check_assets_pixels and pipeline self-test fail on them vs the new palette until
-  the director picks new goldens (then copy x1/C_*.png and write_provenance).
+## Desloppify (director 2026-10-15 "NO SLOP"), branch claude/art-desloppify, no PR; awaiting a fresh critic
+- Round 1 (6bcfc1a): C = dither 0, 6 near-dup colours separated, water ramp (68 colours, cap 72), map tufts/pebbles.
+  Evidence D:/MERCS-vault/renders/desloppify_2026-10-15/ (board_*.png, x1/, scan_summary.json).
+- Round 2 (lead QC of C = FIX), evidence D:/MERCS-vault/renders/desloppify_2026-10-15/round2/: board_{day,night,map}.png
+  (C | D | E at 1x + two 4x crops + slop_scan line), x1/, frames_4k/, scan_summary.json, qc/ (self-QC crops), render.sh,
+  board.py, iso_map.py (isolated-pixel heat map).
+  - D (5c85605) = C + lead FIX 1-3: street verge detail modelled as palette faces (tools/look/kit_ground.py: door path,
+    well apron, cart ruts turning onto the road with standing water, lobed puddle-dark spots, stone clumps where stones
+    gather, tufts at wall/fence feet; open ground quiet); irregular cobbles (gutter rows, repair patch, lost stones),
+    uneven kerbs; map grass bare + hand-placed DRESSING in look_map.gd (lush from woods/shore, dry on verges/hill feet,
+    tuft clumps at edges, 5 stone clusters iron 2 on a soil 2 seat); night wall torch lit (flame + omni 0.55/3.5 m,
+    offset 0.3 m off the wall, no ringed hotspot), lantern range 9.5 -> 6.5 m (heartland light block).
+  - E (df9a7db) = D + own list: flat setts 4 mm over grout + hard shadow filter (day isolated 2.93% -> 0.90%,
+    mean cluster 23 -> 72 px); map road packed earth with wandering verges (3 variants, no marks), road stub at the
+    west junction; ragged forest floor; hills without slate cap + bedded outcrop; stone house coursed (base, quoins).
+  - slop_scan (isolated % / mean cluster): day C 2.85/24, D 2.93/23, E 0.90/72; night C 0.85/58, D 0.51/83,
+    E 0.32/135; map C 1.05/58, D 0.81/75, E 0.81/77. 0 near-dups, 0 off-palette on all. D/E street frames identical
+    except E's setts/shadows/masonry; re-render after a no-op refactor byte-identical (deterministic).
+  - Open (not fixed): left lake's square inlet corner (needs corner bank pieces); hills still read as faceted
+    pyramids; single-px cluster share stays 43-65% (flat-shaded geometry edges); orc fused head is the cast builder's.
+- Goldens unchanged: check_assets_pixels and pipeline self-test fail on them vs the new palette until the director
+  picks (then copy round2/x1/<pick>_*.png to assets/golden and write_provenance for golden).
+- Render: round2/render.sh <V> <scene> (own APPDATA per run, PID logged); 3 in parallel ~1 min. Kit: Blender
+  build_look_kit.py then Godot --import (headless) before rendering.
 
 ## Water fix (lead QC 2026-10-15: map water read as an asphalt road with a lane marking)
 - Cause: water was slate 1 lit by the warm sun (snapped to brown-greys), straight tile edges with a soil kerb,
