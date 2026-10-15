@@ -1,0 +1,24 @@
+{
+ "_doc": "MERCS Ledger, the game's own pixel typeface (D-092). Drawn by hand as text bitmaps in tools/typeface/ledger/, built to exact grid squares by tools/typeface/build_font.py.",
+ "asset": "fonts",
+ "files": {
+  "MERCSLedger-Display.ttf": "52cf16b247e618e21d78677566affe840e98e0d639aa31aae6de67dae4bbc00e",
+  "MERCSLedger-LICENSE.txt": "55ffba96888b83bdecc29bd62084ea6bbb0ff37f17d6decc24eaf1a1975e39d6",
+  "MERCSLedger-Regular.ttf": "2b4b2a2749596b24d57fd7d8b24f6772994fd747d8244f284f79892cd2ef9d6e"
+ },
+ "produced_by": {
+  "tools/typeface/build_font.py": "3a6f2f8dcc1e0283",
+  "tools/typeface/ledger/display.kern.txt": "73eda2c8a48b2d44",
+  "tools/typeface/ledger/display.txt": "347f9de38e540376",
+  "tools/typeface/ledger/regular.kern.txt": "73eda2c8a48b2d44",
+  "tools/typeface/ledger/regular.txt": "df45e7d25eaccd3e"
+ },
+ "models": [],
+ "licence_rows": [
+  "Python, Pillow, NumPy",
+  "fontTools, skia-pathops"
+ ],
+ "seed": null,
+ "status": "PROPOSED: director gate (look approval) pending",
+ "created": "2026-10-15"
+}
