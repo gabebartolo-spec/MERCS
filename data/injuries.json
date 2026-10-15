@@ -1,4 +1,25 @@
 {
-  "_comment": "Empty until the phase that adds the first entry (08_ROADMAP.md). Schema: data/schema/injuries.schema.json.",
-  "injuries": []
+  "_comment": "The whole wound ladder, one of each (08_ROADMAP.md Phase 2 M5): a wound that heals with the fight, a temporary injury that lasts days, a permanent injury with a stat change, a role change and a sprite layer. Death is not an injury: it is the chronicle's (sim/merc/chronicle.gd). Read by sim/merc/injury.gd.",
+  "injuries": [
+    {
+      "id": "inj_gash",
+      "kind": "wound",
+      "name_key": "injury.gash.name"
+    },
+    {
+      "id": "inj_broken_arm",
+      "kind": "temporary",
+      "name_key": "injury.broken_arm.name",
+      "days": 5,
+      "stat_change": {"attack": -2}
+    },
+    {
+      "id": "inj_lost_eye",
+      "kind": "permanent",
+      "name_key": "injury.lost_eye.name",
+      "stat_change": {"attack": -3},
+      "role_key": "injury.lost_eye.role",
+      "layer_id": "injury_lost_eye"
+    }
+  ]
 }

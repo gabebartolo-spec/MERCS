@@ -137,7 +137,8 @@ func _check_blood_price_kept_in_hand() -> void:
 	var foe := BattleUnit.make("foe", BattleUnit.ENEMY, Vector2i(2, 1), Fixture.fighter("bandit"))
 	var duel := _duel(vampyr, foe, rules)
 	var healthy := MercPlay.choose(duel, vampyr, rules)
-	vampyr.hp = Fixture.rule("blood_price_hp") * 2
+	var price := Fixture.sect(Fixture.sect(rules, "moves"), BattleUnit.MOVE_BLOOD_PRICE)
+	vampyr.hp = Merc.whole(price.get("hp_cost", 0)) * 2
 	var weak := MercPlay.choose(duel, vampyr, rules)
 	vampyr.hp = vampyr.max_hp
 	foe.hp = Merc.whole(Fixture.fighter("bandit_chief")["hp"])

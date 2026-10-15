@@ -15,6 +15,10 @@ const EXPECTED_IDS: Array[String] = [
 	"encounter_road",
 	"encounter_toll",
 	"company_merc",
+	"permanent_injury",
+	"death_memory",
+	"battle_blocking",
+	"battle_rout",
 ]
 
 
