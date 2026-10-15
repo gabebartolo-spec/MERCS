@@ -114,11 +114,13 @@ func place_job(contract: Dictionary) -> String:
 	return Jobs.place(self, contract, _job_knobs, _rng)
 
 
-## A broken deal's hunters (GrudgeParties.place, Phase 5 C4) on the map, away from the band,
-## on the Rng "grudge" stream; `strength` picks their line-up. Their id, "" when no tile was free.
-func send_hunters(deal_id: String, strength: int) -> String:
+## A broken deal's hunters (GrudgeParties.place, Phase 5 C4) on the map near the deal's site
+## (`site_id`; the hub when unknown), on the Rng "grudge" stream; `strength` picks their
+## line-up. Their id, "" when no tile was free.
+func send_hunters(deal_id: String, strength: int, site_id: String = "") -> String:
 	var knobs := _dict(_party_knobs, GrudgeParties.TYPE)
-	return GrudgeParties.place(self, {"deal": deal_id, "strength": strength}, knobs, _rng)
+	var deal := {"deal": deal_id, "strength": strength, "site": site_id}
+	return GrudgeParties.place(self, deal, knobs, _rng)
 
 
 ## The party by id, or null.

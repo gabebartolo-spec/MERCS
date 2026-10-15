@@ -80,8 +80,8 @@
       "speed_pct": 100,
       "wander_tiles": 6,
       "return_days": 1,
-      "start_min_tiles": 8,
-      "start_max_tiles": 12,
+      "start_min_tiles": 2,
+      "start_max_tiles": 4,
       "place_tries": 30
     }
   },

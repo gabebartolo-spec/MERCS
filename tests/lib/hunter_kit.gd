@@ -103,7 +103,8 @@ class Played:
 		deal = str(row.get("id", ""))
 		faction = str(row.get("faction", ""))
 		company.economy.accept(deal)
-		row["advance"] = Merc.whole(row.get("reward", 0)) * advance_pct / PERCENT
+		# Rounded up, so "half" of an odd pay is still half or more.
+		row["advance"] = (Merc.whole(row.get("reward", 0)) * advance_pct + PERCENT - 1) / PERCENT
 		company.economy.abandon(deal, company, world.day)
 
 	## One move: a standing fight settled, else a step toward the nearest hunters, else a rest.

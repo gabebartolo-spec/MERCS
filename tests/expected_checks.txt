@@ -10,11 +10,11 @@ assets 13
 slice 16
 battle 64
 loop 8
-sim_world 40
+sim_world 43
 sim_encounters 11
 save 12
 effect 42
-overworld 14
+overworld 16
 road 8
 company 21
 inspect 10

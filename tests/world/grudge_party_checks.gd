@@ -18,6 +18,9 @@ const SIZES: Array[int] = [3, 4, 5, 5]
 const BLIND_DAYS := 3
 const AFTER_DAYS := 10
 const SPLIT := 6
+## The seeds the reachability check walks.
+const REACH_SEEDS := 20
+const JobKit := preload("res://tests/lib/job_kit.gd")
 const BATTLE := "res://data/balance/battle.json"
 const SCENARIOS := "res://data/scenarios.json"
 
@@ -28,6 +31,9 @@ var _check: Callable
 func run(check: Callable) -> void:
 	_check = check
 	_check_sent()
+	_check_start_ignores_band()
+	_check_reachable()
+	_check_captain_per_deal()
 	_check_not_sent(THIRD, false)
 	_check_not_sent(HALF, true)
 	_check_one_per_deal()
@@ -55,12 +61,12 @@ func _hunters(played: HunterKit.Played) -> Array[WorldParty]:
 
 func _check_sent() -> void:
 	var played := HunterKit.Played.new(SEED)
-	var band := played.world.band
 	played.break_deal(HALF)
+	var origin := _origin(played)
 	played.world.rest()
 	var found := _hunters(played)
 	var grudge := played.company.economy.standing.grudge(played.faction)
-	var gap := TileRegion.gap(found[0].tile, band) if found.size() == 1 else -1
+	var gap := TileRegion.gap(found[0].tile, origin) if found.size() == 1 else -1
 	var knobs := _knobs()
 	(
 		_check
@@ -75,9 +81,92 @@ func _check_sent() -> void:
 				and played.company.economy.standing.hunter_calls().is_empty()
 			),
 			(
-				"half the pay up front, walked from: one hunter party that day, %d-%d steps off (%s at %d, %s)"
+				"walked from after half up front: one party that day, %d-%d from the site (%s at %d, %s)"
 				% [knobs.get("start_min_tiles"), knobs.get("start_max_tiles"), found, gap, grudge]
 			)
+		)
+	)
+
+
+## The entrance of the broken deal's site, where its hunters set out from (the job's site).
+static func _origin(played: HunterKit.Played) -> Vector2i:
+	var broken := played.company.economy.standing.broken_deal(played.deal)
+	return played.world.region.entrance(str(broken.get("site", "")))
+
+
+## Rule 6 (lead ruling): where the hunters start never depends on where the band is. The same
+## seed and deal with the band at its gate or across the map: the same start tile.
+func _check_start_ignores_band() -> void:
+	var here := HunterKit.Played.new(SEED)
+	var there := HunterKit.Played.new(SEED)
+	for played: HunterKit.Played in [here, there]:
+		played.break_deal(HALF)
+	var reach := Merc.whole(_knobs().get("start_max_tiles")) + 1
+	there.world.band = _far_tile(there.world, _origin(there), reach)
+	var tiles: Array[Vector2i] = []
+	for played: HunterKit.Played in [here, there]:
+		played.world.rest()
+		var found := _hunters(played)
+		tiles.append(found[0].tile if found.size() == 1 else GrudgeParties.NOWHERE)
+	_check.call(
+		tiles[0] != GrudgeParties.NOWHERE and tiles[0] == tiles[1],
+		"the hunters set out from the same tile wherever the band is (got %s)" % [tiles]
+	)
+
+
+## On every seed of a spread, the hunters start on a tile the band can walk to (and so they can
+## walk to the band).
+func _check_reachable() -> void:
+	var stranded: Array[int] = []
+	for seed_value: int in range(SEED, SEED + REACH_SEEDS):
+		var played := HunterKit.Played.new(seed_value)
+		played.break_deal(HALF)
+		played.world.rest()
+		var found := _hunters(played)
+		if (
+			found.size() != 1
+			or JobKit.Played.first_step(played.world, found[0].tile) == Vector2i.ZERO
+		):
+			stranded.append(seed_value)
+	_check.call(
+		stranded.is_empty(),
+		(
+			"on %d seeds the hunters start where the band can reach (stranded %s)"
+			% [REACH_SEEDS, stranded]
+		)
+	)
+
+
+## The memory names the captain who broke that deal, not whoever leads when the hunters come:
+## the orc breaks the first deal and dies, his successor breaks a second with the same faction,
+## and the first deal's hunters are remembered as the orc's.
+func _check_captain_per_deal() -> void:
+	var played := HunterKit.Played.new(SEED)
+	var first_captain := played.company.captain_id
+	played.break_deal(HALF)
+	var first_deal := played.deal
+	played.world.rest()
+	played.company.bury(first_captain)
+	played.company.appoint(played.company.fighting_order()[0])
+	var second: Dictionary = played.company.economy.board[0]
+	second["faction"] = played.faction
+	played.break_deal(HALF)
+	var second_captain := played.company.captain_id
+	for _move: int in HunterKit.MOVES * 2:
+		if played.settled.any(func(one: Dictionary) -> bool: return one.get("deal") == first_deal):
+			break
+		played.move(true)
+	var about := ""
+	for merc_id: String in played.company.fighting_order():
+		for entry: Dictionary in played.memory.of(merc_id):
+			var params: Dictionary = entry.get("params", {})
+			if params.get("deal") == first_deal:
+				about = str(params.get("about", ""))
+	_check.call(
+		second_captain != first_captain and about == first_captain,
+		(
+			"the first deal's hunters are remembered as %s's deal, not %s's (got %s)"
+			% [first_captain, second_captain, about]
 		)
 	)
 
@@ -174,8 +263,9 @@ func _check_in_sight() -> void:
 func _check_not_psychic() -> void:
 	var near := HunterKit.Played.new(SEED)
 	var far := HunterKit.Played.new(SEED)
+	var site := _farthest_site(near.world)
 	for played: HunterKit.Played in [near, far]:
-		played.world.send_hunters("ctr_x", 1)
+		played.world.send_hunters("ctr_x", 1, site)
 	var party_near := _hunters(near)[0]
 	var sight := Merc.whole(_knobs().get("sight_tiles"))
 	far.world.band = _far_tile(far.world, _hunters(far)[0].tile, sight)
@@ -237,7 +327,10 @@ static func _remembered(played: HunterKit.Played, outcome: String) -> bool:
 		var params: Dictionary = last.get("params", {})
 		var named: bool = (
 			params.get("deal") == played.deal
-			and params.get("about") == played.company.captain_id
+			and (
+				params.get("about")
+				== played.company.economy.standing.broken_deal(played.deal).get("captain")
+			)
 			and params.get("faction") == played.faction
 		)
 		if last.get("key") != GrudgeParties.MEMORY_PREFIX + outcome or not named:
@@ -274,6 +367,18 @@ func _check_old_parties() -> void:
 		not saved.has("strength") and loaded.strength == 0,
 		"a party that is not a hunter saves and loads as before (got %s)" % [saved]
 	)
+
+
+## The site whose entrance lies farthest from the band (so hunters sent from it start unseen).
+static func _farthest_site(world: WorldSim) -> String:
+	var best := ""
+	var best_gap := -1
+	for site: WorldSite in world.sites:
+		var gap := TileRegion.gap(world.region.entrance(site.id), world.band)
+		if gap > best_gap:
+			best = site.id
+			best_gap = gap
+	return best
 
 
 ## A walkable neighbour of the band (the first in the fixed step order).
