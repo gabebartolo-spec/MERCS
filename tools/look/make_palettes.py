@@ -35,6 +35,7 @@ PURPOSE = {
     "skin_pale": "the Vampyr's skin (index-mapped from skin_neutral)",
     "cloth_faded": "commoner and dark cloth: dull red pair, dull blue pair",
     "verdure": "grass, moss, leaves",
+    "verdure_mid": "grass mass: one step between verdure_1 and verdure_2, luma ~69 (director, 2026-10-16: grass B)",
     "heraldry": "faction colours only: crimson, gold, blue, white, yellow",
     "blood": "overlay only: two reds and a dried brown",
     "fire": "torch and ember accents",
@@ -66,6 +67,7 @@ OPTIONS = {
             "soil": ("#2b1c11", "#a27a4e"), "timber": ("#321f0f", "#b68b51"), "bone": ("#8e7d5d", "#efe1bd"),
             "skin_neutral": ("#4c2d1f", "#e0b48f"), "skin_orc": ("#283016", "#9ba15c"),
             "skin_pale": ("#4b3d39", "#e1d3c2"), "verdure": ("#1e2a12", "#808c46"),
+            "verdure_mid": ["#40501d"],  # luma 69.4; kept clear of skin_orc (not the plain OKLab midpoint)
             "cloth_faded": ["#7a3a26", "#a0573a", "#37474f", "#59706f"],
             "heraldry": ["#8a1d1d", "#bb3a2c", "#d29a2a", "#22488a", "#ece3cf", "#e0b92c"],
             "blood": ["#5c1010", "#80201a", "#4c2a18"], "fire": ["#e07a28", "#f6c64a"],
@@ -134,7 +136,7 @@ def gpl(name: str, ramps: list[dict]) -> str:
 
 NL = chr(10)
 CORE = ["soot", "iron", "bone", "skin_neutral", "skin_orc", "skin_pale", "cloth_faded", "heraldry", "blood", "fire"]
-BIOME = ["slate", "soil", "timber", "verdure"]
+BIOME = ["slate", "soil", "timber", "verdure", "verdure_mid"]  # verdure_mid appended so no index moves
 PICKED = "B"  # director, 2026-10-15: option B "Peat and Ochre" is the look target
 BIOME_NAME = "heartland"
 AUDIT = REPO / "docs" / "audits" / "look_target" / "options"
