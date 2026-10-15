@@ -28,7 +28,7 @@ hub_fight 1
 story 60
 story_gui 17
 campaign 6
-panels 11
+panels 13
 campaign_end 11
 ironman 12
 ironman_resume 22
