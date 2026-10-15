@@ -44,6 +44,9 @@ var view: BattleView = null
 var _balance: Dictionary = {}
 ## The triage after a road fight, shown until Continue; empty when none stands.
 var _triage := ""
+## What waits for Continue: the hub's loot and prisoner (the world's result hook), so the
+## triage comes first.
+var _after_triage := Callable()
 var _layer: CanvasLayer = null
 
 
@@ -114,6 +117,9 @@ func _on_choice(choice_id: String) -> void:
 		CONTINUE:
 			_triage = ""
 			_show(_outcome_line())
+			if _after_triage.is_valid():
+				_after_triage.call()
+			_after_triage = Callable()
 		TOLL:
 			world.pay_toll()
 			_show(_outcome_line())
@@ -154,7 +160,12 @@ func _on_fight_over() -> void:
 	view.queue_free()
 	view = null
 	var events := wounds.resolve()
+	var kind := str(world.encounter.get("type", ""))
+	var hook := world.result_hook
+	world.result_hook = Callable()
 	world.resolve_encounter(result)
+	world.result_hook = hook
+	_after_triage = hook.bind(kind, result) if hook.is_valid() else Callable()
 	map.visible = true
 	_triage = RoadFight.triage_body(_outcome_line(), events, wounds)
 	_show(_outcome_line())

@@ -7,23 +7,19 @@ extends "res://tests/lib/runner.gd"
 ## captain's office is handed on with one dissenting voice); a permanent injury takes its
 ## stat change into the next fight and a temporary one heals on its day; company and wounds
 ## survive a save through JSON with the dead still dead, and no older save brings one back.
-## GUI: real clicks and letter keys at 1920x1080: Fight on the road, the triage panel with
-## the chronicle line and the succession and no key help, Continue back to the map, the C
-## screen marking the fallen as gone, Save, and a fresh session that never fields the dead.
+## GUI (tests/wiring/gui_checks.gd): real clicks and letter keys at 1920x1080: Fight on the
+## road, the triage panel, Continue, the C screen marking the fallen as gone, Save, a fresh
+## session that never fields the dead.
 ## Seeded by design: sim fights use MercPlay on seeds 424246 and 424247 (a permanent injury
 ## and the captain's death); the GUI fight is the ambush on the road of the world seed 424260.
 ##   godot --headless --path . --script tests/run_wiring_tests.gd
 
 const Kit := preload("res://tests/lib/wiring_kit.gd")
 const Fixture := preload("res://tests/lib/company_fixture.gd")
-const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
-const SAVE_SYSTEM := preload("res://presentation/autoload/save_system.gd")
+const GuiChecks := preload("res://tests/wiring/gui_checks.gd")
 const WINDOW_SIZE := Vector2i(1920, 1080)
-const LAYOUT_FRAMES := 3
-const FIGHT_FRAMES := 6000
 const DEATH_SEED := 424247
 const SCAR_SEED := 424246
-const GUI_SEED := 424260
 const SCAR_ATTACK := -3
 const TEMPORARY_DAYS := 5
 
@@ -42,9 +38,9 @@ func run_checks() -> void:
 	_check_temporary_injury_heals()
 	_check_save_round_trip()
 	_check_no_save_revives()
-	_clear_save()
-	await _check_gui_fight_and_triage()
-	_clear_save()
+	var gui := GuiChecks.new()
+	gui.setup(self, check)
+	await gui.run()
 
 
 func _cells() -> Array[Vector2i]:
@@ -146,6 +142,9 @@ func _check_aftermath_applied() -> void:
 	var mourned := made.company.roster.all(
 		func(merc: Merc) -> bool: return not made.memories_of(merc.id).is_empty()
 	)
+	var dissent_kept := made.memories_of(dissent).any(
+		func(m: Dictionary) -> bool: return m.get("key") == Memory.KEY_DISSENT
+	)
 	check(
 		(
 			dead_id == "orc"
@@ -159,12 +158,17 @@ func _check_aftermath_applied() -> void:
 			and made.company.member(heir) != null
 			and dissent != ""
 			and dissent != heir
-			and made.memories_of(dissent).any(
-				func(m: Dictionary) -> bool: return m.get("key") == Memory.KEY_DISSENT
-			)
+			and dissent_kept
 		),
-		"the captain's death leaves the roster, enters the chronicle, is mourned by every comrade and hands the office to %s over %s's dissent" % [heir, dissent]
+		(
+			"the captain's death: off the roster, in the chronicle, mourned, office to %s over %s"
+			% [heir, dissent]
+		)
 	)
+	_check_hook_off_changes_nothing()
+
+
+func _check_hook_off_changes_nothing() -> void:
 	var plain_rng := Rng.from_seed(DEATH_SEED)
 	var plain := Kit.wounds(plain_rng)
 	Kit.fight(plain, plain_rng, false)
@@ -197,7 +201,10 @@ func _check_permanent_injury_fielded() -> void:
 			and attack == base + SCAR_ATTACK
 			and made.company.member("vampyr").stat("attack") == base
 		),
-		"a permanent injury is in the next fight's numbers (attack %d from %d) and has its sprite layer" % [attack, base]
+		(
+			"a permanent injury is in the next fight's numbers (attack %d from %d) and has its sprite layer"
+			% [attack, base]
+		)
 	)
 
 
@@ -212,7 +219,10 @@ func _check_temporary_injury_heals() -> void:
 	var healed := _attack_of(made, "vampyr")
 	check(
 		hurt == 1 and now < base and healed == base and made.injuries_of("vampyr").is_empty(),
-		"a temporary injury cuts the next fight's attack (%d from %d) and heals on its day" % [now, base]
+		(
+			"a temporary injury cuts the next fight's attack (%d from %d) and heals on its day"
+			% [now, base]
+		)
 	)
 
 
@@ -238,11 +248,14 @@ func _check_save_round_trip() -> void:
 			and model.company.captain_id == made.company.captain_id
 			and back.chronicle().is_dead("orc")
 			and back.chronicle().entries == made.chronicle().entries
-			and back.memories_of(made.company.captain_id) == made.memories_of(made.company.captain_id)
+			and (
+				back.memories_of(made.company.captain_id)
+				== made.memories_of(made.company.captain_id)
+			)
 			and not _ids(units).has("orc")
 			and units[0].id == made.company.captain_id
 		),
-		"save, reload, continue: the dead stay dead, the new captain leads, the chronicle and memories are back"
+		"save, reload, continue: the dead stay dead, the heir leads, chronicle and memories back"
 	)
 
 
@@ -253,7 +266,9 @@ func _check_no_save_revives() -> void:
 	var block := made.state()
 	var old_company := Company.start(Fixture.defs())
 	var old := Kit.wounds(Rng.from_seed(1), "", block, old_company)
-	var everyone_gone := Company.restore({"roster": [], "fallen": ["orc", "vampyr"]}, Fixture.defs())
+	var everyone_gone := Company.restore(
+		{"roster": [], "fallen": ["orc", "vampyr"]}, Fixture.defs()
+	)
 	check(
 		(
 			old.company.member("orc") == null
@@ -262,7 +277,7 @@ func _check_no_save_revives() -> void:
 			and everyone_gone.member("orc") == null
 			and everyone_gone.member("vampyr") == null
 		),
-		"an older company block that still lists the dead is buried by the chronicle; an emptied company is not restarted"
+		"an older company block listing the dead is buried by the chronicle; none restarts empty"
 	)
 
 
@@ -279,205 +294,3 @@ func _first(events: Array[Dictionary], type: String) -> Dictionary:
 		if event.get("type") == type:
 			return event
 	return {}
-
-
-# --- GUI: real clicks and letter keys -----------------------------------------------------
-
-
-func _check_gui_fight_and_triage() -> void:
-	var rng := Rng.from_seed(GUI_SEED)
-	var world := WorldSim.new()
-	world.start(Kit.json("res://data/balance/world.json"), rng)
-	_saves().save_game(world, rng)
-	var road := world.destinations()[0]
-	var game := await _spawn()
-	var screen := game.company_director()
-	screen.wounds = Kit.wounds(Rng.from_seed(0), "dead", {}, screen.company)
-	await _tap(KEY_M)
-	var director := game.overworld_director()
-	await _click_button(director.panel.button_for(road))
-	await _click_button(director.panel.button_for(OverworldDirector.FIGHT))
-	await _frames(LAYOUT_FRAMES)
-	var fielded: Array[String] = director.wounds.fielded.duplicate()
-	var fought := director.in_fight() and fielded.size() == _cells().size()
-	check(
-		fought and fielded[0] == "orc" and director.view.battle.unit("orc").is_leader,
-		"Fight on the road fields the company, the orc captain first: %s" % [fielded]
-	)
-	await _finish_fight(director)
-	await _frames(LAYOUT_FRAMES)
-	await _check_triage_panel(game, director)
-	await _click_button(director.panel.button_for(OverworldDirector.CONTINUE))
-	await _frames(LAYOUT_FRAMES)
-	check(
-		(
-			director.panel.button_for(OverworldDirector.CONTINUE) == null
-			and director.panel.button_for(OverworldDirector.SAVE) != null
-			and director.map.visible
-		),
-		"Continue returns to the map with its choices"
-	)
-	await _click_button(director.panel.button_for(OverworldDirector.SAVE))
-	await _tap(KEY_M)
-	await _check_company_screen(game)
-	game.queue_free()
-	await process_frame
-	await _check_fresh_session()
-
-
-func _check_triage_panel(game: SliceGame, director: OverworldDirector) -> void:
-	var body := director.panel.shown_body()
-	var entries := director.wounds.chronicle().entries
-	var cause := ""
-	var died_on := -1
-	if not entries.is_empty():
-		cause = TriageText.name_of(str(entries[0].get("cause", "")), director.company)
-		died_on = Merc.whole(entries[0].get("day", -1))
-	var line := Text.t(
-		"chronicle.death", {"name": "The Orc", "day": died_on, "cause": cause}
-	)
-	var captain := director.company.name_of(director.company.captain_id)
-	var heir := Text.t("succession.new_captain", {"name": captain})
-	var dissent := ""
-	for merc: Merc in director.company.roster:
-		for memory: Dictionary in director.wounds.memories_of(merc.id):
-			if memory.get("key") == Memory.KEY_DISSENT:
-				dissent = merc.display_name
-	var hud: CanvasLayer = game.get(&"_hud")
-	check(
-		(
-			director.panel.button_for(OverworldDirector.CONTINUE) != null
-			and director.panel.button_for(OverworldDirector.SAVE) == null
-			and not entries.is_empty()
-			and body.contains(line)
-			and body.contains(heir)
-			and dissent != ""
-			and body.contains(Text.t("succession.dissent", {"name": dissent}))
-			and hud != null
-			and not hud.visible
-		),
-		"after the fight the triage panel words the death and the chronicle line, the succession, Continue only, and the key help is hidden: %s" % body.replace("\n", " | ")
-	)
-
-
-func _check_company_screen(game: SliceGame) -> void:
-	await _tap(KEY_C)
-	await _frames(LAYOUT_FRAMES)
-	var screen := game.company_director()
-	var panel := screen.panel
-	var rows := panel.row_for("orc")
-	var gone := rows != null and rows.text == Text.t("company.fallen.row", {"name": "The Orc"})
-	await _click_button(rows)
-	await _frames(LAYOUT_FRAMES)
-	var shown := panel.header_text() == Text.t("company.fallen.title", {"name": "The Orc"})
-	check(
-		(
-			gone
-			and shown
-			and screen.company.member("orc") == null
-			and screen.company.roster.size() == _cast() - 1
-			and panel.lines_text().contains(Text.t("company.fallen.gone"))
-			and panel.row_for(screen.company.captain_id).text.contains(
-				Text.t("company.mark.captain")
-			)
-		),
-		"the C screen marks the orc as fallen and gone, shows his chronicle line, and marks the new captain"
-	)
-	await _tap(KEY_C)
-
-
-func _check_fresh_session() -> void:
-	var game := await _spawn()
-	var screen := game.company_director()
-	var units := screen.wounds.units(_cells(), BattleUnit.COMPANY)
-	check(
-		(
-			screen.company.member("orc") == null
-			and screen.company.fallen.has("orc")
-			and screen.wounds.chronicle().is_dead("orc")
-			and not _ids(units).has("orc")
-			and units[0].id == screen.company.captain_id
-			and not screen.wounds.memories_of(screen.company.captain_id).is_empty()
-		),
-		"a new session reads the save: the orc is dead and never fielded, his chronicle and memories are back"
-	)
-	game.queue_free()
-	await process_frame
-
-
-func _saves() -> SAVE_SYSTEM:
-	return root.get_node(^"SaveSystem") as SAVE_SYSTEM
-
-
-func _clear_save() -> void:
-	if FileAccess.file_exists(SAVE_SYSTEM.SAVE_PATH):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_SYSTEM.SAVE_PATH))
-
-
-func _spawn() -> SliceGame:
-	var packed: PackedScene = load(SLICE_SCENE) as PackedScene
-	var game: SliceGame = packed.instantiate() as SliceGame
-	root.add_child(game)
-	await process_frame
-	return game
-
-
-## Plays the company's turns by clicks and waits out the enemy's, until the battle is over.
-func _finish_fight(director: OverworldDirector) -> void:
-	var battle := director.view.battle
-	var rules: Dictionary = Kit.json(Fixture.BATTLE).get("rules", {})
-	var sight: int = rules.get("sight_cells", 0)
-	for _frame: int in FIGHT_FRAMES:
-		if battle.is_over():
-			break
-		var actor := battle.current()
-		if actor.side == BattleUnit.COMPANY:
-			await _company_turn(director, BattleAi.choose(battle, actor, sight))
-		else:
-			await process_frame
-
-
-func _company_turn(director: OverworldDirector, action: Dictionary) -> void:
-	var kind := str(action.get("type", ""))
-	if kind == Battle.ACTION_MOVE:
-		var to: Vector2i = action.get("to", Vector2i.ZERO)
-		director.view.click_cell(director.origin + to)
-		await process_frame
-		return
-	var choice_id := Battle.ACTION_WAIT
-	if kind == Battle.ACTION_ATTACK:
-		choice_id = "%s:%s" % [Battle.ACTION_ATTACK, action.get("target")]
-	await _click_button(director.panel.button_for(choice_id))
-
-
-func _frames(count: int) -> void:
-	for _frame: int in count:
-		await process_frame
-
-
-func _click_button(button: Button) -> void:
-	# A freshly shown panel lays its buttons out over the next frames.
-	await _frames(LAYOUT_FRAMES)
-	if button == null or not is_instance_valid(button):
-		return
-	var at := button.get_global_rect().get_center()
-	for pressed: bool in [true, false]:
-		var click := InputEventMouseButton.new()
-		click.button_index = MOUSE_BUTTON_LEFT
-		click.position = at
-		click.global_position = at
-		click.pressed = pressed
-		Input.parse_input_event(click)
-		Input.flush_buffered_events()
-		await process_frame
-
-
-func _tap(code: Key) -> void:
-	for pressed: bool in [true, false]:
-		var event := InputEventKey.new()
-		event.keycode = code
-		event.physical_keycode = code
-		event.pressed = pressed
-		Input.parse_input_event(event)
-		Input.flush_buffered_events()
-		await process_frame

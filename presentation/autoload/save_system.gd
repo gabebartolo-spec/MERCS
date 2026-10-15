@@ -15,9 +15,7 @@ func has_save() -> bool:
 
 ## Writes the run as it stands, with the company and its wounds block (CompanyWounds.state())
 ## when there are some. False when the file could not be written.
-func save_game(
-	world: WorldSim, rng: Rng, company: Company = null, wounds: Dictionary = {}
-) -> bool:
+func save_game(world: WorldSim, rng: Rng, company: Company = null, wounds: Dictionary = {}) -> bool:
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file == null:
 		push_warning(

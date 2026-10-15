@@ -60,7 +60,8 @@ static func _succession(event: Dictionary, held: Company) -> String:
 		"succession.new_captain", {"name": name_of(str(event.get("captain", "")), held)}
 	)
 	if str(event.get("dissent", "")) != "":
-		line += " " + Text.t(
-			"succession.dissent", {"name": name_of(str(event.get("dissent", "")), held)}
+		line += (
+			" "
+			+ Text.t("succession.dissent", {"name": name_of(str(event.get("dissent", "")), held)})
 		)
 	return line

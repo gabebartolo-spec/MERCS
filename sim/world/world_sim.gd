@@ -23,6 +23,10 @@ var log: Array[Dictionary] = []
 ## "from", "to", "day", "days_left", "enemy_first", "enemies": [{"fighter", "cell"}]}.
 ## While it stands the company is still at the site it left and cannot travel or rest.
 var encounter: Dictionary = {}
+## Callables the hub's economy registers (Phase 2 M6, not saved): day_hook.call(day) after every
+## day's tick; result_hook.call(encounter type, result) after a fight's result is applied.
+var day_hook := Callable()
+var result_hook := Callable()
 ## The region's sites in placement order (the hub first).
 var sites: Array[WorldSite] = []
 
@@ -104,6 +108,8 @@ func resolve_encounter(result: Dictionary) -> bool:
 	else:
 		_settle(kind, "lost", -mini(supplies, _knob(kind, "loss_supplies")))
 		encounter = {}
+	if result_hook.is_valid():
+		result_hook.call(kind, result)
 	return true
 
 
@@ -246,6 +252,8 @@ func _tick() -> void:
 	log.append({"step": "tick", "day": day, "supplies": supplies})
 	if supplies == 0:
 		log.append({"step": "starving", "day": day})
+	if day_hook.is_valid():
+		day_hook.call(day)
 
 
 ## Day one at the hub with the balance's supplies, on the sites given (restore() brings its own).

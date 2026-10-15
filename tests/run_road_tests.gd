@@ -5,7 +5,8 @@ extends "res://tests/lib/runner.gd"
 ## what it is with Fight and Pay the toll, the company stays where it was, M and Escape keep
 ## the encounter; Fight closes the map and starts the street battle (the company acts first),
 ## and when it ends the fighters leave the street, the result is applied and the triage panel
-## opens (Continue returns to the map, with the outcome in words). Paying the toll skips the fight. A saved world on another seed
+## opens (Continue returns to the map, with the outcome in words). Paying the toll skips the
+## fight. A saved world on another seed
 ## has an ambush on its first road: only Fight, the enemy strikes first. A save taken with an
 ## encounter standing reopens on its panel. The company's moves in the fight use the sim's
 ## BattleAi for the choice; attacks and waits are real clicks, a move calls click_cell().
