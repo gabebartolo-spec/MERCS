@@ -41,16 +41,19 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
 - Pending from him: author merc_3..merc_6; confirm/reorder M3/M4; the veto lists in #80-#82.
 
 ## Running (builder subagents of this session; they die with it)
-- #81 M3 company MERGED (save v2, F4). #83 4K MERGED. #84 MERGED (gdlint is a required merge check).
-- #82 M5 wounds MERGED (9ac9961; wounds block optional in save v2).
-- M7 storylet + memory (Sonnet): `../MERCS-wt/p2-m7`, claude/p2-m7-storylet (placeholder words).
-- M4 battle skeleton (Opus): `../MERCS-wt/slice-m1`, claude/p2-m4-battle.
-- Walkable overworld (Opus): `../MERCS-wt/p2-walk`, claude/p2-overworld-walk (told: slice_game.gd
-  is at 400 lines, split before adding).
-- M6 hub/economy/recruitment (Sonnet): `../MERCS-wt/p2-m6`, claude/p2-m6-hub (economy in
-  sim/economy/, one-line hook in WorldSim._tick; placeholder recruits).
-gdlint/gdformat locally: `python -m gdtoolkit.linter|formatter` (not on PATH).
-Wiring after merges: company -> encounters, M4 hit hook -> M5 injuries, a triage screen.
+- Merged today: #80 M2, #81 M3, #82 M5, #83 4K, #84 gdlint gate, #85 M4 battle, #86 letter keys
+  (no F-keys: M map, C company, L loop, H help, G frame time; smoke fails on KEY_F).
+- Walkable overworld (Opus): p2-walk, claude/p2-overworld-walk. Told: SliceKeys, slice_game <=400.
+- M6 hub/economy (Sonnet): p2-m6, claude/p2-m6-hub. Told: hub key B via SliceKeys.
+- M7 storylet+memory (Sonnet): p2-m7, claude/p2-m7-storylet.
+- Wiring (Sonnet): slice-m1, claude/p2-wiring (company fights road, hit->injury, triage panel).
+- ART resumed (director "look target first"): Opus, art-look, claude/art-look-target (main + art
+  branch merged). Deliverable: 2-3 labelled options (palette+light+post), each = street day, street
+  night/rain at 4K in-engine, overworld strip at map scale; draft palettes in assets/palette/options/.
+  Lead QCs (art-qa-critic) before the director sees boards; his pick becomes golden + master palette.
+Traps: never `export APPDATA` (breaks gh, git creds, Python user site for gdtoolkit); set it on
+the Godot command line only. gdlint/gdformat: `python -m gdtoolkit.linter|formatter`.
+Director 2026-10-15: agents talk tersely (memory-shared terse-agent-messages.md).
 
 ## Next for the lead
 0. Next free slot: the wiring task (company fights encounters, hits -> injuries, triage screen)
@@ -68,11 +71,8 @@ Wiring after merges: company -> encounters, M4 hit hook -> M5 injuries, a triage
 data 96, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 13, slice 15, battle 14,
 loop 4, sim_world 9, save 7, effect 4, overworld 8.
 
-## Worktrees (4 / 4)
-p2-m7 (M7), p2-m6 (M6), p2-walk (overworld), slice-m1 (M4). Director allowed forced removals of
-finished worktrees (2026-10-15). Art's worktree was removed while paused (branch
-claude/art-slice-cast pushed at 99b3fdf): on resume `git worktree add ../MERCS-wt/art-publish
-claude/art-slice-cast` and fix the path in art.md if needed.
+## Worktrees (5 / 4, director allows forced removal of finished ones)
+p2-walk, p2-m6, p2-m7, slice-m1 (wiring), art-look. Remove each when its PR merges.
 
 ## Co-lead playbook
 playbook: nothing new (2026-10-15; no worker findings yet).
