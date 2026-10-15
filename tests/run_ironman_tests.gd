@@ -41,6 +41,7 @@ func run_checks() -> void:
 	var off := await _fight(false)
 	_check_quit_after_fight(on, off)
 	_check_same_outcomes(on, off)
+	await _check_quit_mid_fight()
 	var last: SliceGame = off["game"]
 	last.queue_free()
 	_clear_save()
@@ -122,13 +123,13 @@ func _check_choice_at_start() -> void:
 
 
 ## The saved world: the band near a lone ambush, the starting six; the save carries `ironman`.
-func _save_world(ironman: bool) -> void:
+func _save_world(ironman: bool, kind: String = "ambush") -> void:
 	var rng := Rng.from_seed(SEED)
 	var world := WorldSim.new()
 	world.start(World.data(), rng)
 	world.parties.clear()
 	World.out_of_town(world, NEAR)
-	World.lone_party(world, "ambush", NEAR)
+	World.lone_party(world, kind, NEAR)
 	var made := Kit.wounds(rng, "", {}, Kit.led_by(End.LAST))
 	_saves().ironman = ironman
 	_saves().save_game(world, rng, made.company, made.state())
@@ -226,6 +227,54 @@ func _check_same_outcomes(on: Dictionary, off: Dictionary) -> void:
 		str(on["state"]) == str(off["state"]) and not str(on["state"]).is_empty(),
 		"same seed, Ironman On and Off: the world, every Rng stream and the company end identical"
 	)
+
+
+## Ironman On, a patrol met (the toll on offer), Fight chosen, the game closed mid-fight: each
+## reload goes straight into the very same battle (units, hp, cells, turn order, every Rng stream)
+## and does not offer the toll again.
+func _check_quit_mid_fight() -> void:
+	_clear_save()
+	_save_world(true, "patrol")
+	var first := await _spawn()
+	await InputKit.tap(self, KEY_M)
+	var director := first.overworld_director()
+	await _walk_into(director)
+	var toll_offered := director.panel.button_for(OverworldDirector.TOLL) != null
+	await InputKit.click(self, director.panel.button_for(OverworldDirector.FIGHT))
+	var started := _battle_of(director)
+	first.queue_free()
+	await process_frame
+	var again: Array[String] = []
+	for _quit: int in 2:
+		var game := await _spawn()
+		await InputKit.tap(self, KEY_M)
+		await InputKit.frames(self, SETTLE)
+		var reloaded := game.overworld_director()
+		again.append(_battle_of(reloaded))
+		var toll_back := reloaded.panel.button_for(OverworldDirector.TOLL) != null
+		again.append(str(toll_back))
+		game.queue_free()
+		await process_frame
+	check(
+		toll_offered and not started.is_empty() and again == [started, "false", started, "false"],
+		"Ironman On, quit mid-fight: each reload is the same battle and the toll is not offered"
+	)
+	_clear_save()
+
+
+## The battle on screen as text: each unit's id, side, cell, hp and facing, the turn order and the
+## Rng; empty when no fight is on.
+func _battle_of(director: OverworldDirector) -> String:
+	if not director.in_fight():
+		return ""
+	var battle := director.view.battle
+	var units: Array = []
+	for fighter: BattleUnit in battle.units:
+		units.append([fighter.id, fighter.side, fighter.cell, fighter.hp, fighter.facing])
+	var order: Array = []
+	for fighter: BattleUnit in battle.turn_order():
+		order.append(fighter.id)
+	return JSON.stringify([units, order, director.rng.state()])
 
 
 ## Game A goes on from the autosave's moment; game B is a fresh session reading that file. Both

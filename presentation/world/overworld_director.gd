@@ -25,6 +25,8 @@ const SAVE := "save"
 const FIGHT := "fight"
 const TOLL := "toll"
 const CONTINUE := "continue"
+## Ironman: the encounter's key once Fight is chosen, saved before the battle is built.
+const FIGHTING := "fighting"
 const IRONMAN_ON := "ironman_on"
 const IRONMAN_OFF := "ironman_off"
 const ENCOUNTER_DATA := "res://data/encounters.json"
@@ -132,6 +134,8 @@ func begin() -> void:
 	add_child(MapCover.make(panel, map))
 	_choosing = fresh
 	_show(_place_line())
+	if ironman and world.encounter.get(FIGHTING, false) == true:
+		_start_fight()
 
 
 ## Whether the map is on screen; the run lives on while it is hidden.
@@ -280,8 +284,10 @@ func _start_fight() -> void:
 		return
 	var battle_data := _json(BATTLE_DATA)
 	wounds.day = world.day
-	var battle := RoadFight.build(wounds, world.pending_encounter(), _scenario(), battle_data, rng)
+	if ironman:
+		world.encounter[FIGHTING] = true
 	_autosave()
+	var battle := RoadFight.build(wounds, world.pending_encounter(), _scenario(), battle_data, rng)
 	map.visible = false
 	view = BattleView.new()
 	add_child(view)
