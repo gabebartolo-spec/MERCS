@@ -10,8 +10,7 @@ extends Node
 ## which the camera watches the fight and walking pauses. F2 opens the overworld map
 ## (OverworldDirector): the region, the company's day and supplies, and the road choices;
 ## walking pauses while it is open, and F2 again or Escape hides it. The director lives
-## for the session, so a day travelled and not yet saved is there when the map reopens. F4
-## opens the company (CompanyDirector: roster, captain, details), the one the map saves.
+## for the session, so a day travelled and not yet saved is there when the map reopens.
 ## Presentation only: nothing here is random, and walking the hub decides no outcome.
 
 const STAGE_SCENE := preload("res://presentation/world/street_stage.tscn")
@@ -58,6 +57,9 @@ var _interior_entry := Vector2i.ZERO
 var _interior_exit := Vector2i.ZERO
 var _frame_ms := 0.0
 var _help: Label = null
+## The key help and the frame time; hidden while a choice panel is up (the map or the loop),
+## which words its own keys and would sit over the help (director, 2026-10-15, 4K TV).
+var _hud: CanvasLayer = null
 var _frame_label: Label = null
 var _loop: LoopDirector = null
 var _overworld: OverworldDirector = null
@@ -171,7 +173,6 @@ func _on_key(key: InputEventKey) -> void:
 		_on_screen_key(code)
 
 
-## The keys that start or close a screen: F5 the loop, F2 the map, F4 the company, Escape.
 func _on_screen_key(code: Key) -> void:
 	if code == KEY_F5:
 		start_loop()
@@ -236,8 +237,7 @@ func end_overworld() -> void:
 		_overworld.set_open(false)
 
 
-## The company screen, made hidden on first use. Its Company is the game's one (the save on
-## disk's, else the starting six), shared with the overworld, which saves it.
+## The company screen (F4), hidden until first used; its Company is the game's one.
 func company_director() -> CompanyDirector:
 	if _company_director == null:
 		_company_director = CompanyDirector.new()
@@ -344,6 +344,7 @@ func _clip(path: String) -> SheetClip:
 
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()
+	_hud = layer
 	add_child(layer)
 	_help = Label.new()
 	_help.text = Text.t("slice.help")
@@ -357,6 +358,7 @@ func _build_hud() -> void:
 
 ## Places every merc and the camera, and shows each merc's current facing.
 func _sync() -> void:
+	_hud.visible = not (_overworld_open() or company_open() or _loop != null)
 	# From the fight on, the camera stays on the field and the street's walkers step aside.
 	var arena := _arena()
 	var fighting := arena != null

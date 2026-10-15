@@ -2,7 +2,7 @@
 # run: checks went missing. Raise a floor in the PR that adds checks; floors only go
 # up (04_GUARDRAILS.md B6). A suite with no line here fails until one is added.
 data 112
-smoke 24
+smoke 29
 stage 43
 stage_scale 11
 stage_light 8
