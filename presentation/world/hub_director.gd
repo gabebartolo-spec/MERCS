@@ -51,7 +51,7 @@ var _share_pct := 0
 
 
 ## Builds the hub for the game's company and world (its overworld must exist), hooked to the
-## world's days and fights, hidden, owned by `game`. A board never posted is posted at once (an emptied one stays empty on reload).
+## world's days and fights, hidden, owned by `game`. Only a board never posted is posted at once.
 static func attach(game: SliceGame) -> HubDirector:
 	var hub := HubDirector.new()
 	game.add_child(hub)
@@ -281,7 +281,7 @@ func _show() -> void:
 		right.append(_label(_reaction))
 	right.append_array(_prisoner_rows())
 	right.append_array(WageRows.rows(company, _share_pct))
-	right.append_array(_pack_rows())
+	right.append_array(HubPack.rows(company, _wearer))
 	if armoury_rows.is_valid():
 		var extra: Variant = armoury_rows.call()
 		if extra is Array:
@@ -343,7 +343,7 @@ func _prisoner_rows() -> Array[Dictionary]:
 	var economy := company.economy
 	var rows: Array[Dictionary] = []
 	if not economy.last_loot.is_empty() and not economy.prisoner.is_empty():
-		rows.append(_label(_loot_line(economy.last_loot)))
+		rows.append(_label(HubPack.loot_line(company, world, economy.last_loot)))
 	if economy.prisoner.is_empty():
 		return rows
 	rows.append(HubPanel.line(HubPanel.HEADING, Text.t("hub.prisoner.title")))
@@ -352,51 +352,6 @@ func _prisoner_rows() -> Array[Dictionary]:
 		var params := {"coin": economy.captives.ransom_coin()}
 		rows.append(_button("prisoner", choice, Text.t("hub.prisoner." + choice, params), true))
 	return rows
-
-
-func _pack_rows() -> Array[Dictionary]:
-	var economy := company.economy
-	var rows: Array[Dictionary] = [HubPanel.line(HubPanel.HEADING, Text.t("hub.pack.title"))]
-	if economy.inventory.is_empty():
-		rows.append(_label(Text.t("hub.pack.empty")))
-		return rows
-	var params := {"name": company.name_of(_wearer)}
-	rows.append(_button("wearer", "next", Text.t("hub.wearer", params), true))
-	var shown: Array[String] = []
-	for item: String in economy.inventory:
-		if item in shown:
-			continue
-		shown.append(item)
-		rows.append(_button("equip", item, Text.t("hub.item.equip", _item_words(item)), true))
-	return rows
-
-
-## The loot line: coin, the supplies the fight won (from the world's log), the gear.
-func _loot_line(loot: Dictionary) -> String:
-	var item := str(loot.get("item", ""))
-	var gear := Text.t("hub.loot.none") if item == "" else str(_item_words(item)["item"])
-	var params := {"coin": loot.get("coin", 0), "supplies": _last_supplies(), "item": gear}
-	return Text.t("hub.loot", params)
-
-
-func _item_words(item_id: String) -> Dictionary:
-	var def: Variant = company.economy.items().get(item_id, {})
-	var found: Dictionary = def if def is Dictionary else {}
-	var bonuses: Array[String] = []
-	var added: Variant = found.get("bonus", {})
-	if added is Dictionary:
-		var numbers: Dictionary = added
-		for stat: Variant in numbers:
-			var key := "company.stat." + str(stat)
-			bonuses.append(Text.t(key, {"value": "%+d" % Merc.whole(numbers[stat])}))
-	return {"item": str(found.get("name", item_id)), "bonus": ", ".join(bonuses)}
-
-
-func _last_supplies() -> int:
-	for i: int in range(world.log.size() - 1, -1, -1):
-		if world.log[i].get("step") == "encounter":
-			return Merc.whole(world.log[i].get("supplies", 0))
-	return 0
 
 
 func _full() -> bool:
