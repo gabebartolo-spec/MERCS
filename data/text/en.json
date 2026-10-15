@@ -200,5 +200,9 @@
   "company.injury.wound": "{name}",
   "company.fallen.row": "{name}  [fallen]",
   "company.fallen.title": "Fallen: {name}",
-  "company.fallen.gone": "Gone from the company for good."
+  "company.fallen.gone": "Gone from the company for good.",
+  "end.title": "The company is no more",
+  "end.intro": "Every mercenary of the company is dead. The campaign is over, and nothing brings them back. This is what is left of them.",
+  "end.memory": "    {line}",
+  "end.begin": "Begin again"
 }

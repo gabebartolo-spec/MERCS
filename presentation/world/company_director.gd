@@ -66,7 +66,7 @@ static func load_wounds(from: Node, held: Company) -> CompanyWounds:
 	var saves := from.get_node_or_null(SAVE_SYSTEM_PATH) as SAVE_SYSTEM
 	if saves != null and saves.has_save():
 		var model := saves.load_game(_json(WORLD_DATA), defs())
-		saved = model.wounds
+		saved = model.wounds if model.ok else {}
 	var injuries: Variant = _json(INJURY_DATA).get("injuries", [])
 	var list: Array = injuries if injuries is Array else []
 	return CompanyWounds.make(held, saved, Rng.from_seed(0), _json(INJURY_RULES), list)
