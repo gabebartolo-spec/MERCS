@@ -1,5 +1,5 @@
 {
-  "_doc": "Look-target environment kits: street and map tiles modelled by script in Blender (primitives only), faces named pal:<ramp>:<step> and coloured from a palette in Godot.",
+  "_doc": "Street and map kits modelled by script in Blender (primitives only), faces named pal:<ramp>:<step>.",
   "asset": "look_target/kit",
   "files": {
     "overworld_kit.glb": "1481ad0992f19c3655332d3c09025d9f227ebe94ff64bd91d22743dc35a18a8f",
@@ -14,6 +14,6 @@
     "Python, Pillow, NumPy"
   ],
   "seed": null,
-  "status": "DRAFT look-target option, not approved by the director",
+  "status": "prototype kit for the golden references",
   "created": "2026-10-15"
 }

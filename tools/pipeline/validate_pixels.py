@@ -122,7 +122,10 @@ def load_colours(path: Path) -> set[tuple[int, int, int]]:
         found = re.findall(r"^\s*(\d+)\s+(\d+)\s+(\d+)", text, re.M)
         return {(int(r), int(g), int(b)) for r, g, b in found}
     data = json.loads(text)
-    return {tuple(int(c[i:i + 2], 16) for i in (1, 3, 5)) for r in data["ramps"] for c in r["colours"]}
+    colours = {tuple(int(c[i:i + 2], 16) for i in (1, 3, 5)) for r in data["ramps"] for c in r["colours"]}
+    if "core" in data:  # a biome palette: core ramps plus the biome's own (06 section 2)
+        colours |= load_colours((path.parent / data["core"]).resolve())
+    return colours
 
 
 def check_image(img: Image, label: str, colours: set | None = None) -> list[str]:

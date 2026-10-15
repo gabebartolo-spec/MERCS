@@ -1,0 +1,113 @@
+{
+ "_doc": "MERCS core palette (06_STYLE_ART.md section 2): the ramps every biome shares and that never change: outline soot, plate iron, bone and linen, the skin ramps, faded cloth, heraldry, blood and fire. A biome palette adds the world's ramps. From look option B 'Peat and Ochre', picked by the director 2026-10-15. Never reorder: colour index is the position in the flattened list.",
+ "schema": "mercs.palette/1",
+ "id": "mercs_core",
+ "status": "APPROVED",
+ "approved": true,
+ "ramps": [
+  {
+   "name": "soot",
+   "purpose": "outlines, iron shadow, charred wood, night",
+   "colours": [
+    "#17120f",
+    "#261e19",
+    "#352b24",
+    "#45392f"
+   ]
+  },
+  {
+   "name": "iron",
+   "purpose": "mail, plate, blades",
+   "colours": [
+    "#2b2b2a",
+    "#4a4946",
+    "#6c6a63",
+    "#908d82",
+    "#b6b1a3"
+   ]
+  },
+  {
+   "name": "bone",
+   "purpose": "linen, plaster, bone, tusks",
+   "colours": [
+    "#8e7d5d",
+    "#a59574",
+    "#bdae8c",
+    "#d6c7a4",
+    "#efe1bd"
+   ]
+  },
+  {
+   "name": "skin_neutral",
+   "purpose": "the one skin ramp sprites render in; recoloured by index",
+   "colours": [
+    "#4c2d1f",
+    "#6f4c38",
+    "#936d54",
+    "#b99071",
+    "#e0b48f"
+   ]
+  },
+  {
+   "name": "skin_orc",
+   "purpose": "the orc's skin (index-mapped from skin_neutral)",
+   "colours": [
+    "#283016",
+    "#424a26",
+    "#5e6637",
+    "#7c8349",
+    "#9ba15c"
+   ]
+  },
+  {
+   "name": "skin_pale",
+   "purpose": "the Vampyr's skin (index-mapped from skin_neutral)",
+   "colours": [
+    "#4b3d39",
+    "#6e5f58",
+    "#93847a",
+    "#b9ab9d",
+    "#e1d3c2"
+   ]
+  },
+  {
+   "name": "cloth_faded",
+   "purpose": "commoner and dark cloth: dull red pair, dull blue pair",
+   "colours": [
+    "#7a3a26",
+    "#a0573a",
+    "#37474f",
+    "#59706f"
+   ]
+  },
+  {
+   "name": "heraldry",
+   "purpose": "faction colours only: crimson, gold, blue, white, yellow",
+   "colours": [
+    "#8a1d1d",
+    "#bb3a2c",
+    "#d29a2a",
+    "#22488a",
+    "#ece3cf",
+    "#e0b92c"
+   ]
+  },
+  {
+   "name": "blood",
+   "purpose": "overlay only: two reds and a dried brown",
+   "colours": [
+    "#5c1010",
+    "#80201a",
+    "#4c2a18"
+   ]
+  },
+  {
+   "name": "fire",
+   "purpose": "torch and ember accents",
+   "colours": [
+    "#e07a28",
+    "#f6c64a"
+   ]
+  }
+ ]
+}

@@ -6,8 +6,9 @@ Each option is one coherent set of named ramps (06_STYLE_ART.md section 2), 64 c
 given by its darkest and lightest colour; the steps between are spaced evenly in OKLab, so lightness
 climbs evenly and any hue shift between the anchors (cool shadows, warm lights) is spread over the
 ramp. A ramp given as a list keeps those colours as they are (cloth pairs, heraldry, blood, fire).
-Writes assets/palette/options/<X>/palette.json (mercs.palette/1), palette.gpl (GIMP) and swatch.png.
-Every option is a DRAFT for the director's look pick; none is approved.
+Writes the picked option (B) as assets/palette/core.json (the ramps that never change) and
+assets/palette/biomes/heartland.json (the world ramps plus the light; it names core.json), each with a .gpl
+and a swatch; the options not picked go to docs/audits/look_target/options/<X>/ as review records.
 """
 from __future__ import annotations
 
@@ -21,7 +22,7 @@ sys.path.insert(0, str(REPO / "tools" / "pipeline"))
 from palette_lib import draw_swatch, load_palette  # noqa: E402
 from pngio import write_png  # noqa: E402
 
-OUT = REPO / "assets" / "palette" / "options"
+OUT = REPO / "assets" / "palette" / "options"  # parent: assets/palette
 PURPOSE = {
     "soot": "outlines, iron shadow, charred wood, night",
     "slate": "stone, steel shadow, sky, water",
@@ -131,24 +132,58 @@ def gpl(name: str, ramps: list[dict]) -> str:
     return "\n".join(lines) + "\n"
 
 
+NL = chr(10)
+CORE = ["soot", "iron", "bone", "skin_neutral", "skin_orc", "skin_pale", "cloth_faded", "heraldry", "blood", "fire"]
+BIOME = ["slate", "soil", "timber", "verdure"]
+PICKED = "B"  # director, 2026-10-15: option B "Peat and Ochre" is the look target
+BIOME_NAME = "heartland"
+AUDIT = REPO / "docs" / "audits" / "look_target" / "options"
+LIGHTS = json.loads((HERE / "look_options.json").read_text(encoding="utf-8"))["options"]
+
+
+def ramps_of(opt: dict, names: list[str]) -> list[dict]:
+    return [{"name": n, "purpose": PURPOSE[n], "colours": ramp(opt["ramps"][n], STEPS.get(n, 0))} for n in names]
+
+
+def save(path: Path, data: dict, title: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=1) + NL, encoding="utf-8", newline=NL)
+    pal = load_palette(path)
+    ramps = [{"name": n, "colours": ["#%02x%02x%02x" % c for c in cs]} for n, cs in pal.ramps]
+    path.with_suffix(".gpl").write_text(gpl(title, ramps), encoding="utf-8", newline=NL)
+    write_png(path.with_name(path.stem + "_swatch.png"), draw_swatch(pal))
+    print(path.relative_to(REPO).as_posix(), len(pal.colours), "colours")
+
+
 def main() -> None:
+    """The picked option becomes the core palette plus the heartland biome (06 section 2); the options the
+    director did not pick stay as review records under docs/audits."""
     for key, opt in OPTIONS.items():
-        ramps = [{"name": n, "purpose": PURPOSE[n], "colours": ramp(opt["ramps"][n], STEPS.get(n, 0))} for n in ORDER]
-        count = sum(len(r["colours"]) for r in ramps)
-        data = {
-            "_doc": f"Look-target option {key}, '{opt['name']}': {opt['doc']}. DRAFT for the director's look pick, "
-                    "NOT APPROVED. Built by tools/look/make_palettes.py (ramps spaced evenly in OKLab between "
-                    "their anchors). Colour index = position in the flattened ramp list.",
-            "schema": "mercs.palette/1", "id": f"look_option_{key}", "name": opt["name"], "status": "DRAFT",
-            "approved": False, "ramps": ramps,
-        }
-        d = OUT / key
-        d.mkdir(parents=True, exist_ok=True)
-        (d / "palette.json").write_text(json.dumps(data, indent=1) + "\n", encoding="utf-8", newline="\n")
-        (d / "palette.gpl").write_text(gpl(f"MERCS look option {key} ({opt['name']})", ramps), encoding="utf-8",
-                                      newline="\n")
-        write_png(d / "swatch.png", draw_swatch(load_palette(d / "palette.json")))
-        print(key, opt["name"], count, "colours")
+        if key == PICKED:
+            continue
+        save(AUDIT / key / "palette.json", {
+            "_doc": f"Look-target option {key}, '{opt['name']}': {opt['doc']}. Not picked (director chose {PICKED}, "
+                    "2026-10-15); kept as a review record. Built by tools/look/make_palettes.py.",
+            "schema": "mercs.palette/1", "id": f"look_option_{key}", "name": opt["name"], "status": "NOT PICKED",
+            "approved": False, "ramps": ramps_of(opt, ORDER)}, f"MERCS look option {key} ({opt['name']})")
+        (AUDIT / key / "look.json").write_text(json.dumps(LIGHTS[key], indent=1) + NL, encoding="utf-8",
+                                               newline=NL)
+    opt = OPTIONS[PICKED]
+    save(OUT.parent / "core.json", {
+        "_doc": "MERCS core palette (06_STYLE_ART.md section 2): the ramps every biome shares and that never "
+                "change: outline soot, plate iron, bone and linen, the skin ramps, faded cloth, heraldry, blood "
+                "and fire. A biome palette adds the world's ramps. From look option B 'Peat and Ochre', picked "
+                "by the director 2026-10-15. Never reorder: colour index is the position in the flattened list.",
+        "schema": "mercs.palette/1", "id": "mercs_core", "status": "APPROVED", "approved": True,
+        "ramps": ramps_of(opt, CORE)}, "MERCS core")
+    save(OUT.parent / "biomes" / f"{BIOME_NAME}.json", {
+        "_doc": f"MERCS biome palette '{BIOME_NAME}' (06 section 2): the core ramps (core.json) plus this "
+                "biome's ground, stone and sky (slate), soil, timber and foliage, and its light. From look "
+                "option B 'Peat and Ochre', picked by the director 2026-10-15. Other biomes (kingdoms, "
+                "landscapes) are new files beside this one with the same ramp names.",
+        "schema": "mercs.palette/1", "id": f"mercs_biome_{BIOME_NAME}", "status": "APPROVED", "approved": True,
+        "core": "../core.json", "light": LIGHTS[PICKED], "ramps": ramps_of(opt, BIOME)},
+        f"MERCS biome {BIOME_NAME} (core + biome)")
 
 
 if __name__ == "__main__":

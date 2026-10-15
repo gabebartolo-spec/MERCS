@@ -9,12 +9,17 @@ A review image only; nothing here ships.
 from __future__ import annotations
 
 import argparse
-import json
+import sys
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
 REPO = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO / "tools" / "pipeline"))
+from palette_lib import load_palette  # noqa: E402
+
+PALETTES = {"B": REPO / "assets" / "palette" / "biomes" / "heartland.json"}  # picked 2026-10-15
+OPTION_NAMES = {"A": "Ash and Hearth", "B": "Peat and Ochre", "C": "Clear Day"}
 FRAMES = (("day", "1  Street, day"), ("night", "2  Street, night and rain"), ("map", "3  Overworld, map scale"))
 FRAME_W, FRAME_H = 1920, 1080
 GAP = 24
@@ -36,15 +41,17 @@ def font(size: int) -> ImageFont.ImageFont:
 
 
 def board(caps: Path, key: str) -> Image.Image:
-    pal = json.loads((REPO / "assets" / "palette" / "options" / key / "palette.json").read_text(encoding="utf-8"))
+    path = PALETTES.get(key, REPO / "docs" / "audits" / "look_target" / "options" / key / "palette.json")
+    pal = load_palette(path)
+    name = OPTION_NAMES[key]
     width = 3 * FRAME_W + 4 * GAP
     img = Image.new("RGB", (width, HEAD + LABEL + FRAME_H + GAP), BG)
     d = ImageDraw.Draw(img)
-    d.text((GAP, 10), f"Option {key}: {pal['name']}", fill=INK, font=font(60))
+    d.text((GAP, 10), f"Option {key}: {name}" + (" (picked: heartland biome)" if key in PALETTES else ""), fill=INK, font=font(60))
     d.text((GAP, 88), CAPTION, fill=INK, font=font(38))
     x = GAP + 1750
-    for ramp in pal["ramps"]:
-        for c in ramp["colours"]:
+    for _, colours in pal.ramps:
+        for c in colours:
             d.rectangle((x, 40, x + SWATCH - 3, 40 + 2 * SWATCH), fill=c)
             x += SWATCH
         x += 10

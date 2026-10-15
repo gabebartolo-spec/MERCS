@@ -1,9 +1,0 @@
-{
-  "source": "render_character.py colour + matid pass, facing_1_SE.png",
-  "reduction": 8,
-  "pivot_px": [
-    44,
-    76
-  ],
-  "palette": "assets/palette/options/B/palette.json"
-}

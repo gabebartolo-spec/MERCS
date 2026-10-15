@@ -1,8 +1,19 @@
 # Art handoff, 2026-10-15 AEDT
 Start from this file, CLAUDE.md, your brief, and the Lead ("main") messages. Load art-qa-critic before any visual review.
 
-## State: LOOK TARGET options A/B/C built, self-QC'd, reported to the Lead. Awaiting the Lead's review. No jobs running.
-Branch `claude/art-look-target` (worktree `MERCS-wt/art-look`), pushed. No PR yet (brief: not needed yet).
+## State: LOOK B LOCKED (director picked B "Peat and Ochre", 2026-10-15). PR open, awaiting review/merge. No jobs running.
+Branch `claude/art-look-target` (worktree `MERCS-wt/art-look`), PR "art: lock look B Peat and Ochre as master palette
+and golden references". Lock-B layout (supersedes the option paths below):
+- `assets/palette/core.{json,gpl}` (44 colours that never change: soot, iron, bone, skins, cloth, heraldry, blood,
+  fire) + `assets/palette/biomes/heartland.{json,gpl}` (slate, soil, timber, verdure + the light block; names its
+  core; .gpl holds core + biome). palette_lib and validate_pixels load a biome as core + biome.
+- Goldens `assets/golden/{street_day,street_rain_night,overworld_map}.png` at 1x logical (960x540) + provenance.
+- Sprites `assets/look_target/heartland/sprites/`; options A and C (palette, look.json, sprites) under
+  `docs/audits/look_target/options/{A,C}/`; light values for all three in `tools/look/look_options.json`.
+- look_target.gd defaults to heartland; `--palette= --light= --sprites= --tag=` runs A or C. Night rain is frozen after
+  its preprocess, so night frames are now byte-identical run to run (they were not: 1.1% of pixels moved).
+- check_assets_pixels.py checks assets/look_target/heartland and assets/golden against heartland; self-test 24/24.
+- Pipeline default pixelate.json still points at master_draft (average_m sheet + fixtures): switching is a separate step.
 
 ## Task (director 2026-10-15: "establish an aesthetic and stick to it")
 Golden references + one master palette + one render rig, validated. 2-3 labelled options, each a coherent palette +

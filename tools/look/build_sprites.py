@@ -1,6 +1,7 @@
 """Build the look-target merc sprites for each palette option from one set of 4x renders.
 
-  python tools/look/build_sprites.py --renders D:/MERCS-vault/renders/look_2026-10-15 [--options A,B,C]
+  python tools/look/build_sprites.py --renders D:/MERCS-vault/renders/look_2026-10-15 \
+      --palette assets/palette/biomes/heartland.json --out assets/look_target/heartland/sprites --tag heartland
 
 One render rig for every option: the 4x colour, normal, parts and matid passes of render_character.py
 (orc and Vampyr, stage-1 blockout kit, weapons left off). Per option:
@@ -12,7 +13,7 @@ One render rig for every option: the 4x colour, normal, parts and matid passes o
    colour from the option's palette (palette index mapping, 06 section 2);
 3. pack_sheets.py packs the street sheet (84 px density, with the normal strip);
 4. a map token: the same render reduced by 8 instead of 4 (half the street size), no normals.
-Writes assets/look_target/<X>/sprites/. Deterministic: the same renders give the same bytes.
+Writes <out>/ and <out>/../pixelate.json. Deterministic: the same renders give the same bytes.
 """
 from __future__ import annotations
 
@@ -44,17 +45,20 @@ MERCS = {
                "iron": [("soot", 0), ("soot", 1), ("soot", 2), ("soot", 3), ("iron", 2)],
                "cloth": [("soot", 0), ("soot", 2), ("cloth_faded", 0), ("cloth_faded", 1)]},
 }
+NL = chr(10)
 TOKEN_SCALE = 8
 TOKEN_CROP = (0, 0, 704, 704)  # 4x pixels; the pivot (352, 608) lands on (44, 76) at 1x / 8
 TOKEN_PIVOT = (44, 76)
 
 
-def option_config(key: str) -> Path:
+def option_config(palette: Path, out: Path, tag: str) -> Path:
+    """tools/pipeline/pixelate.json with this palette, written beside the sprites it made."""
     base = json.loads((PIPE / "pixelate.json").read_text(encoding="utf-8"))
-    base["palette"] = f"assets/palette/options/{key}/palette.json"
-    base["_doc"] = f"Look-target option {key}: tools/pipeline/pixelate.json with the option's palette. " + base["_doc"]
-    path = REPO / "assets" / "palette" / "options" / key / "pixelate.json"
-    path.write_text(json.dumps(base, indent=2) + "\n", encoding="utf-8", newline="\n")
+    base["palette"] = palette.resolve().relative_to(REPO).as_posix()
+    base["_doc"] = f"Look sprites '{tag}': tools/pipeline/pixelate.json with the palette above. " + base["_doc"]
+    path = out.parent / "pixelate.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(base, indent=2) + NL, encoding="utf-8", newline=NL)
     return path
 
 
@@ -100,11 +104,10 @@ def remap(img: Image, labels: np.ndarray, pal, merc: str) -> Image:
     return out
 
 
-def build(renders: Path, key: str) -> None:
-    cfg_path = option_config(key)
+def build(renders: Path, palette: Path, out: Path, key: str) -> None:
+    cfg_path = option_config(palette, out, key)
     cfg = pixelate.load_config(cfg_path)
     pal = load_palette(REPO / cfg["palette"])
-    out = REPO / "assets" / "look_target" / key / "sprites"
     tmp = renders / "pixel" / key
     for merc in MERCS:
         r = {p: renders / f"{merc}_4x_{p}" for p in ("color", "normal", "parts", "matid")}
@@ -144,11 +147,12 @@ def token(r: dict, pal, cfg: dict, merc: str, path: Path) -> None:
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--renders", required=True, type=Path)
-    p.add_argument("--options", default="A,B,C")
+    p.add_argument("--palette", required=True, type=Path, help="palette json (a biome file brings its core)")
+    p.add_argument("--out", required=True, type=Path, help="sprites folder, e.g. assets/look_target/heartland/sprites")
+    p.add_argument("--tag", required=True, help="name in the file names, e.g. heartland")
     a = p.parse_args()
-    for key in a.options.split(","):
-        build(a.renders, key)
-        print("BUILT", key)
+    build(a.renders, a.palette, a.out.resolve(), a.tag)
+    print("BUILT", a.tag)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,25 @@
+{
+  "_doc": "Golden references (06 section 8), 1x logical (960 x 540): look_target.gd captures of the real StreetStage at 3840 x 2160 (exact 4x4 blocks), one pixel kept per block. Changes only by a director decision in DECISIONS.md.",
+  "asset": "golden",
+  "files": {
+    "overworld_map.png": "4f02184aeb8bf7730ae7d6edcf50e09553ec7333fe12783d182ece7c6650c45d",
+    "street_day.png": "963d02eee117a4fe0e5b2a622446c8cf6c93a01977933ca554369bf6beb792d5",
+    "street_rain_night.png": "9827ce2f5c32956568031260b356d2bb61efd92fb9bfc98b938b29776dc9b009"
+  },
+  "produced_by": {
+    "tools/look/look_target.gd": "4cd7f0f28a932af3",
+    "tools/look/palette_post.gdshader": "dbe475862921b525",
+    "tools/look/build_look_kit.py": "65e1ad60d0048f90",
+    "tools/look/build_sprites.py": "eb5304eac5d8533b"
+  },
+  "models": [],
+  "licence_rows": [
+    "Blender",
+    "MPFB (MakeHuman Plugin for Blender)",
+    "Python, Pillow, NumPy",
+    "Godot Engine"
+  ],
+  "seed": null,
+  "status": "APPROVED: look target B 'Peat and Ochre', director 2026-10-15",
+  "created": "2026-10-15"
+}

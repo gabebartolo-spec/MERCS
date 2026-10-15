@@ -1,0 +1,31 @@
+{
+  "_doc": "Orc and Vampyr stage-1 blockouts rendered by the sprite pipeline (CC0 MPFB bodies, Blender primitives for kit), reduced to core + heartland.",
+  "asset": "look_target/heartland/sprites",
+  "files": {
+    "orc_look_heartland.json": "3c1f14c70d1ad13c8b74aa155c0330018bd17e4f3efb874082821ee8bd0d25a9",
+    "orc_look_heartland.png": "91465a73f89af66721c6e0a616ca9386fce84788c382cc735f1674a0f3c38974",
+    "orc_look_heartland_normal.png": "d6b8936a746eb3040a4a906c77c54fca44d3e6b9a45776df2a6e91f1691f76ec",
+    "orc_token_heartland.json": "4f5645c4f632cb62bd820948cf098b9361215f0d2e5c03e377c91d5201f52c2c",
+    "orc_token_heartland.png": "fab11a6550e0a38a9946b324b576d106e83cfe84d9adbf9d56d9224d7942b5c3",
+    "vampyr_look_heartland.json": "8ec802ec4070a3675a1543c753ca6c23d2b91aea53d1772be4928d0885c4eb57",
+    "vampyr_look_heartland.png": "ad938ad022381dd395aaf7937e77ec538c22ea3cf02f78889de6c1fd051b5a3b",
+    "vampyr_look_heartland_normal.png": "c36ec865ad05c529af9857764b32ec720577aa83123b5a0514e99896bb9a59c3",
+    "vampyr_token_heartland.json": "4f5645c4f632cb62bd820948cf098b9361215f0d2e5c03e377c91d5201f52c2c",
+    "vampyr_token_heartland.png": "d696c00c12a189e10510a7232353ea19340cb0af6f650914ea15c93d9e8edbf4"
+  },
+  "produced_by": {
+    "tools/pipeline/render_character.py": "d63ffb26d210188e",
+    "tools/pipeline/pixelate.py": "703232efdc481053",
+    "tools/pipeline/pack_sheets.py": "3fa9bc0dd2d20fb3",
+    "tools/look/build_sprites.py": "eb5304eac5d8533b"
+  },
+  "models": [],
+  "licence_rows": [
+    "Blender",
+    "MPFB (MakeHuman Plugin for Blender)",
+    "Python, Pillow, NumPy"
+  ],
+  "seed": null,
+  "status": "prototype sprites for the golden references",
+  "created": "2026-10-15"
+}

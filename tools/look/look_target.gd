@@ -1,19 +1,23 @@
 extends SceneTree
-## Look-target capture (Art, 2026-10-15): one palette option in the real street stage, on one
+## Look-target capture (Art, 2026-10-15): one palette in the real street stage, on one
 ## camera, light, pixel and outline rig. Runs the game's StreetStage (55-degree camera, 960 x 540
 ## logical pixels, whole-screen pixel mode, lit sprites with normal maps), swaps the grey boxes for
 ## the Blender kit (assets/look_target/kit, every face named pal:<ramp>:<step> and coloured from the
-## option's palette), applies the option's day or night light (assets/palette/options/<X>/look.json)
-## and snaps the whole frame to the option's palette (tools/look/palette_post.gdshader).
+## palette), applies the palette's day or night light and snaps the whole frame to the palette
+## (tools/look/palette_post.gdshader). Default: the heartland biome (core + biome palette, its
+## "light" block) and the heartland sprites;
+## --palette/--light/--sprites/--tag run any other palette (the options not picked, kept under
+## docs/audits/look_target/options/<X>/).
 ## The map frame is the same stage at map scale: the merc density drops from 84 to MAP_HEIGHT_PX, so
 ## the camera rail pulls back, and the map tiles and tokens stand in for the street.
 ##
-##   APPDATA=<scratch> godot --path . --resolution 3840x2160 --script tools/look/look_target.gd \
-##     -- --option=A --scene=day|night|map --out=<png>
+##   APPDATA=<scratch> godot --path . --resolution 3840x2160 --script tools/look/look_target.gd
+##     -- --scene=day|night|map --out=<png> [--palette= --light= --sprites= --tag=]
 
 const STAGE_SCENE := "res://presentation/world/street_stage.tscn"
-const OPTIONS_DIR := "res://assets/palette/options/%s/"
-const SPRITES_DIR := "res://assets/look_target/%s/sprites/"
+const DEFAULT_PALETTE := "res://assets/palette/biomes/heartland.json"
+const DEFAULT_SPRITES := "res://assets/look_target/heartland/sprites/"
+const DEFAULT_TAG := "heartland"
 const STREET_KIT := "res://assets/look_target/kit/street_kit.glb"
 const MAP_KIT := "res://assets/look_target/kit/overworld_kit.glb"
 const POST_SHADER := "res://tools/look/palette_post.gdshader"
@@ -26,6 +30,7 @@ const VAMPYR_AT := Vector3(0.95, 0.0, 0.25)
 const TORCH_AT := Vector3(0.05, 2.06, 1.3)
 const FLAME_AT := Vector3(0.05, 2.06, 1.3)
 const BLOB_RADIUS_M := 0.27
+const TOKEN_BLOB_M := 0.5
 const SHADOW_BIAS := 0.08
 const SHADOW_NORMAL_BIAS := 2.5
 const SHADOW_DISTANCE_M := 120.0
@@ -76,6 +81,7 @@ var _args := {}
 var _palette := {}
 var _look := {}
 var _stage: StreetStage = null
+var _sprites := DEFAULT_SPRITES
 
 
 func _initialize() -> void:
@@ -86,10 +92,17 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	var option: String = _args.get("option", "A")
+	var option: String = _args.get("tag", DEFAULT_TAG)
+	_sprites = _args.get("sprites", DEFAULT_SPRITES)
 	var scene: String = _args.get("scene", "day")
-	_palette = _load_palette(OPTIONS_DIR % option + "palette.json")
-	_look = JSON.parse_string(FileAccess.get_file_as_string(OPTIONS_DIR % option + "look.json"))
+	var palette_path: String = _args.get("palette", DEFAULT_PALETTE)
+	_palette = _load_palette(palette_path)
+	var light_path: String = _args.get("light", "")
+	if light_path.is_empty():
+		var biome: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(palette_path))
+		_look = biome.get("light", {})
+	else:
+		_look = JSON.parse_string(FileAccess.get_file_as_string(light_path))
 	var packed: PackedScene = load(STAGE_SCENE)
 	_stage = packed.instantiate() as StreetStage
 	_stage.auto_walk = false
@@ -127,6 +140,9 @@ func _run() -> void:
 func _load_palette(path: String) -> Dictionary:
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
 	var out := {}
+	if data.has("core"):  # a biome palette: the core ramps, then the biome's (06 section 2)
+		var core: String = data["core"]
+		out = _load_palette(path.get_base_dir().path_join(core).simplify_path())
 	for ramp: Dictionary in data["ramps"]:
 		var colours: Array = ramp["colours"]
 		for i: int in colours.size():
@@ -146,7 +162,7 @@ func _build_street(option: String, night: bool) -> void:
 	var post := kit.find_child("lantern_post", true, false) as GeometryInstance3D
 	if post != null:
 		post.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	var dir := SPRITES_DIR % option
+	var dir := _sprites
 	_stage.use_sheet(dir + "orc_look_%s.json" % option, "SE")
 	_stage.focus_on(STREET_FOCUS)
 	_stage.stand_at(ORC_AT)
@@ -155,7 +171,7 @@ func _build_street(option: String, night: bool) -> void:
 		vampyr, SheetFrame.from_manifest(dir + "vampyr_look_%s.json" % option, "SW")
 	)
 	for at: Vector3 in [ORC_AT, VAMPYR_AT]:
-		_blob(at)
+		_blob(at, BLOB_RADIUS_M, "soot:3", _stage.world())
 	if night:
 		var torch := _stage.world().get_node_or_null("Torch") as OmniLight3D
 		if torch != null:
@@ -180,27 +196,29 @@ func _build_street(option: String, night: bool) -> void:
 		if rain != null:
 			rain.seed = RAIN_SEED
 			rain.restart()
+			# Frozen after its preprocess: the frame no longer depends on how long rendering took.
+			rain.speed_scale = 0.0
 			var streak := rain.draw_pass_1 as QuadMesh
 			var wet := streak.material as StandardMaterial3D
 			wet.albedo_color = _colour(_str(_block("night"), "rain"))
 
 
-func _blob(at: Vector3) -> void:
+func _blob(at: Vector3, radius: float, key: String, parent: Node3D) -> void:
 	var disc := MeshInstance3D.new()
 	var mesh := CylinderMesh.new()
-	mesh.top_radius = BLOB_RADIUS_M
-	mesh.bottom_radius = BLOB_RADIUS_M
+	mesh.top_radius = radius
+	mesh.bottom_radius = radius
 	mesh.height = 0.01
 	mesh.radial_segments = 12
 	var m := StandardMaterial3D.new()
-	m.albedo_color = _colour("soot:3")
+	m.albedo_color = _colour(key)
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mesh.material = m
 	disc.mesh = mesh
 	disc.scale = Vector3(1.0, 1.0, 0.6)
 	disc.position = at + Vector3(0.0, 0.075, 0.0)
 	disc.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_stage.world().add_child(disc)
+	parent.add_child(disc)
 
 
 func _build_map(option: String) -> void:
@@ -225,7 +243,7 @@ func _build_map(option: String) -> void:
 	holder.add_child(town)
 	_stage.focus_on(MAP_FOCUS)
 	_stage.merc().visible = false
-	var dir := SPRITES_DIR % option
+	var dir := _sprites
 	_token(
 		dir + "orc_token_%s.png" % option,
 		_tile_centre(BAND_TILE.x, BAND_TILE.y, cols, rows),
@@ -276,20 +294,7 @@ func _token(path: String, at: Vector3, holder: Node3D) -> void:
 	var forward: Vector3 = -camera.global_transform.basis.z
 	var depth := (at - camera.global_position).dot(forward)
 	sprite.pixel_size = _stage.texel_m() * depth / _stage.rail_distance_m()
-	var blob := MeshInstance3D.new()
-	var mesh := CylinderMesh.new()
-	mesh.top_radius = 0.5
-	mesh.bottom_radius = 0.5
-	mesh.height = 0.01
-	mesh.radial_segments = 10
-	var m := StandardMaterial3D.new()
-	m.albedo_color = _colour("soot:1")
-	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mesh.material = m
-	blob.mesh = mesh
-	blob.scale = Vector3(1.0, 1.0, 0.6)
-	blob.position = at + Vector3(0.0, 0.07, 0.0)
-	holder.add_child(blob)
+	_blob(at, TOKEN_BLOB_M, "soot:1", holder)
 
 
 ## Gives every surface named pal:<ramp>:<step> that palette colour: matte, flat, no specular.
