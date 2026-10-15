@@ -75,7 +75,8 @@ static func replay(battle: Battle, taken: Array[Dictionary]) -> int:
 	return applied
 
 
-## An action read back from JSON: ids as text, a cell [x, y] as Vector2i.
+## An action read back from JSON: a cell [x, y] as Vector2i, whole numbers and flags as they
+## were, a fraction as a float, anything else (ids, names) as text.
 static func _action(plain: Dictionary) -> Dictionary:
 	var action := {}
 	for key: Variant in plain:
@@ -87,7 +88,7 @@ static func _action(plain: Dictionary) -> Dictionary:
 			action[str(key)] = value
 		elif value is float:
 			var number: float = value
-			action[str(key)] = int(number) if is_equal_approx(number, roundf(number)) else number
+			action[str(key)] = int(number) if number == roundf(number) else number
 		else:
 			action[str(key)] = str(value)
 	return action

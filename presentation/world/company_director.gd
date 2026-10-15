@@ -216,6 +216,7 @@ static func lines(merc: Merc) -> Array[String]:
 	for move: String in merc.moves():
 		moves.append(Text.t("company.move." + move))
 	lines.append(Text.t("company.moves", {"moves": ", ".join(moves)}))
+	lines.append(_next_line(merc))
 	lines.append(_gear_line(merc))
 	var slots: Array[String] = []
 	for slot: String in Merc.SLOTS:
@@ -241,6 +242,23 @@ func _memory_lines(merc: Merc) -> Array[String]:
 	var lines: Array[String] = [Text.t("company.memories")]
 	lines.append_array(MemoryWords.lines(entries, company))
 	return lines
+
+
+## One line of what the next level brings, from the merc's data (growth and new moves).
+static func _next_line(merc: Merc) -> String:
+	var next := merc.next_level()
+	if next.is_empty():
+		return Text.t("company.next_none")
+	var parts: Array[String] = []
+	var gains: Dictionary = next["growth"]
+	for key: String in STAT_KEYS:
+		if gains.has(key):
+			var stat := Text.t("company.stat." + key, {"value": ""}).strip_edges()
+			parts.append(Text.t("company.next.gain", {"value": gains[key], "stat": stat}))
+	var fresh: Array = next["moves"]
+	for move: Variant in fresh:
+		parts.append(Text.t("company.next.move", {"move": Text.t("company.move." + str(move))}))
+	return Text.t("company.next", {"level": next["level"], "gains": ", ".join(parts)})
 
 
 static func _gear_line(merc: Merc) -> String:

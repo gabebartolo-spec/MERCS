@@ -6,7 +6,9 @@ extends "res://tests/lib/runner.gd"
 ## adjacent enemy; a hit wounds and a fighter at 0 hp goes down and costs morale (more for a
 ## leader); low morale routs a side with fighters still standing; the enemy waits when it
 ## sees no one. Phase 2 milestone 4's checks (facings, turn order, intent, loadout, the hit
-## hook, blocking, shaken, the event log) live in tests/battle/skeleton_checks.gd.
+## hook, blocking, shaken, the event log) live in tests/battle/skeleton_checks.gd; the
+## golden logs (several seeded fights hashed and pinned) in tests/battle/golden_checks.gd; the
+## action kit (Phase 4 P1a: weapon action + learnt moves, reach, the cap) in kit_checks.gd.
 ## Seeded by design: every roll comes from Rng.from_seed with a fixed seed.
 ##   godot --headless --path . --script tests/run_battle_tests.gd
 
@@ -19,6 +21,8 @@ const STREAM_PROBE := 32
 const SURE_HIT := 100
 const FAR := Vector2i(9, 7)
 const SkeletonChecks := preload("res://tests/battle/skeleton_checks.gd")
+const GoldenChecks := preload("res://tests/battle/golden_checks.gd")
+const KitChecks := preload("res://tests/battle/kit_checks.gd")
 
 
 func suite_name() -> String:
@@ -36,6 +40,8 @@ func run_checks() -> void:
 	_check_blood_price()
 	_check_checks()
 	SkeletonChecks.new().run(check)
+	GoldenChecks.new().run(check)
+	KitChecks.new().run(check)
 	await process_frame
 
 

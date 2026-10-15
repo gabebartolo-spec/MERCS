@@ -1,9 +1,8 @@
 class_name SliceGame
 extends Node
 ## The art direction slice (docs/specs/art_direction_slice.md): the street made playable. One
-## merc walks by keys (WASD or arrows) or a click; a crowd walks fixed routes; the door leads
-## to the interior. Command keys are letters (SliceKeys); the map (M) is walked a tile at a time
-## and its hub's gate leads back to the street. Escape closes a panel. Presentation only.
+## merc walks by keys or a click; letter keys (SliceKeys) command; the map (M) is walked a
+## tile at a time and its hub's gate leads back to the street. Presentation only.
 
 const STAGE_SCENE := preload("res://presentation/world/street_stage.tscn")
 const SLICE_DATA := "res://data/balance/slice.json"
@@ -48,6 +47,7 @@ var _end: CampaignEnd = null
 
 
 func _ready() -> void:
+	UiLook.apply()
 	_data = StageData.load_file(SLICE_DATA)
 	_keys = SliceKeys.new(SliceKeys.ACTIONS)
 	_stage = STAGE_SCENE.instantiate() as StreetStage
@@ -124,16 +124,16 @@ func _on_ground_click(window_position: Vector2) -> void:
 
 ## The street cell under a window position, as {&"cell": Vector2i}, or {} off the ground.
 func ground_cell_at(window_position: Vector2) -> Dictionary:
-	var camera := _stage.camera()
 	var screen := window_position
 	if _stage.pixel_mode == StreetStage.PixelMode.WHOLE_SCREEN:
 		screen = PixelScreen.to_logical(window_position, _stage.screen_scale())
-	var origin := camera.project_ray_origin(screen)
-	var normal := camera.project_ray_normal(screen)
+	var origin := _stage.camera().project_ray_origin(screen)
+	var normal := _stage.camera().project_ray_normal(screen)
 	if normal.y >= 0.0:
 		return {}
 	var ground := origin + normal * (-origin.y / normal.y)
-	return {&"cell": Vector2i(floori(ground.x), floori(ground.z))}
+	var at := Vector2i(floori(ground.x), floori(ground.z))
+	return {&"cell": _arena().street_cell_at(ground) if _arena() != null else at}
 
 
 func _on_key(key: InputEventKey) -> void:
@@ -172,8 +172,9 @@ func _on_screen_key(code: Key) -> void:
 
 
 func _toggle_company() -> void:
-	if _hub != null and not company_open():
-		_hub.set_open(false)
+	var hub := hub_director()  # makes the map, hidden, so the captain appointed here is saved
+	if not company_open():
+		hub.set_open(false)
 	company_director().set_open(not company_open())
 
 
@@ -367,11 +368,10 @@ func _sync() -> void:
 	_stage.stand_at(_ground(player))
 	_stage.merc().visible = not fighting
 	_face(_stage.merc(), player, _clock)
-	var extras := _stage.extra_mercs
 	for i: int in crowd.size():
 		_stage.move_extra(i, _ground(crowd[i]))
-		extras[i].visible = not fighting
-		_face(extras[i], crowd[i], _clock - CROWD_PHASE_S * (i + 1))
+		_stage.extra_mercs[i].visible = not fighting
+		_face(_stage.extra_mercs[i], crowd[i], _clock - CROWD_PHASE_S * (i + 1))
 
 
 ## The battle on screen (loop example or road encounter), or null.

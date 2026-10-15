@@ -62,6 +62,12 @@ func grey(name: String, key: String) -> Color:
 	return Color(g, g, g)
 
 
+## A palette colour by reference ("soil:2", see Palette) from this section; black when missing.
+func colour(name: String, key: String) -> Color:
+	var value: Variant = section(name).get(key, "")
+	return Palette.colour(str(value)) if value is String else Palette.CLEAR
+
+
 func rgb(name: String, key: String) -> Color:
 	var v := vec3(name, key)
 	return Color(v.x, v.y, v.z)
