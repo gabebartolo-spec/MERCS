@@ -159,7 +159,9 @@ func _process(delta: float) -> void:
 		_wait_s += delta
 		if _wait_s >= ENEMY_PAUSE_S:
 			_wait_s = 0.0
-			_play(BattleAi.choose(battle, battle.current(), _sight))
+			var done := BattleAi.act(battle, battle.current(), _sight)
+			if not done.is_empty():
+				_played(done)
 
 
 func _on_choice(choice_id: String) -> void:
@@ -175,8 +177,12 @@ func _on_choice(choice_id: String) -> void:
 
 
 func _play(action: Dictionary) -> void:
-	if battle.apply(action).is_empty():
-		return
+	if not battle.apply(action).is_empty():
+		_played(action)
+
+
+## An action the battle took: recorded (FightRecord), drawn, and the next turn shown.
+func _played(action: Dictionary) -> void:
 	acted.emit(action)
 	_refresh()
 	if battle.is_over():

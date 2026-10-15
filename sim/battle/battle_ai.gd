@@ -51,6 +51,17 @@ static func choose(battle: Battle, fighter: BattleUnit, sight_cells: int) -> Dic
 	return {"type": Battle.ACTION_MOVE, "to": best}
 
 
+## Plays the fighter's turn: his choice, or a wait when the battle refuses it (a bow's shot
+## before P1c), so an enemy turn always moves on (as MercPlay.play_out does). Returns the action
+## applied, {} when even the wait was refused.
+static func act(battle: Battle, fighter: BattleUnit, sight_cells: int) -> Dictionary:
+	var choice := choose(battle, fighter, sight_cells)
+	if not battle.apply(choice).is_empty():
+		return choice
+	var hold := {"type": Battle.ACTION_WAIT}
+	return hold if not battle.apply(hold).is_empty() else {}
+
+
 ## The target of this round's plan while it still stands in sight, else null.
 static func _planned(battle: Battle, fighter: BattleUnit, seen: Array[BattleUnit]) -> BattleUnit:
 	var target_id := str(battle.intent(fighter.id).get("target", ""))

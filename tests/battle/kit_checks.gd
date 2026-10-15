@@ -29,6 +29,7 @@ func run(check: Callable) -> void:
 	_check_kit_legality()
 	_check_reach()
 	_check_bow_waits()
+	_check_enemy_bow_ends()
 	_check_weapon_replaces_attack()
 	_check_base_ids_do_not_crowd()
 	_check_replay()
@@ -178,6 +179,29 @@ func _check_bow_waits() -> void:
 			"a bow's shot is in the kit but refused until its line of fire exists (P1c); "
 			+ "the plain blow is not open beside it (the weapon action replaces it)"
 		)
+	)
+
+
+## An enemy archer beside a merc: his shot is refused until P1c, so BattleAi.act waits in its
+## place (the battle view plays enemy turns through it) and the fight still runs to its end.
+func _check_enemy_bow_ends() -> void:
+	var c := _unit("c", BattleUnit.COMPANY, Vector2i(1, 1), {"attack": SURE_HIT})
+	var b := _unit("b", BattleUnit.ENEMY, Vector2i(2, 1), {"initiative": 9})
+	b.weapon_class = "bow"
+	var battle := _battle([c, b])
+	var enemy_turns := 0
+	var stuck := false
+	for _turn: int in MAX_TURNS:
+		if battle.is_over():
+			break
+		if battle.current().side == BattleUnit.ENEMY:
+			enemy_turns += 1
+			stuck = stuck or BattleAi.act(battle, battle.current(), GRID.x).is_empty()
+		else:
+			battle.apply({"type": battle.kit("c")[0], "target": "b"})
+	_check.call(
+		battle.is_over() and enemy_turns > 0 and not stuck,
+		"an enemy archer beside a merc waits in place of his refused shot; the fight still ends"
 	)
 
 
