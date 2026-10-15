@@ -10,7 +10,7 @@ assets 13
 slice 16
 battle 56
 loop 8
-sim_world 24
+sim_world 25
 sim_encounters 11
 save 12
 effect 37

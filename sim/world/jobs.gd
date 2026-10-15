@@ -10,9 +10,12 @@ extends RefCounted
 ## - hold: standing at the site `hold_days` days in a row brings raiders; beating them is
 ##   done, losing to them fails. Leaving the site before they come starts the count again.
 ## - hunt: the quarry near the site; beating him is done. A lost fight lets him walk on.
-## Every job fails once its deadline has passed. Done pays the contract (Economy.complete);
-## either way the job's party leaves the map and every merc who fights for the company
-## (Company.fighting_order) remembers the job ("memory.job.<type>.<done|failed>").
+## Every job fails once its deadline has passed, unless an advance was taken on it (row
+## "advance", C2): then the lapse is the contract abandoned (lead, 2026-10-16), which the
+## board's expiry settles, so it is never also dented here as a failure. Done pays the
+## contract (Economy.complete); either way the job's party leaves the map and every merc who
+## fights for the company (Company.fighting_order) remembers the job
+## ("memory.job.<type>.<done|failed>").
 ## The parties are ordinary WorldParty records (they see, chase and raise their encounter
 ## like any other: not psychic); their walking numbers are in data/balance/world.json
 ## "parties", the placement and hold numbers in its "jobs". Placement rolls on the Rng "jobs"
@@ -116,7 +119,9 @@ func on_result(result: Dictionary) -> Array[Dictionary]:
 
 func _judge_day(row: Dictionary, day: int) -> String:
 	if _num(row, "deadline") < day:
-		return FAILED
+		# Taken with an advance, a lapsed deadline is the contract abandoned, not failed: the
+		# board's expiry (Economy.on_day, C2) settles it, and the party leaves as a stray.
+		return "" if _num(row, "advance") > 0 else FAILED
 	var site := str(row.get("site", ""))
 	var job := str(row.get("job", ""))
 	if job == ESCORT:

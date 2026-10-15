@@ -31,6 +31,7 @@ func run(check: Callable) -> void:
 	_check_lost_fights()
 	_check_escort_lost_on_the_way()
 	_check_deadline()
+	_check_deadline_with_advance()
 	_check_stray_party()
 	_check_reload_continues()
 	_check_old_contract()
@@ -156,6 +157,36 @@ func _check_deadline() -> void:
 			)
 		)
 	)
+
+
+## Taken with an advance, a lapsed deadline is abandonment (the board's expiry, C2), never
+## also judged failed here: no verdict, no dent from the jobs, and the party leaves as a stray.
+func _check_deadline_with_advance() -> void:
+	var played := JobKit.begin(SEED, "hunt", true)
+	var row := played.company.economy.book.contract(str(played.contract.get("id")))
+	row["deadline"] = SHORT_DEADLINE
+	row["advance"] = Merc.whole(row.get("reward", 0))
+	var faction := str(played.contract.get("faction", ""))
+	var standing := played.company.economy.standing
+	var name_before := standing.reputation(faction)
+	for _day: int in WAIT_DAYS:
+		played.world.rest()
+	_check.call(
+		(
+			played.verdicts.is_empty()
+			and standing.reputation(faction) >= name_before - _abandon_dent()
+			and played.company.economy.book.contract(str(played.contract.get("id"))).is_empty()
+			and not _job_party_on_map(played)
+		),
+		"a hunt taken with an advance that lapses is not judged failed (no double dent), party gone"
+	)
+
+
+## The most one abandonment dents (data/balance/economy.json "standing"): the board's expiry
+## may abandon the contract (C2), the jobs must add nothing on top.
+static func _abandon_dent() -> int:
+	var standing: Dictionary = Fixture.json(Fixture.ECONOMY).get("standing", {})
+	return Merc.whole(standing.get("abandon_dent", 0))
 
 
 ## A job's contract taken off the board some other way: its party leaves on the next day.
