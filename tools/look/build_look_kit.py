@@ -15,7 +15,6 @@ import math
 import sys
 from pathlib import Path
 
-import bmesh
 import bpy
 from mathutils import Matrix, Vector
 
@@ -147,8 +146,13 @@ def stone_house(col, name, x, z, w=4.6, d=4.4, eave=2.9, ridge=4.6):
             seg = w / n
             sx = x - w / 2 + seg * (c + 0.5) - (seg / 2 if r % 2 else 0)
             sx = min(max(sx, x - w / 2 + seg / 4), x + w / 2 - seg / 4)
+            # a damp base course, pale quoins at the corners, plain courses with the odd odd stone between
+            # (a random tone per block read as a quilt)
+            quoin = c == 0 or c == n - 1 + (r % 2)
+            m = (P("slate", 1) if r == 0 else P("slate", 3) if quoin else
+                 stone[int(h(r, c, x) * len(stone))] if h(r, c, 7) < 0.15 else P("slate", 2))
             o.box((seg * (0.5 if r % 2 and c in (0, n) else 1.0) - 0.03, d, hgt - 0.03),
-                  (sx, z, hgt * (r + 0.5)), stone[int(h(r, c, x) * len(stone))])
+                  (sx, z, hgt * (r + 0.5)), m)
     fz = z - d / 2
     o.box((0.9, 0.12, 1.7), (x + 0.9, fz - 0.03, 0.85), P("timber", 1))
     o.box((1.1, 0.14, 0.18), (x + 0.9, fz - 0.04, 1.75), P("timber", 2))
@@ -303,6 +307,7 @@ SHALLOWS = P("water", 2, flat=True)
 LIP = P("water", 1, flat=True)
 DEEP = P("water", 0, flat=True)
 DEEP_FRINGES = 3
+ROAD_VARIANTS = 3
 
 
 def glints(o, n, seed, z_lo=-1.3, z_hi=1.3):
@@ -355,26 +360,27 @@ def bank(o, v, e=TILE / 2, x_lo=-TILE / 2 - 0.15, x_hi=TILE / 2 + 0.15):
         reeds(o, xs[k] + 0.2, e - out[k] * 0.6, v * 10 + c, 3)
 
 
+def hill_y(x, z):
+    """The map hill's height: a cosine dome 2.6 m high over the tile, a little faceted inside."""
+    r = math.hypot(x, z) / (TILE / 2)
+    return (math.cos(math.pi * min(r, 1.0)) + 1.0) / 2.0 * 2.6 + (h(x, z) - 0.5) * 0.15 * (r < 0.9)
+
+
 def overworld(col):
     grass = [(1.01, P("verdure", 2))]
     o = Obj("tile_plain")  # bare grass: patches, tufts and stones are placed by hand (look_map.gd)
     tile_base(o, grass)
     o.finish(col)
     kit_ground.map_dressing(col, Obj)
-    o = Obj("tile_road")
-    tile_base(o, grass)
-    for i in range(8):  # a rutted dirt road along the tile's X axis
-        o.box((TILE / 8 + 0.01, 1.0, 0.04), (-TILE / 2 + (i + 0.5) * TILE / 8, 0.0, 0.03),
-              P("soil", 2 if h(i, 7) > 0.4 else 3))
-    o.finish(col)
-    o = Obj("tile_road_ns")
-    tile_base(o, grass)
-    for i in range(8):
-        o.box((1.0, TILE / 8 + 0.01, 0.04), (0.0, -TILE / 2 + (i + 0.5) * TILE / 8, 0.03),
-              P("soil", 2 if h(i, 9) > 0.4 else 3))
-    o.finish(col)
+    for v in range(ROAD_VARIANTS):  # dirt roads with wandering verges and worn crowns (kit_ground.road)
+        for name, along_x in (("tile_road", True), ("tile_road_ns", False)):
+            o = Obj(name if v == 0 else f"{name}_{v}")
+            tile_base(o, grass)
+            kit_ground.road(o, v, along_x)
+            o.finish(col)
     o = Obj("tile_forest")
-    tile_base(o, [(1.01, P("verdure", 1))])
+    tile_base(o, grass)
+    kit_ground.forest_floor(o, 0)
     for i in range(7):
         tree(o, h(i, 11) * 3.0 - 1.5, h(i, 13) * 3.0 - 1.5, i)
     o.finish(col)
@@ -384,19 +390,18 @@ def overworld(col):
     for i in range(n):
         for j in range(n):
             x0, z0 = -TILE / 2 + i * s, -TILE / 2 + j * s
-            def y(x, z):
-                r = math.hypot(x, z) / (TILE / 2)
-                return (math.cos(math.pi * min(r, 1.0)) + 1.0) / 2.0 * 2.6 + (h(x, z) - 0.5) * 0.15 * (r < 0.9)
+            y = hill_y
             pts = [(x0, z0, y(x0, z0)), (x0 + s, z0, y(x0 + s, z0)), (x0 + s, z0 + s, y(x0 + s, z0 + s)),
                    (x0, z0 + s, y(x0, z0 + s))]
-            top = (y(x0, z0) + y(x0 + s, z0 + s)) / 2
             for tri in ((pts[0], pts[1], pts[2]), (pts[0], pts[2], pts[3])):
                 nrm = (Vector(tri[1]) - Vector(tri[0])).cross(Vector(tri[2]) - Vector(tri[0])).normalized()
                 lit = nrm.dot(HILL_LIGHT)  # pixel-art hills: the slope's colour step is painted, not left to the sun
-                m = (P("slate", 2) if top > 2.2 else P("verdure", 3) if lit > 0.9 else
-                     P("verdure", 2) if lit > 0.7 else P("verdure", 1))
+                m = P("verdure", 3) if lit > 0.9 else P("verdure", 2) if lit > 0.7 else P("verdure", 1)
                 o.poly(list(tri), m)
-    o.box((0.6, 0.45, 0.35), (0.7, -0.5, 1.15), P("slate", 3), rot_z=0.4)
+    # a rock outcrop breaking the turf below the crown, each stone bedded at the slope's height (unlit,
+    # like the map's loose stones)
+    for k, (sx, sz, r) in enumerate(((0.45, -0.35, 0.55), (1.0, -0.15, 0.32), (0.25, -0.95, 0.26))):
+        kit_ground.stone(o, sx, sz, r, (90 + k, ("iron", 2), ("soil", 1), True), lift=hill_y(sx, sz) - r * 0.25)
     o.finish(col)
     # Peat water: the palette's one blue-slate (cloth_faded 2), unlit so the warm sun cannot turn it
     # brown-grey, a little below the land; a few short broken glints, never one long line (a long pale

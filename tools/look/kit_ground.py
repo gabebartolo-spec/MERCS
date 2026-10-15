@@ -21,6 +21,7 @@ from kit_lib import P, h
 
 DIRT = 0.012  # patch faces sit this far above the flat mud (metres); ruts and stones above them
 TILE = 4.0
+SETT_Z = 0.004
 
 
 def rag(pts, seed, amp, step):
@@ -77,18 +78,18 @@ def ribbon(o, pts, width, m, spec):
         o.poly([(*a0, z), (*b0, z), (*b1, z), (*a1, z)], m)
 
 
-def stone(o, x, y, r, spec):
-    """A loose stone: a low six-sided chunk, top and sides on their own palette steps.
-    spec = (seed, top, side, flat): flat stones are drawn unlit (the map's, see pebble history)."""
+def stone(o, x, y, r, spec, lift=0.0):
+    """A loose stone: a low six-sided chunk, top and sides on their own palette steps, its base `lift`
+    metres up. spec = (seed, top, side, flat): flat stones are drawn unlit (the map's, see pebble history)."""
     seed, top, side, flat = spec
     res = bmesh.ops.create_cone(o.bm, cap_ends=True, segments=6, radius1=r, radius2=r * 0.7, depth=r * 0.6,
-                                matrix=Matrix.Translation(Vector((x, y, r * 0.3))) @ Matrix.Rotation(h(seed, 71), 4, "Z")
+                                matrix=Matrix.Translation(Vector((x, y, lift + r * 0.3))) @ Matrix.Rotation(h(seed, 71), 4, "Z")
                                 @ Matrix.Diagonal((1.0, 0.75 + 0.3 * h(seed, 72), 1.0, 1.0)))
     for f in {f for v in res["verts"] for f in v.link_faces}:
         f.material_index = o.mi(P(*top, flat=flat) if f.normal.z > 0.9 else P(*side, flat=flat))
 
 
-def clump(o, c, n, seed, spec):
+def clump(o, c, n, seed, spec, lift=0.0):
     """n stones gathered round c: one larger, the rest small, tighter toward the middle.
     spec = (size, top, side, flat)."""
     size, top, side, flat = spec
@@ -96,7 +97,8 @@ def clump(o, c, n, seed, spec):
         ang = h(seed, k, 75) * math.tau
         dist = 0.0 if k == 0 else size * (1.2 + 2.2 * h(seed, k, 76) ** 1.5)
         r = size * (1.0 if k == 0 else 0.4 + 0.4 * h(seed, k, 77))
-        stone(o, c[0] + math.cos(ang) * dist, c[1] + math.sin(ang) * dist * 0.8, r, (seed * 10 + k, top, side, flat))
+        stone(o, c[0] + math.cos(ang) * dist, c[1] + math.sin(ang) * dist * 0.8, r, (seed * 10 + k, top, side, flat),
+              lift)
 
 
 def blade_fan(o, x, y, k, spec):
@@ -184,13 +186,23 @@ def cobbles(g):
                 m = (P("slate", 1) if (gutter and pick < 0.45) or pick < 0.06 else
                      P("slate", 3) if polished else P("slate", 2))
                 sz = hgt - 0.035 - (0.02 if repair else 0.0)
-                g.box((w - 0.04, sz, 0.05 + 0.02 * h(k, row)),
-                      (x + w / 2, -(z + hgt / 2 + 0.015 * (h(row, k, 5) - 0.5)), 0.015 - (0.02 if pick > 0.97 else 0.0)),
-                      m, rot_z=0.08 * (h(row, k, 6) - 0.5))
+                sett(g, (w - 0.04, sz),
+                     (x + w / 2, -(z + hgt / 2 + 0.015 * (h(row, k, 5) - 0.5))),
+                     m, 0.08 * (h(row, k, 6) - 0.5))
             x += w
             k += 1
         z += hgt
         row += 1
+
+
+def sett(g, size, loc, m, rot_z):
+    """A cobble as a flat face just over the grout, centred on loc (x, y). Boxes showed their sides
+    edge-on as a 1-px fringe and cast specks of shadow into the grout, both flipping between palette
+    colours (speckle); a face higher than the shadow bias still cast a dotted hairline."""
+    c, s_ = math.cos(rot_z), math.sin(rot_z)
+    hw, hd = size[0] / 2, size[1] / 2
+    g.poly([(loc[0] + px * c - py * s_, loc[1] + px * s_ + py * c, SETT_Z)
+            for px, py in ((-hw, -hd), (hw, -hd), (hw, hd), (-hw, hd))], m)
 
 
 def kerbs(g):
@@ -258,8 +270,8 @@ def forest_floor(o, v):
 
 
 def road(o, v, along_x):
-    """A dirt road across a tile: a band of soil 2 whose verges wander (fixed width where tiles
-    meet), with paler worn crown patches of irregular length, never a regular dash."""
+    """A dirt road across a tile: a band of packed earth (soil 3) whose verges wander (fixed width
+    where tiles meet). No marks along it: at map scale any repeated mark read as a lane dash."""
     n = 10
     xs = [-TILE / 2 - 0.02 + k * (TILE + 0.04) / n for k in range(n + 1)]
     half = [0.55 if k in (0, n) else 0.45 + 0.25 * h(v, k, 86) for k in range(n + 1)]
@@ -271,9 +283,4 @@ def road(o, v, along_x):
         for side in (-1, 1):
             o.poly([(*at(xs[k], mid[k]), 0.03), (*at(xs[k + 1], mid[k + 1]), 0.03),
                     (*at(xs[k + 1], mid[k + 1] + side * half[k + 1]), 0.03), (*at(xs[k], mid[k] + side * half[k]), 0.03)],
-                   P("soil", 2))
-    for c in range(2 + v % 2):
-        cx = -1.4 + c * 1.3 + 0.5 * h(v, c, 88)
-        length = 0.35 + 0.5 * h(v, c, 89)
-        pts = [at(cx - length / 2 + length * t / 3, 0.08 * (h(v, c, t, 90) - 0.5)) for t in range(4)]
-        ribbon(o, pts, 0.16, P("soil", 3), (0.032, v * 7 + c, 0.0, 0))
+                   P("soil", 3))

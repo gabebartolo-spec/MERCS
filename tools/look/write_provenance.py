@@ -52,7 +52,8 @@ def main() -> None:
            "tools/look/build_sprites.py"], [blender, mpfb, py], "prototype sprites for the golden references")
     write(REPO / "assets" / "look_target" / "kit",
           "Street and map kits modelled by script in Blender (primitives only), faces named pal:<ramp>:<step>.",
-          ["tools/look/build_look_kit.py"], [blender, py], "prototype kit for the golden references")
+          ["tools/look/build_look_kit.py", "tools/look/kit_lib.py", "tools/look/kit_ground.py"], [blender, py],
+          "prototype kit for the golden references")
     write(REPO / "assets" / "golden",
           "Golden references (06 section 8), 1x logical (960 x 540): look_target.gd captures of the real "
           "StreetStage at 3840 x 2160 (exact 4x4 blocks), one pixel kept per block. Changes only by a director "

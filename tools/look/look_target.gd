@@ -302,6 +302,9 @@ func _light(spec: Dictionary) -> void:
 	key.shadow_bias = SHADOW_BIAS
 	key.shadow_normal_bias = SHADOW_NORMAL_BIAS
 	key.directional_shadow_max_distance = SHADOW_DISTANCE_M
+	# Hard shadow edges: a soft filter's penumbra snapped to the palette as a dotted fringe.
+	RenderingServer.directional_soft_shadow_filter_set_quality(RenderingServer.SHADOW_QUALITY_HARD)
+	RenderingServer.positional_soft_shadow_filter_set_quality(RenderingServer.SHADOW_QUALITY_HARD)
 	var env := Environment.new()
 	env.background_mode = Environment.BG_COLOR
 	env.background_color = _colour(_str(spec, "sky"))

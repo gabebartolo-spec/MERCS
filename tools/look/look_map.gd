@@ -35,21 +35,27 @@ const WATER := "W"
 const SHORE := "S"
 ## Shore tile variants (kit tile_shore_<n>), picked by a fixed hash like the banks.
 const SHORE_VARIANTS := 3
+## Road variants (kit tile_road, _1, _2 and the same for tile_road_ns): the verges wander
+## differently, so a long road does not repeat tile by tile.
+const ROADS := "RN"
+const ROAD_VARIANTS := 3
 ## Grass is bare tiles plus hand-placed dressing (desloppify round 2, 2026-10-15): lush patches
 ## spill out of the woods and along the damp shore, dry patches lie on sunny hill feet and trodden
 ## verges, tuft clumps gather at edges (shore, woods, hill feet, roads) and stones in a few clusters
-## near paths, water and hill feet. Open meadow is left quiet on purpose.
+## near paths, water and hill feet. Open meadow is left quiet on purpose. A half road joins the
+## west road to the north road (tile roads stop at their tile's edge, short of the junction).
 ## Each: kit piece, tile column, tile row, offset x and z (metres), scale x and z, turn (degrees).
 const DRESSING: Array = [
 	["patch_lush_0", 3, 4, -0.5, -0.5, 1.0, 1.0, 20.0],
-	["patch_lush_2", 3, 8, 0.0, 1.0, 1.0, 1.0, 0.0],
+	["patch_lush_2", 3, 8, 0.0, 2.2, 1.0, 0.6, 0.0],
 	["patch_lush_1", 13, 5, 0.5, 1.0, 1.0, 1.0, -15.0],
-	["patch_lush_2", 11, 9, 0.0, 1.0, 1.0, 1.0, 180.0],
+	["patch_lush_2", 11, 9, 0.0, 1.5, 1.0, 0.8, 180.0],
 	["patch_dry_0", 8, 5, 0.0, 0.3, 1.0, 1.0, 30.0],
 	["patch_dry_2", 8, 7, 0.0, 0.5, 1.0, 1.0, 90.0],
 	["patch_dry_1", 4, 6, 0.5, 0.2, 1.0, 1.0, 0.0],
 	["patch_dry_1", 11, 7, 1.0, 0.5, 1.0, 1.0, 160.0],
 	["patch_dry_2", 6, 2, -1.0, 0.5, 1.0, 1.0, 10.0],
+	["tile_road_1", 8, 6, -1.0, 0.0, 0.5, 1.0, 0.0],
 	["tufts_0", 3, 8, 1.2, 1.6, 1.0, 1.0, 0.0],
 	["tufts_1", 6, 9, 0.5, -0.8, 1.0, 1.0, 70.0],
 	["tufts_2", 12, 9, 0.5, 1.0, 1.0, 1.0, 140.0],
@@ -93,6 +99,8 @@ static func lay(kit: Node3D, holder: Node3D) -> void:
 			var tile: String = TILE_NAMES[code]
 			if code == SHORE:
 				tile += "_%d" % ((i * 5 + j * 11) % SHORE_VARIANTS)
+			if code in ROADS and (i * 7 + j * 3) % ROAD_VARIANTS > 0:
+				tile += "_%d" % ((i * 7 + j * 3) % ROAD_VARIANTS)
 			var deep := _deep(i, j)
 			if deep:
 				tile = DEEP_TILE

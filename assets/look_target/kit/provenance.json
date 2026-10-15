@@ -2,11 +2,13 @@
   "_doc": "Street and map kits modelled by script in Blender (primitives only), faces named pal:<ramp>:<step>.",
   "asset": "look_target/kit",
   "files": {
-    "overworld_kit.glb": "c6327f267ca713a4a27fe9821f0c6eba1bd01f1f6b46628845cf0e5aa5e83492",
-    "street_kit.glb": "6972addd29f0225bd933996374466847f88b5df987c6a46fef8ea2525e728adf"
+    "overworld_kit.glb": "4c96b3dd5952e9215a000f508b2787e3df68c6f769a3a60ee504dec94ccf0cf1",
+    "street_kit.glb": "dff2f95b509c87d2affc666b52684b8883683b3bfcb6a0c303804ae549999aa4"
   },
   "produced_by": {
-    "tools/look/build_look_kit.py": "1c407e38e1722a12"
+    "tools/look/build_look_kit.py": "e6ab49c3dfd78cba",
+    "tools/look/kit_lib.py": "d50a0bdc45fd3c10",
+    "tools/look/kit_ground.py": "4996797332de47a3"
   },
   "models": [],
   "licence_rows": [
