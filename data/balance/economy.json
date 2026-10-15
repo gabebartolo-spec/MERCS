@@ -40,5 +40,15 @@
     "abandon_dent": 10,
     "sizeable_advance": 50,
     "grudge_growth": 1
+  },
+  "terms": {
+    "base_limit_pct": 90,
+    "reputation_weight_pct": 20,
+    "need_weight_pct": 10,
+    "advance_cost_pct": 25,
+    "counter_band_pct": 20,
+    "die_sides": 10,
+    "step_in_difficulty": 9,
+    "step_in_shift_pct": 10
   }
 }

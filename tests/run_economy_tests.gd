@@ -11,6 +11,8 @@ extends "res://tests/lib/runner.gd"
 
 const Fixture := preload("res://tests/lib/company_fixture.gd")
 const GoldenChecks := preload("res://tests/economy/golden_checks.gd")
+const TermsChecks := preload("res://tests/economy/terms_checks.gd")
+const TermsDealChecks := preload("res://tests/economy/terms_deal_checks.gd")
 const PayrollChecks := preload("res://tests/economy/payroll_checks.gd")
 const SEED := 424242
 const OTHER_SEED := 7
@@ -33,6 +35,8 @@ func run_checks() -> void:
 	_check_contract_lifecycle()
 	_check_loot()
 	GoldenChecks.new().run(check)
+	TermsChecks.new().run(check)
+	TermsDealChecks.new().run(check)
 	PayrollChecks.new().run(check)
 	await process_frame
 

@@ -34,6 +34,7 @@ func run(check: Callable) -> void:
 	_check_deadline_with_advance(true)
 	_check_deadline_with_advance(false)
 	_check_escort_on_deadline_day()
+	_check_negotiated_advance_lapses()
 	_check_stray_party()
 	_check_reload_continues()
 	_check_old_contract()
@@ -223,6 +224,51 @@ func _check_escort_on_deadline_day() -> void:
 			(
 				"an escort reaching the site on its deadline day (%d) is done as that day ends (%s on %d)"
 				% [deadline, _verdict(played), day]
+			)
+		)
+	)
+
+
+## End to end with C2: a hunt negotiated with the whole price as an advance (Economy.negotiate,
+## the employer accepting), started by take(), then left to its deadline: abandoned, the
+## advance kept, the name lower and a grudge with the faction.
+func _check_negotiated_advance_lapses() -> void:
+	var played := JobKit.begin(SEED, "hunt", false)
+	var economy := played.company.economy
+	var id := str(played.contract.get("id"))
+	var row := economy.book.contract(id)
+	row["deadline"] = SHORT_DEADLINE
+	var price := Merc.whole(row.get("reward", 0))
+	while price > 1 and str(economy.terms.judge(row, price, price).get("reply")) != Terms.ACCEPT:
+		price -= 1
+	var faction := str(row.get("faction", ""))
+	var name_before := economy.standing.reputation(faction)
+	var purse := economy.purse
+	var ask := {"price": price, "advance": price, "speaker": "", "day": played.world.day}
+	var reply := str(economy.negotiate(played.company, id, ask, played.rng).get("reply"))
+	var started := played.jobs.take(id) and _job_party_on_map(played)
+	for _day: int in WAIT_DAYS:
+		played.world.rest()
+	(
+		_check
+		. call(
+			(
+				reply == Terms.ACCEPT
+				and started
+				and _verdict(played) == Jobs.ABANDONED
+				and economy.purse == purse + price
+				and economy.standing.reputation(faction) < name_before
+				and economy.standing.grudges.has(faction)
+			),
+			(
+				"a hunt negotiated at %d coin all up front, then left to its deadline: %s, %s, name %d -> %d"
+				% [
+					price,
+					reply,
+					_verdict(played),
+					name_before,
+					economy.standing.reputation(faction)
+				]
 			)
 		)
 	)

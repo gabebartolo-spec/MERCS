@@ -80,27 +80,30 @@ static func place(on: WorldSim, contract: Dictionary, knobs: Dictionary, rng: Rn
 	return id
 
 
-## Takes a posted contract on: accepted, and its job's party put on the map (a hold's comes
-## later). False (and no change) when Economy.accept refuses it.
+## Takes a contract on as a job: accepted (or already accepted by Economy.negotiate, C2), and
+## its job started, its party put on the map (a hold's comes later). False (and no change)
+## when Economy.accept refuses it or the job was already started.
 func take(contract_id: String) -> bool:
 	var economy := company.economy
-	if not economy.accept(contract_id):
-		return false
 	var row := economy.book.contract(contract_id)
-	var job := str(row.get("job", ""))
-	if job == HOLD:
-		row["held"] = 0
-	elif not job.is_empty():
-		_put(row)
+	if row.get("accepted") == true:
+		if _started(row):
+			return false
+	elif not economy.accept(contract_id):
+		return false
+	_start(row)
 	return true
 
 
 ## A day has passed (call before Economy.on_day, which would let the contract lapse
-## unjudged): every taken job judged by its deadline, an escort by where the band stands, a
+## unjudged): a job accepted without take() (a negotiated deal no caller started) is started,
+## then every taken job judged by its deadline, an escort by where the band stands, a
 ## hold's days counted. The verdicts, {"id", "job", "verdict", "day"}.
 func on_day(day: int) -> Array[Dictionary]:
 	var verdicts: Array[Dictionary] = []
 	for row: Dictionary in _taken():
+		if not _started(row):
+			_start(row)
 		var verdict := _judge_day(row, day)
 		if not verdict.is_empty():
 			verdicts.append(_settle(row, verdict))
@@ -156,6 +159,19 @@ func _judge_fight(row: Dictionary, won: bool) -> String:
 	if won:
 		return DONE
 	return FAILED if job == HOLD else ""
+
+
+## Whether a taken job was started: its party placed, or a hold's day count begun.
+static func _started(row: Dictionary) -> bool:
+	return row.has("job_party") or row.has("held")
+
+
+func _start(row: Dictionary) -> void:
+	var job := str(row.get("job", ""))
+	if job == HOLD:
+		row["held"] = 0
+	elif not job.is_empty():
+		_put(row)
 
 
 ## The job's party on the map, its id kept on the contract.
