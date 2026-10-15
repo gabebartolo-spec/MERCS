@@ -74,6 +74,10 @@ func _check_data() -> void:
 		factions.size() == 2 and pressures.all(func(p: int) -> bool: return p > 0 and p <= 100),
 		"two factions in tension, each with a pressure from 1 to 100, got %s" % [pressures]
 	)
+	_check_recruits_and_gear()
+
+
+func _check_recruits_and_gear() -> void:
 	var recruits: Array = Fixture.json(Fixture.RECRUITS).get("recruits", [])
 	var bad: Array[String] = []
 	for i: int in recruits.size():
@@ -297,6 +301,10 @@ func _check_loot() -> void:
 		gear += 0 if loot["item"] == "" else 1
 	check(bounded, "loot coin stays in the data's range and gear goes to the pack")
 	check(gear > 0 and gear < BOARDS - 1, "some fights leave gear and some do not: %d" % gear)
+	_check_loot_determinism(seen)
+
+
+func _check_loot_determinism(seen: Array[String]) -> void:
 	var again := _company().economy.take_loot("patrol", Rng.from_seed(SEED))
 	check(
 		_is(again, _company().economy.take_loot("patrol", Rng.from_seed(SEED))),

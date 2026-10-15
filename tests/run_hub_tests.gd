@@ -76,12 +76,8 @@ func _check_open() -> void:
 	await _frames(LAYOUT_FRAMES)
 	var panel := _hub().panel
 	var economy := _economy()
-	var accepts := 0
-	for row: Dictionary in economy.board:
-		accepts += 1 if panel.button_for("accept", str(row["id"])) != null else 0
-	var hires := 0
-	for def: Dictionary in economy.offers():
-		hires += 1 if panel.button_for("hire", str(def["id"])) != null else 0
+	var accepts := _count("accept", economy.board)
+	var hires := _count("hire", economy.offers())
 	var start := _game.player.cell
 	await _hold(KEY_D)
 	check(
@@ -103,11 +99,19 @@ func _check_open() -> void:
 	)
 
 
+## How many of these records (each with an "id") have a button for the action.
+func _count(action: String, records: Array[Dictionary]) -> int:
+	var found := 0
+	for record: Dictionary in records:
+		found += 1 if _hub().panel.button_for(action, str(record["id"])) != null else 0
+	return found
+
+
 func _status() -> Dictionary:
 	return {"purse": _economy().purse, "morale": _economy().morale}
 
 
-func _check_wages_by_clicks() -> void:
+func _rest_on_the_map() -> void:
 	await _tap(KEY_ESCAPE)
 	await _tap(KEY_M)
 	var map_panel := _game.overworld_director().panel
@@ -116,6 +120,10 @@ func _check_wages_by_clicks() -> void:
 	await _tap(KEY_M)
 	await _tap(KEY_B)
 	await _frames(LAYOUT_FRAMES)
+
+
+func _check_wages_by_clicks() -> void:
+	await _rest_on_the_map()
 	var panel := _hub().panel
 	var economy := _economy()
 	var rules := _rules()
