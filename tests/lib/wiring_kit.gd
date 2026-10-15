@@ -32,9 +32,12 @@ static func injury_defs() -> Array:
 	return listed if listed is Array else []
 
 
-## The starting six with their wounds, on `rng`.
-static func wounds(rng: Rng, outcome: String = "", saved: Dictionary = {}) -> CompanyWounds:
-	var held := Company.start(Fixture.defs())
+## `held` (the starting six when none) with their wounds, on `rng`; saved is a "wounds" block.
+static func wounds(
+	rng: Rng, outcome: String = "", saved: Dictionary = {}, held: Company = null
+) -> CompanyWounds:
+	if held == null:
+		held = Company.start(Fixture.defs())
 	var made := CompanyWounds.make(held, saved, rng, rules(outcome), injury_defs())
 	made.day = DAY
 	return made
