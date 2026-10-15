@@ -197,13 +197,13 @@ func _check_contract_and_hire() -> void:
 	_game.company_director().set_open(false)
 
 
-## The world applies a won fight, as the overworld does: the hub opens on loot and a prisoner.
+## The world applies a won fight with a surrender, as the overworld does: loot and a prisoner.
 func _check_win_opens_prisoner() -> void:
 	await _tap(KEY_ESCAPE)
 	var world := _hub().world
 	world.encounter = {"type": "patrol", "from": world.at, "to": world.at, "days_left": 0}
 	var purse := _economy().purse
-	world.resolve_encounter({"won": true})
+	world.resolve_encounter({"won": true, "surrendered": true, "prisoners": ["watchman_0"]})
 	await _frames(LAYOUT_FRAMES)
 	var panel := _hub().panel
 	var loot := _economy().last_loot

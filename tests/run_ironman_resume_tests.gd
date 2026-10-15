@@ -184,13 +184,13 @@ func _check_hire() -> void:
 	await _quit(again)
 
 
-## Ironman On: a won fight's prisoner, decided at the hub, stays decided after a quit.
+## Ironman On: a surrendered bandit, decided at the hub, stays decided after a quit.
 func _check_prisoner() -> void:
 	_clear_save()
 	_save_home()
 	var game := await _spawn()
 	var hub := game.hub_director()
-	hub.world.result_hook.call("ambush", {"won": true})
+	hub.world.result_hook.call("ambush", {"won": true, "prisoners": ["bandit_0"]})
 	await InputKit.frames(self, InputKit.LAYOUT_FRAMES)
 	var roster := hub.company.roster.size()
 	await InputKit.click(self, hub.panel.button_for("prisoner", Economy.RECRUIT))
