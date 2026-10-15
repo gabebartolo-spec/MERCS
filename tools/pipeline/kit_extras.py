@@ -19,6 +19,7 @@ from __future__ import annotations
 import math
 
 import bpy
+from mathutils import Vector
 
 SHELL_PREFIX = "shell_"
 EXTRA_FLAG = "mercs_extra"  # set on every object this module adds: render_character.body_mesh skips them
@@ -82,10 +83,31 @@ def add_shells(rig: bpy.types.Object, body: bpy.types.Object, shells: dict) -> l
         disp.direction = "NORMAL"
         disp.mid_level = 0.0
         disp.strength = spec["offset_m"]
+        if "bulge" in spec:
+            add_bulge(obj, members, spec["bulge"])
         made.append(obj.name)
     if made:
         hide_covered(body, covered)
     return made
+
+
+def add_bulge(obj: bpy.types.Object, members: list, bulge: dict) -> None:
+    """Plate that stands off the body where it faces one way: a barrel breastplate swells the chest and gut
+    forward (bulge {"dir": [0, -1, 0], "m": 0.06}), so a heavy leads with his front, not his back. Each member
+    vertex is pushed out along its normal by m times how squarely its rest normal faces dir (0 when it faces
+    away), optionally only between z_min_m and z_max_m (rest-mesh height)."""
+    d = Vector(bulge["dir"]).normalized()
+    lo, hi = bulge.get("z_min_m", -math.inf), bulge.get("z_max_m", math.inf)
+    group = obj.vertex_groups.new(name="mercs_bulge")
+    for v, m in zip(obj.data.vertices, members):
+        w = max(0.0, v.normal.dot(d)) if m and lo <= v.co.z <= hi else 0.0
+        if w > 0.0:
+            group.add([v.index], w, "REPLACE")
+    disp = obj.modifiers.new("shell_bulge", "DISPLACE")
+    disp.direction = "NORMAL"
+    disp.mid_level = 0.0
+    disp.strength = bulge["m"]
+    disp.vertex_group = group.name
 
 
 def hide_covered(body: bpy.types.Object, covered: list) -> None:
@@ -126,3 +148,78 @@ def pleat(obj: bpy.types.Object, depths: list, size_y: float) -> None:
 
 def _angle(co) -> float:
     return math.atan2(co.y, co.x) % (2.0 * math.pi)
+
+
+DRAPE_COLS = 28
+DRAPE_ROWS = 44
+DRAPE_SOLIDIFY_M = 0.012
+
+
+def fold_rise(t: float, start: float) -> float:
+    """0 above a fold's start, rising smoothly to 1 at the hem."""
+    k = max(0.0, min(1.0, (t - start) / max(1e-6, 1.0 - start)))
+    return k * k * (3.0 - 2.0 * k)
+
+
+def drape(objs: list, spec: dict) -> bpy.types.Object:
+    """A cape that hangs (Lead QC 2026-10-15: a cone cape read as a rigid plank held out in still air, with
+    daylight between it and the waist). A grid in world space from the shoulder line (top_z_m) to the hem
+    (hem_z_m), width_top_m widening to width_hem_m. Each column hangs like cloth: at every height it sits
+    clear_m behind the furthest-back point of the figure above it in that column (it rests on the shoulder
+    blades and the buttocks, then falls straight), plus hem_flare_m * t^2 toward the hem (t = 0 at the top,
+    1 at the hem), less tuck_m * t^2 (the hem settles in toward the calves; never into the figure). Its side edges wrap forward by wrap_m toward the arms (never into them), so no daylight
+    shows between cape and back in profile. folds [[x_frac, depth_m, width_frac], ...] add shaped fold
+    clusters that deepen toward the hem, each from its own start (an optional 4th value, 0..1 down the cape: a
+    fold that runs from the collar to the hem reads as a stripe); a fold may go inward only where the figure
+    leaves room. hem_wave_m
+    lets an outward fold hang that much lower than an inward one, so the hem is not a ruled line."""
+    deps = bpy.context.evaluated_depsgraph_get()
+    pts = []
+    for o in objs:
+        ev = o.evaluated_get(deps)
+        mesh = ev.to_mesh()
+        mw = ev.matrix_world
+        pts.extend((mw @ v.co) for v in mesh.vertices)
+        ev.to_mesh_clear()
+    top, hem = spec["top_z_m"], spec["hem_z_m"]
+    band = spec.get("column_m", 0.035)
+    clear = spec["clear_m"]
+    folds = spec.get("folds", [])
+    us = [-1.0 + 2.0 * j / (DRAPE_COLS - 1) for j in range(DRAPE_COLS)]
+    shapes = [[d * math.exp(-((u - f[0]) / f[2]) ** 2) for f, d in ((f, f[1]) for f in folds)] for u in us]
+    profile = [sum(row) for row in shapes]
+    peak = max((abs(p) for p in profile), default=0.0) or 1.0
+    hems = [hem - spec.get("hem_wave_m", 0.0) * p / peak for p in profile]  # a fold that stands out hangs lower
+    verts, grid = [], []
+    for i in range(DRAPE_ROWS):
+        t = i / (DRAPE_ROWS - 1)
+        half = 0.5 * (spec["width_top_m"] + (spec["width_hem_m"] - spec["width_top_m"]) * t)
+        row = []
+        for j, u in enumerate(us):
+            z = top - (top - hems[j]) * t
+            x = u * half
+            col = [p for p in pts if abs(p.x - x) < band]
+            above = max((p.y for p in col if z - band <= p.z <= top + band), default=None)
+            here = max((p.y for p in col if abs(p.z - z) < band), default=None)
+            hang = (above if above is not None else spec.get("back_y_m", 0.0)) + clear
+            y = hang + (spec.get("hem_flare_m", 0.0) - spec.get("tuck_m", 0.0)) * t * t
+            y += sum(a * fold_rise(t, f[3] if len(f) > 3 else 0.0) for a, f in zip(shapes[j], folds))
+            edge = max(0.0, (abs(u) - 0.55) / 0.45)
+            y -= spec.get("wrap_m", 0.0) * edge * edge
+            floor = (here + clear) if here is not None else -math.inf
+            row.append(len(verts))
+            verts.append((x, max(y, floor), z))
+        grid.append(row)
+    faces = [(grid[i][j], grid[i][j + 1], grid[i + 1][j + 1], grid[i + 1][j])
+             for i in range(DRAPE_ROWS - 1) for j in range(DRAPE_COLS - 1)]
+    mesh = bpy.data.meshes.new("drape")
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    mesh.shade_smooth()
+    obj = bpy.data.objects.new("drape", mesh)
+    bpy.context.scene.collection.objects.link(obj)
+    sol = obj.modifiers.new("drape_thickness", "SOLIDIFY")
+    sol.thickness = DRAPE_SOLIDIFY_M
+    sol.offset = 1.0
+    obj.modifiers.new("drape_smooth", "SUBSURF").levels = 1
+    return obj

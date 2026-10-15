@@ -35,7 +35,8 @@ from palette_lib import load_palette  # noqa: E402
 from pngio import Image, read_png, write_png  # noqa: E402
 
 MATID = {"skin": (255, 0, 0), "iron": (0, 255, 0), "timber": (0, 0, 255), "cloth": (255, 255, 0),
-         "bone": (255, 0, 255), "soot": (0, 255, 255), "leather": (255, 128, 0), "eye": (128, 0, 255)}
+         "bone": (255, 0, 255), "soot": (0, 255, 255), "leather": (255, 128, 0), "eye": (128, 0, 255),
+         "mail": (0, 255, 128)}
 EYE = list(MATID).index("eye")
 EYE_COLOUR = ("soot", 0)  # a deliberate face pixel, drawn whenever any 4x sample of the block is eye
 EYE_PAIR_NUM, EYE_PAIR_DEN = 3, 4  # EYE_PAIR: a side block with 3/4 of the fullest count is the same eye
@@ -43,16 +44,22 @@ GAP_MIN = 3  # a transparent slot narrower than this inside a row is closed (clo
 MIN_CLUSTER = 3  # ai-slop-art 2.2/2.3: an interior run of one colour smaller than this is speckle, not a decision
 CLEAN_PASSES = 8
 # Per merc: which ramp each material takes. A list names (ramp, step) pairs: a composite ramp of
-# palette colours (the Vampyr's blackened plate and wine cape).
+# palette colours (the Vampyr's blackened plate and wine cape). soot step 0 is the outline and the eyes only
+# (06 section 3: soot is drawn, never quantised to; fresh critic 2026-10-15: soot shading inside the coat
+# merged the outline into the body), so no material ramp starts at it.
+LEATHER = [("soot", 1), ("soot", 2), ("soot", 3)]
+MAIL = [("soot", 2), ("iron", 0), ("iron", 1), ("iron", 2)]  # a step darker than plate: the parts read apart
 MERCS = {
     "orc": {"skin": "skin_orc", "iron": "iron", "bone": "bone", "timber": "timber", "soot": "soot",
-            "leather": [("soot", 0), ("soot", 1), ("soot", 2), ("soot", 3)],
-            "cloth": [("soot", 0), ("soot", 2), ("cloth_faded", 0), ("cloth_faded", 1)]},
+            "leather": LEATHER, "mail": MAIL,
+            "cloth": [("soot", 3), ("cloth_faded", 0), ("cloth_faded", 1)]},
     "vampyr": {"skin": "skin_pale", "bone": "bone", "timber": "timber", "soot": "soot",
-               "leather": [("soot", 0), ("soot", 1), ("soot", 2), ("soot", 3)],
-               "iron": [("soot", 0), ("soot", 1), ("soot", 2), ("soot", 3), ("iron", 2)],
-               "cloth": [("soot", 0), ("soot", 2), ("cloth_faded", 0), ("cloth_faded", 1)]},
+               "leather": LEATHER, "mail": MAIL,
+               "iron": [("iron", 0), ("iron", 1), ("iron", 2)],
+               "cloth": [("soot", 3), ("cloth_faded", 0), ("cloth_faded", 1)]},
 }
+TOKEN_SKIN_LIFT = {"orc": 1}  # skin steps a merc's map token is lifted by (token_skin_lift)
+BROWS = ("orc",)  # mercs drawn with a lit brow ledge over each eye (eye_rims)
 NL = chr(10)
 TOKEN_SCALE = 8
 TOKEN_CROP = (0, 0, 704, 704)  # 4x pixels; the pivot (352, 608) lands on (44, 76) at 1x / 8
@@ -117,11 +124,15 @@ def eye_pixels(eye: np.ndarray) -> list:
         cy = round(sum(p[0] * int(eye[p]) for p in group) / total)
         cx = sum(p[1] * int(eye[p]) for p in group) / total
         x = round(cx)
-        keep.append((cy, x))
         side = (cy, x + 1) if cx > x else (cy, x - 1)
-        if side in group and eye[side] * EYE_PAIR_DEN >= eye[cy, x] * EYE_PAIR_NUM:
-            keep.append(side)
-    return keep
+        pair = side in group and eye[side] * EYE_PAIR_DEN >= eye[cy, x] * EYE_PAIR_NUM
+        keep.append([(cy, x)] + ([side] if pair else []))
+    if len({len(k) for k in keep}) > 1:  # one eye two pixels wide and the other one reads as a wink: one each
+        keep = [k[:1] for k in keep]
+    if len(keep) == 2 and abs(keep[0][0][0] - keep[1][0][0]) == 1:  # no head roll: both eyes on one row (the
+        row = max(keep[0][0][0], keep[1][0][0])  # lower, under the brow); rounding split them by the pixel grid
+        keep = [[(row, x) for _, x in k] for k in keep]
+    return [p for k in keep for p in k]
 
 
 def ramp_of(pal, spec) -> list[tuple[int, int, int]]:
@@ -169,6 +180,101 @@ def close_gaps(img: Image, labels: np.ndarray) -> Image:
             for gx in range(x, right):
                 out.put(gx, y, img.get(src, y))
                 labels[y, gx] = labels[y, src]
+    return out
+
+
+def eyes_inside(img: Image, labels: np.ndarray) -> None:
+    """An eye pixel on the silhouette edge becomes outline and is lost (Vampyr E, fresh critic 2026-10-15): move
+    it one pixel inward, away from its transparent neighbours, onto the first interior pixel."""
+    for y, x in zip(*np.nonzero(labels == EYE)):
+        y, x = int(y), int(x)
+        if not on_edge(img, x, y):
+            continue
+        dx = sum(1 for nx in (x - 1, x + 1) if 0 <= nx < img.width and img.get(nx, y)[3] == 0 and nx < x) -             sum(1 for nx in (x - 1, x + 1) if 0 <= nx < img.width and img.get(nx, y)[3] == 0 and nx > x)
+        dy = (1 if y > 0 and img.get(x, y - 1)[3] == 0 else 0) - (1 if y + 1 < img.height and img.get(x, y + 1)[3] == 0 else 0)
+        nx, ny = x + dx, y + dy
+        if (nx, ny) != (x, y) and img.get(nx, ny)[3] and not on_edge(img, nx, ny):
+            labels[y, x], labels[ny, nx] = labels[ny, nx], EYE
+
+
+EYE_RIM_STEP = 2  # skin ramp step the pixels either side of an eye are lifted to, at least
+BROW_STEP = 3  # skin ramp step of the brow ledge over an eye (merc "brow": true)
+
+
+def eye_rims(img: Image, labels: np.ndarray, pal, merc: str) -> Image:
+    """An eye reads only against a lit socket rim: in shadow (Vampyr E, fresh critic 2026-10-15) a soot eye on a
+    dark skin step is lost. Each skin pixel 4-beside an eye pixel, not on the outline, is lifted to
+    EYE_RIM_STEP of the merc's skin ramp when it is darker. A merc with "brow" in BROWS also gets a lit brow
+    ledge: the skin pixels over the eye and its two diagonals go up to BROW_STEP, so the eye sits in shadow under
+    a ridge (fresh critic 2026-10-15, orc item 1: at 1x his face was a green bean with no eyes)."""
+    skin = ramp_of(pal, MERCS[merc]["skin"])
+    out = Image(img.width, img.height, bytearray(img.rgba))
+
+    def lift(x: int, y: int, step: int) -> None:
+        c = img.get(x, y)[:3]
+        if c in skin and not on_edge(img, x, y) and labels[y, x] != EYE and skin.index(c) < step:
+            out.put(x, y, (*skin[step], 255))
+
+    for y, x in zip(*np.nonzero(labels == EYE)):
+        y, x = int(y), int(x)
+        for nx, ny in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)):
+            lift(nx, ny, EYE_RIM_STEP)
+        if merc in BROWS:
+            for nx in (x - 1, x, x + 1):
+                lift(nx, y - 1, BROW_STEP)
+    return out
+
+
+HOLE_MAX = 80  # px: an enclosed window of background smaller than this is shadow, not daylight
+
+
+def fill_holes(img: Image, labels: np.ndarray) -> Image:
+    """A small window of background enclosed by the figure (between a hanging arm and a barrel chest, between
+    touching knees) outlined itself into a ring of soot that read as a handle or a hole in the plate (round 2,
+    2026-10-15). Each enclosed transparent region of at most HOLE_MAX pixels takes the darkest colour bordering
+    it, and that pixel's material: deep shadow in the gap, as an artist would draw it."""
+    w, h = img.width, img.height
+    seen = set()
+    out = Image(w, h, bytearray(img.rgba))
+    for y0 in range(h):
+        for x0 in range(w):
+            if (x0, y0) in seen or img.get(x0, y0)[3]:
+                continue
+            region, edge, stack, border = [], False, [(x0, y0)], []
+            seen.add((x0, y0))
+            while stack:
+                x, y = stack.pop()
+                region.append((x, y))
+                for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                    if not (0 <= nx < w and 0 <= ny < h):
+                        edge = True
+                    elif img.get(nx, ny)[3]:
+                        border.append((nx, ny))
+                    elif (nx, ny) not in seen:
+                        seen.add((nx, ny))
+                        stack.append((nx, ny))
+            if edge or len(region) > HOLE_MAX:
+                continue
+            bx, by = min(border, key=lambda p: (pixelate.luma(img.get(*p)), p[1], p[0]))
+            for x, y in region:
+                out.put(x, y, img.get(bx, by))
+                labels[y, x] = labels[by, bx]
+    return out
+
+
+def token_skin_lift(img: Image, pal, merc: str) -> Image:
+    """The overworld grass is snapped to the same greens as the orc's skin (skin_orc 1 is the commonest grass
+    colour on the golden), so his token head vanished into it (fresh critic 2026-10-15, T2). On the map token
+    every interior skin pixel moves TOKEN_SKIN_LIFT steps up the merc's skin ramp: a top-lit head a value step
+    above any grass; the soot outline and the eyes stay."""
+    lift = TOKEN_SKIN_LIFT.get(merc, 0)
+    skin = ramp_of(pal, MERCS[merc]["skin"])
+    out = Image(img.width, img.height, bytearray(img.rgba))
+    for y in range(img.height):
+        for x in range(img.width):
+            c = img.get(x, y)
+            if c[3] and c[:3] in skin and not on_edge(img, x, y):
+                out.put(x, y, (*skin[min(len(skin) - 1, skin.index(c[:3]) + lift)], 255))
     return out
 
 
@@ -252,8 +358,9 @@ def build(renders: Path, palette: Path, out: Path, key: str) -> None:
         for src in sorted(r["color"].glob("facing_*.png")):
             labels = matid_labels(r["matid"] / src.name, cfg["scale"])
             img = pixelate.despeckle(pixelate.reduce_image(read_png(src), cfg, quant), cfg["despeckle_max_px"])
-            img = pixelate.outline(close_gaps(img, labels), pal.ramp_colours(["soot"])[0])  # silhouette only
-            write_png(one / src.name, clean(remap(img, labels, pal, merc), labels, pal))
+            img = pixelate.outline(fill_holes(close_gaps(img, labels), labels), pal.ramp_colours(["soot"])[0])
+            eyes_inside(img, labels)
+            write_png(one / src.name, eye_rims(clean(remap(img, labels, pal, merc), labels, pal), labels, pal, merc))
         nrm = tmp / f"{merc}_1x_normal"
         nrm.mkdir(parents=True, exist_ok=True)
         pixelate.normals_dir(r["normal"], one, nrm, cfg)
@@ -275,8 +382,9 @@ def token(r: dict, pal, cfg: dict, merc: str, path: Path) -> None:
         crop.rgba += src.rgba[(y * src.width + x0) * 4:(y * src.width + x1) * 4]
     img = pixelate.reduce_image(crop, tcfg, quant)
     labels = matid_labels(r["matid"] / face, TOKEN_SCALE, TOKEN_CROP)
-    img = pixelate.outline(remap(close_gaps(img, labels), labels, pal, merc), pal.ramp_colours(["soot"])[0])
-    img = hand_edits(clean(img, labels, pal), pal, merc)
+    img = pixelate.outline(remap(fill_holes(close_gaps(img, labels), labels), labels, pal, merc),
+                           pal.ramp_colours(["soot"])[0])
+    img = hand_edits(eye_rims(token_skin_lift(clean(img, labels, pal), pal, merc), labels, pal, merc), pal, merc)
     write_png(path, img)
     meta = {"source": f"render_character.py colour + matid pass, {face}", "reduction": TOKEN_SCALE,
             "pivot_px": list(TOKEN_PIVOT), "palette": cfg["palette"]}

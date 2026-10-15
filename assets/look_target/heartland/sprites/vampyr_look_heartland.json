@@ -4,7 +4,7 @@
   "layer": "body",
   "clip": "rest",
   "image": "vampyr_look_heartland.png",
-  "image_pixel_sha256": "5232f5f9cf00748f0098693dbad07cf1fc1b2744e5c3be8ebe1a7f4d3c510195",
+  "image_pixel_sha256": "7480d4cfabddf17b3432cfb4b1873ff6740480da5ff0937ec2b949c195d36b28",
   "frame_w": 176,
   "frame_h": 176,
   "frame_count": 8,
@@ -101,42 +101,42 @@
       {
         "file": "facing_0_S.png",
         "kind": "render_4x",
-        "sha256": "50be8b79c3fe5733113026a820baa146060a86f809d0b8451711c2418f95d0a1"
+        "sha256": "106067ee4bfb6232f11f834205f17d8936c41672de6c878126e12b2395a700ae"
       },
       {
         "file": "facing_1_SE.png",
         "kind": "render_4x",
-        "sha256": "8fab01ec2d9838724288377cb869b6a7c529ab46df07ed7f0fd2e25afb35de5d"
+        "sha256": "b725338bfe5107018db3bdcfb56b6035cdcb313965d609dfa9f089e604711779"
       },
       {
         "file": "facing_2_E.png",
         "kind": "render_4x",
-        "sha256": "9afd744b8ceb5e00d095b4ed295a5a0db50d6cd799b512d5db665435a04740ce"
+        "sha256": "fe9fc2d59419da2ed5f570aed5ba6382c61bf6c299f9df409ff6a6be2f3c98e5"
       },
       {
         "file": "facing_3_NE.png",
         "kind": "render_4x",
-        "sha256": "adc4b72e7ea049f3fda35b36886124559056eacb3a976e0aea54dc949638c7b1"
+        "sha256": "adb86e2cb2c063b4a37f1dfbb1549ea1756ca3fb8e92be85cafb1eb7a3ea3a3a"
       },
       {
         "file": "facing_4_N.png",
         "kind": "render_4x",
-        "sha256": "5874f3da364faeb4f9a586bf8f2d3905edcb9f058211a71846932fff4f7fa0a8"
+        "sha256": "d1fa2d54ffe2e1599fd2542e808a9e818e453312e01f17d807ab598ff251c1b1"
       },
       {
         "file": "facing_5_NW.png",
         "kind": "render_4x",
-        "sha256": "272d11fbeeb2a2d8a239506a5808cbe82bc8b26f9d7c361e7cd2664e351f5e9b"
+        "sha256": "becdbebd99521142fff16a05ab0fc8b30beab8d5cbc9ed6191895f768735a87b"
       },
       {
         "file": "facing_6_W.png",
         "kind": "render_4x",
-        "sha256": "6165d86997a4a281c11ef99d5731bf44e0b55bf1691f8ccb7849213806db4e5f"
+        "sha256": "5487a0df363bac537ffa1552aa928005e3f94f4947a009d87251ea62d2c2114e"
       },
       {
         "file": "facing_7_SW.png",
         "kind": "render_4x",
-        "sha256": "77a351e1a92eccfcaae40a65e217e6c6a8489c014b156bd84052d60fe013e971"
+        "sha256": "d252fd8fed7c16cbc78796bc655718b4d86d909872aec179ef442990cc65b292"
       }
     ],
     "inputs": {
@@ -154,7 +154,7 @@
       },
       "render_script": {
         "file": "tools/pipeline/render_character.py",
-        "sha256": "ea923b37759b29abab02683d0328e25c04db14497fe5f2d1ed275a6158c653dd"
+        "sha256": "c99e31ff5a17ed089c7f284e781b4a013adc229af2d34174e43b59c14cdfe449"
       },
       "proportions": {
         "file": "tools/pipeline/proportions.json",
@@ -162,7 +162,7 @@
       },
       "kit": {
         "file": "tools/pipeline/kits/vampyr_s1_blockout.json",
-        "sha256": "a705949c015de9ad02027a74ce983516cf34c820e6e6c92fbe9071d493ca97fb",
+        "sha256": "ee2c22dca07b2c50f542d979aa5a26a153d2b939685123e7fe60131f18292e88",
         "pieces": 7,
         "kept": [
           "collar",
@@ -202,6 +202,6 @@
     ]
   },
   "normal_image": "vampyr_look_heartland_normal.png",
-  "normal_image_pixel_sha256": "93b0bc43f735509b4280eb27afc758fdff0f758163f1c0acdeeeb0a28f4d855e",
+  "normal_image_pixel_sha256": "5dffcd43980191b12f9d019eaad6241e53ae644ed1e689ca330890d87bad5324",
   "normal_doc": "camera-facing tangent space, OpenGL: R = screen right, G = screen up, B = toward camera, encoded n * 0.5 + 0.5; alpha copied from the colour frame"
 }

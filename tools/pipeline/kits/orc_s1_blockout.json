@@ -1,5 +1,5 @@
 {
- "_doc": "Orc, stage 1 blockout (silhouette study, route A). Plate over the mass, a two-handed battle axe carried in the right hand, head bare so tusks and personal details read. Shipped gear (Tripo hard pieces + Blender) replaces these piece by piece. Look fix 2026-10-15 (slop audit rows 7, 14): plate is a conformed shell (tools/pipeline/kit_extras.py) so skin cannot poke through; upper arms, neck and head bare (green skin only where he is unarmoured); heavy leather boots; round layered pauldrons and a wide fauld for a brutish silhouette.",
+ "_doc": "Orc, stage 1 blockout (silhouette study, route A). Plate over the mass, a two-handed battle axe carried in the right hand, head bare so tusks and personal details read. Shipped gear (Tripo hard pieces + Blender) replaces these piece by piece. Look fix 2026-10-15 (slop audit rows 7, 14): plate is a conformed shell (tools/pipeline/kit_extras.py) so skin cannot poke through; upper arms, neck and head bare (green skin only where he is unarmoured); heavy leather boots; round layered pauldrons and a wide fauld for a brutish silhouette. Round 2 (fresh critic 2026-10-15): named armour parts with their own values (plate breastplate, belt, fauld, mail skirt and thighs, knee cops, greaves, leather boots), a gorget behind the neck, a barrel front.",
  "merc": "orc",
  "stage": 1,
  "pieces": {
@@ -19,7 +19,7 @@
    ],
    "top_size": 0.5,
    "sides": 10,
-   "doc": "wide plate skirt flaring over the hips"
+   "doc": "wide plate skirt flaring over the hips, below the belt; the breastplate's lower edge sits above the belt"
   },
   "pauldron_l": {
    "shape": "sphere",
@@ -212,6 +212,55 @@
     0,
     0
    ]
+  },
+  "gorget": {
+   "shape": "cone",
+   "bone": "mixamorig:Neck",
+   "at": "head",
+   "offset_m": [
+    0,
+    0.06,
+    0.0
+   ],
+   "size": [
+    0.36,
+    0.34,
+    0.24
+   ],
+   "top_size": 0.26,
+   "sides": 10,
+   "doc": "round 2 (critic 2026-10-15 item 2): a plate gorget over the trapezius that meets the back of the skull, so the head sits low between the shoulders from every side, not on a stalk from behind"
+  },
+  "knee_l": {
+   "shape": "sphere",
+   "bone": "mixamorig:LeftLeg",
+   "at": "head",
+   "offset_m": [
+    0,
+    -0.05,
+    0.0
+   ],
+   "size": [
+    0.15,
+    0.12,
+    0.14
+   ],
+   "doc": "knee cop: a lit plate edge between the mail thigh and the greave (critic item 3)"
+  },
+  "knee_r": {
+   "shape": "sphere",
+   "bone": "mixamorig:RightLeg",
+   "at": "head",
+   "offset_m": [
+    0,
+    -0.05,
+    0.0
+   ],
+   "size": [
+    0.15,
+    0.12,
+    0.14
+   ]
   }
  },
  "groups": {
@@ -273,7 +322,6 @@
   "cuirass": {
    "bones": [
     "mixamorig:Spine",
-    "mixamorig:Hips",
     "mixamorig:LeftShoulder",
     "mixamorig:RightShoulder",
     "mixamorig:Neck"
@@ -281,7 +329,24 @@
    "offset_m": 0.035,
    "smooth": 40,
    "material": "iron",
-   "doc": "barrel plate over chest, back, pelvis and neck (a bare neck read as moss on the plate at 1x)"
+   "bulge": {
+    "dir": [
+     0,
+     -1,
+     0
+    ],
+    "m": 0.06
+   },
+   "doc": "barrel breastplate and backplate over chest, back and neck; the bulge swells chest and gut forward so the heavy leads with his front (critic item 4: the profile read as a hunchback)"
+  },
+  "skirt": {
+   "bones": [
+    "mixamorig:Hips"
+   ],
+   "offset_m": 0.03,
+   "smooth": 20,
+   "material": "mail",
+   "doc": "mail skirt under the fauld: a darker value than plate, so the breastplate's edge reads (critic item 3)"
   },
   "vambraces": {
    "bones": [
@@ -295,17 +360,25 @@
    "material": "iron",
    "doc": "rerebraces and vambraces: bare upper arms between pauldron and vambrace read as moss patches at 1x"
   },
-  "legs": {
+  "thighs": {
    "bones": [
     "mixamorig:LeftUpLeg",
-    "mixamorig:RightUpLeg",
-    "mixamorig:LeftLeg",
-    "mixamorig:RightLeg"
+    "mixamorig:RightUpLeg"
    ],
    "offset_m": 0.025,
    "smooth": 20,
+   "material": "mail",
+   "doc": "mail chausses over the thighs (darker than plate)"
+  },
+  "greaves": {
+   "bones": [
+    "mixamorig:LeftLeg",
+    "mixamorig:RightLeg"
+   ],
+   "offset_m": 0.028,
+   "smooth": 20,
    "material": "iron",
-   "doc": "cuisses and greaves"
+   "doc": "plate greaves: lit plate between the knee cop and the boot"
   },
   "boots": {
    "bones": [
@@ -314,9 +387,10 @@
     "mixamorig:LeftToeBase",
     "mixamorig:RightToeBase"
    ],
-   "offset_m": 0.025,
+   "offset_m": 0.015,
    "smooth": 30,
-   "material": "leather"
+   "material": "leather",
+   "doc": "heavy leather boots over a broad short foot (bodies.json bone_scale keeps the toes inside the 12 px pivot tolerance)"
   }
  },
  "eyes": {

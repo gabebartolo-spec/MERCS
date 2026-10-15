@@ -1,7 +1,7 @@
 # Art handoff, 2026-10-15 AEDT
 Start from this file, CLAUDE.md, your brief, and the Lead ("main") messages. Load art-qa-critic before any visual review.
 
-## State: LOOK B LOCKED (director picked B "Peat and Ochre", 2026-10-15). PR open, awaiting review/merge. No jobs running.
+## State: cast fix round 2 pushed on PR #118 (claude/art-cast-fix), awaiting a fresh critic. No jobs running.
 Branch `claude/art-look-target` (worktree `MERCS-wt/art-look`), PR "art: lock look B Peat and Ochre as master palette
 and golden references". Lock-B layout (supersedes the option paths below):
 - `assets/palette/core.{json,gpl}` (44 colours that never change: soot, iron, bone, skins, cloth, heraldry, blood,
@@ -27,8 +27,13 @@ and golden references". Lock-B layout (supersedes the option paths below):
 - Rerun: `bash D:/MERCS-vault/renders/cast_fix_2026-10-15/render.sh <out>` (orc + Vampyr, colour, matid, normal),
   then `python tools/look/build_sprites.py --renders <out> --palette assets/palette/biomes/heartland.json
   --out assets/look_target/heartland/sprites --tag heartland`. Board: `D:/MERCS-vault/renders/cast_fix_2026-10-15/`.
-- Not done: goldens still show the old orc (re-capture after claude/art-desloppify lands); SHEET-PIVOT on the orc
-  and Vampyr sheets (feet 13-15 px under the pivot; was already failing on main: tall bodies, rule is for average).
+- Not done: goldens still show the old orc (re-capture after claude/art-desloppify lands).
+- Round 2 (fresh critic `D:/MERCS-vault/renders/cast_fix_2026-10-15/CRITIC.md`): kit_extras `drape` (hanging cape),
+  shell `bulge`, bodies.json per-merc `bone_scale` ([x,y,z] ok; orc head + broad short feet) and orc posture (no hump);
+  orc parts: plate/belt/fauld/`mail` (new matid)/knee cops/greaves/boots + gorget; build_sprites: no ramp starts at
+  soot 0, eyes on one row, eye rims + orc brow, eye off the edge, enclosed holes <= 80 px filled, orc token skin +1.
+  Feet now within 12 (validate_sheet passes). Rerun: `round2/render.sh <out>` (kit-keep adds gorget,knee). Board:
+  `round2/README.md`. Awaiting a fresh critic; never self-passed.
 
 ## Water fix (lead QC 2026-10-15: map water read as an asphalt road with a lane marking)
 - Cause: water was slate 1 lit by the warm sun (snapped to brown-greys), straight tile edges with a soil kerb,
