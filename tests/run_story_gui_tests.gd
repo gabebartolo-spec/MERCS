@@ -85,7 +85,7 @@ func _check_gui() -> void:
 ## The hub's prisoner decision (an economy chronicle line) becomes a memory of the captain.
 func _check_decision(game: SliceGame, story: StoryDirector) -> void:
 	var company := game.company_director().company
-	company.economy.take_prisoner(5)
+	company.economy.captives.take(5)
 	company.economy.decide_prisoner(company, "release", 5)
 	await _frames(LAYOUT_FRAMES)
 	var captain := company.captain_id

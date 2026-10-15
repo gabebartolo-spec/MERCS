@@ -28,8 +28,11 @@ func setup(rules: BattleRules, resolver: BattleResolver) -> void:
 	kit.setup(rules)
 
 
-## True when the actor may try an action of this kind at all (base, or one in his kit).
+## True when the actor may try an action of this kind at all: move and wait, the plain blow only
+## when he has no weapon class (his weapon action replaces it), or one in his kit.
 func legal_kind(actor: BattleUnit, kind: String) -> bool:
+	if kind == ATTACK:
+		return kit.weapon_action(actor) == ATTACK
 	if kind in BASE:
 		return true
 	return kit.has(actor, kind)
