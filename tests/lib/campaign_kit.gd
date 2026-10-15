@@ -143,4 +143,5 @@ class Played:
 		world.result_hook = func(kind: String, result: Dictionary) -> void:
 			if result.get("won", false) == true:
 				company.economy.take_loot(kind, rng)
-				company.economy.take_prisoner(world.day)
+				if not EncounterBattle.taken(result).is_empty():
+					company.economy.take_prisoner(world.day)

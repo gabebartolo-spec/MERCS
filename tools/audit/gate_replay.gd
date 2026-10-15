@@ -14,7 +14,7 @@ extends SceneTree
 ##       from the step after the checkpoint and writes <out_dir>/resumed_<checkpoint>.json.
 ## Every line it prints starts "AUDIT ". Compare the files' md5: a resumed run must end in the
 ## uninterrupted run's save. Tooling only: nothing in the game loads this script.
-##   godot --headless --path . --script tools/audit/gate_replay.gd -- full 424308 0 <dir>
+##   godot --headless --path . --script tools/audit/gate_replay.gd -- full 424310 0 <dir>
 
 const World := preload("res://tests/lib/world_fixture.gd")
 const Fixture := preload("res://tests/lib/company_fixture.gd")
