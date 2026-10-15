@@ -13,7 +13,7 @@ loop 8
 sim_world 11
 sim_encounters 11
 save 12
-effect 16
+effect 18
 overworld 11
 road 8
 company 12
@@ -23,6 +23,7 @@ economy 34
 economy_company 44
 hub 12
 injury 29
+wiring 15
 hub_fight 1
 story 60
 story_gui 17

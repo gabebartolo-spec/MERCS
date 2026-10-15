@@ -2,7 +2,8 @@ extends "res://tests/lib/runner.gd"
 ## Hub fight suite (Phase 2 milestone 6: HubDirector hooked to the road's fight). A real fight
 ## on the walkable map (a saved world on the balance seed with a patrol three tiles from the
 ## band; real key taps walk into it, real clicks on Fight and the battle's buttons) ends with
-## the hub open on a prisoner and the loot exactly when the company won, and shut when it lost.
+## the hub open on a prisoner and the loot exactly when the company won, and shut when it lost;
+## the triage panel comes first and the hub opens on its Continue.
 ## Seeded by design: the balance seed (data/balance/world.json); nothing else rolls.
 ##   godot --headless --path . --script tests/run_hub_fight_tests.gd
 
@@ -73,10 +74,15 @@ func _check_real_fight() -> void:
 		return
 	var won := await InputKit.finish_fight(self, director)
 	await InputKit.frames(self, InputKit.LAYOUT_FRAMES)
+	# The triage panel comes first; the loot and the prisoner wait for Continue.
+	var triage_first := not game.hub_open()
+	await InputKit.click(self, director.panel.button_for(OverworldDirector.CONTINUE))
+	await InputKit.frames(self, InputKit.LAYOUT_FRAMES)
 	var hub := game.hub_director()
 	check(
 		(
-			game.hub_open() == won
+			triage_first
+			and game.hub_open() == won
 			and hub.company.economy.prisoner.is_empty() != won
 			and (not won or hub.panel.button_for("prisoner", Economy.RELEASE) != null)
 		),

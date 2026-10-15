@@ -17,16 +17,22 @@ func has_save() -> bool:
 	return FileAccess.file_exists(SAVE_PATH)
 
 
-## Writes the run as it stands, with the company when there is one. False when the file
-## could not be written.
-func save_game(world: WorldSim, rng: Rng, company: Company = null) -> bool:
+## Writes the run as it stands, with the company and its wounds block (CompanyWounds.state())
+## when there are some. False when the file could not be written.
+func save_game(world: WorldSim, rng: Rng, company: Company = null, wounds: Dictionary = {}) -> bool:
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file == null:
 		push_warning(
 			"save failed: %s (%s)" % [SAVE_PATH, error_string(FileAccess.get_open_error())]
 		)
 		return false
-	file.store_string(JSON.stringify(SaveModel.to_dict(world, rng, company), "\t"))
+	var saved := SaveModel.to_dict(world, rng, company, wounds)
+	if extras.is_valid():
+		var more: Dictionary = extras.call()
+		var story: Variant = more.get("story", {})
+		var block: Dictionary = story if story is Dictionary else {}
+		saved = SaveModel.with_story(saved, block)
+	file.store_string(JSON.stringify(saved, "\t"))
 	var error := file.get_error()
 	file.close()
 	return error == OK

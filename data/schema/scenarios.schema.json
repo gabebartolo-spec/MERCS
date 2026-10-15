@@ -54,6 +54,12 @@
                   "$ref": "#/$defs/cell"
                 }
               },
+              "road_cells": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/cell"
+                }
+              },
               "enemies": {
                 "type": "array",
                 "items": {

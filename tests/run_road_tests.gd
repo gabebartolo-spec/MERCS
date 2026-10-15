@@ -164,7 +164,7 @@ func _check_fight_starts(game: SliceGame, director: OverworldDirector) -> void:
 	var on_street := game.stage().extra_mercs.size() - mercs_before
 	check(
 		(
-			battle.units.size() == enemies.size() + 2
+			battle.units.size() == enemies.size() + director.wounds.fielded.size()
 			and battle.current().side == BattleUnit.COMPANY
 			and on_street == battle.units.size()
 			and director.in_fight()
@@ -180,6 +180,8 @@ func _check_fight_starts(game: SliceGame, director: OverworldDirector) -> void:
 ## The fight to its end: fighters off the street, the result applied, the map back in words.
 func _check_fight_returns(game: SliceGame, director: OverworldDirector, before: Dictionary) -> void:
 	var won := await InputKit.finish_fight(self, director)
+	await _frames(LAYOUT_FRAMES)
+	await InputKit.click(self, director.panel.button_for(OverworldDirector.CONTINUE))
 	await _frames(LAYOUT_FRAMES)
 	var world := director.world
 	var expected := _after_fight(world, won, before)
@@ -267,6 +269,8 @@ func _check_ambush(director: OverworldDirector) -> void:
 	)
 	if director.in_fight():
 		await InputKit.finish_fight(self, director)
+	await _frames(LAYOUT_FRAMES)
+	await InputKit.click(self, director.panel.button_for(OverworldDirector.CONTINUE))
 	await _frames(LAYOUT_FRAMES)
 	var entry: Dictionary = director.world.log.back()
 	check(

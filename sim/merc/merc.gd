@@ -128,12 +128,14 @@ func moves() -> Array[String]:
 
 ## The fighter this merc is in a battle, from their data. The abilities come from the moves
 ## learnt (charge, blood_price); a leader is whoever the company's captain is, so the caller
-## says. Generic gear in the slots adds its bonus to the numbers.
-func to_battle_unit(side: int, at: Vector2i, leads: bool) -> BattleUnit:
+## says. Generic gear in the slots adds its bonus to the numbers. `fit` are the merc's
+## numbers as injuries leave them (CompanyWounds); each change from `stats` is laid over.
+func to_battle_unit(side: int, at: Vector2i, leads: bool, fit: Dictionary = {}) -> BattleUnit:
 	var numbers := stats.duplicate()
 	for key: Variant in numbers:
 		if numbers[key] is int or numbers[key] is float:
-			numbers[key] = stat(str(key))
+			var hurt := whole(fit.get(key, 0)) - whole(stats.get(key, 0)) if fit.has(key) else 0
+			numbers[key] = stat(str(key)) + hurt
 	var learnt := moves()
 	numbers["ability_charge"] = Battle.ACTION_CHARGE in learnt
 	numbers["ability_blood_price"] = Battle.ACTION_BLOOD_PRICE in learnt

@@ -12,6 +12,9 @@ extends RefCounted
 
 var roster: Array[Merc] = []
 var captain_id := ""
+## The ids of the dead, buried here (mortality is final, hard rule 5): never on the roster
+## again, not by add(), not by a save. The chronicle keeps the record of how they died.
+var fallen: Array[String] = []
 ## The purse, wages, contracts, pack and hub (Phase 2 milestone 6); saved with the company.
 var economy: Economy = null
 
@@ -39,10 +42,14 @@ static func start(defs: Dictionary) -> Company:
 static func restore(saved: Dictionary, defs: Dictionary) -> Company:
 	var held: Variant = saved.get("roster", [])
 	var rows: Array = held if held is Array else []
-	if rows.is_empty():
+	if rows.is_empty() and not saved.has("fallen"):
 		return Company.start(defs)
 	var company := Company.new()
 	company._read_rules(defs)
+	var buried: Variant = saved.get("fallen", [])
+	if buried is Array:
+		for dead: Variant in buried:
+			company.fallen.append(str(dead))
 	company.economy = Economy.restore(_section(saved, "economy"), defs)
 	for row: Variant in rows:
 		if not row is Dictionary:
@@ -51,7 +58,7 @@ static func restore(saved: Dictionary, defs: Dictionary) -> Company:
 		var merc := company._add(str(saved_merc.get("id", "")))
 		if merc != null:
 			merc.apply_state(saved_merc)
-	if company.roster.is_empty():
+	if company.roster.is_empty() and company.fallen.is_empty():
 		return Company.start(defs)
 	company.captain_id = str(saved.get("captain", ""))
 	if company.member(company.captain_id) == null:
@@ -106,23 +113,67 @@ func gain_all(amount: int) -> Array[String]:
 
 
 ## Fighters for a battle: the named roster members as BattleUnits on `side`, one per cell in
-## order, the captain leading. Unknown ids are skipped.
-func battle_units(ids: Array[String], cells: Array[Vector2i], side: int) -> Array[BattleUnit]:
+## order, the captain leading. Unknown ids are skipped. `fit` is {id: numbers} for a merc
+## whose numbers injuries have changed (see Merc.to_battle_unit).
+func battle_units(
+	ids: Array[String], cells: Array[Vector2i], side: int, fit: Dictionary = {}
+) -> Array[BattleUnit]:
 	var units: Array[BattleUnit] = []
 	for i: int in mini(ids.size(), cells.size()):
 		var merc := member(ids[i])
 		if merc != null:
-			units.append(merc.to_battle_unit(side, cells[i], merc.id == captain_id))
+			var numbers: Variant = fit.get(merc.id, {})
+			var changed: Dictionary = numbers if numbers is Dictionary else {}
+			units.append(merc.to_battle_unit(side, cells[i], merc.id == captain_id, changed))
 	return units
 
 
-## What the save keeps: who holds the office, each merc's experience and gear, and the
-## economy (purse, wages, contracts, pack, hired recruits).
+## The roster's ids, the captain first, then the rest in roster order: who a fight fields.
+func fighting_order() -> Array[String]:
+	var ids: Array[String] = []
+	if member(captain_id) != null:
+		ids.append(captain_id)
+	for merc: Merc in roster:
+		if merc.id != captain_id:
+			ids.append(merc.id)
+	return ids
+
+
+## The dead leave the roster for good. False (and no change) when the id is not on it. The
+## captain's office is not handed on here: the succession (Aftermath) names who takes it.
+func bury(id: String) -> bool:
+	var merc := member(id)
+	if merc == null:
+		return false
+	roster.erase(merc)
+	if id not in fallen:
+		fallen.append(id)
+	if captain_id == id:
+		captain_id = ""
+	return true
+
+
+## A merc's name from the data, on the roster or not (the dead keep theirs); the id when the
+## data has none.
+func name_of(id: String) -> String:
+	for def: Dictionary in _entries():
+		if str(def.get("id", "")) == id:
+			return str(def.get("name", id))
+	return id
+
+
+## What the save keeps: who holds the office, each merc's experience and gear, the dead, and
+## the economy (purse, wages, contracts, pack, hired recruits).
 func state() -> Dictionary:
 	var rows: Array[Dictionary] = []
 	for merc: Merc in roster:
 		rows.append(merc.state())
-	return {"captain": captain_id, "roster": rows, "economy": economy.state()}
+	return {
+		"captain": captain_id,
+		"roster": rows,
+		"fallen": fallen.duplicate(),
+		"economy": economy.state()
+	}
 
 
 ## A merc made from a recruit's data (data/recruits.json) for inspection before a hire; not on
@@ -132,7 +183,7 @@ func preview(recruit_id: String) -> Merc:
 
 
 func _add(id: String) -> Merc:
-	if member(id) != null or roster.size() >= _cap:
+	if member(id) != null or id in fallen or roster.size() >= _cap:
 		return null
 	var merc := _make(id, _entries())
 	if merc == null:
@@ -163,7 +214,9 @@ func _recruit_entries() -> Array[Dictionary]:
 
 
 func _mend_captain() -> void:
-	if member(captain_id) == null and not roster.is_empty():
+	if roster.is_empty():
+		captain_id = ""
+	elif member(captain_id) == null:
 		captain_id = roster[0].id
 
 

@@ -87,7 +87,8 @@ func _on_action(action: String, id: String) -> void:
 		"pay":
 			economy.pay_wages()
 		"accept":
-			economy.accept(id)
+			if economy.accept(id):
+				_remember_contract()
 		"inspect":
 			_inspected = id
 		"hire":
@@ -102,6 +103,17 @@ func _on_action(action: String, id: String) -> void:
 			set_open(false)
 			return
 	_show()
+
+
+## The contract taken, one memory sentence on every merc of the company (the shared store).
+func _remember_contract() -> void:
+	var shared := StoryDirector.memory_of(self)
+	if shared == null:
+		return
+	var ids: Array[String] = []
+	for merc: Merc in company.roster:
+		ids.append(merc.id)
+	shared.on_choice(ids, Memory.KEY_CONTRACT, world.day)
 
 
 func _decide(choice: String) -> void:
