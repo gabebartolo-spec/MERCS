@@ -22,7 +22,7 @@ const COLOUR_DATA: Array[Array] = [
 ## Data keys that hold a palette reference (the others in those blocks are numbers or lights).
 const REFERENCE_KEYS: Array[String] = ["sky", "colour", "fill", "outline"]
 const WHOLE_BLOCKS: Array[String] = ["colours", "markers", "shades"]
-const PALETTE_SIZE := 64
+const PALETTE_SIZE := 67  # 44 core + 23 heartland (heather added 2026-10-16)
 const MIN_REFERENCES := 25
 const MIN_PAIRS := 6
 const WCAG_FLOOR := 4.5
