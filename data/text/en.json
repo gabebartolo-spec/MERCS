@@ -116,5 +116,14 @@
   "memory.captain_died": "The captain {name} died on day {day}, and the company had to choose.",
   "memory.dissent": "I did not want {name} to lead us.",
   "succession.new_captain": "{name} leads the company now.",
-  "succession.dissent": "{name} did not approve."
+  "succession.dissent": "{name} did not approve.",
+  "battle.order": "Turn order: {names}",
+  "battle.order.separator": " > ",
+  "battle.shaken.company": "The company wavers.",
+  "battle.shaken.enemy": "The enemy wavers.",
+  "battle.intent.attack": "Attacks {target}",
+  "battle.intent.advance": "Advances on {target}",
+  "battle.intent.hold": "Holds",
+  "battle.move.charge": "Charge {target}",
+  "battle.move.blood_price": "Blood price on {target}"
 }

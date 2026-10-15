@@ -22,13 +22,13 @@ static func play_out(battle: Battle, rules: Dictionary, max_turns: int) -> Array
 	return log
 
 
-## rules: data/balance/battle.json "rules" (sight_cells, blood_price_hp, move_cells).
+## rules: data/balance/battle.json "rules" (sight_cells; the blood price from its "moves").
 static func choose(battle: Battle, fighter: BattleUnit, rules: Dictionary) -> Dictionary:
 	var sight := Merc.whole(rules.get("sight_cells", 0))
 	var plain := BattleAi.choose(battle, fighter, sight)
 	if fighter.can_blood_price and plain.get("type") == Battle.ACTION_ATTACK:
 		var target := battle.unit(str(plain["target"]))
-		if _worth_the_price(fighter, target, rules):
+		if _worth_the_price(fighter, target, battle.move_def(BattleUnit.MOVE_BLOOD_PRICE)):
 			return {"type": Battle.ACTION_BLOOD_PRICE, "target": target.id}
 	if fighter.can_charge and plain.get("type") == Battle.ACTION_MOVE:
 		var charge := _charge(battle, fighter, sight)
@@ -38,10 +38,10 @@ static func choose(battle: Battle, fighter: BattleUnit, rules: Dictionary) -> Di
 
 
 ## The Vampyr times his all-ins: he pays only when the blow can finish the foe and the price
-## leaves him standing with health to spare.
-static func _worth_the_price(fighter: BattleUnit, target: BattleUnit, rules: Dictionary) -> bool:
-	var cost := Merc.whole(rules.get("blood_price_hp", 0))
-	var finishing := fighter.damage + Merc.whole(rules.get("blood_price_damage", 0))
+## leaves him standing with health to spare. price: battle.json "rules" "moves" "blood_price".
+static func _worth_the_price(fighter: BattleUnit, target: BattleUnit, price: Dictionary) -> bool:
+	var cost := Merc.whole(price.get("hp_cost", 0))
+	var finishing := fighter.damage + Merc.whole(price.get("damage_bonus", 0))
 	return target.hp <= finishing and fighter.hp > cost + cost
 
 
