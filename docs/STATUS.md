@@ -10,9 +10,9 @@ Current phase: **1 (art) and 2 (horizontal slice) in parallel (D-065)** (Phase 0
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | awaiting director | Phase 2 milestone 1 DONE (#75); awaiting the director's milestone 1 play review (F2 in the build) | — | 2026-10-14 |
+| Dev Lead (Opus 5.5) | working | Phase 2 milestone 1 DONE (#75); milestone 2 in progress; awaiting the director's milestone 1 play review (F2 in the build) | claude/p2-m2-encounters | 2026-10-15 |
 | Merge & CI (Sonnet 5.5) | working | board PR after #75 (#72, #74, #75) | claude/board-after-75 | 2026-10-15 |
-| Art Factory (Opus 5.5) | blocked | paused since 2026-10-10; P1-ART-SLICE-CAST step 2 WIP on claude/art-slice-cast (art-publish worktree) | claude/art-slice-cast | 2026-10-10 |
+| Art Factory (Opus 5.5) | awaiting director | paused; director 2026-10-15: keep Art paused, focus on the playable baseline; P1-ART-SLICE-CAST step 2 WIP on claude/art-slice-cast (art-publish worktree) | claude/art-slice-cast | 2026-10-15 |
 | Concept Lead (Fable 5.1) | working | interviewed the director on the horizontal-slice plan; roadmap rewrite (item 18) DONE in #74; leading Phase 2 under D-071 (milestone 1 in #75); next: milestone 2, travel and encounters, after the director's milestone review; Phase 2 structural audit at the gate | — | 2026-10-14 |
 
 States: working · running a check · awaiting director · blocked · available.
@@ -64,6 +64,7 @@ States: working · running a check · awaiting director · blocked · available.
 
 ### Phase 2 (horizontal slice, D-064)
 1. Dev Lead: milestone 1, map and world tick. DONE (#75).
+2. Dev Lead (builder): milestone 2, travel and encounters. Assigned (director 2026-10-15: start now while he plays milestone 1), branch claude/p2-m2-encounters.
 
 ## Waiting on the director
 - Confirm or change the Lead's reversible sketch calls in the slice loop (#66): a talked-down lookout slips away and the band starts shaken; a failed talk means he fights with them; the defeated cannot be recruited (pending Q21); the recruit is a placeholder until you design that cast member.
@@ -84,7 +85,7 @@ States: working · running a check · awaiting director · blocked · available.
 0 / 10 GiB.
 
 ## Live worktrees
-3 / 4: `../MERCS-wt/art-publish` (branch claude/art-slice-cast), `../MERCS-wt/slice-m1`, `../MERCS-wt/board` (this board PR).
+4 / 4: `../MERCS-wt/art-publish` (branch claude/art-slice-cast), `../MERCS-wt/slice-m1`, `../MERCS-wt/board` (this board PR), `../MERCS-wt/p2-m2` (branch claude/p2-m2-encounters).
 
 ## Logged for later (not assigned)
 - Phase 1, LOW, lint precision (Concept Lead review of #5): `strings.py` flags names in

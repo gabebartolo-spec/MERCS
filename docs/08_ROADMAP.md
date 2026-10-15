@@ -108,7 +108,7 @@ game, not feature rich and not visually complete but structurally sound for us t
 battle encounters, basically a playable game"; "the foundations of all our core tenets should be
 visible in the horizontal slice."
 
-Decisions: D-063 to D-072 (`docs/brainstorms/2026-10-14-horizontal-slice-plan.md`). Starts now,
+Decisions: D-063 to D-071 (`docs/brainstorms/2026-10-14-horizontal-slice-plan.md`). Starts now,
 on placeholder sprites, in parallel with Phase 1 (D-065). Extends the slice loop already on main
 (#66, #67, F5 in the build): nothing here is a second skeleton.
 
