@@ -1,5 +1,5 @@
 {
-  "_comment": "A version 1 save (the world and the Rng, before the company existed): the company two days out from the hub at site_hamlet_1, with a one-day road on to site_wild_1. tests/run_save_tests.gd migrates it to SaveModel.VERSION and expects the starting six with the orc captain, day 2, at site_hamlet_1, three sites and seed 424242.",
+  "_comment": "A version 1 save (the world and the Rng, before the company existed): the company two days out from the hub at site_hamlet_1, with a one-day road on to site_wild_1. tests/run_save_tests.gd migrates it to SaveModel.VERSION and expects the starting six with the orc captain, day 2 and seed 424242 (the walking map lays the region out again from the seed and puts the band at the hub's gate).",
   "version": 1,
   "rng": {"seed": 424242, "streams": {}},
   "world": {

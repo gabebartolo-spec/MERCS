@@ -1,11 +1,14 @@
 extends "res://tests/lib/effect_case.gd"
-## encounter_road: the road decides the encounter. The same seed (424243), walking two
-## different roads out of the hub, raises two different encounters: another type, day or
-## line-up. (M2 fixture: "the same seed on a different road gives a different encounter".)
+## encounter_road: the party decides the encounter. The same seed (424242) and the same walk
+## out of the hub into a lone party three steps away: bandits ambush the company (they strike
+## first), a patrol bars the way and names a toll. (Since the walking map, the party the band
+## meets takes the place of the road it walked.)
 
-const BALANCE := "res://data/balance/world.json"
-const ENCOUNTERS := "res://data/encounters.json"
-const SEED := 424243
+const Fixture := preload("res://tests/lib/world_fixture.gd")
+const SEED := 424242
+const OUT := 3
+const NEAR := 3
+const WALK_LIMIT := 20
 
 
 func id() -> String:
@@ -13,27 +16,18 @@ func id() -> String:
 
 
 func run() -> Dictionary:
-	var first := _destinations()[0]
-	var second := _destinations()[1]
-	return {"on": _met_on(first), "off": _met_on(second)}
+	return {"on": _met("ambush"), "off": _met("patrol")}
 
 
-func _destinations() -> Array[String]:
-	return _world().destinations()
-
-
-func _world() -> WorldSim:
-	var world := WorldSim.new()
-	world.start(json(BALANCE), Rng.from_seed(SEED))
-	var lineups: Array = json(ENCOUNTERS).get("encounters", [])
-	world.set_lineups(lineups)
-	return world
-
-
-## What the company meets walking the road to `to`: type, day and the enemy line-up (not the road).
-func _met_on(to: String) -> String:
-	var world := _world()
-	world.travel_to(to)
+## What the company meets: type, who strikes first, the toll and the enemy line-up.
+func _met(kind: String) -> String:
+	var world := Fixture.world(SEED)
+	world.parties.clear()
+	Fixture.out_of_town(world, OUT)
+	var party := Fixture.lone_party(world, kind, NEAR)
+	if party == null:
+		return "no tile for the party"
+	Fixture.walk_toward(world, party.tile, WALK_LIMIT)
 	var found := world.pending_encounter()
 	if found.is_empty():
 		return "nothing"
@@ -42,4 +36,7 @@ func _met_on(to: String) -> String:
 	for enemy: Variant in enemies:
 		var record: Dictionary = enemy if enemy is Dictionary else {}
 		foes.append(str(record.get("fighter", "")))
-	return "%s on day %d against %s" % [found.get("type"), found.get("day"), foes]
+	return (
+		"%s (enemy first %s, toll %d) against %s"
+		% [found.get("type"), found.get("enemy_first"), world.toll_cost(), foes]
+	)

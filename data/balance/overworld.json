@@ -1,0 +1,27 @@
+{
+  "_comment": "The walkable overworld on screen (presentation/world/overworld_map.gd and overworld_director.gd): the map's scale, the tokens and the placeholder terrain colours, and how a held walking key repeats. overworld.md explains each knob.",
+  "map": {
+    "tile_px": 32,
+    "band_radius_px": 12,
+    "party_radius_px": 10,
+    "site_radius_px": 7,
+    "ring_width_px": 3
+  },
+  "walk": {
+    "first_repeat_s": 0.25,
+    "repeat_s": 0.12
+  },
+  "colours": {
+    "plain_rgb": [0.52, 0.6, 0.36],
+    "road_rgb": [0.7, 0.6, 0.42],
+    "forest_rgb": [0.2, 0.36, 0.2],
+    "hill_rgb": [0.56, 0.48, 0.34],
+    "water_rgb": [0.2, 0.34, 0.52],
+    "town_rgb": [0.34, 0.28, 0.26],
+    "band_rgb": [0.86, 0.68, 0.24],
+    "ambush_rgb": [0.72, 0.14, 0.12],
+    "patrol_rgb": [0.22, 0.32, 0.7],
+    "site_rgb": [0.95, 0.92, 0.84],
+    "ring_rgb": [0.08, 0.06, 0.06]
+  }
+}

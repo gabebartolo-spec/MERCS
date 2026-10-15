@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Locations",
+  "description": "data/locations.json: the hand-made stamps the overworld generator lays at each site (Phase 2, the walkable overworld), one per site kind. Rows run north to south: '#' a town wall, 'E' the entrance tile (exactly one per stamp, by the author's care), '.' the generated land left as it is.",
+  "type": "object",
+  "required": [
+    "locations"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "locations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "site_kind",
+          "rows"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^loc_[a-z0-9]+(_[a-z0-9]+)*$"
+          },
+          "site_kind": {
+            "type": "string",
+            "pattern": "^(hub|hamlet|wild)$"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[#.E]+$"
+            }
+          }
+        }
+      }
+    }
+  }
+}
