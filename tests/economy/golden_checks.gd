@@ -45,19 +45,22 @@ const SEEDS := {
 ## that meets an encounter on the map fights a bigger band (pinned on top of C5 and C6): win
 ## x2, loss/424308, second_fight x2 and wipe x2 move; toll (paid, no fight), job and
 ## loss/424316 hold.
+## Re-pinned by the playable-baseline tune (claude/baseline-tune, data only): the purse starts at
+## 144 (was 80) and the board posts 2-3 contracts every 4 days paying 35-70 (was 1-3 every 5,
+## 20-50), so every route's final save carries a different purse and board: all twelve move.
 const GOLDEN := {
-	"win/424310": "88342bd38398520fe0f8f0725b1437fd9aa2ce3c6e33bc7de4d4336a9b6c5e25",
-	"win/424311": "d76ebdfbcf3e6bac5c9040aa7d4d5f86b252ff40c65f7c419c1245dd9b4494f6",
-	"loss/424308": "349aa5b355698567ed053bc0dc4f7015235a58d87465065a69110048ef2d6a0b",
-	"loss/424316": "ae1491173ccf7b35563033ab048932fe88b7f9e34b0a41d32b40520df5a03e9b",
-	"toll/424308": "6f97c63c31c7cdfb03baaa5448afd92670b8eff5ca12eddeff3aa2bdcb7a237a",
-	"toll/424316": "84a0597763a649f8d644d6499dfe34a8e5e5819a63ced8ff4db6ff5af0f5c32a",
-	"second_fight/424308": "845acf7afb26b34532996ef94ebb5e428f1593b041b6daf49e107b612ffafa63",
-	"second_fight/424316": "c466a1db386136bffef03656530b73482079e31327e768189c4232ed86d87438",
-	"wipe/424308": "90ca7d0846980e50963ffe9ae27abebcc7469312d4165bb1e858c44236990d0a",
-	"wipe/424316": "166f60989c2a7aa80be42896f7b0077ca87f530cce370c067d936ca989fe7c23",
-	"job/424308": "17748c59ae8ea3b7a71d4af78836d37084877417e699dfa05fcef4486130f2c1",
-	"job/424316": "5173a1b21a140efe63db148bc7f21ddb990b170587ea6f374c471a22d8dda873",
+	"win/424310": "1862cccad79ece03d31e01cf5efead9eff2b030e90e0391a70f30419add331a0",
+	"win/424311": "955b237c63a7292600ddb1e2c481a80ed760e75c9b22f5d7cb4f1f6238471b7a",
+	"loss/424308": "9d283afd39b12dea6c4a2ae61af8c081a8edd91f28f1288807b26344a8105166",
+	"loss/424316": "ff4d763d5a65b2474ac86798fc9349fe361f3eeeda65bba4c47cb68a77ec5a93",
+	"toll/424308": "d43213f3c6d39f8964dea8448c361feaf432b1c9689e37fc26e7672c5cafa84d",
+	"toll/424316": "e149b0330c073f796698ccdad2152c0ad265b386208ac7ab4c18edce652b94f5",
+	"second_fight/424308": "b3f2d73dba751fedd1c688e579731597bc99bac33727b21602bb700bfcd6410c",
+	"second_fight/424316": "ca86d6ef4abef740c44ba0dfeb56e75b30b82523648fe7ef7bcca817f8ce328a",
+	"wipe/424308": "58daa09245b7a00e5e76e8f6eb220b60a76bceaf7c86e5cdab2bd83e775e9fe6",
+	"wipe/424316": "3434731c56031ab5f55e4dc39ae35bb76ee8ebdad0a4ae9adf1195ef2a126e11",
+	"job/424308": "c6945a1f65b4411465c2b07e534c01cbbf10a4a5291073042157a8c3bf1e2e04",
+	"job/424316": "a91c36382dd1c45b84a5a9a2614750aa955a314c7d476202433d076e1fd57b49",
 }
 
 
