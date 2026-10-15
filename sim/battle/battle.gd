@@ -77,10 +77,8 @@ func setup(rules: Dictionary, field: Dictionary, fighters: Array[BattleUnit], rn
 	fled.clear()
 	prisoners.clear()
 	log.clear()
-	var loadout_max := _rules.num("loadout_max")
 	for fighter: BattleUnit in fighters:
-		if loadout_max > 0 and fighter.moves.size() > loadout_max:
-			fighter.moves.resize(loadout_max)
+		fighter.moves = _actions.kit.techniques(fighter)
 		BattleGrid.face_nearest(fighter, fighters)
 	_turns.skip_downed()
 	_begin_round(log)

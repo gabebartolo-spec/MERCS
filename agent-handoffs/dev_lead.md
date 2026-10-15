@@ -1,66 +1,73 @@
-# Dev Lead handoff, 2026-10-15 23:45 (desktop, personal account, "Game Studio Lead mercs")
+# Dev Lead handoff, 2026-10-16 03:15 (desktop, personal account, "Game Studio Lead mercs")
 Start: this file, CLAUDE.md, ~/.claude/memory-shared/MEMORY.md + co-lead-playbook.md, your brief
-(agent-briefs/DEV_LEAD_OPUS.md), docs/plans/phase4_combat.md, docs/DECISIONS.md D-082..D-090,
-~/.claude/skills/ai-slop-art/SKILL.md (+ learnings). Then `git fetch`, `gh pr list`, `gh run list`.
+(agent-briefs/DEV_LEAD_OPUS.md), docs/plans/phase4_combat.md, docs/plans/phase5_contracts.md,
+docs/DECISIONS.md D-082..D-090, ~/.claude/skills/ai-slop-art/SKILL.md. Then `git fetch`, `gh pr list`.
 
-## State: working (Phase 4 combat merging via a steward; art critic loops). Director watching a
-movie (23:14): "dont question me for a while" -> queue questions below, make team calls yourself.
+## State: working overnight. Director went to bed 03:13: "dont ask me more questions im going to bed".
+Ask NOTHING until he writes again. Make team calls yourself; table taste calls below.
 
 ## Who does what
-Session = lead AND Dev Lead. Team = builder subagents (die with the session). D-090: parallel
-Godot OK (GODOT=/c/Users/DANTE/Desktop/Godot_v4.7.2-stable_win64.exe/Godot_v4.7.2-stable_win64_console.exe,
-own APPDATA on the command only, offscreen, kill by PID); no builder ceiling for independent work.
-Common builder rules for combat: scratchpad p4_common.md + p4_rulings.md (session scratch; copy the
-rulings below into briefs if the scratchpad is gone).
+Session = lead AND Dev Lead. Team = builder subagents (die with the session: check ListAgents).
+D-090: parallel Godot OK (GODOT=/c/Users/DANTE/Desktop/Godot_v4.7.2-stable_win64.exe/Godot_v4.7.2-stable_win64_console.exe,
+own APPDATA on the command only, offscreen, kill by PID). Builder rules: session scratchpad
+p4_common.md; all rulings below (copy them into briefs if the scratchpad is gone).
 
-## Director rulings tonight (log as D-091.. in the next board PR, branch docs/board-after-<n>)
-- D-091 Combat depth first. Q-B weapons sword/axe/spear/mace/bow; armour leather/mail/plate.
-- Q-A 1 weapon + 4 moves (no item slot). Q-C surrender when cornered or leader down. Q-D captain death
-  = large morale fall (lead: + per-fighter resolve test). Q-E withdraw: position decides.
-- Q-F captain sits out: no XP, small morale dip. Q-G blood at every hit, bodies stay. Q-H NOT ASKED.
-- D-092 original MERCS typeface ("better to make a unique one"); "More grit in headings only".
-- D-093 look B colours on the game screens: "Yes, use B" (#115 merged).
-- D-094 levels: small growth + new moves (#120 merged). D-095 XP from fights: survive + kills.
-- Lead calls: prisoners only from surrender; enemies get placeholder gear; weapon action replaces
-  plain attack for classed fighters; level-2 XP 10->9 (placeholder balance); tile "hill" -> "rough".
+## Director rulings (log as D-091..D-1xx in the next board PR, branch docs/board-after-<n>)
+- 2026-10-15: D-091 combat depth first; weapons sword/axe/spear/mace/bow; armour leather/mail/plate;
+  1 weapon + 4 moves; surrender when cornered or leader down; captain death = large morale fall;
+  withdraw: position decides; captain sits out: no XP, small dip; blood every hit, bodies stay.
+  D-092 own typeface, grit in headings. D-093 look B colours. D-094 small growth + new moves. D-095 XP survive+kills.
+- 2026-10-16 interview: captain's fall breaks ABOUT HALF (placeholder resolves 4/5/6/6, done in #123);
+  sit-out dip 10; sergeant = most XP; blood price frequency left; hover odds = PERCENTAGE;
+  Ledger B "Ship B" (#116 merged); build ranged next (P1c) + spears real 2-cell reach; tiles method B'
+  (Claude-painted); heather = 3 muted purples; orc skin -> grey-olive; next playtest AFTER combat merges
+  AND art lands; next depth pass = Contracts and the road; prisoners ransom/recruit/release/execute;
+  loot = worn gear; armour strong but costly (slower + price/upkeep); a named death every few fights
+  (target 1 per 4); company cap 8; road fights 4-8 soldiers, up to 12-16 if rabble (weak kind).
+- Contracts (Q-1..Q-16, all in docs/plans/phase5_contracts.md "Decided"): 6 deploy + 2 reserve; share
+  of contract pay, split BY LEVEL; daily wage by level; terms negotiated ("you must negotiate"): advance
+  vs on return + a merc steps in with a trait the director names; reputation PER FACTION; hunters only
+  on abandoning after an advance of half the pay or more, growing with the grudge; towns buy and sell;
+  worn = one point weaker; prisoner recruit left out "Not until you design it".
+- Lead calls: P1c lines (walls block arrows/spears, fighters block neither, range 6 in data); #127 gear
+  placeholders retuned to keep the slice 89-109/200 wins; orc skin option A (golden grass remapped to
+  verdure); P6c impact (pasted brief): deterministic, no physics raycasts, hit-stop presentation only.
 
-## Merged since last handoff
-#112 perf, #113 gate evidence, #114 battle split, #115 look B UI, #117 battle readable, #119 effect
-fixtures (8 systems, 4 routes), #120 levels, #121 action kit. #110 Ironman notes.
+## Merged tonight
+#116 Ledger, #122 non-psychic AI, #123 morale/surrender, #124 deploy-or-delegate, #125 XP from fights,
+#128 handoff, #129 blood and bodies (lead QC r3 PASS), #130 contracts plan.
 
-## Open PRs (steward agent merges 122->123->124->125->126 in order, re-pinning goldens between)
-- #122 P5 non-psychic AI: review OK + add merc_play to the hidden-read scan.
-- #123 P2 morale/surrender/rout: review OK + broken-fighter intent fix + no-prisoner hub check.
-- #124 P4 deploy-or-delegate: review OK once its flat fight_xp is REMOVED.
-- #125 XP from fights: review OK; set level_xp[1]=9. #126 kit follow-ups: review running.
-- #116 MERCS Ledger typeface: Regular SHIP, Display fixed after critic r2 -> director look question.
-- #118 cast fix (orc/vampyr/tokens): round 2 pushed, fresh critic running.
-- Running builders: P1b gear (claude/p4-p1b-gear), P6b blood (claude/p4-p6b-blood), tiles B5
-  (shore + rough), goldens round 3 (claude/art-desloppify), cast critic, #126 review, steward.
+## Open PRs and running agents (03:15)
+- Steward: merging #126 (kit follow-ups + wait fallback) then #127 (gear: initiative display from one
+  source, placeholder retune, gear-off golden check). Reviews done (scratchpad review126/127.md).
+- #118 cast round 3 (orc/vampyr/average_m repaint + grey-olive skin + golden remap): painter running,
+  CI was red (test, plan) - painter told. Then a FRESH critic (opus builder briefed with ai-slop-art;
+  realism-critic refuses pixel sprites without photos).
+- Tiles B6 (D:/MERCS-vault/renders/tile_trial_2026-10-15/B6_claude, palette branch claude/tiles-b6
+  92249fd, heather 3 colours, no PR yet): fresh critic running. Missing: hills, shore corners, road
+  bends; water ramp (D-089) not yet in repo palette; grass luma 80 vs golden 71 (critic judges).
+- P1c ranged + spear reach: waits for #127 to merge, then claude/p4-p1c-ranged.
+- P6c blood spray + hit-stop: waits on #129 (merged) -> building claude/p4-p6c-impact.
+- C0 economy split + route goldens: claude/c0-economy-split.
 
-## Queued for the director (ask when he's back, one at a time, with images)
-1. Tile method board (after B5 critic SHIP): A Blender rig / B Claude-painted / C Retro Diffusion;
-   hills + transitions labelled missing; heather needs a purple ramp (palette add?).
-2. MERCS Ledger look approval: "is the heading voice grim enough?" (board_v2.png).
-3. Cast look (after critic SHIP). 4. Goldens round 3 (after critic SHIP).
-5. Balance notes for play review: captain fall breaks 4/6 mercs + all recruits (resolve 5 vs bar 6);
-   sat-out dip 10; sergeant = most XP; Vampyr blood price fires less (432->257 over 300 fights).
-6. Q-H hover odds: % or roll needed (before P7 action bar).
-7. Gate playthrough build: MERCS-builds/2026-10-15_gate_2ea4632 (stale now; rebuild after merges).
+## Next steps
+1. Merge #126, #127; then P1c, P6c, C0 PRs each after its review (sim review for P1c/C0; lead QC P6c).
+2. Cast and tiles: critic loop until SHIP; then palette PR (heather + water ramp + grey-olive) and
+   wire the art into the live game (slop audit root A: the game shows no art yet).
+3. Board PR: D-091..D-1xx from the rulings above; roll the oldest DECISIONS entries to the archive.
+   Add the "Run result: OBSERVED|NOT VERIFIED|N/A" line to the PR template (playbook TRIAL 2026-10-16).
+4. Contracts C1-C4 after C0. Fresh gate build only when combat + art have landed (his ruling).
 
-## Art status (vault D:/MERCS-vault/renders/)
-Tiles: B4 7/10 SHIP (grass, road, forest x2, water x2); B5 fixing shore + rough. Goldens: E best,
-round 3 running. Typeface: typeface_2026-10-15. Cast: cast_fix_2026-10-15/round2. Slop audit
-README in slop_audit_2026-10-15 (root A: the live game shows no art yet -> integrate after picks).
-Palette: orc skin_orc_1 == commonest grass colour (separate in the dedupe palette PR).
-
-## Worktrees: 14 live (over the cap of 4; D-090). Steward removes merged ones.
+## Queued for the director (when HE writes again; one at a time, with images)
+- Cast look and goldens round 3 (after critic SHIP). Tile board B6 (after SHIP). Name each merc's
+  bargaining trait (contracts Q-8). Balance read after his playtest.
 
 ## Rules learnt the hard way (keep under 10 lines)
 - Never `export APPDATA`. Board PRs: branch `docs/board-after-<n>`; DECISIONS.md 392/400: roll to archive.
-- PR [MERGE NOTE] must use bullets "- Review needed: none|done (...)" / "- Director gate: ...":
-  scratch note.py rewrites them. "Base branch policy prohibits" = retry after 20 s.
-- Floors conflicts: keep every suite line at the count the suite RUNS; effect id lists keep all ids.
+- PR body needs ## Evidence, ## Not exercised, [MERGE NOTE] bullets "- Review needed: none|done (...)" /
+  "- Director gate: none|done (...)" (note.py). merge_eligibility needs PYTHONUTF8=1 on Windows.
+- Floors conflicts: keep every suite line at the count it RUNS. Only a branch's owner pushes to it
+  (auto-fix events on steward-owned PRs go to the steward).
 - Sim PRs: fresh mercs-sim-review that plays the exploit in separate processes, then merge.
-- Art: maker never passes own work; fresh critic SHIP/FIX; lead QC at 2x/6x; nothing slop reaches him.
+- Art: maker never passes own work; fresh critic; lead QC at 2x; nothing slop reaches him.
 - gdlint caps: 400 lines/file, 4 args/function, complexity 12: split, don't squeeze.

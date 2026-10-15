@@ -8,7 +8,7 @@ stage_scale 11
 stage_light 8
 assets 13
 slice 16
-battle 50
+battle 56
 loop 8
 sim_world 11
 sim_encounters 11
@@ -34,3 +34,4 @@ ironman 14
 ironman_resume 24
 look 17
 perf 14
+battle_view 45

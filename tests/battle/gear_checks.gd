@@ -65,7 +65,7 @@ func _duel(attacker: Dictionary, defender: Dictionary) -> Battle:
 ## One sure hit by a on d (seeded); its "damage" event.
 func _blow(attacker: Dictionary, defender: Dictionary) -> Dictionary:
 	var battle := _duel(attacker, defender)
-	for event: Dictionary in battle.apply({"type": Battle.ACTION_ATTACK, "target": "d"}):
+	for event: Dictionary in battle.apply(_strike(battle, "d")):
 		if event.get("type") == BattleResolver.EVENT_DAMAGE:
 			return event
 	return {}
@@ -210,18 +210,14 @@ func _check_shield() -> void:
 	var guard := BattleRules.read(shield, "defense")
 	var bare := _duel({"gear": {"sword": true}}, {"hp": SURE_HIT})
 	var held := _duel({"gear": {"sword": true}}, {"hp": SURE_HIT, "gear": {"shield": true}})
-	var need_bare := BattleRules.read(
-		bare.odds({"type": Battle.ACTION_ATTACK, "target": "d"}), "need"
-	)
-	var need_held := BattleRules.read(
-		held.odds({"type": Battle.ACTION_ATTACK, "target": "d"}), "need"
-	)
+	var need_bare := BattleRules.read(bare.odds(_strike(bare, "d")), "need")
+	var need_held := BattleRules.read(held.odds(_strike(held, "d")), "need")
 	var axe := _splits({"axe": true})
 	var sword := _splits({"sword": true})
 	var missed := _duel(
 		{"attack": SURE_MISS, "gear": {"axe": true}}, {"hp": SURE_HIT, "gear": {"shield": true}}
 	)
-	missed.apply({"type": Battle.ACTION_ATTACK, "target": "d"})
+	missed.apply(_strike(missed, "d"))
 	_check.call(
 		(
 			guard > 0
@@ -252,7 +248,7 @@ func _splits(weapon: Dictionary) -> int:
 		var pair: Array[BattleUnit] = [a, d]
 		var battle := Battle.new()
 		battle.setup(_rules(), {"size": GRID}, pair, Rng.from_seed(SEED + i))
-		var events := battle.apply({"type": Battle.ACTION_ATTACK, "target": "d"})
+		var events := battle.apply(_strike(battle, "d"))
 		var split := events.filter(
 			func(e: Dictionary) -> bool: return e.get("type") == BattleGear.EVENT_SHIELD_BROKEN
 		)
@@ -295,10 +291,10 @@ func _check_odds() -> void:
 		{"attack": 2, "damage": 6, "gear": {"sword": true}},
 		{"hp": SURE_HIT, "defense": 1, "gear": {"plate": true, "shield": true}}
 	)
-	var rng_before := battle.odds({"type": Battle.ACTION_ATTACK, "target": "d"})
-	var again := battle.odds({"type": Battle.ACTION_ATTACK, "target": "d"})
-	var own_side := battle.odds({"type": Battle.ACTION_ATTACK, "target": "a"})
-	var events := battle.apply({"type": Battle.ACTION_ATTACK, "target": "d"})
+	var rng_before := battle.odds(_strike(battle, "d"))
+	var again := battle.odds(_strike(battle, "d"))
+	var own_side := battle.odds(_strike(battle, "a"))
+	var events := battle.apply(_strike(battle, "d"))
 	var need := -1
 	for event: Dictionary in events:
 		if event.get("type") == BattleResolver.EVENT_ATTACK:
@@ -362,3 +358,8 @@ func _check_merc() -> void:
 			+ "generic gear fills only a slot the line leaves open"
 		)
 	)
+
+
+## The current fighter's weapon action on a target (the plain attack without a class, P1a).
+func _strike(battle: Battle, target: String) -> Dictionary:
+	return {"type": battle.kit(battle.current().id)[0], "target": target}
