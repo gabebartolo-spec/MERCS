@@ -60,7 +60,9 @@ def main() -> None:
           "Round 6 (2026-10-16, tools/look/cast_r6/): the orc's heads rebuilt as skulls (rounded crown, brow "
           "arches, ears, nose, neck, a sloped back in profile) on a mossier skin_orc ramp; the orc token head "
           "redrawn so the tusks cross a straight mouth; the Vampyr's breastplate tapered to the waist with a "
-          "plackart line and fauld lames, the lining as cape folds, and the E/W jaw blob replaced by a jaw line.",
+          "plackart line and fauld lames, the lining as cape folds, and the E/W jaw blob replaced by a jaw line. "
+          "Round 7 (2026-10-16, tools/look/cast_r7/): the orc's E/W ear a skin crease (no soot ring inside the "
+          "skull); the Vampyr's five enclosed outline holes filled with soot 0 and an eye socket on his E/W head.",
           ["tools/pipeline/render_character.py", "tools/pipeline/kit_extras.py", "tools/pipeline/pixelate.py",
            "tools/pipeline/pack_sheets.py", "tools/pipeline/kits/orc_s1_blockout.json",
            "tools/pipeline/kits/vampyr_s1_blockout.json", "tools/look/build_sprites.py",
@@ -81,12 +83,13 @@ def main() -> None:
           "no dark rims; orc figures' skin on the round-5 ramp by index; director to approve "
           "(tools/look/cast_r5/remap_golden.py). Round 6 (2026-10-16): every old lit-grass pixel on "
           "verdure_mid_0 (no neighbour rule, so no lattice); orc figures' skin on the round-6 ramp by index "
-          "(tools/look/cast_r6/remap_golden.py).",
+          "(tools/look/cast_r6/remap_golden.py). Round 7 (2026-10-16): every old shade pixel (40,48,22) on "
+          "verdure_0 (no neighbour rule), so main's forest-floor dither survives (tools/look/cast_r7/remap_golden.py).",
           ["tools/look/look_target.gd", "tools/look/look_map.gd", "tools/look/palette_post.gdshader",
            "tools/look/build_look_kit.py",
            "tools/look/build_sprites.py", "tools/look/cast_r3/remap_golden.py",
            "tools/look/cast_r4/remap_golden.py", "tools/look/cast_r5/remap_golden.py",
-           "tools/look/cast_r6/remap_golden.py"],
+           "tools/look/cast_r6/remap_golden.py", "tools/look/cast_r7/remap_golden.py"],
           [blender, mpfb, py, "Godot Engine"],
           approved)
 

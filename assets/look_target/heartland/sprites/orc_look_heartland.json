@@ -4,7 +4,7 @@
   "layer": "body",
   "clip": "rest",
   "image": "orc_look_heartland.png",
-  "image_pixel_sha256": "c2c5ee2f6519198531700ca18fc49a53f922c6d23f2710e1b5b9b83c37aa002c",
+  "image_pixel_sha256": "065f18d39daf83509cdce6d779487bd0da394b53e80df0b244ae64abac3c4936",
   "frame_w": 176,
   "frame_h": 176,
   "frame_count": 8,
@@ -207,6 +207,6 @@
     ]
   },
   "normal_image": "orc_look_heartland_normal.png",
-  "normal_image_pixel_sha256": "ddbe1df1aefaa48853a216cda9357a4bf95fd7c3e769d48c11bb16cb2c6dfb70",
+  "normal_image_pixel_sha256": "1e98b769fbff85c6b949aed7e3976aa11890664e05a6594e457673061da2d726",
   "normal_doc": "camera-facing tangent space, OpenGL: R = screen right, G = screen up, B = toward camera, encoded n * 0.5 + 0.5; alpha copied from the colour frame"
 }

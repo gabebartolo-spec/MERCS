@@ -4,7 +4,7 @@
   "layer": "body",
   "clip": "rest",
   "image": "vampyr_look_heartland.png",
-  "image_pixel_sha256": "002407686264eeb230b4dcbfca2a534287f277d33c75811599c451d85af27fc3",
+  "image_pixel_sha256": "af54e31d549bf15c2b8014eabb4bf9fe7eb5a2df5cd9e11d600f360f0b7d9db9",
   "frame_w": 176,
   "frame_h": 176,
   "frame_count": 8,
@@ -202,6 +202,6 @@
     ]
   },
   "normal_image": "vampyr_look_heartland_normal.png",
-  "normal_image_pixel_sha256": "e2d4dc829c9ae1064cd583bbdc7862900254184a0cbdd1f2e4b7237d002313eb",
+  "normal_image_pixel_sha256": "22721b7647d554bfc494bbbeb7383fd18b928dbbd350e0efdc7e9f4167f6344d",
   "normal_doc": "camera-facing tangent space, OpenGL: R = screen right, G = screen up, B = toward camera, encoded n * 0.5 + 0.5; alpha copied from the colour frame"
 }
