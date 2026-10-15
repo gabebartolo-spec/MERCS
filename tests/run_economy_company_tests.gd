@@ -10,6 +10,7 @@ extends "res://tests/lib/runner.gd"
 ##   godot --headless --path . --script tests/run_economy_company_tests.gd
 
 const Fixture := preload("res://tests/lib/company_fixture.gd")
+const StandingChecks := preload("res://tests/economy/standing_checks.gd")
 const V1_FIXTURE := "res://tests/fixtures/save/v1.json"
 const WORLD_BALANCE := "res://data/balance/world.json"
 const SEED := 424242
@@ -30,6 +31,7 @@ func run_checks() -> void:
 	_check_save_round_trip()
 	_check_older_save()
 	_check_world_hooks()
+	StandingChecks.new().run(check)
 	await process_frame
 
 
