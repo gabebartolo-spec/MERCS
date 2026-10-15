@@ -15,6 +15,18 @@ and golden references". Lock-B layout (supersedes the option paths below):
 - check_assets_pixels.py checks assets/look_target/heartland and assets/golden against heartland; self-test 24/24.
 - Pipeline default pixelate.json still points at master_draft (average_m sheet + fixtures): switching is a separate step.
 
+## Water fix (lead QC 2026-10-15: map water read as an asphalt road with a lane marking)
+- Cause: water was slate 1 lit by the warm sun (snapped to brown-greys), straight tile edges with a soil kerb,
+  and a hairline crack between tiles showing the sky (bone 3) as one long pale line.
+- Fix: water faces are `pal:cloth_faded:2:flat` (unlit, exactly the palette's one blue-slate; `:flat` suffix
+  handled in look_target.gd `_recolour`); glints are short broken dash pairs (slate 2, flat); tiles scaled 1.002
+  so they overlap (no crack); ragged mud-and-rush banks (kit `bank_0..2`, `bank_half_pos/neg`) on every
+  water edge that meets land, and shore tiles `tile_shore_0..2` (water south half, bank across the middle).
+- Map layout moved to `tools/look/look_map.gd` (look_target.gd was at the 400-line cap). Street goldens untouched.
+- Before/after 2x crops: `D:/MERCS-vault/renders/look_2026-10-15/water_fix/`. Gates: lints 10/10, pixels and
+  palette pass (0 off-palette, 48 colours), assets suite 13/13, gdlint/gdformat clean.
+- Side effect: the 1.002 tile overlap moves about 1,800 pixels above the water by a pixel (tuft edges).
+
 ## Task (director 2026-10-15: "establish an aesthetic and stick to it")
 Golden references + one master palette + one render rig, validated. 2-3 labelled options, each a coherent palette +
 lighting + post set, shown as: street day, street night + rain (4K, real Godot build), overworld strip at map scale.
@@ -53,7 +65,7 @@ lighting + post set, shown as: street day, street night + rain (4K, real Godot b
 
 ## Known limits (said in the report)
 - Figures are stage-1 blockouts (primitive plate, bare feet, no weapons); the orc's stoop is his bodies.json posture.
-- Map water reads as flat grey slate in every option (no water ramp); banner poles lean with the perspective camera.
+- Options A and C map water still reads as flat grey slate (not re-rendered); banner poles lean with the perspective camera.
 - Map tokens are unlit (no normal maps); street sprites are lit.
 - A fresh realism critic (art-qa-critic section 0) has NOT been run: I cannot spawn agents. The Lead should.
 

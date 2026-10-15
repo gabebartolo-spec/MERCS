@@ -21,10 +21,11 @@ const DEFAULT_TAG := "heartland"
 const STREET_KIT := "res://assets/look_target/kit/street_kit.glb"
 const MAP_KIT := "res://assets/look_target/kit/overworld_kit.glb"
 const POST_SHADER := "res://tools/look/palette_post.gdshader"
+const LookMap := preload("res://tools/look/look_map.gd")
+const FLAT := ":flat"
 const SCREEN_SCALE := 4
 const MAP_HEIGHT_PX := 20
 const SETTLE_FRAMES := 12
-const TILE_M := 4.0
 const ORC_AT := Vector3(-0.85, 0.0, 0.55)
 const VAMPYR_AT := Vector3(0.95, 0.0, 0.25)
 const TORCH_AT := Vector3(0.05, 2.06, 1.3)
@@ -43,34 +44,8 @@ const RESERVED_PENALTY := {"heraldry": 0.012, "blood": 0.012, "fire": 0.004}
 const RAIN_SEED := 11
 const WINDOW_PX := Vector2i(3840, 2160)
 const STREET_FOCUS := Vector3(0.0, 0.0, -2.0)
-const MAP_ROWS: Array[String] = [
-	"FFFFFHHHHFFFFFHHHH",
-	"FFFFHHHPPPFFFFHHHH",
-	"FFFFFHPPPPPFFFFHHH",
-	"FFFFPPPPPPPPFFFFHH",
-	"FFFPPPPPTRRRRRRRRR",
-	"FFPPPPPPNPPPPPFFFF",
-	"RRRRRRRRNPPPPPFFFF",
-	"PPPPPPPPNPPPHHFFFH",
-	"PPPPPPPPNPPHHHFFHH",
-	"SSSSSPPPNPPPPPPFHH",
-	"WWWWWSSSNSSSSSSSPP",
-	"WWWWWWWWWWWWWWWWSS",
-	"WWWWWWWWWWWWWWWWWW",
-]
-const TILE_NAMES := {
-	"P": "tile_plain",
-	"R": "tile_road",
-	"N": "tile_road_ns",
-	"F": "tile_forest",
-	"H": "tile_hill",
-	"W": "tile_water",
-	"S": "tile_shore",
-	"T": "tile_plain",
-}
 ## The band's standard is planted beside its token, clear of the figure, slightly toward the camera.
 const BANNER_OFFSET_M := Vector3(1.7, 0.0, 0.3)
-const TURNABLE := "PFHW"
 const TOWN_TILE := Vector2i(8, 4)
 const TOWN_SCALE := 1.5
 const MAP_FOCUS := Vector3(0.0, 0.0, 4.0)
@@ -226,43 +201,19 @@ func _build_map(option: String) -> void:
 	_recolour(kit)
 	var holder := Node3D.new()
 	_stage.world().add_child(holder)
-	var rows := MAP_ROWS.size()
-	var cols := MAP_ROWS[0].length()
-	for j: int in rows:
-		for i: int in cols:
-			var key: String = TILE_NAMES[MAP_ROWS[j][i]]
-			var tile := kit.find_child(key, true, false) as Node3D
-			var copy := tile.duplicate() as Node3D
-			copy.position = _tile_centre(i, j, cols, rows)
-			if MAP_ROWS[j][i] in TURNABLE:
-				copy.rotation.y = PI / 2.0 * ((i * 7 + j * 13) % 4)
-			holder.add_child(copy)
+	LookMap.lay(kit, holder)
 	var town := (kit.find_child("marker_town", true, false) as Node3D).duplicate() as Node3D
-	town.position = _tile_centre(TOWN_TILE.x, TOWN_TILE.y, cols, rows)
+	town.position = LookMap.centre(TOWN_TILE.x, TOWN_TILE.y)
 	town.scale = Vector3.ONE * TOWN_SCALE
 	holder.add_child(town)
 	_stage.focus_on(MAP_FOCUS)
 	_stage.merc().visible = false
 	var dir := _sprites
-	_token(
-		dir + "orc_token_%s.png" % option,
-		_tile_centre(BAND_TILE.x, BAND_TILE.y, cols, rows),
-		holder
-	)
-	_token(
-		dir + "vampyr_token_%s.png" % option,
-		_tile_centre(PARTY_TILE.x, PARTY_TILE.y, cols, rows),
-		holder
-	)
-	_banner(kit, "marker_banner_band", _tile_centre(BAND_TILE.x, BAND_TILE.y, cols, rows), holder)
-	_banner(
-		kit, "marker_banner_party", _tile_centre(PARTY_TILE.x, PARTY_TILE.y, cols, rows), holder
-	)
+	_token(dir + "orc_token_%s.png" % option, LookMap.centre(BAND_TILE.x, BAND_TILE.y), holder)
+	_token(dir + "vampyr_token_%s.png" % option, LookMap.centre(PARTY_TILE.x, PARTY_TILE.y), holder)
+	_banner(kit, "marker_banner_band", LookMap.centre(BAND_TILE.x, BAND_TILE.y), holder)
+	_banner(kit, "marker_banner_party", LookMap.centre(PARTY_TILE.x, PARTY_TILE.y), holder)
 	kit.free()
-
-
-func _tile_centre(i: int, j: int, cols: int, rows: int) -> Vector3:
-	return Vector3((i - cols / 2.0 + 0.5) * TILE_M, 0.0, (j - rows / 2.0 + 0.5) * TILE_M)
 
 
 func _banner(kit: Node3D, key: String, at: Vector3, holder: Node3D) -> void:
@@ -298,6 +249,8 @@ func _token(path: String, at: Vector3, holder: Node3D) -> void:
 
 
 ## Gives every surface named pal:<ramp>:<step> that palette colour: matte, flat, no specular.
+## pal:<ramp>:<step>:flat is drawn unlit, exactly that colour (map water: the warm sun turned the
+## palette's one blue-slate into brown-grey, and the water read as a road).
 func _recolour(node: Node) -> void:
 	if node is MeshInstance3D:
 		var mi := node as MeshInstance3D
@@ -307,7 +260,11 @@ func _recolour(node: Node) -> void:
 			if not tag.begins_with("pal:"):
 				continue
 			var m := StandardMaterial3D.new()
-			m.albedo_color = _colour(tag.trim_prefix("pal:"))
+			var key := tag.trim_prefix("pal:")
+			if key.ends_with(FLAT):
+				key = key.trim_suffix(FLAT)
+				m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			m.albedo_color = _colour(key)
 			m.roughness = 1.0
 			m.metallic_specular = 0.0
 			mi.set_surface_override_material(s, m)

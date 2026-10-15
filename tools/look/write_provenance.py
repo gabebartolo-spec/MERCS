@@ -57,7 +57,8 @@ def main() -> None:
           "Golden references (06 section 8), 1x logical (960 x 540): look_target.gd captures of the real "
           "StreetStage at 3840 x 2160 (exact 4x4 blocks), one pixel kept per block. Changes only by a director "
           "decision in DECISIONS.md.",
-          ["tools/look/look_target.gd", "tools/look/palette_post.gdshader", "tools/look/build_look_kit.py",
+          ["tools/look/look_target.gd", "tools/look/look_map.gd", "tools/look/palette_post.gdshader",
+           "tools/look/build_look_kit.py",
            "tools/look/build_sprites.py"], [blender, mpfb, py, "Godot Engine"], approved)
 
 

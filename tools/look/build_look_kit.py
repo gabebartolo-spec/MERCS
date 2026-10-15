@@ -102,8 +102,9 @@ class Obj:
         return ob
 
 
-def P(ramp: str, step: int) -> str:
-    return f"pal:{ramp}:{step}"
+def P(ramp: str, step: int, flat: bool = False) -> str:
+    """A palette face; flat ones are drawn unlit, exactly that colour (look_target.gd)."""
+    return f"pal:{ramp}:{step}" + (":flat" if flat else "")
 
 
 # ---------------------------------------------------------------- street
@@ -355,15 +356,16 @@ def street(col):
 
 # ---------------------------------------------------------------- overworld
 
-def tile_base(o, m_choices, y0=0.0, bump=0.0, n=4):
-    """A map tile's ground: faceted triangles at the tile's edge height y0 (edges stay flat so tiles meet)."""
+def tile_base(o, m_choices, y0=0.0, bump=0.0, n=4, rows=None):
+    """A map tile's ground: faceted triangles at the tile's edge height y0 (edges stay flat so tiles meet).
+    rows limits it to a band of the n rows along Y (the shore tile: water rows, then grass rows)."""
     s = TILE / n
 
     def y(x, z):
         edge = abs(x) >= TILE / 2 - 1e-4 or abs(z) >= TILE / 2 - 1e-4
         return y0 + (0.0 if edge else (h(round(x, 3), round(z, 3)) - 0.5) * bump)
     for i in range(n):
-        for j in range(n):
+        for j in rows or range(n):
             x0, z0 = -TILE / 2 + i * s, -TILE / 2 + j * s
             a, b = (x0, z0, y(x0, z0)), (x0 + s, z0, y(x0 + s, z0))
             c, d = (x0 + s, z0 + s, y(x0 + s, z0 + s)), (x0, z0 + s, y(x0, z0 + s))
@@ -381,6 +383,52 @@ def tree(o, x, z, k):
         o.cone(0.09, 0.07, 0.8, (x, z, 0.4), P("timber", 1), segs=4)
         o.cone(0.6, 0.35, 0.9, (x, z, 1.25), P("verdure", 2), segs=7)
         o.cone(0.35, 0.0, 0.45, (x, z, 1.9), P("verdure", 3), segs=7)
+
+
+WATER = ("cloth_faded", 2)
+WATER_Y = -0.04
+BANK_VARIANTS = 3
+WATER_FACETS = [(1.01, P(*WATER, flat=True))]
+SHORE_VARIANTS = 3
+
+
+def glints(o, n, seed, z_lo=-1.3, z_hi=1.3):
+    """Short broken glints on water: each is two short dashes with a gap, nothing long or continuous."""
+    for i in range(n):
+        gx, gz = h(i, seed, 21) * 2.6 - 1.3, z_lo + h(i, seed, 22) * (z_hi - z_lo)
+        for k in range(2):
+            o.box((0.16 + 0.1 * h(i, k, 23), 0.04, 0.01), (gx + k * 0.32, gz + 0.04 * k, WATER_Y + 0.01),
+                  P("slate", 2, flat=True))
+
+
+def reeds(o, x, z, k, n):
+    """A clump of rushes: thin cones, green and dry ochre."""
+    for r in range(n):
+        rx, rz = x + (h(k, r, 41) - 0.5) * 0.35, z + (h(k, r, 42) - 0.5) * 0.25
+        tall = 0.3 + 0.3 * h(k, r, 43)
+        m = P("verdure", 3) if h(k, r, 44) < 0.55 else P("timber", 3) if h(k, r, 44) < 0.8 else P("verdure", 1)
+        o.cone(0.05, 0.0, tall, (rx, rz, tall / 2), m, segs=3)
+
+
+def bank(o, v, e=TILE / 2, x_lo=-TILE / 2 - 0.15, x_hi=TILE / 2 + 0.15):
+    """A shoreline along the line y = e from x_lo to x_hi (+Y is the land side): ragged wet mud that runs
+    out into the water by a varying depth and back under the grass, and a few low rush clumps. Every
+    water-tile edge that meets land gets one (Godot turns it to face the land), and the shore tile has one
+    across its middle, so no shore is a ruler-straight line."""
+    n = max(2, round((x_hi - x_lo) / 0.43))
+    xs = [x_lo + k * (x_hi - x_lo) / n for k in range(n + 1)]
+    out = [0.2 + 0.55 * h(v, k, 51) for k in range(n + 1)]  # into the water, metres from the line
+    mid = [o_ * (0.35 + 0.3 * h(v, k, 52)) for k, o_ in enumerate(out)]
+    land = [0.04 + 0.36 * h(v, k, 53) ** 2 for k in range(n + 1)]  # back under the grass
+    for k in range(n):
+        x0, x1 = xs[k], xs[k + 1]
+        o.poly([(x0, e - out[k], 0.012), (x1, e - out[k + 1], 0.012), (x1, e - mid[k + 1], 0.012),
+                (x0, e - mid[k], 0.012)], P("soil", 1))
+        o.poly([(x0, e - mid[k], 0.014), (x1, e - mid[k + 1], 0.014), (x1, e + land[k + 1], 0.014),
+                (x0, e + land[k], 0.014)], P("soil", 2))
+    for c in range(2):
+        k = int(h(v, c, 56) * n)
+        reeds(o, xs[k] + 0.2, e - out[k] * 0.6, v * 10 + c, 3)
 
 
 def overworld(col):
@@ -428,16 +476,28 @@ def overworld(col):
                 o.poly(list(tri), m)
     o.box((0.6, 0.45, 0.35), (0.7, -0.5, 1.15), P("slate", 3), rot_z=0.4)
     o.finish(col)
+    # Peat water: the palette's one blue-slate (cloth_faded 2), unlit so the warm sun cannot turn it
+    # brown-grey, a little below the land; a few short broken glints, never one long line (a long pale
+    # line read as a lane marking, and the whole as a road).
     o = Obj("tile_water")
-    tile_base(o, [(1.01, P("slate", 1))], y0=-0.12, bump=0.0, n=2)
-    for i in range(3):
-        o.box((0.5, 0.05, 0.01), (h(i, 21) * 3.0 - 1.5, h(i, 22) * 3.0 - 1.5, -0.11), P("slate", 2))
+    tile_base(o, WATER_FACETS, y0=WATER_Y, n=4)
+    glints(o, 3, 0)
     o.finish(col)
-    o = Obj("tile_shore")  # water on the -Y half, grass bank on +Y
-    tile_base(o, grass)
-    o.box((TILE, TILE / 2, 0.02), (0, -TILE / 4, 0.02), P("slate", 1))
-    o.box((TILE, 0.25, 0.05), (0, 0.0, 0.03), P("soil", 3))
-    o.finish(col)
+    for v in range(SHORE_VARIANTS):
+        o = Obj(f"tile_shore_{v}")  # water on the -Y half, grass on +Y, a ragged bank between
+        tile_base(o, WATER_FACETS, y0=WATER_Y, n=4, rows=range(2))
+        tile_base(o, grass, n=4, rows=range(2, 4))
+        glints(o, 1, 5 + v, z_lo=-1.6, z_hi=-0.6)
+        bank(o, 9 + v, e=0.0)
+        o.finish(col)
+    for v in range(BANK_VARIANTS):  # the edge of a water tile whose neighbour is land (Godot turns it)
+        o = Obj(f"bank_{v}")
+        bank(o, v)
+        o.finish(col)
+    for name, lo, hi in (("bank_half_pos", 0.0, TILE / 2 + 0.15), ("bank_half_neg", -TILE / 2 - 0.15, 0.0)):
+        o = Obj(name)  # beside a shore tile: only its grass half needs a bank
+        bank(o, 7, x_lo=lo, x_hi=hi)
+        o.finish(col)
     # town marker: a walled hamlet with a hall and a tower, at map scale
     o = Obj("marker_town")
     for k in range(9):  # trodden earth inside the palisade
