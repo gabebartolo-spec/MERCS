@@ -43,7 +43,9 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
   2's review: confirm or reorder milestones 3 and 4.
 
 ## Running (builder subagents of this session; they die with it)
-- M3 company (four placeholder mercs for him to author): `../MERCS-wt/p2-m3`, claude/p2-m3-company.
+- M3 company = PR #81 (save v2, F4 inspect). Conflicted with #80; its coder is merging origin/main
+  (Auto-fix is on for #81). Lead pre-reviewed the save (v1->v2 arm, v1 fixture, defaults): PASS;
+  post the verdict, set Review needed: done, merge_eligibility, merge. Then start M6.
 - M4 battle skeleton (Opus): `../MERCS-wt/slice-m1`, claude/p2-m4-battle. Keeps Battle's API.
 - M5 wounds/triage/death/chronicle/succession, sim only, keyed by merc id:
   `../MERCS-wt/p2-m5`, claude/p2-m5-wounds.
