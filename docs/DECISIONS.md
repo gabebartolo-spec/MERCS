@@ -4,6 +4,41 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
+## 2026-10-15 · D-088 · Director · Texel Studio may be installed locally for the tile trial
+Words: answer "Allow the install" (self-hosted engine at github EYamanS/texel-studio cde7bdd, local Ollama, no spend).
+Why: Third column of the terrain-tile trial (D-080); register row CLEARED for self-hosted internal use.
+Changes: Installed under D:/MERCS-vault/tools/texel-studio (venv), not in the repo. Cloud texel.studio stays uncleared (Pro = spend).
+
+## 2026-10-15 · D-087 · Director · Ironman is an option at campaign start; default On (lead's pick)
+Words: answer "Ironman as an option" to "How strict should saving be?".
+Why: Quitting and reloading undid deaths; Ironman closes it, Off keeps manual saves.
+Changes: #103: autosave at fight start, fight end and Continue; a mid-fight quit reloads the same fight. Optional save key "ironman"; old saves load as Off.
+
+## 2026-10-15 · D-086 · Director · The palette is core ramps plus one set per biome/kingdom
+Words: "the game has scope for multiple colour pallettes in the future to differentiate different biomes/kingdoms/landscapes"
+Why: One look across the game, with regions told apart by their biome set.
+Changes: #100: `assets/palette/core.*` (44) + `assets/palette/biomes/heartland.*`; validators read core + biome. `06_STYLE_ART.md` §2.
+
+## 2026-10-15 · D-085 · Director · Look target B "Peat and Ochre"; lighting 5% brighter; final fidelity much higher
+Words: "peat and ochre probably has the most atmosphere"; "the colour looks good though. the lighting could stand to be 5% brighter"; "the end fidelity would have to be much higher though in terms of the art"; pick: "B Peat and Ochre".
+Why: The look target fixes palette, light and texel density for every later asset.
+Changes: #100 goldens `assets/golden/{street_day,street_rain_night,overworld_map}.png`; B is biome "heartland". Fidelity rises in final art, not in the target.
+
+## 2026-10-15 · D-084 · Director · Full-loop playtest passed
+Words: "playtest was good carry on"
+Why: Walk, encounter, battle, triage, hub and storylet run as one loop.
+Changes: Phase 2 gate pack (#97) and gap fixes (#101) follow.
+
+## 2026-10-15 · D-083 · Director · The campaign ends when the whole company is dead
+Words: answer "Campaign ends".
+Why: Mortality is final (rule 5); no free restart of a wiped company.
+Changes: #98: last screen, save marked ended.
+
+## 2026-10-15 · D-082 · Director · Retro Diffusion: US$10 prepaid, private, for the terrain-tile trial
+Words: answers "Licence check, then trial", "Small paid plan, private", "US$10"; then "$10 is in".
+Why: Trial an AI pixel tool against the Blender rig on the locked look.
+Changes: Spend cap US$10; more needs a new yes. Trial 2026-10-15 used US$1.02 (17 images). Outputs stay in the vault until he picks a method.
+
 ## 2026-10-15 · D-081 · Director · Agents talk tersely to one another
 Words: "you guys should use concise language when you speak to one another so that we use less context and tokens on messages"
 Why: Fewer tokens per message.

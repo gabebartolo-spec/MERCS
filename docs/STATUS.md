@@ -10,9 +10,9 @@ Current phase: **1 (art, look target first) and 2 (horizontal slice) in parallel
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | working | Phase 2 M1-M6 merged; M7 storylet (claude/p2-m7-storylet), walkable overworld (claude/p2-overworld-walk), wiring (claude/p2-wiring) in progress; coder cap 4 (D-072) | see Item column | 2026-10-15 |
+| Dev Lead (Opus 5.5) | working | Phase 2 all milestones merged; gate gaps #101 merged; Ironman #103 (sim review next); coder cap 4 (D-072) | claude/ironman (#103) | 2026-10-15 |
 | Merge & CI (Sonnet 5.5) | working | board PR after #75-#87 (D-072..D-081) | claude/board-1015 | 2026-10-15 |
-| Art Factory (Opus 5.5) | working | resumed 2026-10-15 on the look target first (D-074); the cast WIP waits | claude/art-look-target | 2026-10-15 |
+| Art Factory (Opus 5.5) | working | look B locked (#100, D-085/D-086); terrain-tile trial: Blender vs Retro Diffusion merged (#104), Texel Studio column next (D-088) | vault D:/MERCS-vault/renders/tile_trial_2026-10-15 | 2026-10-15 |
 | Concept Lead (Fable 5.1) | available | roadmap rewrite DONE (#74); handoff in #77 (open); Phase 2 structural audit at the gate | claude/concept-lead-handoff (#77) | 2026-10-15 |
 
 States: working · running a check · awaiting director · blocked · available.
@@ -69,21 +69,21 @@ States: working · running a check · awaiting director · blocked · available.
 4. Milestone 4, battle skeleton (order, intent, morale rout, blocking). DONE (#85).
 5. Milestone 5, wounds, triage, death, chronicle, succession (sim). DONE (#82); wiring after M3/M4.
 6. Milestone 6, wages, contracts, loot, hiring, the prisoner choice. DONE (#87).
-7. Milestone 7, one storylet plus the memory system. In progress, claude/p2-m7-storylet.
-Extras: lint magic numbers are errors (#79); `tools/merge_eligibility.sh` (#78); 4K display fix (#83); gdlint required (#84); letter keys replace function keys (#86); walkable overworld (claude/p2-overworld-walk, in progress); wiring (claude/p2-wiring, in progress).
-Art: look target (claude/art-look-target, in progress) comes before the cast (D-074).
+7. Milestone 7, one storylet plus the memory system. DONE (#89).
+Extras: lint magic numbers are errors (#79); `tools/merge_eligibility.sh` (#78); 4K display fix (#83); gdlint required (#84); letter keys replace function keys (#86); walkable overworld (#93, D-078); wiring (#90); campaign ends on a wipe (#98, D-083); gate pack (#97, `docs/audits/phase2_gate/README.md`); gate gaps (#101); Ironman (#103, open, D-087). Full-loop playtest passed (D-084).
+Art: look target B "Peat and Ochre" locked (#100, D-085); palette = core + biome sets (D-086). Terrain-tile trial running (D-080, D-082, D-088).
 
 ## Waiting on the director
 - Author `merc_3` to `merc_6` (#81), the six recruits, the two factions and the generic items (#87); placeholders stand until then.
 - Confirm or reorder milestones 3 and 4 (both built).
 - Veto lists: #80, #81, #82, #85, #87 (calls in each PR body); `caps.json` gains `encounters`, `equipment`, `factions`, `recruits`, `scenarios`.
-- Pick the look target when Art shows it; the Texel Studio trial for terrain tiles waits on the pick (D-080).
+- Pick the terrain-tile method from the trial board (Blender rig, Retro Diffusion, Texel Studio) when the lead shows it. The Phase 2 gate playthrough (`docs/audits/phase2_gate/README.md`).
 - Tripo threshold (D-060): confirm 500 -> 2,000 credits per session in writing; 500 stands.
 - Mixamo: 10 of 14 clips are in the vault; the rest wait on his sign-in (D-029).
 - Allow or decline deleting superseded remote branches `claude/p1-crisp-snap`, `claude/p1-frame-time`, `claude/p1-sheet-export-load`.
 
 ## Merge queue
-#77 open (Concept Lead handoff, docs). Nothing else open.
+#77 open (Concept Lead handoff, docs). #103 Ironman (sim review before merge).
 
 ## GPU jobs
 (none)
@@ -92,7 +92,7 @@ Art: look target (claude/art-look-target, in progress) comes before the cast (D-
 0 / 10 GiB.
 
 ## Live worktrees
-5 / 4 (over; prune once their PRs merge): `../MERCS-wt/art-look` (claude/art-look-target), `../MERCS-wt/p2-m7`, `../MERCS-wt/p2-walk`, `../MERCS-wt/slice-m1` (claude/p2-wiring), `../MERCS-wt/board` (this PR).
+1 / 4: `../MERCS-wt/ironman` (claude/ironman, #103).
 
 ## Logged for later (not assigned)
 - Phase 1, LOW, lint precision (Concept Lead review of #5): `strings.py` flags names in
