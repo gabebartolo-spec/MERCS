@@ -29,6 +29,18 @@ static func wrap(host: Node, world: Node3D, logical: Vector2i, scale: int) -> Su
 	return viewport
 
 
+## Fits a stage's wrapped viewport to the logical size and scale the stage now reports
+## (its logical_size_px and integer_scale), and re-aims its camera for them.
+static func refit(stage: StreetStage) -> void:
+	var viewport := stage.get_node(^"PixelScreen/LogicalViewport") as SubViewport
+	var container := viewport.get_parent() as SubViewportContainer
+	var logical := stage.logical_size()
+	container.stretch_shrink = stage.screen_scale()
+	container.size = Vector2(logical * stage.screen_scale())
+	viewport.size = logical
+	stage.pitch_degrees = stage.pitch_degrees
+
+
 ## The logical-viewport pixel under a window position (whole-screen mode).
 static func to_logical(window_position: Vector2, scale: int) -> Vector2:
 	return window_position / maxf(1.0, float(scale))
