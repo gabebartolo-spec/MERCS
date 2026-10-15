@@ -25,6 +25,9 @@ var company: Company = null
 ## The wounds block (Aftermath.state(): chronicle, memories, captain, injuries); {} in a
 ## save made before it existed. Optional, so it needs no version of its own.
 var wounds := {}
+## The story block (StoryletState.state(): storylets fired and when); {} in a save made before
+## it existed, which reads as nothing fired. Optional like "wounds", so no version of its own.
+var story := {}
 
 
 ## The Rng's seed and stream positions are written as strings: they are 64-bit ints, and
@@ -61,10 +64,18 @@ static func from_dict(
 		model.rng = Rng.from_seed(_num(_dict(balance, "world"), "seed"))
 	model.world = WorldSim.restore(_dict(current, "world"), balance, model.rng)
 	model.wounds = _dict(current, "wounds")
+	model.story = _dict(current, "story")
 	if not company_defs.is_empty():
 		model.company = Company.restore(_dict(current, "company"), company_defs)
 	model.ok = true
 	return model
+
+
+## Adds the story block to a saved dictionary (Phase 2 M7); an empty block adds nothing.
+static func with_story(saved: Dictionary, story_block: Dictionary) -> Dictionary:
+	if not story_block.is_empty():
+		saved["story"] = story_block
+	return saved
 
 
 ## Brings a save of any older version up to VERSION one step at a time, on a copy.

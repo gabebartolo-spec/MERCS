@@ -19,6 +19,10 @@ var recruit := ""
 ## {"step": "hired"|"passed"|"contract"|"gate"|"battle"|"fate"|"injury"|"camp", ...}.
 var log: Array[Dictionary] = []
 var battle: Battle = null
+## Optional: the run's memories. When set, the fight and each choice write a sentence on every
+## company merc who took part (Phase 2 M7); `day` is the world's day for those sentences.
+var memory: Memory = null
+var day := 0
 
 var _scenario := {}
 var _fighters := {}
@@ -70,6 +74,7 @@ func hire(yes: bool) -> void:
 func accept_contract() -> void:
 	if stage == Stage.CONTRACT:
 		log.append({"step": "contract", "id": str(_scenario.get("id", ""))})
+		_remember_choice(Memory.KEY_CONTRACT)
 		stage = Stage.TRAVEL
 
 
@@ -114,6 +119,7 @@ func end_battle() -> void:
 		return
 	var won := battle.winner == BattleUnit.COMPANY
 	log.append({"step": "battle", "won": won, "surrendered": battle.surrendered})
+	_remember_fight(won)
 	stage = Stage.AFTERMATH if won and battle.surrendered == BattleUnit.ENEMY else Stage.RETURN
 
 
@@ -124,7 +130,24 @@ func choices() -> Array:
 func choose_fate(choice: String) -> void:
 	if stage == Stage.AFTERMATH and choice in choices():
 		log.append({"step": "fate", "choice": choice})
+		_remember_choice(Memory.KEY_FATE_PREFIX + choice)
 		stage = Stage.RETURN
+
+
+func _remember_choice(key: String) -> void:
+	if memory != null:
+		memory.on_choice(company, key, day)
+
+
+## The fight's sentence on each company merc; a merc the battle downed remembers going down.
+func _remember_fight(won: bool) -> void:
+	if memory == null or battle == null:
+		return
+	var fallen: Array[String] = []
+	for fighter: BattleUnit in battle.units:
+		if fighter.side == BattleUnit.COMPANY and fighter.down:
+			fallen.append(fighter.id)
+	memory.on_fight(company, won, fallen, day)
 
 
 func _begin_battle() -> void:
