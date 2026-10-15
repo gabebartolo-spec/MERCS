@@ -10,7 +10,7 @@ combat roles and each merc's own abilities, never a type chart (vision, 2026-10-
 - `hit_base`: an attack hits when die + attacker's attack ≥ this + defender's defense (11: an even fight hits half the time).
 - `morale_start`: each side's morale when the fight begins.
 - `morale_loss_ally_down`, `morale_loss_leader_down`: morale a side loses when one of its fighters goes down, and more when it is the leader.
-- `sight_cells`: how far a fighter sees (Chebyshev cells); the enemy plans and acts only on fighters it can see.
+- `sight_cells`: how far a fighter sees (Chebyshev cells); the enemy plans and acts only on fighters it can see, and of each it knows only whether he looks wounded (`sim/battle/battle_knowledge.gd`), never his exact health or other numbers (rule 6).
 - `loadout_max`: how many learnt moves a fighter takes into a fight (D-066: up to four); extra moves are left out, last first.
 - `morale_sides`: each side's (`company`, `enemy`) morale thresholds. `shaken_below`: below this the side is shaken (shown to the player; no roll changes yet). `rout_below`: below this, with fighters still up, the side routs and the fight ends with them alive (the main non-HP ending).
 - Blocking, the one terrain feature of Phase 2 (D-066), has no knob: a walk ends on the first cell next to a standing opponent, so a front-liner in front of a back-liner stops attackers reaching him.
