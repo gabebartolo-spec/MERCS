@@ -47,6 +47,8 @@ var down := false
 var wounded := false
 ## The merc's resolve-flavoured social weight, read by visible checks (sim/story/checks.gd).
 var presence := 0
+## The merc's own resolve: at the captain's fall he holds at or above the rules' bar (BattleMorale).
+var resolve := 0
 ## Learnt moves taken into this fight, by id, in loadout order (at most "loadout_max").
 var moves: Array[String] = []
 ## Added to this fighter's next attack only, then cleared (the Vampyr's blood price).
@@ -83,6 +85,7 @@ static func make(unit_id: String, unit_side: int, at: Vector2i, stats: Dictionar
 	unit.initiative = _int(stats, "initiative", 0)
 	unit.is_leader = stats.get("leader", false) == true
 	unit.presence = _int(stats, "presence", 0)
+	unit.resolve = _int(stats, "resolve", 0)
 	for move: String in _listed_moves(stats.get("moves", [])):
 		unit.teach(move, true)
 	for flag: Variant in FLAGS:

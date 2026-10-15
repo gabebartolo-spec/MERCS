@@ -9,6 +9,12 @@
     "morale_loss_leader_down": 50,
     "sight_cells": 8,
     "loadout_max": 4,
+    "morale_captain_fall": {
+      "hold_resolve": 6
+    },
+    "surrender": {
+      "pinned_by": 1
+    },
     "morale_sides": {
       "company": {
         "shaken_below": 75,
@@ -36,6 +42,7 @@
       "attack": 2,
       "defense": 3,
       "damage": 6,
+      "resolve": 6,
       "initiative": 2,
       "presence": 1,
       "moves": {
@@ -48,6 +55,7 @@
       "attack": 3,
       "defense": 2,
       "damage": 5,
+      "resolve": 7,
       "initiative": 4,
       "presence": 4,
       "moves": {
@@ -59,6 +67,7 @@
       "attack": 1,
       "defense": 1,
       "damage": 4,
+      "resolve": 4,
       "initiative": 3
     },
     "bandit_chief": {
@@ -66,6 +75,7 @@
       "attack": 2,
       "defense": 2,
       "damage": 5,
+      "resolve": 6,
       "initiative": 3,
       "leader": true
     },
@@ -74,6 +84,7 @@
       "attack": 2,
       "defense": 2,
       "damage": 4,
+      "resolve": 5,
       "initiative": 3
     },
     "watch_sergeant": {
@@ -81,6 +92,7 @@
       "attack": 2,
       "defense": 3,
       "damage": 5,
+      "resolve": 7,
       "initiative": 3,
       "leader": true
     },
@@ -89,6 +101,7 @@
       "attack": 2,
       "defense": 2,
       "damage": 5,
+      "resolve": 5,
       "initiative": 3,
       "presence": 2
     }

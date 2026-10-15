@@ -9,8 +9,8 @@ extends RefCounted
 ## - BattleIntents (battle_intents.gd): each enemy's round plan from what it sees (BattleAi);
 ## - BattleActions (battle_actions.gd): move, attack, wait and the learnt moves, legal or not;
 ## - BattleResolver (battle_resolver.gd): one blow's rolls, damage, the hit hook, a down;
-## - BattleMorale (battle_morale.gd): each side's morale, shaken and breaking;
-## - BattleEnd (battle_end.gd): a wipe or a rout ends the fight;
+## - BattleMorale (battle_morale.gd): each side's morale, shaken and breaking, the captain's fall;
+## - BattleEnd (battle_end.gd): a wipe, a rout or a surrender ends the fight;
 ## - BattleGrid, BattleUnit, BattleAi: the grid with blocking, a fighter, the enemy's choices.
 ## Every outcome is a roll on the Rng "battle" stream; apply() returns the events presentation
 ## draws and log keeps them all, rounds and intents included. Seeded: the same setup, seed and
@@ -28,6 +28,8 @@ const ACTIONS: Array[String] = [
 const BASE_ACTIONS: Array[String] = BattleActions.BASE
 const EVENT_HIT := BattleResolver.EVENT_HIT
 const EVENT_ROUT := BattleEnd.EVENT_ROUT
+const EVENT_SURRENDER := BattleEnd.EVENT_SURRENDER
+const EVENT_CAPTAIN_FALL := BattleMorale.EVENT_CAPTAIN_FALL
 const EVENT_ROUND := BattleTurns.EVENT_ROUND
 const EVENT_INTENT := BattleIntents.EVENT_INTENT
 const EVENT_TURN := "turn"
@@ -36,8 +38,11 @@ var units: Array[BattleUnit] = []
 var winner := -1
 ## The side whose morale broke with fighters still standing, or -1.
 var routed := -1
-## The sketch's name for routed, still read by SliceLoop's aftermath.
+## The side that gave way with men taken prisoner (cornered or leaderless, BattleEnd), or -1.
 var surrendered := -1
+## When a side gave way: the ids of its fighters who ran, and of those taken prisoner.
+var fled: Array[String] = []
+var prisoners: Array[String] = []
 ## The round under way, from 1; a round ends when everyone standing has acted.
 var round_number: int:
 	get:
@@ -60,13 +65,15 @@ func setup(rules: Dictionary, field: Dictionary, fighters: Array[BattleUnit], rn
 	_rules.setup(rules)
 	_grid.setup(field)
 	units = fighters
-	_turns.setup(fighters)
+	_turns.setup(fighters, _morale)
 	_morale.setup(rules)
 	_resolver.setup(_rules, rng, _morale)
 	_actions.setup(_rules, _resolver)
 	winner = -1
 	routed = -1
 	surrendered = -1
+	fled.clear()
+	prisoners.clear()
 	log.clear()
 	var loadout_max := _rules.num("loadout_max")
 	for fighter: BattleUnit in fighters:
@@ -145,8 +152,9 @@ func intents() -> Array[Dictionary]:
 
 
 ## Applies one action by the current fighter and returns what happened, in order:
-## {"type": "move"|"attack"|"damage"|"hit"|"down"|"morale"|"shaken"|"rout"|"end"|"round"|
-## "intent"|"turn"|<move id>, ...}. An illegal action changes nothing and returns [].
+## {"type": "move"|"attack"|"damage"|"hit"|"down"|"morale"|"shaken"|"captain_fall"|"rout"|
+## "surrender"|"end"|"round"|"intent"|"turn"|<move id>, ...}. An illegal action changes
+## nothing and returns [].
 func apply(action: Dictionary) -> Array[Dictionary]:
 	var events: Array[Dictionary] = []
 	var actor := current()
@@ -156,7 +164,7 @@ func apply(action: Dictionary) -> Array[Dictionary]:
 	if not _actions.legal_kind(actor, kind) or not _actions.act(self, actor, action, events):
 		return events
 	_intents.done(actor.id)
-	BattleEnd.check(self, _morale, events)
+	BattleEnd.check(self, _morale, _grid, events)
 	if not is_over():
 		if _turns.advance():
 			_begin_round(events)
@@ -168,6 +176,13 @@ func apply(action: Dictionary) -> Array[Dictionary]:
 ## The definition of a learnt move (battle.json "rules" "moves"), or {}.
 func move_def(move: String) -> Dictionary:
 	return _rules.move_def(move)
+
+
+## What the player may see of a side's morale: {"side", "morale", "shaken_below",
+## "rout_below", "state": "steady"|"shaken"|"broken", "leader_down", "hold_resolve",
+## "broken": ids} (BattleMorale.view). Presentation shows the thresholds; it decides nothing.
+func standing(side: int) -> Dictionary:
+	return _morale.view(units, side)
 
 
 ## A new round: each standing enemy plans what it will do from what it can see.

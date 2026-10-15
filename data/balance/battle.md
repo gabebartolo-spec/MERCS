@@ -13,6 +13,8 @@ combat roles and each merc's own abilities, never a type chart (vision, 2026-10-
 - `sight_cells`: how far a fighter sees (Chebyshev cells); the enemy plans and acts only on fighters it can see.
 - `loadout_max`: how many learnt moves a fighter takes into a fight (D-066: up to four); extra moves are left out, last first.
 - `morale_sides`: each side's (`company`, `enemy`) morale thresholds. `shaken_below`: below this the side is shaken (shown to the player; no roll changes yet). `rout_below`: below this, with fighters still up, the side routs and the fight ends with them alive (the main non-HP ending).
+- `morale_captain_fall`: the captain's fall (Phase 4, director ruling Q-D "large morale fall"). Besides the side's `morale_loss_leader_down`, every fighter of that side still standing takes the blow on his own resolve: `hold_resolve`: a fighter whose `resolve` is at least this holds (steady veterans); below it he breaks, stops acting for the rest of the fight, and shares his side's fate at the end. A side whose standing fighters have all broken gives way as if routed.
+- `surrender`: who surrenders when a side gives way (Phase 4, director ruling Q-C "cornered or leader down"). With the side's leader down every man surrenders; otherwise each runs if he has a way out and surrenders if cornered. `pinned_by`: standing foes beside a fighter that pin him (0: never pinned, only walled in with no walk to a free edge of the field). Surrendered men are the prisoners the hub's decision is about.
 - Blocking, the one terrain feature of Phase 2 (D-066), has no knob: a walk ends on the first cell next to a standing opponent, so a front-liner in front of a back-liner stops attackers reaching him.
 - `moves`: the learnt moves by id, each a few knobs; a fighter may use one only if it is in their loadout. `walk`: may walk (as a move) before the attack, in the same turn. `hp_cost`: health paid first, never the last point. `attack_bonus`, `damage_bonus`: added to that one attack's roll and damage. `charge` is the orc's (pure aggression); `blood_price` is the Vampyr's (health as energy).
 
@@ -20,6 +22,7 @@ combat roles and each merc's own abilities, never a type chart (vision, 2026-10-
 The loop sketch's fighters, by id. The orc and the Vampyr are the director's reference pair (brainstorm 2026-10-09); their numbers are a sketch to read the playstyles, not balance. Names live in `data/text/en.json`.
 - `hp`, `attack`, `defense`, `damage`, `initiative`: as in `rules`.
 - `presence`: weight in social checks (talking the lookout down).
+- `resolve`: the fighter's own nerve at his captain's fall (`rules.morale_captain_fall`). The orc and the Vampyr copy `data/mercs.json`; the enemies' values are placeholders for the lead to tune (bandits shaky, the sergeant steady).
 - `moves`: the fighter's loadout, `{move_id: true}`, in order (ids from `rules.moves`; at most `loadout_max`).
 - `leader`: losing this fighter costs `morale_loss_leader_down`.
 - `watchman`, `watch_sergeant`: the road patrol's fighters (Phase 2 M2, data/encounters.json); the sergeant leads.
