@@ -55,6 +55,12 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
   ALL Phase 2 milestones built. Full-loop build: MERCS-builds/2026-10-15_loop_674c749 (his play).
 - Director 2026-10-15: company wipe -> "Campaign ends" (final chronicle screen). Coder: worktree
   campaign-end, claude/campaign-end. LOG as a D-entry in the next board PR.
+- Director 2026-10-15 on the walk/full-loop build: "playtest was good carry on" (log in board PR).
+- Look target A/B/C built (claude/art-look-target 1ee6d22; boards docs/audits/look_target/
+  option_{A,B,C}.png; frames D:/MERCS-vault/renders/look_2026-10-15). Lead QC sent back: puddles
+  read as casterless shadows, straw as tools, orc pauldrons balloon/head big; + blockout caption.
+  realism-critic needs a REAL reference photo path to run (none in repo) - get freely licensed
+  refs (ask before downloading) or proceed on lead QC.
 - Gate pack coder: slice-m1, claude/p2-gate-pack: blocked-step feedback fix + docs/audits/
   phase2_gate/ (what to play, veto table, placeholders, 4K captures, structural self-check).
   Then: Concept Lead's structural audit (other account) + his one playthrough = the gate.
