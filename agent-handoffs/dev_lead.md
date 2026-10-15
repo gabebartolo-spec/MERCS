@@ -58,6 +58,15 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
   terrain tiles only: local Ollama, no concept-art (diffusion) step, palette-locked, licensing
   register row CLEARED first (its licence: outputs ours, internal use ok, no resale as a service).
   One strip from Texel vs the Blender rig, side by side, he picks. Rucol GAN repo rejected (no licence).
+- Retro Diffusion (director 2026-10-15): licence checked (ToS 2026-09-28: outputs ours,
+  commercial ok; free-credit outputs go PUBLIC; they may train on outputs; we may not train on
+  theirs). Director: "Small paid plan, private", SPEND YES US$10 prepaid balance (he tops it up
+  himself) - LOG IN NEXT BOARD PR as a D-entry. Confirm privacy switch before any generation.
+  Joins the tile trial (Texel Studio vs RD vs Blender rig) after his look-target pick.
+- Mixels (D-035; director 2026-10-15 "eager to avoid mixels or fake pixels"): validator coder
+  running (`../MERCS-wt/mixels`, claude/no-mixels: PIX-UPSCALED/ALPHA/PALETTE/AA over assets/ in
+  project-lints). Overworld coder told: one texel grid, no scaled nodes. Flag: UI font is smooth,
+  not pixel - bring a labelled font sheet with the look target (06 §7 [D]).
 Traps: never `export APPDATA` (breaks gh, git creds, Python user site for gdtoolkit); set it on
 the Godot command line only. gdlint/gdformat: `python -m gdtoolkit.linter|formatter`.
 Director 2026-10-15: agents talk tersely (memory-shared terse-agent-messages.md).
@@ -79,7 +88,7 @@ data 96, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 13, slice 15,
 loop 4, sim_world 9, save 7, effect 4, overworld 8.
 
 ## Worktrees (5 / 4, director allows forced removal of finished ones)
-p2-walk, p2-m7, slice-m1 (wiring), art-look (4/4). Remove each when its PR merges.
+p2-walk, p2-m7, slice-m1 (wiring), art-look, mixels (5/4). Remove each when its PR merges.
 
 ## Co-lead playbook
 playbook: nothing new (2026-10-15; no worker findings yet).
