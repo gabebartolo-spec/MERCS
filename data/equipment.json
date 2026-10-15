@@ -1,11 +1,15 @@
 {
-  "_comment": "Generic gear (Phase 2 milestone 6, D-066): stats only, a few slots (weapon, armour, trinket), never drawn on the sprite or portrait. PLACEHOLDER items and first numbers: the director names and tunes them. bonus adds to the merc's own numbers (hp, attack, defense, damage, initiative, presence). class (weapons and armour only) is the battle class (rules.gear in data/balance/battle.json); it applies only when the merc's own gear line names no class for that slot, so the look still shows the fighting (D-066). Schema: data/schema/equipment.schema.json.",
+  "_comment": "Generic gear (Phase 2 milestone 6, D-066): stats only, a few slots (weapon, armour, trinket), never drawn on the sprite or portrait. PLACEHOLDER items and first numbers: the director names and tunes them. bonus adds to the merc's own numbers (hp, attack, defense, damage, initiative, presence). class (weapons and armour only) is the battle class (rules.gear in data/balance/battle.json); it applies only when the merc's own gear line names no class for that slot, so the look still shows the fighting (D-066). price (Phase 5 C6) is the coin a town asks for a new piece; a town buys any piece back for a part of its price (data/balance/economy.json armoury). worn (C6, director Q-11: worn = one point weaker, worth less) is the battered form of a weapon or armour, looted from the fallen enemies who carried its class: its own id and name, the bonus one point lower and a lower price; it keeps the slot and class. PLACEHOLDER prices and worn names. Schema: data/schema/equipment.schema.json.",
   "equipment": [
-    {"id": "wpn_iron_blade", "name": "Iron blade", "slot": "weapon", "class": "sword", "bonus": {"damage": 1}},
-    {"id": "wpn_hunting_spear", "name": "Hunting spear", "slot": "weapon", "class": "spear", "bonus": {"attack": 1}},
-    {"id": "arm_padded_coat", "name": "Padded coat", "slot": "armour", "class": "leather", "bonus": {"defense": 1}},
-    {"id": "arm_mail_shirt", "name": "Mail shirt", "slot": "armour", "class": "mail", "bonus": {"defense": 1, "hp": 2}},
-    {"id": "trk_lucky_knot", "name": "Lucky knot", "slot": "trinket", "bonus": {"presence": 1}},
-    {"id": "trk_wolf_tooth", "name": "Wolf tooth", "slot": "trinket", "bonus": {"initiative": 1}}
+    {"id": "wpn_iron_blade", "name": "Iron blade", "slot": "weapon", "class": "sword", "bonus": {"damage": 1}, "price": 20,
+     "worn": {"id": "wpn_iron_blade_worn", "name": "Notched iron blade", "bonus": {}, "price": 8}},
+    {"id": "wpn_hunting_spear", "name": "Hunting spear", "slot": "weapon", "class": "spear", "bonus": {"attack": 1}, "price": 18,
+     "worn": {"id": "wpn_hunting_spear_worn", "name": "Cracked hunting spear", "bonus": {}, "price": 7}},
+    {"id": "arm_padded_coat", "name": "Padded coat", "slot": "armour", "class": "leather", "bonus": {"defense": 1}, "price": 15,
+     "worn": {"id": "arm_padded_coat_worn", "name": "Torn padded coat", "bonus": {}, "price": 6}},
+    {"id": "arm_mail_shirt", "name": "Mail shirt", "slot": "armour", "class": "mail", "bonus": {"defense": 1, "hp": 2}, "price": 40,
+     "worn": {"id": "arm_mail_shirt_worn", "name": "Battered mail shirt", "bonus": {"defense": 1, "hp": 1}, "price": 16}},
+    {"id": "trk_lucky_knot", "name": "Lucky knot", "slot": "trinket", "bonus": {"presence": 1}, "price": 10},
+    {"id": "trk_wolf_tooth", "name": "Wolf tooth", "slot": "trinket", "bonus": {"initiative": 1}, "price": 10}
   ]
 }
