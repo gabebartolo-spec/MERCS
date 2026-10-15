@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Injuries",
-  "description": "Injuries a mercenary can carry. data/injuries.json. Phase 0 fixes the file shape and the id only; a field is added here in the PR that adds the first entry using it.",
+  "description": "Injuries a mercenary can carry. data/injuries.json. kind is wound (heals with the fight), temporary (days, optional stat_change while it lasts) or permanent (stat_change, role_key and layer_id, the sprite layer id). name_key and role_key are keys in data/text/en.json.",
   "type": "object",
   "required": ["injuries"],
   "additionalProperties": false,
@@ -10,10 +10,20 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id"],
+        "required": ["id", "kind"],
         "additionalProperties": false,
         "properties": {
-          "id": {"type": "string", "pattern": "^inj_[a-z0-9]+(_[a-z0-9]+)*$"}
+          "id": {"type": "string", "pattern": "^inj_[a-z0-9]+(_[a-z0-9]+)*$"},
+          "kind": {"type": "string", "pattern": "^(wound|temporary|permanent)$"},
+          "name_key": {"type": "string", "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$"},
+          "days": {"type": "integer", "minimum": 1},
+          "stat_change": {
+            "type": "object",
+            "additionalProperties": false,
+            "patternProperties": {"^[a-z0-9]+(_[a-z0-9]+)*$": {"type": "integer"}}
+          },
+          "role_key": {"type": "string", "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$"},
+          "layer_id": {"type": "string", "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$"}
         }
       }
     }

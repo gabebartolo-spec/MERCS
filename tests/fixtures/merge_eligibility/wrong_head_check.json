@@ -50,6 +50,12 @@
    "status": "completed",
    "conclusion": "success",
    "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  {
+   "name": "gdlint",
+   "status": "completed",
+   "conclusion": "success",
+   "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
   }
  ]
 }

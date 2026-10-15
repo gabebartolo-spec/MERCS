@@ -57,7 +57,9 @@ func _check_settings() -> void:
 func _check_text_size() -> void:
 	var theme := load(str(ProjectSettings.get_setting("gui/theme/custom", ""))) as Theme
 	var size := theme.default_font_size if theme != null else 0
-	check(size >= MIN_FONT_SIZE, "the base text size is at least %d, not %d" % [MIN_FONT_SIZE, size])
+	check(
+		size >= MIN_FONT_SIZE, "the base text size is at least %d, not %d" % [MIN_FONT_SIZE, size]
+	)
 
 
 func _check_autoloads() -> void:
