@@ -128,7 +128,7 @@ func _check_wages_by_clicks() -> void:
 	var panel := _hub().panel
 	var economy := _economy()
 	var rules := _rules()
-	var per_day := economy.wage_per_day(_hub().company.roster.size())
+	var per_day := economy.wage_per_day(_hub().company.roster)
 	var owed_words := Text.t(
 		"hub.wages.owed",
 		{"owed": per_day * REST_DAYS, "per_day": per_day, "count": 6, "days": REST_DAYS}
