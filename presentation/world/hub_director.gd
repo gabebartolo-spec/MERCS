@@ -86,7 +86,7 @@ func _on_result(kind: String, result: Dictionary) -> void:
 		return
 	company.economy.take_loot(kind, rng)
 	if not EncounterBattle.taken(result).is_empty():
-		company.economy.take_prisoner(world.day)
+		company.economy.captives.take(world.day)
 	_reaction = ""
 	set_open(true)
 
@@ -245,8 +245,10 @@ func _prisoner_rows() -> Array[Dictionary]:
 	rows.append(_label(Text.t("hub.prisoner.title")))
 	rows.append(_label(Text.t("hub.prisoner.body")))
 	for choice: String in Economy.CHOICES:
-		var params := {"coin": economy.ransom_coin()}
-		var open := choice != Economy.RECRUIT or economy.can_recruit_prisoner(company)
+		var params := {"coin": economy.captives.ransom_coin()}
+		var open := (
+			choice != Economy.RECRUIT or economy.captives.can_recruit(company, economy.hired)
+		)
 		rows.append(_button("prisoner", choice, Text.t("hub.prisoner." + choice, params), open))
 	return rows
 
@@ -298,7 +300,7 @@ func _last_supplies() -> int:
 
 
 func _faction_name(faction_id: String) -> String:
-	return company.economy.faction_name(faction_id)
+	return company.economy.book.faction_name(faction_id)
 
 
 func _full() -> bool:

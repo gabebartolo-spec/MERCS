@@ -144,4 +144,4 @@ class Played:
 			if result.get("won", false) == true:
 				company.economy.take_loot(kind, rng)
 				if not EncounterBattle.taken(result).is_empty():
-					company.economy.take_prisoner(world.day)
+					company.economy.captives.take(world.day)

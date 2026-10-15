@@ -260,7 +260,7 @@ func _check_contract_lifecycle() -> void:
 	check(not economy.accept("ctr_nope"), "an unknown contract is refused")
 	economy.refresh_board(1, SITES, Rng.from_seed(OTHER_SEED))
 	check(
-		_is(economy.contract(id).get("accepted"), true),
+		_is(economy.book.contract(id).get("accepted"), true),
 		"a fresh board keeps the contracts already accepted"
 	)
 	var purse := economy.purse
@@ -268,12 +268,12 @@ func _check_contract_lifecycle() -> void:
 		economy.complete(id) and economy.purse == purse + _w(row["reward"]),
 		"completing pays the reward"
 	)
-	check(economy.contract(id).is_empty(), "a completed contract leaves the board")
+	check(economy.book.contract(id).is_empty(), "a completed contract leaves the board")
 	economy.refresh_board(0, SITES, Rng.from_seed(SEED))
 	var lapsing: Dictionary = economy.board[0]
-	var lapsed := economy.expire(_w(lapsing["deadline"]) + 1)
+	var lapsed := economy.book.expire(_w(lapsing["deadline"]) + 1)
 	check(
-		str(lapsing["id"]) in lapsed and economy.contract(str(lapsing["id"])).is_empty(),
+		str(lapsing["id"]) in lapsed and economy.book.contract(str(lapsing["id"])).is_empty(),
 		"a contract past its deadline lapses, lapsed: %s" % [lapsed]
 	)
 

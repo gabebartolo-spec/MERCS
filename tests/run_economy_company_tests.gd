@@ -134,7 +134,7 @@ func _check_hiring() -> void:
 
 func _prisoner_company() -> Company:
 	var company := _company()
-	company.economy.take_prisoner(3)
+	company.economy.captives.take(3)
 	return company
 
 
@@ -183,7 +183,7 @@ func _check_prisoner_choices() -> void:
 func _check_prisoner_refusals() -> void:
 	var company := _company()
 	check(not company.economy.decide_prisoner(company, "release", 1), "no prisoner, no decision")
-	company.economy.take_prisoner(1)
+	company.economy.captives.take(1)
 	check(not company.economy.decide_prisoner(company, "hang", 1), "an unknown choice is refused")
 	company.economy.purse = company.economy.hire_cost() * company.cap()
 	while company.roster.size() < company.cap():
@@ -196,8 +196,8 @@ func _check_prisoner_refusals() -> void:
 		"a full roster cannot take the prisoner: the choice stays open"
 	)
 	var next := _company()
-	next.economy.take_prisoner(1)
-	next.economy.take_prisoner(9)
+	next.economy.captives.take(1)
+	next.economy.captives.take(9)
 	check(
 		Merc.whole(next.economy.prisoner["day"]) == 1,
 		"a second prisoner does not replace the one waiting"
@@ -210,7 +210,7 @@ func _check_save_round_trip() -> void:
 	_day(company, 1)
 	economy.take_loot("patrol", Rng.from_seed(SEED))
 	economy.accept(str(economy.board[0]["id"]))
-	economy.take_prisoner(1)
+	economy.captives.take(1)
 	economy.hire(company, "recruit_1")
 	var saved := _through_json(company.state())
 	var back := Company.restore(saved, Fixture.defs())
