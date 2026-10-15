@@ -16,7 +16,7 @@ func run() -> Dictionary:
 
 func _decide(choice: String) -> String:
 	var company := Company.start(Fixture.defs())
-	company.economy.take_prisoner(DAY)
+	company.economy.captives.take(DAY)
 	company.economy.decide_prisoner(company, choice, DAY)
 	var economy := company.economy
 	return "roster %d, coin %d, morale %d" % [company.roster.size(), economy.purse, economy.morale]

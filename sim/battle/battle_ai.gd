@@ -31,11 +31,12 @@ static func choose(battle: Battle, fighter: BattleUnit, sight_cells: int) -> Dic
 	if seen.is_empty():
 		return {"type": Battle.ACTION_WAIT}
 	var planned := _planned(battle, fighter, seen)
+	var blow := battle.kit(fighter.id)[0]
 	if planned != null and BattleGrid.gap(fighter.cell, planned.cell) == 1:
-		return {"type": Battle.ACTION_ATTACK, "target": planned.id}
+		return {"type": blow, "target": planned.id}
 	var target := _most_hurt_adjacent(fighter, seen)
 	if target != null:
-		return {"type": Battle.ACTION_ATTACK, "target": target.id}
+		return {"type": blow, "target": target.id}
 	var goal := planned if planned != null else _closest(fighter.cell, seen)
 	var best := fighter.cell
 	var best_gap := BattleGrid.gap(fighter.cell, goal.cell)
@@ -49,6 +50,17 @@ static func choose(battle: Battle, fighter: BattleUnit, sight_cells: int) -> Dic
 	if best == fighter.cell:
 		return {"type": Battle.ACTION_WAIT}
 	return {"type": Battle.ACTION_MOVE, "to": best}
+
+
+## Plays the fighter's turn: his choice, or a wait when the battle refuses it (a bow's shot
+## before P1c), so an enemy turn always moves on (as MercPlay.play_out does). Returns the action
+## applied, {} when even the wait was refused.
+static func act(battle: Battle, fighter: BattleUnit, sight_cells: int) -> Dictionary:
+	var choice := choose(battle, fighter, sight_cells)
+	if not battle.apply(choice).is_empty():
+		return choice
+	var hold := {"type": Battle.ACTION_WAIT}
+	return hold if not battle.apply(hold).is_empty() else {}
 
 
 ## The target of this round's plan while it still stands in sight, else null.

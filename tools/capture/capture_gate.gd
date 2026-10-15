@@ -158,8 +158,8 @@ func _finish_fight(director: OverworldDirector, turns: int) -> void:
 			await process_frame
 		else:
 			var choice_id := Battle.ACTION_WAIT
-			if kind == Battle.ACTION_ATTACK:
-				choice_id = "%s:%s" % [Battle.ACTION_ATTACK, action.get("target")]
+			if kind == battle.kit(actor.id)[0]:
+				choice_id = "%s:%s" % [kind, action.get("target")]
 			await _click(director.panel.button_for(choice_id))
 		played += 1
 
