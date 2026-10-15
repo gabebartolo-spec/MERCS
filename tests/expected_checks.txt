@@ -10,11 +10,11 @@ assets 13
 slice 16
 battle 64
 loop 8
-sim_world 28
+sim_world 43
 sim_encounters 19
 save 12
-effect 40
-overworld 14
+effect 42
+overworld 16
 road 8
 company 23
 inspect 10
@@ -26,7 +26,7 @@ injury 29
 wiring 19
 hub_fight 2
 story 60
-story_gui 18
+story_gui 21
 campaign 13
 panels 15
 campaign_end 11

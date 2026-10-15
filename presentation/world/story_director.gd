@@ -18,6 +18,10 @@ const SAVE_SYSTEM_PATH := ^"/root/SaveSystem"
 const CLOSE := "close"
 const ATTEMPT_PREFIX := "attempt:"
 const HOOK_REST := "rest"
+## A prisoner's fate in the chronicle; the prefix of every other chronicle line's memory.
+const PRISONER_PREFIX := "prisoner."
+const MEMORY_PREFIX := "memory."
+const HUB_PREFIX := "hub."
 ## Above the overworld's layer, so the scene covers its choices while it is up.
 const LAYER := 2
 
@@ -152,19 +156,27 @@ func _resumable(held: Dictionary) -> bool:
 	return not attempts.is_empty() and not book.definition(str(held.get("id", ""))).is_empty()
 
 
-## The hub's decisions (the economy's chronicle lines, {"day", "merc", "key": "prisoner.<choice>"})
-## become a memory sentence on the merc who remembers them, once each.
+## The hub's decisions (the economy's chronicle lines, {"day", "merc", "key"}) become a memory
+## sentence on the merc who remembers them, once each.
 func _remember_decisions() -> void:
 	if book == null or book.company == null:
 		return
 	var lines := book.company.economy.chronicle
 	while _decisions_seen < lines.size():
 		var line := lines[_decisions_seen]
-		var choice := str(line.get("key", "")).trim_prefix("prisoner.")
-		memory.record(
-			str(line.get("merc", "")), Memory.KEY_FATE_PREFIX + choice, {}, Injury.num(line, "day")
-		)
+		var key := memory_key(str(line.get("key", "")))
+		memory.record(str(line.get("merc", "")), key, {}, Injury.num(line, "day"))
 		_decisions_seen += 1
+
+
+## The memory key of a chronicle line's key: a prisoner's fate ("prisoner.<choice>") is
+## "memory.fate_<choice>"; any other is "memory." + it without a leading "hub."
+## ("standing.grudge" -> "memory.standing.grudge", "hub.terms.step_in_won" ->
+## "memory.terms.step_in_won").
+static func memory_key(chronicle_key: String) -> String:
+	if chronicle_key.begins_with(PRISONER_PREFIX):
+		return Memory.KEY_FATE_PREFIX + chronicle_key.trim_prefix(PRISONER_PREFIX)
+	return MEMORY_PREFIX + chronicle_key.trim_prefix(HUB_PREFIX)
 
 
 func _on_overworld_choice(choice_id: String) -> void:
