@@ -26,6 +26,9 @@ var battle: Battle = null
 ## Set before begin(): the street to draw on and the panel to speak through.
 var street_stage: StreetStage = null
 var panel: LoopPanel = null
+## Display names by fighter id, for fighters the cast text keys do not name (the company's
+## mercs, from their data); the others are named by their kind.
+var unit_names := {}
 
 var _origin := Vector2i.ZERO
 var _sight := 0
@@ -290,6 +293,8 @@ func _field_far() -> Vector2i:
 
 
 func _name(fighter: BattleUnit) -> String:
+	if unit_names.has(fighter.id):
+		return str(unit_names[fighter.id])
 	var kind := fighter.id.rstrip("0123456789").trim_suffix("_")
 	var key := ("cast.%s.name" if fighter.side == BattleUnit.COMPANY else "enemy.%s.name") % kind
 	return Text.t(key)

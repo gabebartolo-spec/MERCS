@@ -6,6 +6,10 @@ extends RefCounted
 const MERCS := "res://data/mercs.json"
 const BATTLE := "res://data/balance/battle.json"
 const COMPANY := "res://data/balance/company.json"
+const ECONOMY := "res://data/balance/economy.json"
+const FACTIONS := "res://data/factions.json"
+const EQUIPMENT := "res://data/equipment.json"
+const RECRUITS := "res://data/recruits.json"
 const SCENARIOS := "res://data/scenarios.json"
 const MAX_ACTIONS := 300
 ## The band the merc faces: the scenario's first FOES enemies (the chief and a bandit).
@@ -20,7 +24,15 @@ static func json(path: String) -> Dictionary:
 ## What a Company is made from, read from the data files.
 static func defs() -> Dictionary:
 	var battle := json(BATTLE)
-	return {"mercs": json(MERCS), "fighters": battle.get("fighters", {}), "company": json(COMPANY)}
+	return {
+		"mercs": json(MERCS),
+		"fighters": battle.get("fighters", {}),
+		"company": json(COMPANY),
+		"economy": json(ECONOMY),
+		"factions": json(FACTIONS),
+		"equipment": json(EQUIPMENT),
+		"recruits": json(RECRUITS),
+	}
 
 
 static func rules() -> Dictionary:

@@ -1,0 +1,33 @@
+{
+ "_comment": "expect: placeholder",
+ "recruits": [
+  {
+   "id": "recruit_1",
+   "name": "Recruit 1",
+   "species": "",
+   "role": "To be written by the director",
+   "stats": {
+    "hp": 11,
+    "attack": 2,
+    "defense": 2,
+    "damage": 5,
+    "initiative": 3,
+    "presence": 2,
+    "resolve": 5
+   },
+   "moves_by_level": {
+    "1": [
+     "move",
+     "attack"
+    ]
+   },
+   "stage_1_gear": [],
+   "gear_slots": {
+    "weapon": null,
+    "armour": null,
+    "trinket": null
+   },
+   "look": "placeholder"
+  }
+ ]
+}

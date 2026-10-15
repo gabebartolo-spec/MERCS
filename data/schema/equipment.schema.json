@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Equipment",
-  "description": "Weapons (wpn_) and armour (arm_). data/equipment.json. Phase 0 fixes the file shape and the id only; a field is added here in the PR that adds the first entry using it.",
+  "description": "Generic gear (D-066): weapons (wpn_), armour (arm_) and trinkets (trk_), for stats only. data/equipment.json. slot is the generic-gear slot it fills; bonus maps a merc stat to the number it adds.",
   "type": "object",
   "required": ["equipment"],
   "additionalProperties": false,
@@ -10,10 +10,24 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id"],
+        "required": ["id", "name", "slot", "bonus"],
         "additionalProperties": false,
         "properties": {
-          "id": {"type": "string", "pattern": "^(wpn|arm)_[a-z0-9]+(_[a-z0-9]+)*$"}
+          "id": {"type": "string", "pattern": "^(wpn|arm|trk)_[a-z0-9]+(_[a-z0-9]+)*$"},
+          "name": {"type": "string", "minLength": 1},
+          "slot": {"type": "string", "pattern": "^(weapon|armour|trinket)$"},
+          "bonus": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "hp": {"type": "integer"},
+              "attack": {"type": "integer"},
+              "defense": {"type": "integer"},
+              "damage": {"type": "integer"},
+              "initiative": {"type": "integer"},
+              "presence": {"type": "integer"}
+            }
+          }
         }
       }
     }

@@ -1,0 +1,3 @@
+# Files validate_pixels.py does not check. One glob (repo-relative, forward slashes) per line,
+# then " # reason". Start with only what must be excused; every line needs a reason.
+assets/**/*_normal.png # normal maps encode vectors, not palette art; their alpha is checked by validate_sheet.py

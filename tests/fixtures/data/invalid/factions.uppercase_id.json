@@ -1,1 +1,1 @@
-{"_comment": "expect: does not match", "factions": [{"id": "fac_Free_Company"}]}
+{"_comment": "expect: does not match", "factions": [{"id": "fac_Free_Company", "name": "X", "pressure": 40}]}

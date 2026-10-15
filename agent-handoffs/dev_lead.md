@@ -1,99 +1,67 @@
-# Dev Lead handoff, 2026-10-10 (desktop, second Claude account, "MERCS BOSS")
-Start from this file, CLAUDE.md, `~/.claude/memory-shared/MEMORY.md`, your brief
-(`agent-briefs/DEV_LEAD_OPUS.md`), `docs/00_VISION.md` (revised 2026-10-09, #63) and
-`docs/specs/art_direction_slice.md`. Run `git fetch`, then `gh pr list` and `docs/STATUS.md`.
+# Dev Lead handoff, 2026-10-15 18:24 (desktop, personal account, "Game Studio Lead mercs")
+Start: this file, CLAUDE.md, ~/.claude/memory-shared/MEMORY.md + co-lead-playbook.md, your brief
+(agent-briefs/DEV_LEAD_OPUS.md, Project Architect 3.0, cap FOUR coders), docs/08_ROADMAP.md
+Phase 2 (lines 102-189), docs/STATUS.md, docs/brainstorms/2026-10-15-director-comments.md.
+Then `git fetch`, `gh pr list`, `gh run list`.
 
-## State: team PAUSED, except Art finishing step 2 (director 2026-10-10: "pause art when they complete the task")
+## State: working (look-target fixes, gate pack, campaign end running)
 
 ## Who does what
-This account has no Concept Lead: the session acts as lead AND Dev Lead under the original
-account's rules. Peers (desktop sessions, message by session id):
-"MERCS SUPPORT" (local_f70eca67-...) = Merge & CI; "MERCS ART FACTORY" (local_e5986dbb-...) = Art.
+No Concept Lead in this account: the session is lead AND Dev Lead. The team is builder
+subagents of this session (Sonnet; Opus for judgement work), one task per life; they die with the
+session. Agents talk tersely (memory-shared terse-agent-messages.md). Art = a builder on Opus.
 
-## Team refresh and pause (director, 2026-10-10)
-Rule: `.claude/skills/mercs-handoff` "The lead refreshes the team" + shared memory
-refresh-workers-at-task-boundaries. Art: regenerated, passed step 1 r2, started step 2 gait,
-then told to PAUSE (commit WIP, rewrite art.md, push, stop). Support: NOT yet regenerated; it
-refuses relayed director instructions and waits for the director to type "restart" in its chat
-(then it fixes merge_ci.md for #70, merges that, clears). After its clear send NO kick-off while
-paused. The lead regenerated itself after this rewrite. Nothing resumes until the director says.
+## Phase 2 (horizontal slice): ALL MILESTONES MERGED 2026-10-15
+#80 encounters, #81 company (save v2, C), #82 wounds, #85 battle skeleton, #87 hub/economy (B),
+#89 storylet+memory, #93 walkable overworld (M; tile region, locations.json, visible parties),
+#90 wiring (company up to 6 fights parties, triage, dead stay dead). Also #83 4K display, #84
+gdlint required, #86 letter keys (no F-keys), #88 board, #91 validate_pixels (D-035 no mixels).
+Director played M1, M2 and the walk/full-loop build: "playtest was good carry on".
+Full-loop build: Documents/GitHub/MERCS-builds/2026-10-15_loop_674c749/MERCS.exe.
 
-## Co-lead playbook (director 2026-10-10, global CLAUDE.md)
-`~/.claude/memory-shared/co-lead-playbook.md` is shared by every BOSS on every project and both
-accounts. Workers report "Findings for the lead". I curate them into the playbook before ANY refresh
-and write "playbook: updated" or "playbook: nothing new" here. playbook: updated (seeded 2026-10-10).
-The AFL boss was told; its message is queued. Director: only the lead writes learnings.md and the
-playbook (global and MERCS CLAUDE.md updated; the MERCS change is on PR #72).
+## Running (builders)
+- Gate pack: `../MERCS-wt/slice-m1`, claude/p2-gate-pack: blocked-step feedback + docs/audits/
+  phase2_gate/ (what to play, veto table, placeholders, 4K captures, structural self-check).
+  Then the gate = Concept Lead's structural audit (other account) + his one playthrough.
+- Campaign end: `../MERCS-wt/campaign-end`, claude/campaign-end. Director: a wiped company ends
+  the campaign (final chronicle screen, ended save never loads into play). Log as a D-entry.
+- Art look target: `../MERCS-wt/art-look`, claude/art-look-target. A "Ash and Hearth", B "Peat and
+  Ochre", C "Clear Day" (boards docs/audits/look_target/option_{A,B,C}.png; 4K frames
+  D:/MERCS-vault/renders/look_2026-10-15). Re-rendering with lead QC fixes (puddles read as
+  casterless shadows, straw as tools, orc pauldrons balloon + head big; "blockout" caption) and
+  his note: "the colour looks good though. the lighting could stand to be 5% brighter" (+5% light,
+  all options). He leans B ("most atmosphere") but picks from the FIXED A/B/C. His pick = master
+  palette + goldens. He also said "the end fidelity would have to be much higher" (final art).
+  realism-critic refuses without a real reference photo path (none in repo; ask before download).
 
-## Art step 2 (gait) status
-QA failure: the director caught a backwards orc axe (rot_deg sign) and a Vampyr scabbard
-that reads as tendrils. I approved trimmed checks: A (clearance under 1 cm fails; prop
-orientation), B (flat-colour pass, 2x contact crops). Vampyr renders bare for the gait; the
-orc keeps the fixed axe if A passes. Then Art sends me the clips, writes its findings and pauses.
-UPDATE: Art was reset by the director mid step 2 (405d2b7, art.md has exact next steps). Check A
-caught both old defects and a new haft-in-thigh clash, so it is PROVEN (playbook and art-qa-critic
-learnings updated). Art's first job on resume: fix the axe clearance, or render the orc bare.
-Art refresh (99b3fdf): playbook: updated (Blender exit-code and 4D-normalise traps, leg IK). The
-haft-clearance limit was rejected for the playbook; it stays open in art.md. While paused, send NO kick-off.
+## Queued after his look pick
+Tile trial on the chosen palette: Retro Diffusion (US$10 prepaid, his written yes; logged into the
+built-in browser pane; lead drives it; skill ~/.claude/skills/retro-diffusion; download at
+ORIGINAL size; check the first output's public flag) vs Texel Studio (local Ollama, no diffusion
+step, licensing row first) vs the Blender rig; RD Low-Poly 3D worth a props trial. Bring a pixel
+UI font sheet (06 §7 [D]).
 
-## THE GOAL (director /goal, 2026-10-09)
-"A playable vertical slice that I can test and assess the art direction before we develop bulk
-assets and content", including "an example of the core gameplay loop". M1 street, M2 motion and
-M5 loop example are on main (F5 in the build). Remaining: the cast's art (orc + Vampyr) in the
-slice, then the gate ("is this the look?").
+## Waiting on the director
+Author merc_3..6, recruits, both factions, the storylet's words (placeholders in data); veto
+tables #80-#93 (gate pack collects them); confirm/reorder M3/M4 (both built).
 
-## Director decisions that shape the work (logged D-042..D-062)
-- Realistic proportions; 84 px mercs on a 960x540 logical screen; sprites drawn at 45 deg in the
-  55 deg world at the same px/m.
-- Vision (#63): hand-made cast of 25, grim fantasy with magic, no type chart, promotion lines.
-- Route A: Tripo for any part where it gives the best result (ask above 2,000 credits/session;
-  D-060 confirmation pending on the board). Sprite changes only at promotion + one signature piece.
-- "Permanent injuries must be considered for all spritework" -> injury layers.
-- Testing: smallest suites per PR, audits at milestones. Mixels fail automatically.
+## Next board PR must log (branch claude/board-after-<n>)
+Retro Diffusion US$10 spend yes; campaign ends on wipe; full-loop playtest pass; lighting +5%;
+fidelity note; the look pick.
 
-## Art (P1-ART-SLICE-CAST, branch claude/art-slice-cast, no PR)
-QC order: (1) clay + 45 deg silhouettes: PASSED r2 (2026-10-10), (2) gait as a played 3 s loop
-(orc heavy and grounded, Vampyr controlled and predatory; bare bodies + weapon, no cape; S/SE/E/NE
-at 1x and 2x; no foot slide): STARTED then PAUSED, clips come to the lead, (3) geared sheets with injury
-layers per the layer contract. Step 3 must fix: orc tusks (front reads as flat plates; want
-tapered cones from the lower jaw) and Vampyr cape (stands off the shoulder like a tower shield
-in SE/SW/E/W; must hug back and shoulders). Vampyr Tripo head at 4x before full sheets.
-Lesson: judge motion as a PLAYED CLIP at game speed, not frame by frame.
+## Worktrees (3/4)
+slice-m1 (gate pack), campaign-end, art-look. Remove each when its work merges.
 
-## Sprite layers (#70, merged)
-`SheetClip.load_layers([body, gear, head, injury...])` composites same-grid mercs.sheet/1 layers.
-Contract sent to Art: one manifest per layer per clip, identical frames/pivot/size, hard alpha,
-`<merc>_<layer>_<clip>.json`, plus a look manifest (layer order per merc per stage).
-Next code: SliceGame loads the orc and Vampyr looks from that manifest (data, not code).
-
-## Code map (slice)
-- `presentation/world/slice_game.gd`: walking, follow camera, crowd, T/R/F1/F3/F5, door, clips, loop.
-- `presentation/world/{loop_director,loop_panel,battle_view,street_stage,sheet_clip}.gd`.
-- `sim/core/rng.gd`, `sim/battle/`, `sim/story/{checks,slice_loop}.gd`.
-- Data: `data/balance/{stage,slice,battle}.json`, `data/scenarios.json`.
-
-## Suites (floors)
-data 96, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 13, slice 15, battle 14, loop 4.
-
-## Open PRs
-`claude/team-refresh`: docs-only, the refresh rule in mercs-handoff + this handoff. Merge & CI merges.
-
-## Next for the Dev Lead
-1. Kick off Support after its restart (above). 2. QC Art's gait clips (art-qa-critic, played clip).
-3. Tell the director the F5 loop example is playable in the build.
-4. Load the cast's looks in SliceGame when Art publishes stage-1 sheets.
-5. Branches waiting on the director (deletes refused by settings): claude/p1-crisp-snap,
-   claude/p1-frame-time, claude/p1-sheet-export-load.
-
-## Worktrees
-Mine: `../MERCS-wt/slice-m1` (branch changes per PR). Art: `../MERCS-wt/art-publish`.
+## Co-lead playbook
+playbook: updated 2026-10-15 (merge-check gap, APPDATA trap). Curate Art's "Findings for the
+lead" (4K window 3836x2158; Blender glTF double-sided faces) on Art's refresh.
 
 ## Rules learnt the hard way (keep under 10 lines)
-- REWRITE this file each time; never insert sections (doc-caps fails past 120 lines).
-- tests.yml skips draft PRs: mark ready, THEN push.
-- Headless test windows are 64x64: size root to 1920x1080 before clicking GUI in a suite.
-- Lit sprites ignore `modulate`; mark sides or states with world geometry, not tint.
-- `git show <ref>:file > file` writes LFS pointers for LFS paths; use `git lfs smudge`.
-- A suite extending a script that fails to parse HANGS: `SUITE_TIMEOUT=120`; kill by PID.
-- Typed GDScript: assign a Variant to a typed local before arithmetic, casts or `.get()`.
-- `git fetch` and read `git log origin/main` before choosing or briefing any work.
+- Never `export APPDATA`: set it on the Godot command only (breaks gh, git creds, Python user site).
+- gdlint/gdformat: `python -m gdtoolkit.linter|formatter`; CI requires both (merge_eligibility).
+- Handoff on a branch is deleted on merge: each update = new branch from main + PR; keep <=120 lines.
+- Every merge: `bash tools/merge_eligibility.sh <pr>` then `gh pr merge --match-head-commit`.
+- Before merging a sim PR: post the mercs-sim-review verdict, set Review needed: done.
+- A milestone's Director gate line: "none blocking; play review after merge (D-064)".
+- tests.yml skips drafts: mark ready, then push. Headless windows are 64x64: size root first.
+- Captures at 3840x2160 offscreen (--windowed --position 8000,8000) before he looks.

@@ -1,35 +1,20 @@
 class_name SliceGame
 extends Node
 ## The art direction slice (docs/specs/art_direction_slice.md): the street made playable. One
-## merc walks by keys (WASD or arrows) or a click; the camera follows; a crowd walks fixed
-## routes; the door leads to the interior. Command keys are letters from slice.json "keys"
-## (SliceKeys): time of day, rain, help, frame time, the loop example (LoopDirector), the map
-## (OverworldDirector, which lives for the session) and the company. Escape closes a panel.
-## Presentation only: nothing here is random, and walking the hub decides no outcome.
+## merc walks by keys (WASD or arrows) or a click; a crowd walks fixed routes; the door leads
+## to the interior. Command keys are letters (SliceKeys); the map (M) is walked a tile at a time
+## and its hub's gate leads back to the street. Escape closes a panel. Presentation only.
 
 const STAGE_SCENE := preload("res://presentation/world/street_stage.tscn")
 const SLICE_DATA := "res://data/balance/slice.json"
-## The merc sheets Art publishes: the rest pose, and the walk and idle clips beside it.
-## Moving mercs play walk, standing ones idle, falling back to the rest pose; with none of
-## them the stage's grey capsule stands in.
+## The merc sheets Art publishes: rest pose, walk and idle clips (the grey capsule if none).
 const MERC_SHEET := "res://assets/sprites/mercs/average_m/average_m_body_rest.json"
 const WALK_SHEET := "res://assets/sprites/mercs/average_m/average_m_body_walk.json"
 const IDLE_SHEET := "res://assets/sprites/mercs/average_m/average_m_body_idle.json"
-## Crowd merc n starts its clips this many seconds later than merc n - 1, so they do not
-## step in unison.
+## Crowd merc n starts its clips this much later than merc n - 1 (not in unison).
 const CROWD_PHASE_S := 0.37
 const ROUTE_PREFIX := "route_"
 const MS_PER_S := 1000.0
-const DIRECTION_BY_KEY := {
-	KEY_W: Vector2i(0, -1),
-	KEY_UP: Vector2i(0, -1),
-	KEY_S: Vector2i(0, 1),
-	KEY_DOWN: Vector2i(0, 1),
-	KEY_A: Vector2i(-1, 0),
-	KEY_LEFT: Vector2i(-1, 0),
-	KEY_D: Vector2i(1, 0),
-	KEY_RIGHT: Vector2i(1, 0),
-}
 
 ## Read by tests and the frame-time readout; the merc the player walks.
 var player := GridWalker.new()
@@ -44,20 +29,20 @@ var _walk: SheetClip = null
 var _idle: SheetClip = null
 var _clock := 0.0
 var _shown := {}
-var _held := {}
+var _held := HeldKeys.new()
 var _door := Vector2i.ZERO
 var _street_return := Vector2i.ZERO
 var _interior_entry := Vector2i.ZERO
 var _interior_exit := Vector2i.ZERO
 var _frame_ms := 0.0
 var _help: Label = null
-## The key help and the frame time; hidden while a choice panel is up (the map or the loop),
-## which words its own keys and would sit over the help (director, 2026-10-15, 4K TV).
+## The key help and frame time; hidden while a panel is up (director, 2026-10-15, 4K TV).
 var _hud: CanvasLayer = null
 var _frame_label: Label = null
 var _loop: LoopDirector = null
 var _overworld: OverworldDirector = null
 var _company_director: CompanyDirector = null
+var _hub: HubDirector = null
 var _keys: SliceKeys = null
 
 
@@ -66,8 +51,7 @@ func _ready() -> void:
 	_keys = SliceKeys.new(SliceKeys.ACTIONS)
 	_stage = STAGE_SCENE.instantiate() as StreetStage
 	_stage.auto_walk = false
-	# The stage's logical screen (stage.json "pixel"), at the largest whole scale the window
-	# fits: x2 at 1080p, x4 at 4K.
+	# The stage's logical screen (stage.json "pixel") at the largest whole scale that fits.
 	var stage_data := StageData.load_file(StreetStage.STAGE_DATA_PATH)
 	var logical_h := int(stage_data.num("pixel", "logical_height_px"))
 	_stage.integer_scale = maxi(
@@ -77,6 +61,7 @@ func _ready() -> void:
 	_setup_walkers()
 	_load_frames()
 	_build_hud()
+	StoryDirector.attach(self)
 	_sync()
 
 
@@ -95,7 +80,9 @@ func _process(delta: float) -> void:
 ## Advances every walker by delta seconds and redraws. Deterministic for the same inputs.
 func step(delta: float) -> void:
 	_clock += delta
-	player.hold(Vector2i.ZERO if _paused() else _held_direction())
+	player.hold(Vector2i.ZERO if _paused() else _held.direction())
+	if _overworld_open() and not company_open():
+		_overworld.walk(_held.direction(), delta)
 	player.advance(delta)
 	_use_doors()
 	for i: int in crowd.size():
@@ -116,8 +103,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		_on_ground_click(click.position)
 
 
-## A left click on the street: walk there, or a move in the battle on screen. Nothing while
-## the map is open, except in a fight on the road.
+## A left click on the street: walk there, or a move in the battle on screen.
 func _on_ground_click(window_position: Vector2) -> void:
 	var fighting := _overworld != null and _overworld.in_fight()
 	if _overworld_open() and not fighting:
@@ -150,11 +136,9 @@ func ground_cell_at(window_position: Vector2) -> Dictionary:
 
 func _on_key(key: InputEventKey) -> void:
 	var code := key.physical_keycode if key.physical_keycode != KEY_NONE else key.keycode
-	if DIRECTION_BY_KEY.has(code):
-		_held[code] = key.pressed
-	elif not key.pressed:
+	if _held.take(code, key.pressed) or not key.pressed:
 		return
-	elif _keys.action(code) == &"time_of_day":
+	if _keys.action(code) == &"time_of_day":
 		var next := (int(_stage.time_of_day) + 1) % StageLighting.TimeOfDay.size()
 		_stage.set_conditions(next as StageLighting.TimeOfDay, _stage.rain)
 		_shown.clear()
@@ -177,13 +161,14 @@ func _on_screen_key(code: Key) -> void:
 		toggle_overworld()
 	elif action == &"company":
 		company_director().set_open(not company_open())
-	elif action == SliceKeys.CLOSE and company_open():
-		_company_director.set_open(false)
+	elif action == &"hub":
+		hub_director().set_open(not hub_open())
+	elif action == SliceKeys.CLOSE and (company_open() or hub_open()):
+		(_company_director if company_open() else _hub).set_open(false)
 	elif action == SliceKeys.CLOSE and _overworld_open():
-		end_overworld()
+		toggle_overworld()
 
 
-## Starts the loop example from its seed (slice.json "loop"), ending any pass in progress.
 func start_loop() -> void:
 	end_loop()
 	_loop = LoopDirector.new()
@@ -208,30 +193,19 @@ func end_loop() -> void:
 	_shown.clear()
 
 
-## Shows the overworld map over the street, or hides it when it is open. The first M
-## creates the director (which continues the save on disk, if any); later ones show and
-## hide the same one, so the run stays as it is until the player saves.
+## Leaves the street for the overworld, or, on the map, goes back to the street when the
+## band stands on the hub's gate (OverworldDirector.toggle). The first M creates the
+## director (which continues the save on disk, if any), so the run stays as it is.
 func toggle_overworld() -> void:
 	if _overworld == null:
-		_overworld = OverworldDirector.new()
-		_overworld.company = company_director().company
-		_overworld.street_stage = _stage
-		var origin := _data.floats("loop", "battle_origin_xz")
-		_overworld.origin = Vector2i(int(origin[0]), int(origin[1]))
-		add_child(_overworld)
-		_overworld.begin()
+		_overworld = OverworldDirector.make(self)
+		_hub = HubDirector.attach(self)
 		return
-	_overworld.set_open(not _overworld.is_open())
+	_overworld.toggle()
 
 
 func overworld_director() -> OverworldDirector:
 	return _overworld
-
-
-## Hides the map; the run it holds stays for the next M.
-func end_overworld() -> void:
-	if _overworld != null:
-		_overworld.set_open(false)
 
 
 ## The company screen (C), hidden until first used; its Company is the game's one.
@@ -247,22 +221,25 @@ func company_open() -> bool:
 	return _company_director != null and _company_director.is_open()
 
 
+## The hub screen; the overworld (and so the world) is made, hidden, if need be.
+func hub_director() -> HubDirector:
+	if _hub == null:
+		toggle_overworld()
+		_overworld.set_open(false)
+	return _hub
+
+
+func hub_open() -> bool:
+	return _hub != null and _hub.is_open()
+
+
 func _overworld_open() -> bool:
 	return _overworld != null and _overworld.is_open()
 
 
-## Walking waits while the loop example or the overworld map has the player's attention.
+## Walking waits while a panel or the loop has the player's attention.
 func _paused() -> bool:
-	return _loop != null or _overworld_open() or company_open()
-
-
-func _held_direction() -> Vector2i:
-	var direction := Vector2i.ZERO
-	for code: Variant in _held:
-		if _held[code]:
-			var step_dir: Vector2i = DIRECTION_BY_KEY[code]
-			direction += step_dir
-	return direction
+	return _loop != null or _overworld_open() or company_open() or hub_open()
 
 
 func _setup_walkers() -> void:
@@ -328,7 +305,6 @@ func _load_frames() -> void:
 	_idle = _clip(IDLE_SHEET)
 	if _rest != null:
 		_stage.use_sheet(MERC_SHEET, player.facing)
-	# Moving at the walk clip's own ground speed keeps the planted foot still.
 	if _walk != null and _walk.ground_speed_mps > 0.0:
 		player.speed_m_s = _walk.ground_speed_mps
 		for walker: GridWalker in crowd:
@@ -355,7 +331,7 @@ func _build_hud() -> void:
 
 ## Places every merc and the camera, and shows each merc's current facing.
 func _sync() -> void:
-	_hud.visible = not (_overworld_open() or company_open() or _loop != null)
+	_hud.visible = not (_paused())
 	# From the fight on, the camera stays on the field and the street's walkers step aside.
 	var arena := _arena()
 	var fighting := arena != null
@@ -370,15 +346,14 @@ func _sync() -> void:
 		_face(extras[i], crowd[i], _clock - CROWD_PHASE_S * (i + 1))
 
 
-## The battle on screen, from the loop example or from an encounter on the road, or null.
+## The battle on screen (loop example or road encounter), or null.
 func _arena() -> BattleView:
 	if _loop != null and _loop.view != null:
 		return _loop.view
 	return _overworld.view if _overworld != null else null
 
 
-## Shows the frame a merc should have now: its facing, from walk while it moves and idle
-## while it stands (the rest pose when a clip is missing).
+## Shows a merc's frame now: walk while it moves, idle while it stands (else the rest pose).
 func _face(sprite: Sprite3D, walker: GridWalker, seconds: float) -> void:
 	var clip := _walk if walker.is_moving() else _idle
 	if clip == null or clip.frame_count(walker.facing) == 0:
