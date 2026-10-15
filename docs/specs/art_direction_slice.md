@@ -15,7 +15,7 @@ Its question is "is this the look, and does the look hold up while I play the ga
 before any bulk asset or content work starts. The loop example is a **sketch**: one short scripted
 pass through the nine steps of `00_VISION.md` "Core loop", deep enough to see every kind of screen
 and moment the art must carry (street, recruit, choice, battle, aftermath, camp), shallow on
-systems. It is not Phase 8's vertical slice, and it does not pass any Phase 2–6 gate: those systems
+systems. It is not Phase 9's vertical slice, and it does not pass any Phase 3–7 gate: those systems
 are still proved separately. Sketch code follows every hard rule (seeded sim, presentation reads
 events, content in `data/`), so later phases deepen it instead of replacing it.
 
@@ -65,7 +65,7 @@ world and sprite art, and the UI only for legibility and fit.
 | Controls | WASD / arrows and click-to-move on the grid; camera follow snapped to whole logical pixels | Dev |
 | Text | the F1 help line in the UI font pick (Q9), or a placeholder OFL face until then | Dev |
 
-Not in the slice: polished UI art, painted portraits (Phase 2), sound, saves, more than one pass of
+Not in the slice: polished UI art, painted portraits (Phase 3), sound, saves, more than one pass of
 the loop, a second street, any weather beyond rain (fog, snow, storm and wind are world-phase items: ask first), and
 any diffusion-made frame.
 

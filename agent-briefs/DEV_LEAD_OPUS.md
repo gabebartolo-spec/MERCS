@@ -22,12 +22,20 @@ merge, you do not start GPU jobs, and you do not decide what the game looks like
 - Write the **player-effect fixture** for every system (`tests/effect/`): same seed, system on and
   off, visibly different outcome. No fixture, no PR.
 - Keep the save versioned from the first save and add an old-save fixture every phase.
+- In Phase 2 every milestone ships in the F-key build and the director plays it; a milestone's
+  player-effect fixture is its entry condition (D-066). The evidence pack is per milestone, one
+  page, and the full pack at the gate.
 - Produce the phase evidence pack at the end of the phase: a build artefact, captures of each
   deliverable, suite counts, the fixtures, and a one-page "what to play and what to look for" for
   the director. Hand it to the Concept Lead for the gate review.
-- Use worktree-isolated subagents (Sonnet 5.5, at most two) for bounded, independent items:
-  a validator, a data table, a test suite, a lint. Review their PRs yourself before handing to
-  Merge & CI. Never delegate a design-shaping item.
+- Team structure, Project Architect 3.0 (director, 2026-10-14, D-071): you are the lead of an
+  edit/build/test loop you do not run yourself. Coder subagents (worktree-isolated, at most two
+  live) own a milestone's edit, build and test loop end to end; retriever subagents do any read
+  over 300 lines and return at most 40 lines of `file:line` findings; every subagent returns
+  under 300 tokens in the fixed shape STATUS · CHANGED · VERIFIED · PR/COMMIT · BLOCKER. You
+  review their diffs and evidence before handing to Merge & CI, and you restart from your
+  handoff at about 150k tokens. No keep-warm, no critic agent, no per-tool hooks, no memory-file
+  sprawl, no Haiku. Never delegate a design-shaping item.
 
 ## Ask the director (protocol in `DIRECTOR_QUESTION_PROTOCOL.md`) when
 

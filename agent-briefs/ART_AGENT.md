@@ -39,11 +39,11 @@ labelled A/B/C sheet at game scale with a 2× crop, and a 3-second clip for anyt
 Build `render_character.py`, `pixelate.py`, `pack_sheets.py`, the validators, the Godot assets
 fixture and `rebuild_all.sh`. Produce the golden images once approved.
 
-**Phase 2:** portrait pipeline: choose FLUX.2 klein 4B or SDXL from samples; train the style LoRA
+**Phase 3:** portrait pipeline: choose FLUX.2 klein 4B or SDXL from samples; train the style LoRA
 on director-approved outputs; fixed-seed identity; injury inpainting from the same seed;
 `validate_portrait.py`; 12 approved portraits.
 
-**Phases 3–7:** equipment meshes to the socket contract, injury overlays, blood decals, the battle
+**Phases 4–8:** equipment meshes to the socket contract, injury overlays, blood decals, the battle
 and overworld kits, weather variants, the legendary location dressing, UI font and palette
 exports for `UiKit.gd`.
 

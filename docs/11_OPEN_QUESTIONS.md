@@ -79,11 +79,11 @@ sitting captain (D-024). Kept below for the record.
 - **You appoint, the company reacts (Recommended).** You pick any living member; one to three
   mercenaries object or approve from their traits and memories, with real morale and loyalty
   consequences, and an unpopular choice can cause a departure. Cost: the reaction scenes are
-  Phase 5 content.
+  Phase 6 content.
 - Seniority or rank decides automatically. Cheapest; removes a decision you would enjoy.
 - The company votes. Dramatic, but you lose control of your own company at its worst moment.
-- No answer: the Dev Lead builds "you appoint" behind a data flag in Phase 2; reactions land in
-  Phase 5.
+- No answer: the Dev Lead builds "you appoint" behind a data flag in Phase 3; reactions land in
+  Phase 6.
 
 **Q14. Does the campaign start with a company you inherit, or with a captain you create?**
 - **Inherit a small company with a sitting captain (Recommended).** You get people and their
@@ -99,39 +99,66 @@ first; otherwise the Concept Lead adds a recommendation before the question is a
 **Q15. Sandbox or guided story?** Leaning: a sandbox campaign with large crises, like Battle
 Brothers, where the story emerges from play and feels unique to each run. Alternative: a guided
 narrative spine with sandbox stretches.
+- Concept Lead recommendation (2026-10-14): the sandbox. Phase 2's map, tick and faction
+  pressure are its skeleton already; a spine would be a second structure built before the first
+  is proven. Revisit at the Phase 2 gate if play shows the sandbox has no pull.
 
 **Q16. Does the Vampyr get a last-ditch escape** (bat or shadow form to dodge a killing blow)?
 Director: only if it is thematic, true to his identity, and proves balanced and fun. Options:
 his own version of surviving being downed; a separate move; cut.
+- Concept Lead recommendation (2026-10-14): his own version of being downed, inside the triage
+  ladder Phase 2 builds (his health is energy, so "down" for him is a bargain the triage roll
+  reads differently), not a separate move. One rule, no new system; decide after Phase 2's play.
 
 **Q17. How is a moveset changed** outside level-ups? Trainers, potions, or another in-game
 mechanism.
+- Concept Lead recommendation (2026-10-14): not at all in Phase 2 (moves by level, four taken
+  into battle). In Phase 3, swap only at promotion; a trainer at the hub is the first extension
+  if play wants it. Potions add an item economy before the economy is proven.
 
 **Q18. Which income systems ship first?** Contracts, trade, crafting, gladiator events, looting
 and banditry are all wanted; each needs its own rules, UI and balancing.
+- **Answered (director, 2026-10-14, D-066):** contracts and loot first (coin, supplies and
+  generic equipment, equipped for stats with the sprite unchanged); wages and supplies are the
+  drain. Trade, crafting, gladiator events and banditry wait for a depth pass.
 
 **Q19. How do earned epithets and identity branches (One-Eye, Oathbreaker) sit alongside the
 fixed three-stage promotion line?** Branches inside a stage, cosmetic and storylet-only, or
 replaced by the promotion line.
+- Concept Lead recommendation (2026-10-14): epithets are earned names and storylet tags inside
+  a stage, never stats or looks; the promotion line owns stats and looks. Injury already changes
+  role options (pillar 5), so biography has teeth without a second progression system.
 
 **Q20. What sits beside the four learnt moves in battle?** Basic weapon actions, an item slot, or
 nothing. And does equipment physics (plate resists cuts, axes break shields) still apply inside
 each merc's gear line?
+- Concept Lead recommendation (2026-10-14): one basic weapon action beside the four moves and
+  nothing else in Phase 2; no item slot until an item exists. Equipment physics applies inside
+  gear lines and to generic gear (D-066), and is the only counter system (pillar 3: never a type
+  chart).
 
 **Q21. With a fixed cast of 25, how does recruitment stay a discovery, and where do prisoners
-fit?** Phase 6 currently recruits surrendered enemies and Phase 7 has regional recruitment pools.
+fit?** Phase 7 currently recruits surrendered enemies and Phase 8 has regional recruitment pools.
 Options include: cast members can appear as enemies and be won over; cast members are found in
 the world (taverns, story gates); captured enemies are ransomed or released but never recruited.
+- **Partly answered (director, 2026-10-14, D-066):** Phase 2 hires at the hub (accepted as
+  "shopping" for structure) and ships one prisoner decision: release, ransom, execute, recruit.
+- Concept Lead recommendation for the rest: cast members are found in the world with a reason to
+  be there, and a prisoner can be recruited only when he is a cast member who appeared as an
+  enemy; nameless enemies are ransomed, released or executed. Discovery is owed by Phase 7.
 
 **Q22. How many of the 25 are in the vertical slice?** The slice roster cap is 12. Art cost is
 about 3 stage looks per merc plus personal-detail variants for a returning playstyle.
+- **Answered for the horizontal slice (director, 2026-10-14, D-066):** 6 at stage 1, placeholder
+  sprites except the orc and the Vampyr. Phase 3 authors 12 in data; stage-2 and stage-3 art
+  only for the two reference mercs until the Phase 9 roster is chosen.
 
 ## Design questions the Dev Lead will raise during their phases
 
-- Phase 3: how much of the enemy's equipment should be visible before a fight begins (it changes
+- Phase 4: how much of the enemy's equipment should be visible before a fight begins (it changes
   how much planning is possible)?
-- Phase 4: should a surgeon's failed roll be able to kill (harsher, more memorable) or only maim?
-- Phase 5: do storylets pause the game as a full-screen scene, or play in a side panel while the
+- Phase 5: should a surgeon's failed roll be able to kill (harsher, more memorable) or only maim?
+- Phase 6: do storylets pause the game as a full-screen scene, or play in a side panel while the
   camp is visible?
-- Phase 7: do contracts show their simulated cause ("the mine dispute") on the board, or does the
+- Phase 8: do contracts show their simulated cause ("the mine dispute") on the board, or does the
   player discover it?
