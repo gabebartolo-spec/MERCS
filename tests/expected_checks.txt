@@ -8,7 +8,7 @@ stage_scale 11
 stage_light 8
 assets 13
 slice 16
-battle 44
+battle 47
 loop 8
 sim_world 11
 sim_encounters 11

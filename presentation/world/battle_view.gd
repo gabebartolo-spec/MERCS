@@ -166,7 +166,10 @@ func _process(delta: float) -> void:
 		_wait_s += delta
 		if _wait_s >= ENEMY_PAUSE_S:
 			_wait_s = 0.0
-			_play(BattleAi.choose(battle, battle.current(), _sight))
+			var before := battle.log.size()
+			var done := BattleAi.act(battle, battle.current(), _sight)
+			if not done.is_empty():
+				_played(done, battle.log.slice(before))
 
 
 func _on_choice(choice_id: String) -> void:
@@ -183,8 +186,12 @@ func _on_choice(choice_id: String) -> void:
 
 func _play(action: Dictionary) -> void:
 	var events := battle.apply(action)
-	if events.is_empty():
-		return
+	if not events.is_empty():
+		_played(action, events)
+
+
+## An action the battle took: recorded (FightRecord), drawn, and the next turn shown.
+func _played(action: Dictionary, events: Array[Dictionary]) -> void:
 	acted.emit(action)
 	_refresh()
 	marks.record(events, battle, _sprites, fx)
@@ -215,7 +222,7 @@ func _actions(actor: BattleUnit) -> Array[Dictionary]:
 		if _adjacent(actor.cell, enemy.cell):
 			out.append(
 				{
-					"id": Battle.ACTION_ATTACK + ":" + enemy.id,
+					"id": battle.kit(actor.id)[0] + ":" + enemy.id,
 					"label": Text.t("slice.battle.attack", params)
 				}
 			)
