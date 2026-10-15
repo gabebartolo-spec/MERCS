@@ -10,6 +10,7 @@ extends "res://tests/lib/runner.gd"
 ##   godot --headless --path . --script tests/run_economy_tests.gd
 
 const Fixture := preload("res://tests/lib/company_fixture.gd")
+const GoldenChecks := preload("res://tests/economy/golden_checks.gd")
 const SEED := 424242
 const OTHER_SEED := 7
 const WEEK := 7
@@ -30,6 +31,7 @@ func run_checks() -> void:
 	_check_contracts_by_pressure()
 	_check_contract_lifecycle()
 	_check_loot()
+	GoldenChecks.new().run(check)
 	await process_frame
 
 
