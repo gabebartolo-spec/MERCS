@@ -143,8 +143,8 @@ func turn_order() -> Array[BattleUnit]:
 
 
 ## What a standing enemy plans for this round, until it acts: {"unit", "kind": "attack" |
-## "advance" | "hold", "target"} (BattleAi.intent); {} when it has no plan or broke at his
-## captain's fall (a broken man never acts, so he shows no plan).
+## "advance" | "search" | "hold", "target"} (BattleAi.intent); {} when it has no plan or
+## broke at his captain's fall (a broken man never acts, so he shows no plan).
 func intent(unit_id: String) -> Dictionary:
 	return {} if _morale.is_broken(unit_id) else _intents.plan(unit_id)
 

@@ -15,6 +15,11 @@ extends RefCounted
 const BATTLE_DATA := "res://data/balance/battle.json"
 const SCENARIOS := "res://data/scenarios.json"
 const ENCOUNTERS := "res://data/encounters.json"
+const TEXT := "res://data/text/en.json"
+const INTENT_TEXT := "battle.intent."
+## A line-up written as a block (C7's shape): the same placements under "fighters".
+const BLOCK_LINEUP := {"fighters": [{"fighter": "bandit", "cell": [4, 2]}]}
+const BLOCK_CELL := Vector2i(4, 2)
 ## The scenario's company deployments: the slice's own pair, and the road's six in order.
 const COMPANY_KEYS: Array[String] = ["company_cells", "road_cells"]
 const FIRST_SEED := 1000
@@ -45,15 +50,22 @@ const SEEN_AT := Vector2i(8, 1)
 const GONE_TO := Vector2i(17, 1)
 
 var _check: Callable
+## Every intent the fights and scenes below planned whose text names no one it should
+## ("Advances on " with an empty name), and the kinds seen.
+var _nameless: Array[String] = []
+var _kinds := {}
+var _text := {}
 
 
 ## check: the runner's check(condition, expectation).
 func run(check: Callable) -> void:
 	_check = check
+	_text = _json(TEXT)
 	_check_no_fight_stalls()
 	_check_deployments_in_sight()
 	_check_walks_round_a_wall()
 	_check_walks_to_last_seen()
+	_check_intents_name_their_target()
 
 
 func _data() -> Dictionary:
@@ -93,6 +105,7 @@ func _check_no_fight_stalls() -> void:
 				choice = MercPlay.choose(battle, actor, rules)
 			if battle.apply(choice).is_empty():
 				battle.apply({"type": Battle.ACTION_WAIT})
+			_note_intents(battle, battle.intents())
 		if not battle.is_over():
 			stalled.append(FIRST_SEED + n)
 	var ended := fights > 0 and cap > 0 and blind_starts.is_empty() and stalled.is_empty()
@@ -184,6 +197,8 @@ func _check_walks_to_last_seen() -> void:
 	battle.apply({"type": Battle.ACTION_WAIT})
 	var lost := BattleKnowledge.seen(battle, watchman, sight).is_empty()
 	var choice := BattleAi.choose(battle, watchman, sight)
+	var searching := BattleAi.intent(battle, watchman, sight)
+	_note_intents(battle, [searching])
 	watchman.cell = SEEN_AT
 	BattleKnowledge.remember(battle, sight)
 	var after := BattleAi.choose(battle, watchman, sight)
@@ -194,6 +209,7 @@ func _check_walks_to_last_seen() -> void:
 			and str(choice.get("type")) == Battle.ACTION_MOVE
 			and watchman.last_seen == BattleUnit.NOWHERE
 			and str(after.get("type")) == Battle.ACTION_WAIT
+			and str(searching.get("kind")) == BattleAi.INTENT_SEARCH
 		),
 		(
 			"an enemy who lost sight walks to where he last saw a foe (%s), then holds there (%s)"
@@ -210,8 +226,9 @@ func _check_deployments_in_sight() -> void:
 	var sight := BattleRules.read(_rules(), "sight_cells")
 	var lineups: Array[Array] = []
 	for encounter: Dictionary in _list(_json(ENCOUNTERS), "encounters"):
-		for lineup: Array in _list(encounter, "lineups"):
-			lineups.append(lineup)
+		for lineup: Variant in _list(encounter, "lineups"):
+			lineups.append(_lineup(lineup))
+	var block_read := _cells(_placed(_lineup(BLOCK_LINEUP))) == [BLOCK_CELL]
 	var blind: Array[String] = []
 	var checked := 0
 	for scenario: Dictionary in _list(_json(SCENARIOS), "scenarios"):
@@ -227,7 +244,43 @@ func _check_deployments_in_sight() -> void:
 				blind.append_array(_blind(company, _cells(_placed(enemies)), sight))
 				checked += company.size()
 	var said := "every authored deployment (%d) starts each fighter in sight of a foe" % checked
-	_check.call(checked > 0 and blind.is_empty(), "%s (%d cells; blind %s)" % [said, sight, blind])
+	var ok := checked > 0 and blind.is_empty() and block_read
+	_check.call(
+		ok, "%s (%d cells; blind %s; block line-up read %s)" % [said, sight, blind, block_read]
+	)
+
+
+## A line-up's placements: the list itself, or a block's "fighters" (C7 line-ups carry
+## "places" and "from_day" beside them).
+func _lineup(lineup: Variant) -> Array:
+	if lineup is Dictionary:
+		return _list(lineup, "fighters")
+	return lineup if lineup is Array else []
+
+
+## Notes each plan whose text (en.json battle.intent.<kind>) is missing, or names a target
+## the plan does not have.
+func _note_intents(battle: Battle, plans: Array) -> void:
+	for plan: Dictionary in plans:
+		var kind := str(plan.get("kind", ""))
+		_kinds[kind] = true
+		var line := str(_text.get(INTENT_TEXT + kind, ""))
+		var named := battle.unit(str(plan.get("target", ""))) != null
+		if line.is_empty() or (line.contains("{target}") and not named):
+			_nameless.append("%s %s" % [plan, line])
+
+
+## Every plan shown over an enemy reads whole: no "Advances on " with an empty name. The
+## lost-sight walk plans "search", which names no one (review of #147).
+func _check_intents_name_their_target() -> void:
+	var searched := _kinds.has(BattleAi.INTENT_SEARCH) and _kinds.has(BattleAi.INTENT_ADVANCE)
+	_check.call(
+		searched and _nameless.is_empty(),
+		(
+			"every planned intent's text names its target when it has one (kinds %s; nameless %s)"
+			% [_kinds.keys(), _nameless.slice(0, 3)]
+		)
+	)
 
 
 ## The company stood on its first n cells, for every n: who sees no foe.

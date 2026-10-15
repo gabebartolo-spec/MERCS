@@ -17,13 +17,16 @@ extends RefCounted
 const INTENT_ATTACK := "attack"
 const INTENT_ADVANCE := "advance"
 const INTENT_HOLD := "hold"
+## Walking to where he last saw a foe (BattleUnit.last_seen): no target, he sees no one.
+const INTENT_SEARCH := "search"
 
 
-## The plan for this round: {"unit", "kind": attack | advance | hold, "target": id or ""}.
+## The plan for this round: {"unit", "kind": attack | advance | search | hold, "target": id,
+## "" for search and hold}.
 static func intent(battle: Battle, fighter: BattleUnit, sight_cells: int) -> Dictionary:
 	var seen := BattleKnowledge.seen(battle, fighter, sight_cells)
 	if seen.is_empty():
-		var kind := INTENT_HOLD if fighter.last_seen == BattleUnit.NOWHERE else INTENT_ADVANCE
+		var kind := INTENT_HOLD if fighter.last_seen == BattleUnit.NOWHERE else INTENT_SEARCH
 		return {"unit": fighter.id, "kind": kind, "target": ""}
 	var target := _most_hurt_in_reach(battle, fighter, seen)
 	if target != null:
