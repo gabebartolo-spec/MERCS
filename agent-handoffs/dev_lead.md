@@ -20,22 +20,20 @@ Director played M1, M2 and the walk/full-loop build: "playtest was good carry on
 Full-loop build: Documents/GitHub/MERCS-builds/2026-10-15_loop_674c749/MERCS.exe.
 
 ## Running (builders)
-- Gate pack: `../MERCS-wt/slice-m1`, claude/p2-gate-pack: blocked-step feedback + docs/audits/
-  phase2_gate/ (what to play, veto table, placeholders, 4K captures, structural self-check).
-  Then the gate = Concept Lead's structural audit (other account) + his one playthrough.
-- Campaign end: `../MERCS-wt/campaign-end`, claude/campaign-end. Director: a wiped company ends
-  the campaign (final chronicle screen, ended save never loads into play). Log as a D-entry.
-- Art look target: `../MERCS-wt/art-look`, claude/art-look-target. A "Ash and Hearth", B "Peat and
-  Ochre", C "Clear Day" (boards docs/audits/look_target/option_{A,B,C}.png; 4K frames
-  D:/MERCS-vault/renders/look_2026-10-15). Re-rendering with lead QC fixes (puddles read as
-  casterless shadows, straw as tools, orc pauldrons balloon + head big; "blockout" caption) and
-  his note: "the colour looks good though. the lighting could stand to be 5% brighter" (+5% light,
-  all options). He leans B ("most atmosphere") but picks from the FIXED A/B/C. His pick = master
-  palette + goldens. He also said "the end fidelity would have to be much higher" (final art).
-  realism-critic refuses without a real reference photo path (none in repo; ask before download).
+- #97 gate pack MERGED (docs/audits/phase2_gate/README.md = what to play, veto table, 4K frames).
+  Gate = Concept Lead's structural audit (other account) + his one playthrough.
+- Gap fixes: `../MERCS-wt/slice-m1`, claude/p2-gate-gaps (campaign same-seed replay check, save
+  mid-fight, v2 fixture, names not ids in memories, panel overlap, visible seen-ring).
+- Campaign end = PR #98 (sim review PASS posted): coder merging main after #97, then merge.
+- LOOK PICKED: B "Peat and Ochre" (director 2026-10-15, after the fixed boards; earlier "the
+  colour looks good though. the lighting could stand to be 5% brighter" - done). Art
+  (`../MERCS-wt/art-look`) locking it: palette = core ramps (skin, gear, heraldry, UI, soot) +
+  biome sets, B = biome "heartland" (director: "scope for multiple colour palettes in the future to
+  differentiate different biomes/kingdoms/landscapes"); goldens in assets/golden/; 06 §2/§8.
+  He also said "the end fidelity would have to be much higher" (final art, later).
 
-## Queued after his look pick
-Tile trial on the chosen palette: Retro Diffusion (US$10 prepaid, his written yes; logged into the
+## Next after the lock-B PR merges
+Tile trial on B (heartland): Retro Diffusion (US$10 prepaid, his written yes; logged into the
 built-in browser pane; lead drives it; skill ~/.claude/skills/retro-diffusion; download at
 ORIGINAL size; check the first output's public flag) vs Texel Studio (local Ollama, no diffusion
 step, licensing row first) vs the Blender rig; RD Low-Poly 3D worth a props trial. Bring a pixel
@@ -47,10 +45,10 @@ tables #80-#93 (gate pack collects them); confirm/reorder M3/M4 (both built).
 
 ## Next board PR must log (branch claude/board-after-<n>)
 Retro Diffusion US$10 spend yes; campaign ends on wipe; full-loop playtest pass; lighting +5%;
-fidelity note; the look pick.
+fidelity note; look B; palette = core + biomes.
 
 ## Worktrees (3/4)
-slice-m1 (gate pack), campaign-end, art-look. Remove each when its work merges.
+slice-m1 (gate gaps), campaign-end (#98), art-look. Remove each when its work merges.
 
 ## Co-lead playbook
 playbook: updated 2026-10-15 (merge-check gap, APPDATA trap). Curate Art's "Findings for the
