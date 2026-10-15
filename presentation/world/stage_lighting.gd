@@ -32,13 +32,13 @@ static func apply(
 	environment.background_mode = Environment.BG_COLOR
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	environment.ambient_light_energy = data.num(light, "ambient_energy")
-	var tint := Color.WHITE
+	var tint := Palette.NO_TINT
 	if time == TimeOfDay.DAY:
-		environment.background_color = data.grey("shades", "sky")
+		environment.background_color = data.colour("shades", "sky")
 		environment.ambient_light_color = data.grey(light, "ambient_grey")
 	else:
 		var block := DUSK_BLOCK if time == TimeOfDay.DUSK else NIGHT_BLOCK
-		environment.background_color = data.rgb(block, "sky_rgb")
+		environment.background_color = data.colour(block, "sky")
 		environment.ambient_light_color = data.rgb(light, "ambient_rgb")
 		tint = data.rgb(block, "sprite_tint_rgb")
 	ambient.environment = environment

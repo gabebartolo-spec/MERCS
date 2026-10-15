@@ -94,7 +94,7 @@ static func capsule(
 	width: int, height: int, fill: Color, outline: Color, with_normals := false
 ) -> SheetFrame:
 	var image := Image.create(width, height, false, Image.FORMAT_RGBA8)
-	image.fill(Color(0.0, 0.0, 0.0, 0.0))
+	image.fill(Palette.CLEAR)
 	var radius := width / HALF
 	var centre_x := radius - 1.0 / HALF
 	for y: int in height:
