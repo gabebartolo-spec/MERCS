@@ -9,7 +9,7 @@ extends "res://tests/lib/runner.gd"
 ## save. Determinism: the same seed with Ironman On and Off ends in the same world, Rng positions
 ## and company (an autosave only reads state), and a game reloaded from the autosave continues
 ## exactly as the uninterrupted one.
-## Seeded by design: world seed 424270 and a lone ambush, played by BattleAi; the triage is cut so
+## Seeded by design: world seed 4 and a lone ambush, played by BattleAi; the triage is cut so
 ## data's triage rolls on the injury stream, as in the wiring suite's fight; the fixtures are files.
 ##   godot --headless --path . --script tests/run_ironman_tests.gd
 
@@ -21,7 +21,7 @@ const SAVE_SYSTEM := preload("res://presentation/autoload/save_system.gd")
 const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const FIXTURES := "res://tests/fixtures/save/"
 const WINDOW_SIZE := Vector2i(1920, 1080)
-const SEED := 424270
+const SEED := 4
 const NEAR := 3
 const TAP_LIMIT := 8
 const SETTLE := 4

@@ -14,7 +14,7 @@ extends "res://tests/lib/runner.gd"
 ## B over a triage keeps the hub shut; a quit mid-walk reopens at the last day's end. Unsaved
 ## (tests/ironman_resume/unsaved_checks.gd): no change without a following save, every input of
 ## three scripted campaigns, and the guard shown to catch each way a change can miss its save.
-## Seeded by design: world seed 424270, a lone ambush or patrol three steps out, the battle played
+## Seeded by design: world seed 4, a lone ambush or patrol three steps out, the battle played
 ## by BattleAi on both sides (InputKit), the start of the Ironman suite's own fight.
 ##   godot --headless --path . --script tests/run_ironman_resume_tests.gd
 
@@ -29,7 +29,7 @@ const SaveOrderChecks := preload("res://tests/ironman_resume/save_order_checks.g
 const UnsavedChecks := preload("res://tests/ironman_resume/unsaved_checks.gd")
 const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const WINDOW_SIZE := Vector2i(1920, 1080)
-const SEED := 424270
+const SEED := 4
 const NEAR := 3
 const TAP_LIMIT := 8
 const SETTLE := 4
