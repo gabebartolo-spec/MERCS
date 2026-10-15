@@ -124,16 +124,16 @@ func _on_ground_click(window_position: Vector2) -> void:
 
 ## The street cell under a window position, as {&"cell": Vector2i}, or {} off the ground.
 func ground_cell_at(window_position: Vector2) -> Dictionary:
-	var camera := _stage.camera()
 	var screen := window_position
 	if _stage.pixel_mode == StreetStage.PixelMode.WHOLE_SCREEN:
 		screen = PixelScreen.to_logical(window_position, _stage.screen_scale())
-	var origin := camera.project_ray_origin(screen)
-	var normal := camera.project_ray_normal(screen)
+	var origin := _stage.camera().project_ray_origin(screen)
+	var normal := _stage.camera().project_ray_normal(screen)
 	if normal.y >= 0.0:
 		return {}
 	var ground := origin + normal * (-origin.y / normal.y)
-	return {&"cell": Vector2i(floori(ground.x), floori(ground.z))}
+	var at := Vector2i(floori(ground.x), floori(ground.z))
+	return {&"cell": _arena().street_cell_at(ground) if _arena() != null else at}
 
 
 func _on_key(key: InputEventKey) -> void:
