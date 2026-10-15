@@ -81,7 +81,8 @@ func is_noted(merc_id: String) -> bool:
 
 ## Down, then triage: every merc the hook noted is rolled (wound, temporary, permanent or
 ## dead), the dead buried and mourned, the succession applied. Returns Aftermath's events in
-## id order: "triage", "death" and "succession".
+## id order: "triage", "death" and "succession"; last, "campaign_end" when that left nobody
+## alive in the company.
 func resolve() -> Array[Dictionary]:
 	var battle_log: Array = []
 	for note: Dictionary in _downed:
@@ -102,7 +103,14 @@ func resolve() -> Array[Dictionary]:
 		_apply(event)
 	_downed.clear()
 	fielded = []
+	if company.is_wiped():
+		events.append({"type": "campaign_end", "day": day, "fallen": company.fallen.duplicate()})
 	return events
+
+
+## Whether the campaign is over: every merc of the company is dead (Company.is_wiped).
+func ended() -> bool:
+	return company.is_wiped()
 
 
 ## The save's "wounds" block.
@@ -112,6 +120,11 @@ func state() -> Dictionary:
 
 func chronicle() -> Chronicle:
 	return _after.chronicle
+
+
+## The memories the company holds, the dead's included.
+func memory() -> Memory:
+	return _after.memory
 
 
 func memories_of(merc_id: String) -> Array[Dictionary]:

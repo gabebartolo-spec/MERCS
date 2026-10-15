@@ -44,6 +44,7 @@ var _overworld: OverworldDirector = null
 var _company_director: CompanyDirector = null
 var _hub: HubDirector = null
 var _keys: SliceKeys = null
+var _end: CampaignEnd = null
 
 
 func _ready() -> void:
@@ -62,6 +63,7 @@ func _ready() -> void:
 	_load_frames()
 	_build_hud()
 	StoryDirector.attach(self)
+	_end = CampaignEnd.from_save(self, CompanyDirector.defs())
 	_sync()
 
 
@@ -81,7 +83,7 @@ func _process(delta: float) -> void:
 func step(delta: float) -> void:
 	_clock += delta
 	player.hold(Vector2i.ZERO if _paused() else _held.direction())
-	if _overworld_open() and not company_open():
+	if _overworld_open() and not company_open() and not end_open():
 		_overworld.walk(_held.direction(), delta)
 	player.advance(delta)
 	_use_doors()
@@ -136,7 +138,7 @@ func ground_cell_at(window_position: Vector2) -> Dictionary:
 
 func _on_key(key: InputEventKey) -> void:
 	var code := key.physical_keycode if key.physical_keycode != KEY_NONE else key.keycode
-	if _held.take(code, key.pressed) or not key.pressed:
+	if _held.take(code, key.pressed) or not key.pressed or end_open():
 		return
 	if _keys.action(code) == &"time_of_day":
 		var next := (int(_stage.time_of_day) + 1) % StageLighting.TimeOfDay.size()
@@ -199,9 +201,23 @@ func end_loop() -> void:
 func toggle_overworld() -> void:
 	if _overworld == null:
 		_overworld = OverworldDirector.make(self)
+		_overworld.wiped.connect(_on_wiped)
 		_hub = HubDirector.attach(self)
 		return
 	_overworld.toggle()
+
+
+## The last screen of the campaign (the whole company is dead), once it has opened.
+func campaign_end() -> CampaignEnd:
+	return _end
+
+
+func end_open() -> bool:
+	return _end != null and _end.is_open()
+
+
+func _on_wiped(held: Company, chronicle: Chronicle, memory: Memory) -> void:
+	_end = CampaignEnd.open_for(self, held, chronicle, memory)
 
 
 func overworld_director() -> OverworldDirector:
@@ -239,7 +255,7 @@ func _overworld_open() -> bool:
 
 ## Walking waits while a panel or the loop has the player's attention.
 func _paused() -> bool:
-	return _loop != null or _overworld_open() or company_open() or hub_open()
+	return _loop != null or _overworld_open() or company_open() or hub_open() or end_open()
 
 
 func _setup_walkers() -> void:

@@ -13,7 +13,7 @@ loop 8
 sim_world 11
 sim_encounters 11
 save 12
-effect 18
+effect 19
 overworld 14
 road 8
 company 12
@@ -27,3 +27,4 @@ wiring 15
 hub_fight 1
 story 60
 story_gui 17
+campaign_end 11
