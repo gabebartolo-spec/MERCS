@@ -24,6 +24,8 @@ const FACINGS: Array[Vector2i] = [
 	Vector2i.RIGHT,
 	Vector2i(1, 1),
 ]
+## No cell: a fighter's last_seen before he has seen any foe.
+const NOWHERE := Vector2i(-1, -1)
 ## The reference pair's move ids (battle.json "rules" "moves").
 const MOVE_CHARGE := "charge"
 const MOVE_BLOOD_PRICE := "blood_price"
@@ -70,6 +72,10 @@ var next_damage_bonus := 0
 ## while the fighter carries a whole one (an axe can split it). Both dressed by BattleGear.
 var armour_class := ""
 var shield := false
+## Where this fighter last saw the nearest foe he could see (BattleKnowledge.remember), NOWHERE
+## when he has seen none or found that spot empty; BattleAi walks there once the foe is gone
+## from sight. His own memory, never the other side's position (rule 6).
+var last_seen := NOWHERE
 
 ## The sketch's flags, kept as views of the loadout.
 var can_charge: bool:

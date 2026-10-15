@@ -40,3 +40,9 @@ The loop sketch's fighters, by id. The orc and the Vampyr are the director's ref
 ## gate
 - `die_sides`, `talk_down_difficulty`: the bandit lookout check: die + presence must reach the difficulty.
 - `shaken_morale`: morale the band starts without when its lookout is talked down (he slips away; on a failure he fights with them).
+
+## fight_length
+
+The fight-length audit (`tests/battle/length_checks.gd`): seeded random fights on a walled street, both sides played by the AI, must all end. Not a rule of play; a guard that no fight stalls.
+- `fights`: how many seeded fights the audit plays.
+- `turn_cap`: the most actions a fight may take before the audit calls it stalled.

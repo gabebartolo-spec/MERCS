@@ -231,6 +231,7 @@
   "battle.intent.attack": "Attacks {target}",
   "battle.intent.advance": "Advances on {target}",
   "battle.intent.hold": "Holds",
+  "battle.intent.search": "Searches where he last saw the enemy",
   "battle.move.charge": "Charge {target}",
   "battle.move.blood_price": "Blood price on {target}",
   "battle.odds.hit": "Hit {chance}%",

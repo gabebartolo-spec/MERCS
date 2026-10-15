@@ -204,5 +204,9 @@
     "die_sides": 20,
     "talk_down_difficulty": 15,
     "shaken_morale": 30
+  },
+  "fight_length": {
+    "fights": 300,
+    "turn_cap": 300
   }
 }
