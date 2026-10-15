@@ -3,9 +3,10 @@ extends "res://tests/lib/runner.gd"
 ## Real input events reach the game through Input.parse_input_event, never a handler call: a
 ## real C tap opens the company with a row per merc and the captain marked; a real click on a
 ## roster row shows that merc's name, level, role words, stats, moves at their level, own gear
-## line, the three generic slots and the experience bar; a placeholder says so; a real click
-## on the office button makes them captain (the row marks move, the button goes); a held key
-## does not walk the merc while it is open; hide and show keeps the screen; the captain
+## line, the three generic slots and the experience bar; the initiative shown is the one he
+## acts at in a fight (his plate's slowness counted, Phase 4 P1b); a placeholder says so; a
+## real click on the office button makes them captain (the row marks move, the button goes);
+## a held key does not walk the merc while it is open; hide and show keeps the screen; the captain
 ## chosen here is in the save the overworld writes and a fresh session shows it; Escape hides.
 ## Seeded by design: nothing here rolls; the world uses the balance seed.
 ##   godot --headless --path . --script tests/run_inspect_tests.gd
@@ -31,6 +32,7 @@ func run_checks() -> void:
 	var game := await _spawn()
 	await _check_open(game)
 	await _check_pick(game)
+	_check_initiative(game)
 	await _check_placeholder(game)
 	await _check_experience_bar(game)
 	await _check_walking_paused(game)
@@ -114,6 +116,34 @@ func _check_pick(game: SliceGame) -> void:
 		(
 			"clicking the Vampyr's row shows his role, stats, moves at his level, gear line "
 			+ "and the three slots"
+		)
+	)
+
+
+## One source for initiative: the screen shows what the Vampyr acts at once a battle has set
+## him up (his plate counted), not his bare stat.
+func _check_initiative(game: SliceGame) -> void:
+	var lines := game.company_director().panel.lines_text()
+	var vampyr := game.company_director().company.member("vampyr")
+	var unit := vampyr.to_battle_unit(BattleUnit.COMPANY, Vector2i.ZERO, true)
+	var foe := BattleUnit.make("foe", BattleUnit.ENEMY, Vector2i(3, 3), {})
+	var found: Variant = _json("res://data/balance/battle.json").get("rules", {})
+	var rules: Dictionary = found if found is Dictionary else {}
+	var battle := Battle.new()
+	battle.setup(
+		rules, {"size": Vector2i(4, 4)}, [unit, foe] as Array[BattleUnit], Rng.from_seed(1)
+	)
+	check(
+		(
+			unit.initiative != vampyr.stat("initiative")
+			and lines.contains(Text.t("company.stat.initiative", {"value": unit.initiative}))
+			and not lines.contains(
+				Text.t("company.stat.initiative", {"value": vampyr.stat("initiative")})
+			)
+		),
+		(
+			"the Vampyr's initiative on the company screen is the %d he acts at (plate counted)"
+			% [unit.initiative]
 		)
 	)
 

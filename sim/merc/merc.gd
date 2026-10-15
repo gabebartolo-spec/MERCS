@@ -182,6 +182,15 @@ func to_battle_unit(side: int, at: Vector2i, leads: bool, fit: Dictionary = {}) 
 	return BattleUnit.make(id, side, at, numbers)
 
 
+## The initiative the merc acts at in a fight: his stat with his armour's slowness (BattleGear
+## rule 4). rules: data/balance/battle.json "rules" (its "gear" block).
+func fighting_initiative(rules: Dictionary) -> int:
+	var unit := to_battle_unit(BattleUnit.COMPANY, Vector2i.ZERO, false)
+	var gear: Variant = rules.get(BattleGear.GEAR_KEY, {})
+	var block: Dictionary = gear if gear is Dictionary else {}
+	return unit.initiative + BattleGear.armour_initiative(block, unit.armour_class)
+
+
 ## The battle classes the merc fights with (BattleGear.dress keys): the gear line's, and for a
 ## slot it leaves open, the class of the generic gear worn there (D-066: the look still shows
 ## the gear line). Slots with neither are left out, so a stats_from fighter's "gear" applies.

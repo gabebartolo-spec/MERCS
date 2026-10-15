@@ -55,7 +55,17 @@ static func dress(unit: BattleUnit, stats: Dictionary) -> void:
 ## Rule 4: what each fighter's armour does to his initiative (set, never added twice).
 func fit(fighters: Array[BattleUnit]) -> void:
 	for fighter: BattleUnit in fighters:
-		fighter.gear_initiative = BattleRules.read(_armour(fighter), "initiative")
+		fighter.gear_initiative = armour_initiative(_gear, fighter.armour_class)
+
+
+## Rule 4 from a "gear" block (battle.json "rules" "gear"): what this armour class adds to
+## initiative. The one source for the number a fighter acts at and the number the company
+## screen shows (Merc.fighting_initiative).
+static func armour_initiative(gear: Dictionary, armour_class: String) -> int:
+	var armours: Variant = gear.get("armour", {})
+	var table: Dictionary = armours if armours is Dictionary else {}
+	var found: Variant = table.get(armour_class, {})
+	return BattleRules.read(found if found is Dictionary else {}, "initiative")
 
 
 ## Rule 2: the defense an attacker must beat, the shield included while it is whole.

@@ -17,7 +17,7 @@ effect 30
 overworld 14
 road 8
 company 14
-inspect 9
+inspect 10
 company_battle 5
 economy 34
 economy_company 44
