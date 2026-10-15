@@ -1,5 +1,5 @@
 {
-  "_comment": "A version 0 save (the first shape, before migrations): the company two days out from the hub at site_hamlet_1, with a one-day road on to site_wild_1. tests/run_save_tests.gd migrates it to SaveModel.VERSION and expects day 2, at site_hamlet_1, three sites and seed 424242.",
+  "_comment": "A version 0 save (the first shape, before migrations): the company two days out from the hub at site_hamlet_1, with a one-day road on to site_wild_1. tests/run_save_tests.gd migrates it to SaveModel.VERSION and expects day 2 and seed 424242; since the walking map the region is laid out again from the seed (its seven sites) and the band stands at the hub's gate.",
   "version": 0,
   "rng": {"seed": 424242, "streams": {}},
   "world": {

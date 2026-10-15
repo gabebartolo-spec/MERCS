@@ -1,98 +1,108 @@
-# Dev Lead handoff, 2026-10-10 (desktop, second Claude account, "MERCS BOSS")
-Start from this file, CLAUDE.md, `~/.claude/memory-shared/MEMORY.md`, your brief
-(`agent-briefs/DEV_LEAD_OPUS.md`), `docs/00_VISION.md` (revised 2026-10-09, #63) and
-`docs/specs/art_direction_slice.md`. Run `git fetch`, then `gh pr list` and `docs/STATUS.md`.
+# Dev Lead handoff, 2026-10-15 (desktop, personal account, "Game Studio Lead mercs")
+Start from this file, CLAUDE.md, `~/.claude/memory-shared/MEMORY.md`, the co-lead playbook,
+your brief (`agent-briefs/DEV_LEAD_OPUS.md`, Project Architect 3.0 since D-071) and
+`docs/08_ROADMAP.md` Phase 2 (lines 102-189). Run `git fetch`, `gh pr list`, `docs/STATUS.md`.
 
-## State: team PAUSED, except Art finishing step 2 (director 2026-10-10: "pause art when they complete the task")
+## State: working (four coders: M2, M3, M4, M5)
 
 ## Who does what
-This account has no Concept Lead: the session acts as lead AND Dev Lead under the original
-account's rules. Peers (desktop sessions, message by session id):
-"MERCS SUPPORT" (local_f70eca67-...) = Merge & CI; "MERCS ART FACTORY" (local_e5986dbb-...) = Art.
+This account has no Concept Lead: the session is lead AND Dev Lead under the original account's
+rules. No peer sessions were alive on 2026-10-15; the team is run as builder subagents
+(`subagent_type: builder`, Sonnet) spawned from this session, one task per life. Merge & CI work
+(board PRs) goes to a builder brief too. Art Factory: PAUSED (director 2026-10-15: "Keep Art
+paused", focus on the playable baseline). Its handoff: `../MERCS-wt/art-publish/agent-handoffs/art.md`.
 
-## Team refresh and pause (director, 2026-10-10)
-Rule: `.claude/skills/mercs-handoff` "The lead refreshes the team" + shared memory
-refresh-workers-at-task-boundaries. Art: regenerated, passed step 1 r2, started step 2 gait,
-then told to PAUSE (commit WIP, rewrite art.md, push, stop). Support: NOT yet regenerated; it
-refuses relayed director instructions and waits for the director to type "restart" in its chat
-(then it fixes merge_ci.md for #70, merges that, clears). After its clear send NO kick-off while
-paused. The lead regenerated itself after this rewrite. Nothing resumes until the director says.
+## THE GOAL (director, 2026-10-14, D-063..D-071, brainstorm docs/brainstorms/2026-10-14-...)
+Medium term: the horizontal slice, a playable baseline of every pillar, thin and structurally
+sound (Phase 2, seven milestones in dependency order). Short term (parked): the vertical slice
+look gate (orc + Vampyr). Each milestone ships in the F-key build; the director plays it and
+says carry on or wrong. Entry condition of every milestone: its player-effect fixture passes.
 
-## Co-lead playbook (director 2026-10-10, global CLAUDE.md)
-`~/.claude/memory-shared/co-lead-playbook.md` is shared by every BOSS on every project and both
-accounts. Workers report "Findings for the lead". I curate them into the playbook before ANY refresh
-and write "playbook: updated" or "playbook: nothing new" here. playbook: updated (seeded 2026-10-10).
-The AFL boss was told; its message is queued. Director: only the lead writes learnings.md and the
-playbook (global and MERCS CLAUDE.md updated; the MERCS change is on PR #72).
+## Done this session (2026-10-15)
+- Merged #74 (roadmap rewrite, D-063..D-071) and #75 (milestone 1: F2 overworld, WorldSim,
+  save v1) at matched heads after checking every suite ran (13 suites at floor). Main 38b2659
+  green; Windows build at `Documents/GitHub/MERCS-builds/2026-10-15_m1_38b2659/MERCS.exe`
+  (headless boot clean).
+- Board PR #76 merged (8df923a): D-063..D-071 logged, Phase 2 items 1-2, Art paused, roadmap
+  D-072 typo -> D-071. Local branch claude/board-after-75 remains (delete refused by settings).
+- Pruned two stale clean worktrees (dual-desktop, loving-elgamal).
 
-## Art step 2 (gait) status
-QA failure: the director caught a backwards orc axe (rot_deg sign) and a Vampyr scabbard
-that reads as tendrils. I approved trimmed checks: A (clearance under 1 cm fails; prop
-orientation), B (flat-colour pass, 2x contact crops). Vampyr renders bare for the gait; the
-orc keeps the fixed axe if A passes. Then Art sends me the clips, writes its findings and pauses.
-UPDATE: Art was reset by the director mid step 2 (405d2b7, art.md has exact next steps). Check A
-caught both old defects and a new haft-in-thigh clash, so it is PROVEN (playbook and art-qa-critic
-learnings updated). Art's first job on resume: fix the axe clearance, or render the orc bare.
-Art refresh (99b3fdf): playbook: updated (Blender exit-code and 4D-normalise traps, leg IK). The
-haft-clearance limit was rejected for the playbook; it stays open in art.md. While paused, send NO kick-off.
+## Director today (2026-10-15) - record in a dated roadmap chapter via the next board PR
+- "Start now" M2; "Keep Art paused"; "4 coders" (D-071 cap 2 -> 4); "get busy" (memory-shared
+  run-the-team-at-full-width.md).
+- M1 "is played. its good"; M2 "playtest is a success. clearly limited by the lack of combat
+  infrastructure but it works".
+- 4K TV bug: "the game needs to display on a 4k tv, i cant read any of the text its too small"
+  -> FIXED in #83 (fullscreen, canvas_items 2x, 24 px theme, smoke checks). Build not yet sent.
+- DESIGN GOAL: "moving around the world should be done manually, not in a menu, our band will
+  navigate an overworld just like pokemon, procedurally generated maps like battle brothers with
+  bespoke hand crafted locations and events and towns". His picks: smaller map scale with a cut
+  to street scale in towns/locations; encounters are visible parties (engage, avoid, run).
+- Pending from him: author merc_3..merc_6; confirm/reorder M3/M4; the veto lists in #80-#82.
 
-## THE GOAL (director /goal, 2026-10-09)
-"A playable vertical slice that I can test and assess the art direction before we develop bulk
-assets and content", including "an example of the core gameplay loop". M1 street, M2 motion and
-M5 loop example are on main (F5 in the build). Remaining: the cast's art (orc + Vampyr) in the
-slice, then the gate ("is this the look?").
+## Running (builder subagents of this session; they die with it)
+- Merged today: #80 M2, #81 M3, #82 M5, #83 4K, #84 gdlint gate, #85 M4 battle, #86 letter keys
+  (no F-keys: M map, C company, L loop, H help, G frame time; smoke fails on KEY_F).
+- Walkable overworld (Opus): p2-walk, claude/p2-overworld-walk. Told: SliceKeys, slice_game <=400.
+- #87 M6 hub/economy MERGED (hub on B; economy inside the company save block; review PASS).
+- #88 board MERGED (D-072..D-081, docs/brainstorms/2026-10-15-director-comments.md). Name board
+  branches claude/board-after-<n> or merge_eligibility refuses them.
+- Rejected tools today: Rucol GAN (no licence), gmattie Data-Pixels (hand-typed pixels, no use).
+- #89 M7 storylet+memory MERGED (optional story save block; placeholder words for him).
+- Wiring = PR #90 (green pre-#89): coder merging main + Aftermath uses story_director.memory +
+  Economy.accept memory line + field up to 6 mercs; then sim review + merge. Veto: no game-over on wipe.
+- ART resumed (director "look target first"): Opus, art-look, claude/art-look-target (main + art
+  branch merged). Deliverable: 2-3 labelled options (palette+light+post), each = street day, street
+  night/rain at 4K in-engine, overworld strip at map scale; draft palettes in assets/palette/options/.
+  Lead QCs (art-qa-critic) before the director sees boards; his pick becomes golden + master palette.
+- QUEUED after his palette pick: Texel Studio trial (director yes 2026-10-15) for map-scale
+  terrain tiles only: local Ollama, no concept-art (diffusion) step, palette-locked, licensing
+  register row CLEARED first (its licence: outputs ours, internal use ok, no resale as a service).
+  One strip from Texel vs the Blender rig, side by side, he picks. Rucol GAN repo rejected (no licence).
+- Retro Diffusion (director 2026-10-15): licence checked (ToS 2026-09-28: outputs ours,
+  commercial ok; free-credit outputs go PUBLIC; they may train on outputs; we may not train on
+  theirs). Director: "Small paid plan, private", SPEND YES US$10 prepaid balance (he tops it up
+  himself) - LOG IN NEXT BOARD PR as a D-entry. DONE by him 2026-10-15: balance $10.00 (paid $11
+  incl. tax, account gabebartolo). Account page has NO output-privacy switch (cookies only): first
+  trial generation, check its gallery/public flag before any more.
+  He logged RD into the BUILT-IN browser pane too (2026-10-15): the lead drives the trial there
+  (builders have no browser tools); never sign out or change account settings.
+  Joins the tile trial (Texel Studio vs RD vs Blender rig) after his look-target pick.
+- Mixels (D-035; director 2026-10-15 "eager to avoid mixels or fake pixels"): validator coder
+  running (`../MERCS-wt/mixels`, claude/no-mixels: PIX-UPSCALED/ALPHA/PALETTE/AA over assets/ in
+  project-lints). Overworld coder told: one texel grid, no scaled nodes. Flag: UI font is smooth,
+  not pixel - bring a labelled font sheet with the look target (06 §7 [D]).
+Traps: never `export APPDATA` (breaks gh, git creds, Python user site for gdtoolkit); set it on
+the Godot command line only. gdlint/gdformat: `python -m gdtoolkit.linter|formatter`.
+Director 2026-10-15: agents talk tersely (memory-shared terse-agent-messages.md).
 
-## Director decisions that shape the work (logged D-042..D-062)
-- Realistic proportions; 84 px mercs on a 960x540 logical screen; sprites drawn at 45 deg in the
-  55 deg world at the same px/m.
-- Vision (#63): hand-made cast of 25, grim fantasy with magic, no type chart, promotion lines.
-- Route A: Tripo for any part where it gives the best result (ask above 2,000 credits/session;
-  D-060 confirmation pending on the board). Sprite changes only at promotion + one signature piece.
-- "Permanent injuries must be considered for all spritework" -> injury layers.
-- Testing: smallest suites per PR, audits at milestones. Mixels fail automatically.
+## Next for the lead
+0. Next free slot: the wiring task (company fights encounters, hits -> injuries, triage screen)
+   once M4 and the walkable overworld merge; then the Phase 2 evidence pack.
+1. Review M2 and M3 PRs (mercs-sim-review on the save keys, fixtures failing first, real taps),
+   merge on green (merge_eligibility.sh once it lands), fetch the build, ask him to play.
+2. Record his milestone verdicts the same turn; ask him to author the four placeholder mercs
+   and to confirm or reorder milestones 3/4.
+3. After M2+M3 merge: flip STRICT_FROM_PHASE/caps phase to 2 and fix the listed literals.
+4. Then milestone 4 (battle skeleton) and 5 (wounds) as the next two coder slots.
+5. Handoff lives on remote branch claude/lead-handoff-1015 (updated via gh api while all
+   worktrees are busy); open a docs-only PR for it at session end.
 
-## Art (P1-ART-SLICE-CAST, branch claude/art-slice-cast, no PR)
-QC order: (1) clay + 45 deg silhouettes: PASSED r2 (2026-10-10), (2) gait as a played 3 s loop
-(orc heavy and grounded, Vampyr controlled and predatory; bare bodies + weapon, no cape; S/SE/E/NE
-at 1x and 2x; no foot slide): STARTED then PAUSED, clips come to the lead, (3) geared sheets with injury
-layers per the layer contract. Step 3 must fix: orc tusks (front reads as flat plates; want
-tapered cones from the lower jaw) and Vampyr cape (stands off the shoulder like a tower shield
-in SE/SW/E/W; must hug back and shoulders). Vampyr Tripo head at 4x before full sheets.
-Lesson: judge motion as a PLAYED CLIP at game speed, not frame by frame.
+## Suites (floors on main)
+data 96, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 13, slice 15, battle 14,
+loop 4, sim_world 9, save 7, effect 4, overworld 8.
 
-## Sprite layers (#70, merged)
-`SheetClip.load_layers([body, gear, head, injury...])` composites same-grid mercs.sheet/1 layers.
-Contract sent to Art: one manifest per layer per clip, identical frames/pivot/size, hard alpha,
-`<merc>_<layer>_<clip>.json`, plus a look manifest (layer order per merc per stage).
-Next code: SliceGame loads the orc and Vampyr looks from that manifest (data, not code).
+## Worktrees (5 / 4, director allows forced removal of finished ones)
+p2-walk, slice-m1 (wiring #90), art-look, mixels (4/4). Remove each when its PR merges.
 
-## Code map (slice)
-- `presentation/world/slice_game.gd`: walking, follow camera, crowd, T/R/F1/F3/F5, door, clips, loop.
-- `presentation/world/{loop_director,loop_panel,battle_view,street_stage,sheet_clip}.gd`.
-- `sim/core/rng.gd`, `sim/battle/`, `sim/story/{checks,slice_loop}.gd`.
-- Data: `data/balance/{stage,slice,battle}.json`, `data/scenarios.json`.
-
-## Suites (floors)
-data 96, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 13, slice 15, battle 14, loop 4.
-
-## Open PRs
-`claude/team-refresh`: docs-only, the refresh rule in mercs-handoff + this handoff. Merge & CI merges.
-
-## Next for the Dev Lead
-1. Kick off Support after its restart (above). 2. QC Art's gait clips (art-qa-critic, played clip).
-3. Tell the director the F5 loop example is playable in the build.
-4. Load the cast's looks in SliceGame when Art publishes stage-1 sheets.
-5. Branches waiting on the director (deletes refused by settings): claude/p1-crisp-snap,
-   claude/p1-frame-time, claude/p1-sheet-export-load.
-
-## Worktrees
-Mine: `../MERCS-wt/slice-m1` (branch changes per PR). Art: `../MERCS-wt/art-publish`.
+## Co-lead playbook
+playbook: nothing new (2026-10-15; no worker findings yet).
 
 ## Rules learnt the hard way (keep under 10 lines)
 - REWRITE this file each time; never insert sections (doc-caps fails past 120 lines).
 - tests.yml skips draft PRs: mark ready, THEN push.
+- Before merging, read the shard log: every suite listed with its count, not just "green".
 - Headless test windows are 64x64: size root to 1920x1080 before clicking GUI in a suite.
-- Lit sprites ignore `modulate`; mark sides or states with world geometry, not tint.
 - `git show <ref>:file > file` writes LFS pointers for LFS paths; use `git lfs smudge`.
 - A suite extending a script that fails to parse HANGS: `SUITE_TIMEOUT=120`; kill by PID.
 - Typed GDScript: assign a Variant to a typed local before arithmetic, casts or `.get()`.

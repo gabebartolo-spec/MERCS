@@ -1,0 +1,15 @@
+{
+  "_comment": "The hand-made locations laid onto the walkable overworld (read by sim/world/tile_gen.gd, through the world data's \"locations\"). One stamp per site kind: rows of tiles drawn north to south, '#' a town wall (cannot be walked), 'E' the entrance (the site's own tile, where the band arrives), '.' leaves the generated land as it is. The hub's entrance cuts to the street (the hub at full street scale). Wild sites have no stamp: their entrance is a lone tile. Schema: data/schema/locations.schema.json.",
+  "locations": [
+    {
+      "id": "loc_hub",
+      "site_kind": "hub",
+      "rows": ["#####", "#####", "##E##"]
+    },
+    {
+      "id": "loc_hamlet",
+      "site_kind": "hamlet",
+      "rows": ["##.", ".E#"]
+    }
+  ]
+}

@@ -26,7 +26,7 @@ from pathlib import Path
 PIPELINE = Path(__file__).resolve().parent
 ROOT = PIPELINE.parents[1]
 FIXTURES = ROOT / "tests" / "fixtures" / "pipeline"
-RULE = re.compile(r":0: (SHEET-[A-Z]+) ")
+RULE = re.compile(r":0: ((?:SHEET|PIX)-[A-Z]+) ")
 BODY = "average_m"
 
 
@@ -130,11 +130,39 @@ def case_normals() -> list[str]:
     return problems
 
 
+PIXEL_CASES = [  # fixture, extra args, rules it must report (none = must pass)
+    ("clean_1x.png", ["--palette", "palette.gpl"], set()),
+    ("clean_1x.png", [], set()),
+    ("upscaled_2x.png", [], {"PIX-UPSCALED"}),
+    ("upscaled_3x.png", [], {"PIX-UPSCALED"}),
+    ("soft_alpha.png", [], {"PIX-ALPHA"}),
+    ("off_palette.png", ["--palette", "palette.gpl"], {"PIX-PALETTE"}),
+    ("aa_edge.png", [], {"PIX-AA"}),
+    ("aa_edge.png", ["--palette", "palette.gpl"], {"PIX-PALETTE"}),
+]
+
+
+def case_pixels(name: str, extra: list[str], want: set[str]) -> list[str]:
+    base = FIXTURES.parent / "pixels"
+    args = [str((base / a).relative_to(ROOT)) if a.endswith(".gpl") else a for a in extra]
+    proc = run(["tools/pipeline/validate_pixels.py", str((base / name).relative_to(ROOT)), *args])
+    got = set(RULE.findall(proc.stdout))
+    problems = []
+    if proc.returncode != (1 if want else 0):
+        problems.append(f"exit code {proc.returncode}, expected {1 if want else 0}")
+    if want != got:
+        problems.append(f"expected {sorted(want)}, got {sorted(got)}")
+    if problems:
+        problems.append(proc.stdout.strip())
+    return problems
+
+
 def main() -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     results = [(f"sheet/{d.name}", case_sheet(d))
                for d in sorted((FIXTURES / "sheets").iterdir()) if d.is_dir()]
+    results += [(f"pixels/{n}{'+palette' if e else ''}", case_pixels(n, e, w)) for n, e, w in PIXEL_CASES]
     results.append(("rebuild/byte-identical", case_rebuild()))
     results.append(("normals/reduce", case_normals()))
     width = max(len(label) for label, _ in results)

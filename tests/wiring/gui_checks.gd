@@ -1,9 +1,9 @@
 extends RefCounted
 ## The wiring suite's GUI checks, run by tests/run_wiring_tests.gd: real clicks and letter keys
-## at 1920x1080 through the whole game: Fight on the road, the triage panel (the chronicle
-## line, the succession, no key help), Continue, the C screen marking the fallen, Save, and a
-## fresh session that never fields the dead. Seeded by design: the ambush on the road of the
-## world seed 424260, played by BattleAi.
+## at 1920x1080 through the whole game: walk into an ambush, Fight, the triage panel (the
+## chronicle line, no key help), Continue, the C screen marking the fallen, Save, and a fresh
+## session that never fields the dead. Seeded by design: the ambush met by walking on world
+## seed 424270, played by BattleAi.
 
 const Kit := preload("res://tests/lib/wiring_kit.gd")
 const Fixture := preload("res://tests/lib/company_fixture.gd")
@@ -11,9 +11,12 @@ const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const SAVE_SYSTEM := preload("res://presentation/autoload/save_system.gd")
 const LAYOUT_FRAMES := 3
 const FIGHT_FRAMES := 6000
-const GUI_SEED := 424260
-## Who falls in that fight when every triage roll is death (BattleAi plays the company).
-const FALLEN: Array[String] = ["merc_4", "merc_6"]
+const GUI_SEED := 424270
+const NEAR := 3
+const TAP_LIMIT := 8
+const World := preload("res://tests/lib/world_fixture.gd")
+## Who dies in that fight (BattleAi plays the company, the injury stream rolls the triage).
+const FALLEN: Array[String] = ["merc_4"]
 
 var _tree: SceneTree = null
 var _check: Callable
@@ -42,17 +45,11 @@ func _cast() -> int:
 
 func run() -> void:
 	_clear_save()
-	var rng := Rng.from_seed(GUI_SEED)
-	var world := WorldSim.new()
-	world.start(Kit.json("res://data/balance/world.json"), rng)
-	_saves().save_game(world, rng)
-	var road := world.destinations()[0]
+	_save_ambush_world()
 	var game := await _spawn()
-	var screen := game.company_director()
-	screen.wounds = Kit.wounds(Rng.from_seed(0), "dead", {}, screen.company)
 	await _tap(KEY_M)
 	var director := game.overworld_director()
-	await _click_button(director.panel.button_for(road))
+	await _walk_into(director)
 	await _click_button(director.panel.button_for(OverworldDirector.FIGHT))
 	await _frames(LAYOUT_FRAMES)
 	var fielded: Array[String] = director.wounds.fielded.duplicate()
@@ -79,12 +76,37 @@ func _continue_and_save(game: SliceGame, director: OverworldDirector) -> void:
 		"Continue returns to the map with its choices"
 	)
 	await _click_button(director.panel.button_for(OverworldDirector.SAVE))
-	await _tap(KEY_M)
 	await _check_company_screen(game)
 	game.queue_free()
 	await _tree.process_frame
 	await _check_fresh_session()
 	_clear_save()
+
+
+## A saved world with the band three tiles out of the hub's gate and a lone ambush near it.
+func _save_ambush_world() -> void:
+	var rng := Rng.from_seed(GUI_SEED)
+	var world := WorldSim.new()
+	world.start(World.data(), rng)
+	world.parties.clear()
+	World.out_of_town(world, NEAR)
+	World.lone_party(world, "ambush", NEAR)
+	_saves().save_game(world, rng)
+
+
+## Taps the walking keys toward the lone party until its encounter stands.
+func _walk_into(director: OverworldDirector) -> void:
+	var world := director.world
+	var keys := {
+		Vector2i(0, -1): KEY_W, Vector2i(0, 1): KEY_S, Vector2i(-1, 0): KEY_A, Vector2i(1, 0): KEY_D
+	}
+	for _tap_count: int in TAP_LIMIT:
+		if not world.encounter.is_empty() or world.parties.is_empty():
+			return
+		var to := world.parties[0].tile - world.band
+		var step := Vector2i(signi(to.x), 0) if to.x != 0 else Vector2i(0, signi(to.y))
+		var code: Key = keys.get(step, KEY_NONE)
+		await _tap(code)
 
 
 func _check_triage_panel(game: SliceGame, director: OverworldDirector) -> void:
@@ -134,6 +156,8 @@ func _fallen(wounds: CompanyWounds) -> Array[String]:
 func _check_company_screen(game: SliceGame) -> void:
 	if game.hub_open():
 		await _tap(KEY_ESCAPE)
+	# The band is not at the gate, so M cannot close the map; hide it to reach the screen.
+	game.overworld_director().set_open(false)
 	await _tap(KEY_C)
 	await _frames(LAYOUT_FRAMES)
 	var screen := game.company_director()

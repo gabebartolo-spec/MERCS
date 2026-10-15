@@ -14,6 +14,7 @@ Each manifest (`mercs.sheet/1`, written by pack_sheets.py) and the PNG it names 
   SHEET-PIVOT    the pivot is outside the frame, or a frame's feet (lowest opaque row) are not
                  at the pivot, or the pivot column misses the figure
   SHEET-CLIP     an opaque pixel touches a frame edge (the figure is cut off)
+  PIX-UPSCALED   a frame is stored at k>1 pixels per texel (a mixel risk, D-035; see validate_pixels.py)
   SHEET-EMPTY    a frame has no opaque pixel
   SHEET-NORMAL   the manifest names a normal_image that is missing, unreadable, a different size
                  from the colour image, or whose alpha differs from the colour image's anywhere
@@ -31,7 +32,8 @@ import sys
 from pathlib import Path
 
 from palette_lib import load_palette
-from pngio import PngError, read_png
+from pngio import Image, PngError, read_png
+from validate_pixels import upscale_factor
 
 PIPELINE = Path(__file__).resolve().parent
 REPO = PIPELINE.parents[1]
@@ -165,6 +167,13 @@ def check_pixels(m: dict, img, colours: set, feet_tol: dict, f: Findings) -> Non
                     counts["SHEET-CLIP"] += 1
                     if counts["SHEET-CLIP"] <= MAX_PIXEL_FINDINGS:
                         f.add("SHEET-CLIP", f"{where} is opaque on the frame edge")
+        crop = Image.blank(fr["w"], fr["h"])
+        for y in range(fr["h"]):
+            for x in range(fr["w"]):
+                crop.put(x, y, img.get(fr["x"] + x, fr["y"] + y))
+        k = upscale_factor(crop)
+        if k:
+            f.add("PIX-UPSCALED", f"frame {fr['facing']} is stored at {k} pixels per texel")
         if not rows:
             f.add("SHEET-EMPTY", f"frame {fr['facing']} has no opaque pixel")
             continue

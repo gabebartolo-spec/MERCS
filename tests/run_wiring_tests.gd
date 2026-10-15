@@ -10,8 +10,8 @@ extends "res://tests/lib/runner.gd"
 ## GUI (tests/wiring/gui_checks.gd): real clicks and letter keys at 1920x1080: Fight on the
 ## road, the triage panel, Continue, the C screen marking the fallen as gone, Save, a fresh
 ## session that never fields the dead.
-## Seeded by design: sim fights use MercPlay on seeds 424246 and 424247 (a permanent injury
-## and the captain's death); the GUI fight is the ambush on the road of the world seed 424260.
+## Seeded by design: sim fights use MercPlay on seeds 424251 (a permanent injury) and 424264
+## (the captain's death); the GUI fight is an ambush met by walking, world seed 424270.
 ##   godot --headless --path . --script tests/run_wiring_tests.gd
 
 const Kit := preload("res://tests/lib/wiring_kit.gd")

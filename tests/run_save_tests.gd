@@ -7,9 +7,11 @@ extends "res://tests/lib/runner.gd"
 ## fixture (v1.json, before the company) does too and reads as the starting six, the orc
 ## captain; the company is saved and comes back equal.
 ## Encounters
-## (Phase 2 M2, no version bump: one new key with a default): a road's standing encounter
+## (Phase 2 M2, no version bump: one new key with a default): a party's standing encounter
 ## survives a save through JSON and the run continues exactly as the uninterrupted one; an
-## older save without the key loads with no encounter.
+## older save without the key loads with no encounter. The walking map (no version bump:
+## optional keys with defaults; the map itself is laid out again from the seed): the band's
+## tile and the parties come back; a save without them starts at the hub's gate.
 ## Seeded by design: Rng.from_seed(424242) and 424243 only.
 ##   godot --headless --path . --script tests/run_save_tests.gd
 
@@ -17,9 +19,14 @@ const BALANCE := "res://data/balance/world.json"
 const V0_FIXTURE := "res://tests/fixtures/save/v0.json"
 const V1_FIXTURE := "res://tests/fixtures/save/v1.json"
 const Fixture := preload("res://tests/lib/company_fixture.gd")
+const World := preload("res://tests/lib/world_fixture.gd")
 const SEED := 424242
-const STEPS := 6
-const SPLIT := 3
+const STEPS := 12
+const SPLIT := 5
+## The band's walk out of the hub, and how far off the lone party starts.
+const OUT := 3
+const NEAR := 3
+const WALK_LIMIT := 20
 ## Stream positions JSON's doubles cannot hold: 2^53 + 1 and an odd value near 2^62.
 const BIG_STATE := 9007199254740993
 const HUGE_STATE := 4611686018427387905
@@ -44,6 +51,7 @@ func run_checks() -> void:
 	_check_migrate_v1()
 	_check_encounter_through_json()
 	_check_old_save_has_no_encounter()
+	_check_band_and_parties()
 	await process_frame
 
 
@@ -52,8 +60,9 @@ func _json(path: String) -> Dictionary:
 	return parsed if parsed is Dictionary else {}
 
 
+## The world data as the game hands it over: the balance with the hand-made stamps.
 func _balance() -> Dictionary:
-	return _json(BALANCE)
+	return World.data()
 
 
 func _world(rng: Rng) -> WorldSim:
@@ -62,14 +71,9 @@ func _world(rng: Rng) -> WorldSim:
 	return world
 
 
-## A scripted walk, steps `first` to `last` (exclusive) of one sequence: on even steps
-## travel along the first road out, on odd steps rest. Splitting it keeps the sequence.
+## The split-safe scripted run of steps and rests (tests/lib/world_fixture.gd).
 func _walk(world: WorldSim, first: int, last: int) -> void:
-	for i: int in range(first, last):
-		if i % 2 == 0:
-			world.travel_to(world.destinations()[0])
-		else:
-			world.rest()
+	World.scripted(world, first, last)
 
 
 func _check_round_trip() -> void:
@@ -170,13 +174,17 @@ func _check_migrate_v0() -> void:
 			and model.ok
 			and version_after == SaveModel.VERSION
 			and model.world.day == expected_day
-			and model.world.at == expected_at
-			and model.world.sites.size() == 3
-			and model.world.site("site_wild_1").days_to("site_hamlet_1") == 1
+			and expected_at == "site_hamlet_1"
+			and model.world.at == RegionGen.HUB_ID
+			and model.world.band == model.world.region.entrance(RegionGen.HUB_ID)
+			and model.world.sites.size() == _world(Rng.from_seed(SEED)).sites.size()
 			and model.rng.seed_value == SEED
 		),
 		(
-			"the version 0 fixture migrates to version %d and keeps its day, place, sites and seed"
+			(
+				"the version 0 fixture migrates to version %d and keeps its day and seed; the map is"
+				+ " laid out again from the seed and the band stands at the hub's gate"
+			)
 			% SaveModel.VERSION
 		)
 	)
@@ -254,12 +262,16 @@ func _check_migrate_v1() -> void:
 	)
 
 
-## A world at a road's standing encounter on ROAD_SEED, its line-ups loaded.
+## A world on ROAD_SEED, its line-ups loaded, walked into a lone ambush: its encounter stands.
 func _met(rng: Rng) -> WorldSim:
 	var world := _world(rng)
 	var lineups: Array = _json(ENCOUNTERS).get("encounters", [])
 	world.set_lineups(lineups)
-	world.travel_to(world.destinations()[0])
+	world.parties.clear()
+	World.out_of_town(world, OUT)
+	var party := World.lone_party(world, "ambush", NEAR)
+	if party != null:
+		World.walk_toward(world, party.tile, WALK_LIMIT)
 	return world
 
 
@@ -281,7 +293,7 @@ func _check_encounter_through_json() -> void:
 	)
 	for world: WorldSim in [whole, model.world]:
 		world.resolve_encounter({"won": true})
-		world.travel_to(world.destinations()[0])
+		_walk(world, 0, SPLIT)
 	check(
 		standing and JSON.stringify(model.world.state()) == JSON.stringify(whole.state()),
 		"a pending encounter survives a save through JSON and the run continues as the uninterrupted one"
@@ -301,7 +313,42 @@ func _check_old_save_has_no_encounter() -> void:
 			and from_v0.world.encounter.is_empty()
 			and without_key.ok
 			and without_key.world.encounter.is_empty()
-			and without_key.world.travel_to(without_key.world.destinations()[0])
+			and without_key.world.step(Vector2i(0, 1))
 		),
 		"a save from before encounters, and a v1 save without the key, load with no encounter"
+	)
+
+
+## The walking map's state rides in the save: the band's tile, the day's units walked and
+## every party (through JSON); a save from before it (no band, no parties) puts the band at
+## the hub's gate with the seed's own parties.
+func _check_band_and_parties() -> void:
+	var rng := Rng.from_seed(SEED)
+	var world := _world(rng)
+	_walk(world, 0, STEPS)
+	var parsed: Variant = JSON.parse_string(JSON.stringify(SaveModel.to_dict(world, rng)))
+	var reread: Dictionary = parsed if parsed is Dictionary else {}
+	var model := SaveModel.from_dict(reread, _balance())
+	var old := SaveModel.to_dict(world, rng)
+	var old_world: Dictionary = old.get("world", {})
+	for key: String in ["band", "march", "haven", "parties"]:
+		old_world.erase(key)
+	var from_old := SaveModel.from_dict(old, _balance())
+	var fresh := _world(Rng.from_seed(SEED))
+	var parties_back := JSON.stringify(model.world.state().get("parties"))
+	check(
+		(
+			model.ok
+			and model.world.band == world.band
+			and world.band != fresh.band
+			and parties_back == JSON.stringify(world.state().get("parties"))
+			and from_old.ok
+			and from_old.world.band == fresh.band
+			and from_old.world.at == RegionGen.HUB_ID
+			and (
+				JSON.stringify(from_old.world.state().get("parties"))
+				== JSON.stringify(fresh.state().get("parties"))
+			)
+		),
+		"the band's tile and the parties come back from JSON; a save without them starts at the hub"
 	)
