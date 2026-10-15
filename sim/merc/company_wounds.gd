@@ -18,6 +18,7 @@ var day := 0
 var fielded: Array[String] = []
 
 var _after: Aftermath = null
+var _memory: Memory = null
 var _rules := {}
 var _defs: Array = []
 var _injuries := {}
@@ -145,8 +146,17 @@ func layers_of(merc_id: String) -> Array[String]:
 	return Injury.layers(_row(_mercs(), merc_id), _defs)
 
 
+## The game's one Memory (the story director's): deaths and dissent are written on it, so
+## the storylets see them. The wounds block then saves that same store.
+func adopt_memory(shared: Memory) -> void:
+	_memory = shared
+	_after.memory = shared
+
+
 func _take(next: Aftermath) -> void:
 	_after = next
+	if _memory != null:
+		_after.memory = _memory
 	_injuries = next.injuries.duplicate(true)
 
 

@@ -23,6 +23,7 @@ const EXPECTED_IDS: Array[String] = [
 	"wiring_death_reload",
 	"hub_wages",
 	"hub_prisoner",
+	"storylet_memory",
 ]
 
 

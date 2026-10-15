@@ -47,10 +47,11 @@ static func build(
 	return battle
 
 
-## The scenario's cells for the company, in order (where CompanyWounds.units() stands them).
+## The scenario's cells for the company on the road, in order (where CompanyWounds.units()
+## stands them): "road_cells", the full deployment of six (D-066).
 static func company_cells(scenario: Dictionary) -> Array[Vector2i]:
 	var cells: Array[Vector2i] = []
-	for entry: Variant in _list(_dict(scenario, "battle"), "company_cells"):
+	for entry: Variant in _list(_dict(scenario, "battle"), "road_cells"):
 		cells.append(_cell(entry))
 	return cells
 

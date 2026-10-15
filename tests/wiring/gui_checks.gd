@@ -12,6 +12,8 @@ const SAVE_SYSTEM := preload("res://presentation/autoload/save_system.gd")
 const LAYOUT_FRAMES := 3
 const FIGHT_FRAMES := 6000
 const GUI_SEED := 424260
+## Who falls in that fight when every triage roll is death (BattleAi plays the company).
+const FALLEN: Array[String] = ["merc_4", "merc_6"]
 
 var _tree: SceneTree = null
 var _check: Callable
@@ -87,67 +89,71 @@ func _continue_and_save(game: SliceGame, director: OverworldDirector) -> void:
 
 func _check_triage_panel(game: SliceGame, director: OverworldDirector) -> void:
 	var body := director.panel.shown_body()
-	var entries := director.wounds.chronicle().entries
-	var cause := ""
-	var died_on := -1
-	if not entries.is_empty():
-		cause = TriageText.name_of(str(entries[0].get("cause", "")), director.company)
-		died_on = Merc.whole(entries[0].get("day", -1))
-	var line := Text.t("chronicle.death", {"name": "The Orc", "day": died_on, "cause": cause})
-	var captain := director.company.name_of(director.company.captain_id)
-	var heir := Text.t("succession.new_captain", {"name": captain})
-	var dissent := _dissenter(director)
+	var lines_ok := true
+	for entry: Dictionary in director.wounds.chronicle().entries:
+		var merc_id := str(entry.get("merc", ""))
+		var cause := TriageText.name_of(str(entry.get("cause", "")), director.company)
+		var line := Text.t(
+			"chronicle.death",
+			{
+				"name": director.company.name_of(merc_id),
+				"day": Merc.whole(entry.get("day", -1)),
+				"cause": cause
+			}
+		)
+		lines_ok = lines_ok and body.contains(line)
+	var shared := StoryDirector.memory_of(director)
 	var hud: CanvasLayer = game.get(&"_hud")
 	_check.call(
 		(
 			director.panel.button_for(OverworldDirector.CONTINUE) != null
 			and director.panel.button_for(OverworldDirector.SAVE) == null
-			and not entries.is_empty()
-			and body.contains(line)
-			and body.contains(heir)
-			and dissent != ""
-			and body.contains(Text.t("succession.dissent", {"name": dissent}))
+			and _fallen(director.wounds) == FALLEN
+			and lines_ok
+			and shared != null
+			and not shared.of("orc").is_empty()
 			and hud != null
 			and not hud.visible
 		),
 		(
-			"triage panel: death, chronicle line, succession, Continue only, no key help: %s"
+			"triage panel: each death with its chronicle line, Continue only, no key help: %s"
 			% body.replace("\n", " | ")
 		)
 	)
 
 
-## The name of the merc who holds the dissent memory ("" when none does).
-func _dissenter(director: OverworldDirector) -> String:
-	for merc: Merc in director.company.roster:
-		for memory: Dictionary in director.wounds.memories_of(merc.id):
-			if memory.get("key") == Memory.KEY_DISSENT:
-				return merc.display_name
-	return ""
+## The ids in the chronicle, sorted.
+func _fallen(wounds: CompanyWounds) -> Array[String]:
+	var ids: Array[String] = []
+	for entry: Dictionary in wounds.chronicle().entries:
+		ids.append(str(entry.get("merc", "")))
+	ids.sort()
+	return ids
 
 
 func _check_company_screen(game: SliceGame) -> void:
+	if game.hub_open():
+		await _tap(KEY_ESCAPE)
 	await _tap(KEY_C)
 	await _frames(LAYOUT_FRAMES)
 	var screen := game.company_director()
 	var panel := screen.panel
-	var rows := panel.row_for("orc")
-	var gone := rows != null and rows.text == Text.t("company.fallen.row", {"name": "The Orc"})
+	var rows := panel.row_for(FALLEN[0])
+	var name := screen.company.name_of(FALLEN[0])
+	var gone := rows != null and rows.text == Text.t("company.fallen.row", {"name": name})
 	await _click_button(rows)
 	await _frames(LAYOUT_FRAMES)
-	var shown := panel.header_text() == Text.t("company.fallen.title", {"name": "The Orc"})
+	var shown := panel.header_text() == Text.t("company.fallen.title", {"name": name})
 	_check.call(
 		(
 			gone
 			and shown
-			and screen.company.member("orc") == null
-			and screen.company.roster.size() == _cast() - 1
+			and screen.company.member(FALLEN[0]) == null
+			and screen.company.roster.size() == _cast() - FALLEN.size()
 			and panel.lines_text().contains(Text.t("company.fallen.gone"))
-			and panel.row_for(screen.company.captain_id).text.contains(
-				Text.t("company.mark.captain")
-			)
+			and panel.row_for("orc").text.contains(Text.t("company.mark.captain"))
 		),
-		"the C screen marks the orc fallen and gone, with his chronicle line, and the new captain"
+		"the C screen marks the fallen gone, with the chronicle line, and the captain still marked"
 	)
 	await _tap(KEY_C)
 
@@ -156,16 +162,17 @@ func _check_fresh_session() -> void:
 	var game := await _spawn()
 	var screen := game.company_director()
 	var units := screen.wounds.units(_cells(), BattleUnit.COMPANY)
+	var shared := StoryDirector.memory_of(game.company_director())
 	_check.call(
 		(
-			screen.company.member("orc") == null
-			and screen.company.fallen.has("orc")
-			and screen.wounds.chronicle().is_dead("orc")
-			and not _ids(units).has("orc")
-			and units[0].id == screen.company.captain_id
-			and not screen.wounds.memories_of(screen.company.captain_id).is_empty()
+			_fallen(screen.wounds) == FALLEN
+			and screen.company.fallen.size() == FALLEN.size()
+			and FALLEN.all(func(id: String) -> bool: return not _ids(units).has(id))
+			and units.size() == _cast() - FALLEN.size()
+			and shared != null
+			and not shared.of("orc").is_empty()
 		),
-		"a new session: the orc is dead and never fielded, chronicle and memories back"
+		"a new session: the dead are never fielded, chronicle and shared memories are back"
 	)
 	game.queue_free()
 	await _tree.process_frame

@@ -24,6 +24,7 @@ func run_checks() -> void:
 	_check_hire()
 	_check_gate()
 	_check_aftermath_needs_surrender()
+	_check_memories()
 	await process_frame
 
 
@@ -162,3 +163,35 @@ func _check_aftermath_needs_surrender() -> void:
 		no_choice and injured,
 		"a band that dies fighting gives no aftermath choice; a wounded merc comes home with an injury"
 	)
+
+
+## Phase 2 M7: with a Memory set, the contract, the fight and the fate each write a sentence
+## on every company merc; without one the loop is as it was.
+func _check_memories() -> void:
+	var loop := _loop(SEED)
+	loop.memory = Memory.new()
+	loop.day = 7
+	loop.advance()
+	loop.hire(false)
+	loop.accept_contract()
+	check(loop.memory.has_key("orc", Memory.KEY_CONTRACT), "taking the contract is remembered")
+	loop.advance()
+	loop.fight()
+	var rules: Dictionary = _json(BATTLE_DATA).get("rules", {})
+	var sight: int = rules.get("sight_cells", 0)
+	for _turn: int in MAX_TURNS:
+		if loop.battle.is_over():
+			break
+		loop.battle.apply(BattleAi.choose(loop.battle, loop.battle.current(), sight))
+	loop.end_battle()
+	var won := loop.battle.winner == BattleUnit.COMPANY
+	var key := Memory.KEY_FIGHT_WON if won else Memory.KEY_FIGHT_LOST
+	check(
+		loop.memory.has_key("orc", key) and loop.memory.has_key("vampyr", key),
+		"each merc who fought remembers it, as won or lost"
+	)
+	check(str(loop.memory.of("orc")[0].get("day")) == "7", "the sentences carry the world's day")
+	if loop.stage == SliceLoop.Stage.AFTERMATH:
+		loop.choose_fate("spare")
+		check(loop.memory.has_key("orc", "memory.fate_spare"), "the prisoner's fate is remembered")
+	check(_loop(SEED).memory == null, "without a memory store the loop writes none")

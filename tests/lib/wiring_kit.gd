@@ -43,6 +43,13 @@ static func wounds(
 	return made
 
 
+## The starting six with `captain` holding the office.
+static func led_by(captain: String) -> Company:
+	var held := Company.start(Fixture.defs())
+	held.appoint(captain)
+	return held
+
+
 static func scenario() -> Dictionary:
 	var list := Fixture.rows(json(Fixture.SCENARIOS), "scenarios")
 	var first: Dictionary = list[0]

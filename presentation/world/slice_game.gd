@@ -2,8 +2,7 @@ class_name SliceGame
 extends Node
 ## The art direction slice (docs/specs/art_direction_slice.md): the street made playable. One
 ## merc walks by keys (WASD or arrows) or a click; a crowd walks fixed routes; the door leads
-## to the interior. Command keys are letters (SliceKeys): time of day, rain, help, frame time,
-## the loop, the map, the company, the hub. Escape closes a panel. Presentation only.
+## to the interior. Command keys are letters (SliceKeys); Escape closes a panel. Presentation only.
 
 const STAGE_SCENE := preload("res://presentation/world/street_stage.tscn")
 const SLICE_DATA := "res://data/balance/slice.json"
@@ -71,6 +70,7 @@ func _ready() -> void:
 	_setup_walkers()
 	_load_frames()
 	_build_hud()
+	StoryDirector.attach(self)
 	_sync()
 
 

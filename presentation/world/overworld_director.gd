@@ -76,6 +76,9 @@ func begin() -> void:
 	if wounds == null:
 		wounds = CompanyDirector.load_wounds(self, company)
 	wounds.bind(rng)
+	var shared := StoryDirector.memory_of(self)
+	if shared != null:
+		wounds.adopt_memory(shared)
 	_layer = CanvasLayer.new()
 	add_child(_layer)
 	map = OverworldMap.new()
