@@ -1,4 +1,4 @@
-# Dev Lead handoff, 2026-10-16 04:35 (desktop, personal account, "Game Studio Lead mercs")
+# Dev Lead handoff, 2026-10-16 04:50 (desktop, personal account, "Game Studio Lead mercs")
 Start: this file, CLAUDE.md, ~/.claude/memory-shared/MEMORY.md + co-lead-playbook.md, your brief
 (agent-briefs/DEV_LEAD_OPUS.md), docs/plans/phase4_combat.md, docs/plans/phase5_contracts.md ("Decided"),
 docs/DECISIONS.md D-091..D-112, ~/.claude/skills/ai-slop-art/SKILL.md. Then `git fetch`, `gh pr list`.
@@ -27,16 +27,20 @@ all rulings: scratchpad p4_rulings.md (copy into briefs if the scratchpad is gon
 #131 handoff, #132 C0 economy split, #133 blood spray + hit-stop, #134 C4 reputation, #135 C3 wages,
 #136 C2 negotiation, #137 board, #138 C1 jobs.
 
-## Open PRs and running agents (04:35)
-- #139 P1c ranged + spear reach: opened by the P1c builder; needs a fresh mercs-sim-review, then merge.
-- #118 cast: round 5 painter running (orc moss skin #7e8a73, broad jaw/brow/tusks, Vampyr darker armour +
-  cape lining front, golden lit grass -> verdure_mid_0 via cherry-pick of tiles-b6 99a1de4). Then a FRESH
-  critic (opus builder + ai-slop-art; realism-critic refuses pixel art without photos). Critic notes:
-  scratchpad crit118_r4/CRITIC.md.
-- Tiles B8 painter running (heather shadow sides, rough lighter, road 15 px/luma 85, forest 0110 saddle),
-  vault tile_trial_2026-10-15/B8_claude; palette branch claude/tiles-b6 (heather + verdure_mid_0). Then critic.
-- Contracts builders running: C5 prisoners, C6 loot/armoury, C7 road + rabble + lethality ledger,
-  C4b hunter parties, C8 hub screens (captures -> lead QC). Each PR -> fresh mercs-sim-review -> merge.
+## Open PRs and running agents (04:50)
+- #139 P1c ranged + spear reach: review APPROVE; builder adding the diagonal corner-gap fix (line_clear checks
+  side cells), then merge on green.
+- Stall fix builder (claude/p4-ai-path, starts after #139 merges): 29/300 random fights never ended (AI walk
+  stuck behind walls). PRIORITY before the playtest; adds a fight-length audit check.
+- #118 cast round 5 pushed (671f992); fresh critic running (crit118_r5). Lead concerns: orc head reads as a
+  box/bucket helm; skin pale sage; Vampyr dark cuirass reads as a hole.
+- Tiles B9 painter running (heather calmer |dx|<=10, rough 2-4 clumps + no fixed boulder, road_v2). Shipped
+  so far: grass, water, shore, forest. Palette branch claude/tiles-b6 (heather + verdure_mid_0; #118 also
+  carries it).
+- Contracts builders running: C5 prisoners (reaction data placeholder), C6 loot/armoury, C7 road + rabble +
+  ledger (line-ups by place/day), C4b hunters (one party per broken deal, fights once), C8 hub screens.
+- Follow-ups queued: GUI test click helpers press only "attack" (armed mercs press Wait since #126) -> click
+  kit[0] after #139; paired win-rate audit (watch spears now 2 cells).
 
 ## Queued for the director (when HE writes; one at a time, with images)
 1. Pick mercs 3-6: MERCS-builds/merc_candidates_2026-10-16.md (12 drafts, 3 per slot).
