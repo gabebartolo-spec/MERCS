@@ -98,6 +98,7 @@ func _check_decision(game: SliceGame, story: StoryDirector) -> void:
 	check(story.memory.of(captain).size() == count, "and only once")
 	await _check_broken_deal(company, story)
 	_check_chronicle_words()
+	_check_hunted_words(company)
 
 
 ## Every chronicle line the economy can write (a prisoner's fate, a walked deal with or without a
@@ -117,6 +118,18 @@ func _check_chronicle_words() -> void:
 		if Text.t(key) == key:
 			bare.append(key)
 	check(bare.is_empty(), "every memory the economy's chronicle makes has words: bare %s" % [bare])
+
+
+## A hunter fight's memory reads with the captain's name in it, every placeholder filled.
+func _check_hunted_words(company: Company) -> void:
+	var captain := company.member(company.captain_id)
+	var params := {"about": captain.id, "deal": "ctr_walked", "faction": "fac_placeholder_a"}
+	var entry := {"key": GrudgeParties.MEMORY_PREFIX + "won", "params": params, "day": 7}
+	var said := MemoryWords.line(entry, company)
+	check(
+		said.contains(captain.display_name) and not said.contains("{"),
+		"a hunter fight is remembered with the captain's name: %s" % said
+	)
 
 
 ## A deal walked from after the whole pay up front (a chronicle line "standing.grudge") becomes

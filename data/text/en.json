@@ -249,6 +249,6 @@
   "memory.job.hold.failed": "On day {day} we could not hold the place.",
   "memory.job.hunt.done": "On day {day} we ran down the man we were hunting.",
   "memory.job.hunt.failed": "On day {day} the man we hunted got away.",
-  "memory.grudge.hunted.won": "On day {day} {faction} sent men after us for the deal {about} broke ({deal}). We beat them off.",
-  "memory.grudge.hunted.lost": "On day {day} {faction} sent men after us for the deal {about} broke ({deal}), and they beat us."
+  "memory.grudge.hunted.won": "On day {day} men came after us for the deal {name} broke. We beat them off.",
+  "memory.grudge.hunted.lost": "On day {day} men came after us for the deal {name} broke, and they beat us."
 }

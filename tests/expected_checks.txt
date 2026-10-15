@@ -26,7 +26,7 @@ injury 29
 wiring 19
 hub_fight 2
 story 60
-story_gui 19
+story_gui 20
 campaign 12
 panels 15
 campaign_end 11
