@@ -65,6 +65,8 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
   himself) - LOG IN NEXT BOARD PR as a D-entry. DONE by him 2026-10-15: balance $10.00 (paid $11
   incl. tax, account gabebartolo). Account page has NO output-privacy switch (cookies only): first
   trial generation, check its gallery/public flag before any more.
+  He logged RD into the BUILT-IN browser pane too (2026-10-15): the lead drives the trial there
+  (builders have no browser tools); never sign out or change account settings.
   Joins the tile trial (Texel Studio vs RD vs Blender rig) after his look-target pick.
 - Mixels (D-035; director 2026-10-15 "eager to avoid mixels or fake pixels"): validator coder
   running (`../MERCS-wt/mixels`, claude/no-mixels: PIX-UPSCALED/ALPHA/PALETTE/AA over assets/ in
