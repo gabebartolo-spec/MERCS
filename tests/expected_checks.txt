@@ -22,6 +22,8 @@ company_battle 5
 economy 96
 economy_company 70
 hub 12
+hub_terms 13
+hub_reload 3
 injury 29
 wiring 20
 hub_fight 2
