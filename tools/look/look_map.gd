@@ -35,10 +35,37 @@ const WATER := "W"
 const SHORE := "S"
 ## Shore tile variants (kit tile_shore_<n>), picked by a fixed hash like the banks.
 const SHORE_VARIANTS := 3
-## Grass variants (kit tile_plain, tile_plain_1, _2): different tuft clumps, so the grid does
-## not repeat.
-const PLAIN := "P"
-const PLAIN_VARIANTS := 3
+## Grass is bare tiles plus hand-placed dressing (desloppify round 2, 2026-10-15): lush patches
+## spill out of the woods and along the damp shore, dry patches lie on sunny hill feet and trodden
+## verges, tuft clumps gather at edges (shore, woods, hill feet, roads) and stones in a few clusters
+## near paths, water and hill feet. Open meadow is left quiet on purpose.
+## Each: kit piece, tile column, tile row, offset x and z (metres), scale x and z, turn (degrees).
+const DRESSING: Array = [
+	["patch_lush_0", 3, 4, -0.5, -0.5, 1.0, 1.0, 20.0],
+	["patch_lush_2", 3, 8, 0.0, 1.0, 1.0, 1.0, 0.0],
+	["patch_lush_1", 13, 5, 0.5, 1.0, 1.0, 1.0, -15.0],
+	["patch_lush_2", 11, 9, 0.0, 1.0, 1.0, 1.0, 180.0],
+	["patch_dry_0", 8, 5, 0.0, 0.3, 1.0, 1.0, 30.0],
+	["patch_dry_2", 8, 7, 0.0, 0.5, 1.0, 1.0, 90.0],
+	["patch_dry_1", 4, 6, 0.5, 0.2, 1.0, 1.0, 0.0],
+	["patch_dry_1", 11, 7, 1.0, 0.5, 1.0, 1.0, 160.0],
+	["patch_dry_2", 6, 2, -1.0, 0.5, 1.0, 1.0, 10.0],
+	["tufts_0", 3, 8, 1.2, 1.6, 1.0, 1.0, 0.0],
+	["tufts_1", 6, 9, 0.5, -0.8, 1.0, 1.0, 70.0],
+	["tufts_2", 12, 9, 0.5, 1.0, 1.0, 1.0, 140.0],
+	["tufts_0", 14, 9, -0.5, 0.6, 1.0, 1.0, 200.0],
+	["tufts_1", 10, 8, 1.4, 0.0, 1.0, 1.0, 30.0],
+	["tufts_2", 3, 4, -1.3, 0.5, 1.0, 1.0, 250.0],
+	["tufts_0", 10, 4, 0.5, 1.2, 1.0, 1.0, 100.0],
+	["tufts_1", 7, 7, 2.9, 0.5, 1.0, 1.0, 300.0],
+	["tufts_2", 6, 2, -1.2, 1.0, 1.0, 1.0, 10.0],
+	["tufts_0", 11, 3, 1.0, 0.5, 1.0, 1.0, 160.0],
+	["stones_0", 7, 6, 2.0, 1.3, 1.0, 1.0, 0.0],
+	["stones_1", 10, 8, 1.2, -0.6, 1.0, 1.0, 80.0],
+	["stones_2", 5, 9, -0.3, -0.3, 1.0, 1.0, 200.0],
+	["stones_0", 13, 9, 0.3, 1.0, 1.0, 1.0, 130.0],
+	["stones_1", 6, 2, -1.5, 0.2, 1.0, 1.0, 290.0],
+]
 ## Open water with only water around it (all eight neighbours, or the map edge) is deep (kit
 ## tile_water_deep); each side facing shallower water gets a ragged fringe (kit deep_fringe_<n>).
 const DEEP_TILE := "tile_water_deep"
@@ -66,8 +93,6 @@ static func lay(kit: Node3D, holder: Node3D) -> void:
 			var tile: String = TILE_NAMES[code]
 			if code == SHORE:
 				tile += "_%d" % ((i * 5 + j * 11) % SHORE_VARIANTS)
-			if code == PLAIN and (i * 3 + j * 7) % PLAIN_VARIANTS > 0:
-				tile += "_%d" % ((i * 3 + j * 7) % PLAIN_VARIANTS)
 			var deep := _deep(i, j)
 			if deep:
 				tile = DEEP_TILE
@@ -79,6 +104,24 @@ static func lay(kit: Node3D, holder: Node3D) -> void:
 				_banks(kit, i, j, holder)
 			if deep:
 				_fringes(kit, i, j, holder)
+	_dress(kit, holder)
+
+
+## Places the hand-placed grass patches, tuft clumps and stone clusters (DRESSING).
+static func _dress(kit: Node3D, holder: Node3D) -> void:
+	for spot: Array in DRESSING:
+		var key: String = spot[0]
+		var i: int = spot[1]
+		var j: int = spot[2]
+		var dx: float = spot[3]
+		var dz: float = spot[4]
+		var sx: float = spot[5]
+		var sz: float = spot[6]
+		var turn: float = spot[7]
+		var piece := _piece(kit, key, i, j, holder)
+		piece.position += Vector3(dx, 0.0, dz)
+		piece.scale = Vector3(sx, 1.0, sz)
+		piece.rotation.y = deg_to_rad(turn)
 
 
 ## Whether (i, j) is water with water on all eight sides (the map's edge counts as water).

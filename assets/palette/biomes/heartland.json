@@ -41,7 +41,9 @@
    "ambient_energy": 0.5775,
    "sky": "soot:1",
    "torch_energy": 3.6,
-   "torch_range_m": 9.5,
+   "torch_range_m": 6.5,
+   "wall_torch_energy": 0.55,
+   "wall_torch_range_m": 3.5,
    "rain": "bone:0"
   },
   "post": {

@@ -19,6 +19,10 @@ import bmesh
 import bpy
 from mathutils import Matrix, Vector
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from kit_lib import Obj, P, h  # noqa: E402
+import kit_ground  # noqa: E402
+
 TILE = 4.0
 HILL_LIGHT = Vector((-0.45, -0.45, 0.77)).normalized()  # from the camera-left front, high
 
@@ -26,85 +30,6 @@ HILL_LIGHT = Vector((-0.45, -0.45, 0.77)).normalized()  # from the camera-left f
 def args() -> Path:
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
     return Path(argv[argv.index("--out") + 1]).resolve()
-
-
-def h(*v: float) -> float:
-    """Deterministic hash of numbers to [0, 1)."""
-    x = 0.0
-    for i, a in enumerate(v):
-        x += math.sin(a * (12.9898 + 7.1 * i) + 78.233 * (i + 1)) * 43758.5453
-    return x - math.floor(x)
-
-
-def mat(name: str) -> bpy.types.Material:
-    m = bpy.data.materials.get(name)
-    if m is None:
-        m = bpy.data.materials.new(name)
-    return m
-
-
-class Obj:
-    """A mesh being built with bmesh; faces get palette material names."""
-
-    def __init__(self, name: str):
-        self.name = name
-        self.bm = bmesh.new()
-        self.mats: list[str] = []
-
-    def mi(self, m: str) -> int:
-        if m not in self.mats:
-            self.mats.append(m)
-        return self.mats.index(m)
-
-    def box(self, size, loc, m, rot_z: float = 0.0, jitter: tuple | None = None, rot_x: float = 0.0):
-        r = Matrix.Rotation(rot_z, 4, "Z") @ Matrix.Rotation(rot_x, 4, "X")
-        res = bmesh.ops.create_cube(self.bm, size=1.0,
-                                    matrix=Matrix.Translation(Vector(loc)) @ r @ Matrix.Diagonal((*size, 1.0)))
-        self._paint(res["verts"], m, jitter)
-
-    def cone(self, r1, r2, depth, loc, m, segs=6, jitter=None, rot=None):
-        mtx = Matrix.Translation(Vector(loc))
-        if rot is not None:
-            mtx = mtx @ rot
-        res = bmesh.ops.create_cone(self.bm, cap_ends=True, segments=segs, radius1=r1, radius2=r2, depth=depth,
-                                    matrix=mtx)
-        self._paint(res["verts"], m, jitter)
-
-    def poly(self, pts, m):
-        """A face, wound so its normal points up (+Z) or, for a vertical face, as given."""
-        vs = [self.bm.verts.new(p) for p in pts]
-        e1 = Vector(pts[1]) - Vector(pts[0])
-        e2 = Vector(pts[2]) - Vector(pts[0])
-        if e1.cross(e2).z < -1e-9:
-            vs.reverse()
-        f = self.bm.faces.new(vs)
-        f.material_index = self.mi(m)
-
-    def _paint(self, verts, m, jitter):
-        faces = {f for v in verts for f in v.link_faces}
-        for f in faces:
-            mm = m
-            if jitter:
-                c = f.calc_center_median()
-                mm = jitter[int(h(c.x, c.y, c.z) * len(jitter))]
-            f.material_index = self.mi(mm)
-
-    def finish(self, collection) -> bpy.types.Object:
-        me = bpy.data.meshes.new(self.name)
-        self.bm.to_mesh(me)
-        self.bm.free()
-        for p in me.polygons:
-            p.use_smooth = False
-        for m in self.mats:
-            me.materials.append(mat(m))
-        ob = bpy.data.objects.new(self.name, me)
-        collection.objects.link(ob)
-        return ob
-
-
-def P(ramp: str, step: int, flat: bool = False) -> str:
-    """A palette face; flat ones are drawn unlit, exactly that colour (look_target.gd)."""
-    return f"pal:{ramp}:{step}" + (":flat" if flat else "")
 
 
 # ---------------------------------------------------------------- street
@@ -126,8 +51,7 @@ def tris(g, x_lo, x_hi, z_lo, z_hi, cell, choices, bump):
 
 
 def ground(col):
-    """Mud verges in 0.5 m cells and a cobbled road in 0.25 m cells; mostly one ramp step, with a few
-    neighbours, so the ground reads as worn surface, not a checkerboard."""
+    """The street's ground: cobbled road, kerbs and the mud verges with their modelled detail."""
     g = Obj("ground")
 
     def cells(x_lo, x_hi, z_lo, z_hi, cell, choices, bump):
@@ -143,33 +67,14 @@ def ground(col):
                 pick = h(ix + x_lo, iz + z_lo, cell)
                 m = next(mm for t, mm in choices if pick < t)
                 g.poly(pts, m)
-    # cobbles: running-bond rows of low stones over dark grout
+    # cobbles over dark grout, then the mud verges (flat: their detail is modelled, kit_ground.py)
     cells(-14.0, 14.0, -1.6, 1.9, 0.5, [(1.01, P("slate", 0))], 0.0)
-    row = 0
-    z = -1.58
-    while z < 1.85:
-        x = -14.0 + (0.14 if row % 2 else 0.0)
-        k = 0
-        while x < 13.8:
-            w = 0.26 + 0.06 * h(row, k)
-            pick = h(row, k, 3)
-            m = P("slate", 2) if pick < 0.75 else P("slate", 1) if pick < 0.95 else P("slate", 3)
-            g.box((w - 0.04, 0.19, 0.05 + 0.02 * h(k, row)), (x + w / 2, -(z + 0.11), 0.015), m)
-            x += w
-            k += 1
-        z += 0.22
-        row += 1
+    kit_ground.cobbles(g)
     mud = [(1.01, P("soil", 2))]
-    tris(g, -14.0, 14.0, -12.0, -1.6, 0.6, mud, 0.015)
-    tris(g, -14.0, 14.0, 1.9, 7.0, 0.6, mud, 0.015)
-    for k in range(40):  # loose stones break up the mud
-        sx = h(k, 31) * 24.0 - 12.0
-        sz = 2.1 + h(k, 37) * 4.0 if k % 2 else -1.8 - h(k, 37) * 2.0
-        g.box((0.14, 0.1, 0.06), (sx, -sz, 0.03), P("slate", 2 if k % 3 else 1), rot_z=h(k, 41) * math.pi)
-    # kerb stones along the road edges
-    for ix in range(-28, 28):
-        for z in (-1.65, 1.95):
-            g.box((0.46, 0.18, 0.08), (ix * 0.5 + 0.25, -z, 0.03), P("slate", 3 if h(ix, z) > 0.5 else 2))
+    tris(g, -14.0, 14.0, -12.0, -1.6, 0.6, mud, 0.0)
+    tris(g, -14.0, 14.0, 1.9, 7.0, 0.6, mud, 0.0)
+    kit_ground.street_dirt(g)
+    kit_ground.kerbs(g)
     return g.finish(col)
 
 
@@ -398,7 +303,6 @@ SHALLOWS = P("water", 2, flat=True)
 LIP = P("water", 1, flat=True)
 DEEP = P("water", 0, flat=True)
 DEEP_FRINGES = 3
-PLAIN_VARIANTS = 3
 
 
 def glints(o, n, seed, z_lo=-1.3, z_hi=1.3):
@@ -451,42 +355,12 @@ def bank(o, v, e=TILE / 2, x_lo=-TILE / 2 - 0.15, x_hi=TILE / 2 + 0.15):
         reeds(o, xs[k] + 0.2, e - out[k] * 0.6, v * 10 + c, 3)
 
 
-def tuft(o, x, z, k):
-    """A grass tuft: a small fan of three blades from one root, leaning a little away from the camera, so the
-    sun gives it a lit and a shadow side and a small cast shadow (a single cone read as a shapeless shard,
-    and a full star of thin blades as a scribble)."""
-    lean = (h(k, 61) - 0.5) * 0.6
-    for b in range(3):
-        ang = math.pi + lean + (b - 1) * 0.7 + 0.2 * (h(k, b, 62) - 0.5)
-        tilt = 0.3 + 0.2 * h(k, b, 63)
-        length = 0.3 + 0.1 * h(k, b, 64)
-        rot = Matrix.Rotation(ang, 4, "Z") @ Matrix.Rotation(tilt, 4, "X")
-        mid = rot @ Vector((0.0, 0.0, length / 2))
-        o.cone(0.11, 0.0, length, (x + mid.x, z + mid.y, mid.z), P("verdure", 3), segs=3, rot=rot)
-
-
-def pebble(o, x, z, k):
-    """A stone from above: a low six-sided chunk, its top slate 3 and its sides slate 1, both unlit so the warm
-    sun cannot snap it to a skin colour (a lit slate box read as a pink blob); it still casts a shadow."""
-    r = 0.22 + 0.08 * h(k, 71)
-    res = bmesh.ops.create_cone(o.bm, cap_ends=True, segments=6, radius1=r, radius2=r * 0.7, depth=0.14,
-                                matrix=Matrix.Translation(Vector((x, z, 0.07))) @ Matrix.Rotation(h(k, 72), 4, "Z"))
-    for f in {f for v in res["verts"] for f in v.link_faces}:
-        f.material_index = o.mi(P("slate", 3, flat=True) if f.normal.z > 0.9 else P("slate", 1, flat=True))
-
-
 def overworld(col):
     grass = [(1.01, P("verdure", 2))]
-    for v in range(PLAIN_VARIANTS):  # grass: a few clumps of tufts with bare grass between, and a stone or two
-        o = Obj("tile_plain" if v == 0 else f"tile_plain_{v}")
-        tile_base(o, grass)
-        for c in range(3 + v % 2):
-            cx, cz = h(v, c, 65) * 3.0 - 1.5, h(v, c, 66) * 3.0 - 1.5
-            for t in range(1 + int(h(v, c, 67) * 2)):
-                tuft(o, cx + (h(v, c, t, 68) - 0.5) * 1.0, cz + (h(v, c, t, 69) - 0.5) * 1.0, v * 100 + c * 10 + t)
-        for p in range(1 + v % 2):
-            pebble(o, h(v, p, 73) * 3.0 - 1.5, h(v, p, 74) * 3.0 - 1.5, v * 10 + p)
-        o.finish(col)
+    o = Obj("tile_plain")  # bare grass: patches, tufts and stones are placed by hand (look_map.gd)
+    tile_base(o, grass)
+    o.finish(col)
+    kit_ground.map_dressing(col, Obj)
     o = Obj("tile_road")
     tile_base(o, grass)
     for i in range(8):  # a rutted dirt road along the tile's X axis

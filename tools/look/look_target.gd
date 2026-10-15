@@ -30,6 +30,11 @@ const ORC_AT := Vector3(-0.85, 0.0, 0.55)
 const VAMPYR_AT := Vector3(0.95, 0.0, 0.25)
 const TORCH_AT := Vector3(0.05, 2.06, 1.3)
 const FLAME_AT := Vector3(0.05, 2.06, 1.3)
+## The timber house's wall torch (kit bracket at Blender x -0.65, y 3.54): at night it burns, so the
+## light on that facade has a visible source and falls off around it (desloppify round 2).
+const WALL_TORCH_AT := Vector3(-0.65, 2.5, -3.54)
+## Its light sits a little out from the flame, so the wall gets a broad glow, not a ringed hotspot.
+const WALL_LIGHT_OUT := Vector3(0.0, 0.0, 0.3)
 const BLOB_RADIUS_M := 0.27
 const TOKEN_BLOB_M := 0.5
 const SHADOW_BIAS := 0.08
@@ -154,19 +159,15 @@ func _build_street(option: String, night: bool) -> void:
 			torch.light_color = _colour("fire:0")
 			torch.light_energy = _num(_block("night"), "torch_energy")
 			torch.omni_range = _num(_block("night"), "torch_range_m")
-		var flame := MeshInstance3D.new()
-		var ball := SphereMesh.new()
-		ball.radius = 0.07
-		ball.height = 0.16
-		ball.radial_segments = 6
-		ball.rings = 3
-		var hot := StandardMaterial3D.new()
-		hot.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		hot.albedo_color = _colour("fire:1")
-		ball.material = hot
-		flame.mesh = ball
-		flame.position = FLAME_AT
-		_stage.world().add_child(flame)
+		_flame(FLAME_AT)
+		_flame(WALL_TORCH_AT)
+		var wall := OmniLight3D.new()
+		wall.position = WALL_TORCH_AT + WALL_LIGHT_OUT
+		wall.light_color = _colour("fire:0")
+		wall.light_energy = _num(_block("night"), "wall_torch_energy")
+		wall.omni_range = _num(_block("night"), "wall_torch_range_m")
+		wall.shadow_enabled = true
+		_stage.world().add_child(wall)
 		var rain := _stage.world().get_node_or_null("Rain") as GPUParticles3D
 		if rain != null:
 			rain.seed = RAIN_SEED
@@ -176,6 +177,23 @@ func _build_street(option: String, night: bool) -> void:
 			var streak := rain.draw_pass_1 as QuadMesh
 			var wet := streak.material as StandardMaterial3D
 			wet.albedo_color = _colour(_str(_block("night"), "rain"))
+
+
+func _flame(at: Vector3) -> void:
+	var flame := MeshInstance3D.new()
+	var ball := SphereMesh.new()
+	ball.radius = 0.07
+	ball.height = 0.16
+	ball.radial_segments = 6
+	ball.rings = 3
+	var hot := StandardMaterial3D.new()
+	hot.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	hot.albedo_color = _colour("fire:1")
+	ball.material = hot
+	flame.mesh = ball
+	flame.position = at
+	flame.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_stage.world().add_child(flame)
 
 
 func _blob(at: Vector3, radius: float, key: String, parent: Node3D) -> void:
