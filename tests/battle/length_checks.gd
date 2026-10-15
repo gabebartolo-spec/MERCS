@@ -254,7 +254,8 @@ func _check_deployments_in_sight() -> void:
 ## "places" and "from_day" beside them).
 func _lineup(lineup: Variant) -> Array:
 	if lineup is Dictionary:
-		return _list(lineup, "fighters")
+		var block: Dictionary = lineup
+		return _list(block, "fighters")
 	return lineup if lineup is Array else []
 
 
