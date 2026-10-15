@@ -107,6 +107,15 @@ func lower_morale(side: int, amount: int) -> void:
 	log.append_array(_morale.lower(side, amount))
 
 
+## The given side takes the first turn (an ambush): the turn moves to that side's first
+## fighter in the order, and the strict order carries on from there.
+func give_first_turn(side: int) -> void:
+	for i: int in _order.size():
+		if _order[i].side == side and _order[i].can_act():
+			_turn = i
+			return
+
+
 func unit(unit_id: String) -> BattleUnit:
 	for fighter: BattleUnit in units:
 		if fighter.id == unit_id:

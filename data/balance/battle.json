@@ -69,6 +69,21 @@
       "initiative": 3,
       "leader": true
     },
+    "watchman": {
+      "hp": 9,
+      "attack": 2,
+      "defense": 2,
+      "damage": 4,
+      "initiative": 3
+    },
+    "watch_sergeant": {
+      "hp": 11,
+      "attack": 2,
+      "defense": 3,
+      "damage": 5,
+      "initiative": 3,
+      "leader": true
+    },
     "recruit_placeholder": {
       "hp": 11,
       "attack": 2,

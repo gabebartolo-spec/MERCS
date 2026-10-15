@@ -22,6 +22,7 @@ The loop sketch's fighters, by id. The orc and the Vampyr are the director's ref
 - `presence`: weight in social checks (talking the lookout down).
 - `moves`: the fighter's loadout, `{move_id: true}`, in order (ids from `rules.moves`; at most `loadout_max`).
 - `leader`: losing this fighter costs `morale_loss_leader_down`.
+- `watchman`, `watch_sergeant`: the road patrol's fighters (Phase 2 M2, data/encounters.json); the sergeant leads.
 - `recruit_placeholder`: the loop's recruit until the director designs the cast member offered there.
 
 ## gate

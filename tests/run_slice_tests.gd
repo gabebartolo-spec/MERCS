@@ -31,6 +31,9 @@ func suite_name() -> String:
 
 
 func run_checks() -> void:
+	# The window stretches the 1920x1080 canvas (canvas_items): give the headless window the
+	# game's size so a click's window position is its canvas position, as on a 1080p screen.
+	root.size = WINDOW_SIZE
 	var game := await _spawn()
 	_check_boot(game)
 	await _check_keys(game)
