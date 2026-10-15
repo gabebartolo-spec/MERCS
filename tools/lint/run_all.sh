@@ -66,6 +66,7 @@ run_step no_weights "$py" tools/lint/no_weights.py
 run_step function_limits "$py" tools/lint/function_limits.py
 run_step worktrees bash tools/lint/worktrees.sh
 run_step self-test "$py" tools/lint/test_lints.py
+run_step pixels "$py" tools/pipeline/check_assets_pixels.py
 run_step pipeline "$py" tools/pipeline/test_pipeline.py
 
 printf '%-15s %-6s %-5s %s\n' CHECK RESULT WARN DETAIL
