@@ -155,10 +155,10 @@ func accept(id: String) -> bool:
 
 ## Completes an accepted contract: it pays its reward and leaves the board. False otherwise.
 func complete(id: String) -> bool:
-	var reward := book.complete(id)
-	if reward < 0:
+	var row := book.complete(id)
+	if row.is_empty():
 		return false
-	purse += reward
+	purse += _num(row, "reward", 0)
 	return true
 
 

@@ -47,14 +47,14 @@ func accept(id: String) -> bool:
 	return true
 
 
-## Takes an accepted contract off the board; the reward it pays, or -1 (and no change) when it
-## is not on the board or not accepted.
-func complete(id: String) -> int:
+## Takes an accepted contract off the board and returns its row (the caller pays the reward),
+## or {} (and no change) when it is not on the board or not accepted.
+func complete(id: String) -> Dictionary:
 	var row := contract(id)
 	if row.is_empty() or row.get("accepted") != true:
-		return -1
+		return {}
 	board.erase(row)
-	return _num(row, "reward", 0)
+	return row
 
 
 ## Removes the contracts whose deadline is before `day`; the ids removed.

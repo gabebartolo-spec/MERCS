@@ -270,6 +270,13 @@ func _check_contract_lifecycle() -> void:
 	)
 	check(economy.book.contract(id).is_empty(), "a completed contract leaves the board")
 	economy.refresh_board(0, SITES, Rng.from_seed(SEED))
+	# A negative reward still pays, as it did before the split (the row is not a refusal).
+	economy.book.board.append({"id": "ctr_neg", "accepted": true, "reward": -5})
+	var before := economy.purse
+	check(
+		economy.complete("ctr_neg") and economy.purse == before - 5,
+		"a negative reward is paid and the call returns true"
+	)
 	var lapsing: Dictionary = economy.board[0]
 	var lapsed := economy.book.expire(_w(lapsing["deadline"]) + 1)
 	check(
