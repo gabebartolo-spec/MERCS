@@ -119,6 +119,32 @@ func on_the_road(parked: bool) -> void:
 	await _walk_into(map, watch)
 	await _press(map.panel.button_for(OverworldDirector.FIGHT))
 	await watch.settle("fight", DECISION)
+	var won := await _fight_through(map, watch)
+	if parked:
+		_park_loot(map)
+		watch.problems.clear()
+	await InputKit.tap(_tree, KEY_B)
+	await watch.settle("B over the triage", VIEW)
+	await _press(map.panel.button_for(OverworldDirector.CONTINUE))
+	await watch.settle("continue", VIEW)
+	if parked:
+		var flagged := watch.problems.size() == 1 and watch.problems[0].begins_with("continue")
+		_check.call(
+			flagged, "the save-order guard flags a change parked until Continue (as main had)"
+		)
+	else:
+		var hub := game.hub_director()
+		var button := hub.panel.button_for("prisoner", Economy.RANSOM)
+		while button != null:
+			await _press(button)
+			await watch.settle("ransom", DECISION)
+			button = hub.panel.button_for("prisoner", Economy.RANSOM)
+		_verdict(watch, won, "on the road, a won ambush")
+	await _quit(game)
+
+
+## Every company turn played (BattleAi's choice, by real input) and settled; true when it was won.
+func _fight_through(map: OverworldDirector, watch: SaveWatch) -> bool:
 	var battle := map.view.battle
 	var sight := _sight()
 	for _frame: int in InputKit.FIGHT_FRAMES:
@@ -131,35 +157,17 @@ func on_the_road(parked: bool) -> void:
 		else:
 			await _tree.process_frame
 	await watch.settle("the fight's end", DECISION)
-	if parked:
-		var show: Callable = map._after_triage
-		var economy := map.company.economy
-		var stream := map.rng
-		map._after_triage = func() -> void:
-			economy.take_loot("ambush", stream, {"won": true})
-			show.call()
-		watch.problems.clear()
-	await InputKit.tap(_tree, KEY_B)
-	await watch.settle("B over the triage", VIEW)
-	await _press(map.panel.button_for(OverworldDirector.CONTINUE))
-	await watch.settle("continue", VIEW)
-	if parked:
-		(
-			_check
-			. call(
-				watch.problems.size() == 1 and watch.problems[0].begins_with("continue"),
-				"the save-order guard flags a change parked until Continue (main's loot bug as a lambda)"
-			)
-		)
-	else:
-		var hub := game.hub_director()
-		var button := hub.panel.button_for("prisoner", Economy.RANSOM)
-		while button != null:
-			await _press(button)
-			await watch.settle("ransom", DECISION)
-			button = hub.panel.button_for("prisoner", Economy.RANSOM)
-		_verdict(watch, battle.winner == BattleUnit.COMPANY, "on the road, a won ambush")
-	await _quit(game)
+	return battle.winner == BattleUnit.COMPANY
+
+
+## Main's bug as a lambda (lintfool lambda_park): the loot parked until Continue.
+func _park_loot(map: OverworldDirector) -> void:
+	var show: Callable = map._after_triage
+	var economy := map.company.economy
+	var stream := map.rng
+	map._after_triage = func() -> void:
+		economy.take_loot("ambush", stream, {"won": true})
+		show.call()
 
 
 ## The guard catches a change that misses its save: after a rest, a change made later in the same
