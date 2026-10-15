@@ -10,7 +10,7 @@ extends "res://tests/lib/runner.gd"
 ## GUI (tests/wiring/gui_checks.gd): real clicks and letter keys at 1920x1080: Fight on the
 ## road, the triage panel, Continue, the C screen marking the fallen as gone, Save, a fresh
 ## session that never fields the dead.
-## Seeded by design: sim fights use MercPlay on seeds 425343 (a permanent injury) and 424358
+## Seeded by design: sim fights use MercPlay on seeds 425353 (a permanent injury) and 424358
 ## (the captain's death; both re-picked when equipment physics, Phase 4 P1b, moved the fights:
 ## plate keeps the Vampyr alive, so merc_3 holds the office there); the GUI fight is an ambush
 ## met by walking, world seed 424270.
@@ -24,7 +24,7 @@ const DEATH_SEED := 424358
 ## Who leads and falls on DEATH_SEED (Phase 4 P1b: in plate the Vampyr no longer falls on any
 ## nearby seed, so the captain's death is shown with a placeholder merc in the office).
 const DEATH_CAPTAIN := "merc_3"
-const SCAR_SEED := 425343
+const SCAR_SEED := 425353
 const SCAR_ATTACK := -3
 const TEMPORARY_DAYS := 5
 ## The merc who goes down on SCAR_SEED (in plate, the Vampyr no longer does).

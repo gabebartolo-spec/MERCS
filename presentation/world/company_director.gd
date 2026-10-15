@@ -16,6 +16,7 @@ const FACTIONS_DATA := "res://data/factions.json"
 const EQUIPMENT_DATA := "res://data/equipment.json"
 const RECRUITS_DATA := "res://data/recruits.json"
 const JOBS_DATA := "res://data/jobs.json"
+const TRAITS_DATA := "res://data/traits.json"
 const WORLD_DATA := "res://data/balance/world.json"
 const INJURY_RULES := "res://data/balance/injury.json"
 const INJURY_DATA := "res://data/injuries.json"
@@ -48,6 +49,7 @@ static func defs() -> Dictionary:
 		"equipment": _json(EQUIPMENT_DATA),
 		"recruits": _json(RECRUITS_DATA),
 		"jobs": _json(JOBS_DATA),
+		"traits": _json(TRAITS_DATA),
 	}
 
 
