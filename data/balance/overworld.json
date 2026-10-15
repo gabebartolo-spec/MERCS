@@ -14,11 +14,12 @@
     "repeat_s": 0.12
   },
   "colours": {
-    "plain": "verdure:2",
+    "plain": "verdure:3",
     "road": "soil:4",
-    "forest": "verdure:0",
+    "forest": "verdure:1",
     "hill": "soil:2",
-    "water": "slate:1",
+    "water": "cloth_faded:2",
+    "void": "soot:1",
     "town": "slate:3",
     "band": "heraldry:2",
     "ambush": "heraldry:1",

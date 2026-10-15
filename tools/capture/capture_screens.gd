@@ -9,7 +9,7 @@ extends SceneTree
 const InputKit := preload("res://tests/lib/input_kit.gd")
 const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const SETTLE_FRAMES := 12
-const DEAD := "fallen_comrade"
+const DEAD := "recruit_1"
 const LOOP_CHOICES: Array[String] = ["continue", "hire", "accept", "continue"]
 
 var _out := "user://screens"

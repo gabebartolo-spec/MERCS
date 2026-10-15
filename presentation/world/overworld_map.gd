@@ -182,7 +182,7 @@ func _place(token: Control, tile: Vector2i, radius: int) -> void:
 func _draw_map() -> void:
 	if _world == null:
 		return
-	_canvas.draw_rect(Rect2(Vector2.ZERO, _canvas.size), _terrain_colours[TileRegion.Terrain.WATER])
+	_canvas.draw_rect(Rect2(Vector2.ZERO, _canvas.size), _colour("void"))
 	var first := (-_origin / _tile).max(Vector2i.ZERO)
 	var last := (_viewport.size - _origin) / _tile + Vector2i.ONE
 	last = last.min(Vector2i(_world.region.width, _world.region.height))

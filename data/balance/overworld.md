@@ -22,6 +22,7 @@ All in logical pixels: the map is drawn at 1x on the same texel grid as the stre
 Colours of the look-B palette.
 - Every colour here is a palette reference "ramp:index" (core.json or the heartland biome; presentation/palette.gd), never RGB.
 - `plain`, `road`, `forest`, `hill`, `water`, `town`: each terrain's tile.
+- `void`: what shows past the region's edge (a dark soot frame, not a terrain).
 - `band`: the band's token (the company's colour on the street's battle rings).
 - `ambush`, `patrol`: bandits' and a patrol's tokens, by encounter type.
 - `site`: a site's marker.
