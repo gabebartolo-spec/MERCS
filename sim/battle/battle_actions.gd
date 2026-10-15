@@ -6,8 +6,8 @@ extends RefCounted
 ## loadout): a walk first when it has "walk", a health price ("hp_cost", never the last point),
 ## then an attack with its "attack_bonus" and "damage_bonus". The weapon action of the
 ## fighter's class (battle.json "rules" "actions" "weapon", BattleKit): a blow on a foe within
-## the class's "reach" (a spear's 2); a "ranged" class's shot is refused until the bow's line of
-## fire exists (Phase 4 P1c). Only what the fighter's kit holds is legal beyond the base three.
+## the class's "reach" (a spear's 2, a bow's shot further) along a line no wall stops
+## (BattleRanged, Phase 4 P1c). Only what the fighter's kit holds is legal beyond the base three.
 ## An action is refused whole (no events, nothing changed) unless every part is legal. The
 ## blow is BattleResolver's.
 
@@ -17,15 +17,17 @@ const WAIT := "wait"
 const BASE: Array[String] = [MOVE, ATTACK, WAIT]
 
 var kit := BattleKit.new()
+var ranged := BattleRanged.new()
 
 var _rules: BattleRules = null
 var _resolver: BattleResolver = null
 
 
-func setup(rules: BattleRules, resolver: BattleResolver) -> void:
+func setup(rules: BattleRules, resolver: BattleResolver, grid: BattleGrid) -> void:
 	_rules = rules
 	_resolver = resolver
 	kit.setup(rules)
+	ranged.setup(grid, rules)
 
 
 ## True when the actor may try an action of this kind at all: move and wait, the plain blow only
@@ -54,16 +56,16 @@ func act(battle: Battle, actor: BattleUnit, action: Dictionary, events: Array[Di
 	return _use_move(battle, actor, action, events)
 
 
-## The weapon action: a blow on "target" within the class's "reach" (at least 1); a "ranged"
-## class is refused until its shot exists (P1c). The resolver reads the reach (BattleRules).
+## The weapon action: a blow on "target" within the class's "reach" (at least 1) along a line
+## no wall stops (BattleRanged: a spear over a friend's shoulder, a bow's shot over heads).
 func _strike(
 	battle: Battle, actor: BattleUnit, action: Dictionary, events: Array[Dictionary]
 ) -> bool:
 	var kind := str(action.get("type", ""))
-	var def := _rules.weapon_def(kind)
-	if def.get("ranged") == true:
+	var target := battle.unit(str(action.get("target", "")))
+	if not ranged.can_strike(actor, target, kind):
 		return false
-	return _resolver.attack(actor, battle.unit(str(action.get("target", ""))), kind, events)
+	return _resolver.attack(actor, target, kind, events)
 
 
 ## A learnt move: a walk to "to" first when the move has "walk", a health price ("hp_cost",
