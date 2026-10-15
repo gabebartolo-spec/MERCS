@@ -31,5 +31,5 @@ campaign 6
 panels 11
 campaign_end 11
 ironman 12
-ironman_resume 16
+ironman_resume 22
 perf 14

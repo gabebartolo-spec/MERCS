@@ -172,8 +172,9 @@ func _on_screen_key(code: Key) -> void:
 
 
 func _toggle_company() -> void:
-	if _hub != null and not company_open():
-		_hub.set_open(false)
+	var hub := hub_director()  # makes the map, hidden, so the captain appointed here is saved
+	if not company_open():
+		hub.set_open(false)
 	company_director().set_open(not company_open())
 
 
@@ -367,11 +368,10 @@ func _sync() -> void:
 	_stage.stand_at(_ground(player))
 	_stage.merc().visible = not fighting
 	_face(_stage.merc(), player, _clock)
-	var extras := _stage.extra_mercs
 	for i: int in crowd.size():
 		_stage.move_extra(i, _ground(crowd[i]))
-		extras[i].visible = not fighting
-		_face(extras[i], crowd[i], _clock - CROWD_PHASE_S * (i + 1))
+		_stage.extra_mercs[i].visible = not fighting
+		_face(_stage.extra_mercs[i], crowd[i], _clock - CROWD_PHASE_S * (i + 1))
 
 
 ## The battle on screen (loop example or road encounter), or null.
