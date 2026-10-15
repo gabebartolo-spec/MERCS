@@ -86,12 +86,17 @@ func _check_gui() -> void:
 func _check_decision(game: SliceGame, story: StoryDirector) -> void:
 	var company := game.company_director().company
 	company.economy.captives.take(5)
+	var reactor := company.economy.captives.reacting(company, "release")
 	company.economy.decide_prisoner(company, "release", 5)
 	await _frames(LAYOUT_FRAMES)
 	var captain := company.captain_id
 	check(
 		story.memory.has_key(captain, "memory.fate_release"),
 		"a prisoner decision at the hub is remembered by the captain"
+	)
+	check(
+		reactor != "" and story.memory.has_key(reactor, "memory.fate_release"),
+		"and by the merc who reacts most strongly to it (%s, Phase 5 C5)" % reactor
 	)
 	var count := story.memory.of(captain).size()
 	await _frames(LAYOUT_FRAMES)

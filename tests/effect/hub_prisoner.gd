@@ -1,9 +1,15 @@
 extends "res://tests/lib/effect_case.gd"
-## hub_prisoner: the prisoner choice changes the company. The same company and seed after one
-## won fight: recruit the prisoner, or let them go. Roster size, coin and morale differ.
+## hub_prisoner: the prisoners from the fight (Phase 5 C5). The starting company after a won
+## fight in which a bandit chief and a bandit surrendered (EncounterBattle.result "prisoners"),
+## each man then given one of the three fates (release, ransom, execute: director Q-12 left
+## recruiting out). On: both men are the prisoners, a ransom is priced by each man's fighter
+## type, and each fate is remembered by the captain and by the merc who reacts most strongly
+## (economy.json "prisoner" "reactions", placeholders). Off: the Phase 2 rule: one nameless
+## prisoner per won fight, a flat ransom, and only the captain remembers.
 
 const Fixture := preload("res://tests/lib/company_fixture.gd")
 const DAY := 3
+const TAKEN: Array[String] = ["bandit_chief_0", "bandit_1"]
 
 
 func id() -> String:
@@ -11,12 +17,30 @@ func id() -> String:
 
 
 func run() -> Dictionary:
-	return {"on": _decide(Economy.RECRUIT), "off": _decide(Economy.RELEASE)}
+	var defs := Fixture.defs()
+	var phase_2 := defs.duplicate(true)
+	var rules: Dictionary = phase_2["economy"]["prisoner"]
+	rules.erase("ransom_by_fighter")
+	rules.erase("reactions")
+	return {"on": _fates(defs, TAKEN), "off": _fates(phase_2, [])}
 
 
-func _decide(choice: String) -> String:
-	var company := Company.start(Fixture.defs())
-	company.economy.captives.take(DAY)
-	company.economy.decide_prisoner(company, choice, DAY)
-	var economy := company.economy
-	return "roster %d, coin %d, morale %d" % [company.roster.size(), economy.purse, economy.morale]
+## Each fate in turn on a fresh company: coin, morale and who remembers it.
+func _fates(defs: Dictionary, taken: Array[String]) -> String:
+	var parts: Array[String] = []
+	for choice: String in Economy.CHOICES:
+		var company := Company.start(defs)
+		var economy := company.economy
+		economy.captives.take(DAY, taken)
+		while economy.decide_prisoner(company, choice, DAY):
+			pass
+		var who: Array[String] = []
+		for line: Dictionary in economy.chronicle:
+			who.append(str(line.get("merc", "")))
+		parts.append(
+			(
+				"%s: coin %d, morale %d, remembered by %s"
+				% [choice, economy.purse, economy.morale, ",".join(who)]
+			)
+		)
+	return "; ".join(parts)
