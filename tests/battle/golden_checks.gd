@@ -15,17 +15,20 @@ const GRID := Vector2i(12, 8)
 const MAX_TURNS := 300
 const ILLEGAL_EVERY := 7
 ## Pinned before the battle.gd split (claude/p4-plan-split); seed -> SHA-256 of the fight.
-## Re-pinned by Phase 4 P2 (morale, surrender, the captain's fall): seeds 1, 1337, 424242, 90210
-## and 2026 end the same way (same winner, same round) but the broken band's end now says who
-## ran and who surrendered, and in seed 1 the chief's fall breaks his shaky bandits first.
+## Re-pinned, all seven, by Phase 4 P5 (claude/p4-p5-ai): the enemy no longer picks the foe
+## beside it with the least exact health (rule 6) but the one it saw wounded, ties by id
+## (BattleKnowledge), so plans, blows and the fights after them move.
+## Re-pinned by Phase 4 P2 (morale, surrender, the captain's fall) on top of P5: seeds 1, 7,
+## 1337, 424242, 90210 and 2026 now end with the broken band's men running or surrendering
+## (and the chief's fall breaking his shaky bandits first); seed 31 is unchanged.
 const GOLDEN := {
-	1: "62c7974dab16e161d64cfd244a853c9cebfc4673599e1b7079ac93469caead5a",
-	7: "cb8f59423e39e245274404ec1f16e030741fc4e4a219c594cedf06a6bc1ea249",
-	1337: "47650130c1973c04fcabaf050f293083ccb9350c1d0e13567c0458dee299a5e5",
-	424242: "8d703a69cbb60fd2f40778bdd9fbf79d9eb3d85c35962d4297c241408175aa11",
-	90210: "9f3a31d990b2a0e92741e635738a7cfbfc5a8f584b978056c1a7bd99b9dfdf89",
-	2026: "e8c66eb084e07e191a254f384db16085a4c2c431909c57db42fcf17c2e438769",
-	31: "4f7c3ae850981a983eddbf65fbc8195fc28e1b8ae6e91dde4fbbab2be3b145b2",
+	1: "3299931e9bdb761e4059482a56a893ea1cc7edd80068325ddfa4b3cd166c509c",
+	7: "7568529f025b8ea2c47b985b30b29e5e221424b06cd42bfa23c4783ec7ef2150",
+	1337: "036b27068c601f3442f239d5e186a8064d14023fd0d74b38c96996d091f1b538",
+	424242: "a1b6cca7a1fba6c46516214e263cf2c1ccd37ecdd2b1ed581c583549305f43b3",
+	90210: "99c70224e351a57618f1687ead0e8d972c3cfa1901fbebb269198a1ab91b87a9",
+	2026: "5cd2331f919abb9568429914bd493e439fdb776daa16bdcbfc3d3e372cbc4c63",
+	31: "ac55cc7c4e59ae637676de3c515542566de606443c76050c5fed73a1103cb975",
 }
 const MARK := "golden_mark"
 

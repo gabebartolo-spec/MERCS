@@ -12,6 +12,7 @@
     "mercs": 6,
     "recruits": 6,
     "encounters": 2,
-    "locations": 2
+    "locations": 2,
+    "actions": 10
   }
 }

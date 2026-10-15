@@ -34,6 +34,29 @@
         "attack_bonus": 4,
         "damage_bonus": 3
       }
+    },
+    "actions": {
+      "weapon": {
+        "sword": {
+          "reach": 1
+        },
+        "axe": {
+          "reach": 1
+        },
+        "spear": {
+          "reach": 2
+        },
+        "mace": {
+          "reach": 1
+        },
+        "bow": {
+          "ranged": true
+        }
+      },
+      "technique": {
+        "charge": true,
+        "blood_price": true
+      }
     }
   },
   "fighters": {

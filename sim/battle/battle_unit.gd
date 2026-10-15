@@ -49,6 +49,9 @@ var wounded := false
 var presence := 0
 ## The merc's own resolve: at the captain's fall he holds at or above the rules' bar (BattleMorale).
 var resolve := 0
+## The class of the weapon in hand (stats "weapon_class": sword, axe, spear, mace, bow; director
+## Q-B, 2026-10-15), "" for none; the action kit gives its weapon action (BattleKit).
+var weapon_class := ""
 ## Learnt moves taken into this fight, by id, in loadout order (at most "loadout_max").
 var moves: Array[String] = []
 ## Added to this fighter's next attack only, then cleared (the Vampyr's blood price).
@@ -86,6 +89,7 @@ static func make(unit_id: String, unit_side: int, at: Vector2i, stats: Dictionar
 	unit.is_leader = stats.get("leader", false) == true
 	unit.presence = _int(stats, "presence", 0)
 	unit.resolve = _int(stats, "resolve", 0)
+	unit.weapon_class = str(stats.get("weapon_class", ""))
 	for move: String in _listed_moves(stats.get("moves", [])):
 		unit.teach(move, true)
 	for flag: Variant in FLAGS:

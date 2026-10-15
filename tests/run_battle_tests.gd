@@ -8,7 +8,9 @@ extends "res://tests/lib/runner.gd"
 ## sees no one. Phase 2 milestone 4's checks (facings, turn order, intent, loadout, the hit
 ## hook, blocking, shaken, the event log) live in tests/battle/skeleton_checks.gd; the
 ## golden logs (several seeded fights hashed and pinned) in tests/battle/golden_checks.gd;
-## Phase 4's morale, captain's fall, rout and surrender in tests/battle/morale_checks.gd.
+## Phase 4's morale, captain's fall, rout and surrender in tests/battle/morale_checks.gd; the
+## enemy that is not psychic (rule 6) in tests/battle/ai_checks.gd; the
+## action kit (Phase 4 P1a: weapon action + learnt moves, reach, the cap) in kit_checks.gd.
 ## Seeded by design: every roll comes from Rng.from_seed with a fixed seed.
 ##   godot --headless --path . --script tests/run_battle_tests.gd
 
@@ -23,6 +25,8 @@ const FAR := Vector2i(9, 7)
 const SkeletonChecks := preload("res://tests/battle/skeleton_checks.gd")
 const GoldenChecks := preload("res://tests/battle/golden_checks.gd")
 const MoraleChecks := preload("res://tests/battle/morale_checks.gd")
+const AiChecks := preload("res://tests/battle/ai_checks.gd")
+const KitChecks := preload("res://tests/battle/kit_checks.gd")
 
 
 func suite_name() -> String:
@@ -42,6 +46,8 @@ func run_checks() -> void:
 	SkeletonChecks.new().run(check)
 	GoldenChecks.new().run(check)
 	MoraleChecks.new().run(check)
+	AiChecks.new().run(check)
+	KitChecks.new().run(check)
 	await process_frame
 
 
