@@ -21,7 +21,7 @@ func _week(pays: bool) -> String:
 	var economy := company.economy
 	var rng := Rng.from_seed(SEED)
 	for day: int in range(1, WEEK + 1):
-		economy.on_day(company.roster.size(), day, SITES, rng)
+		economy.on_day(company.roster, day, SITES, rng)
 		if pays:
 			economy.pay_wages()
 	return "morale %d, owing %d coin, purse %d" % [economy.morale, economy.owed, economy.purse]
