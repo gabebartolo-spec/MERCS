@@ -24,6 +24,8 @@ const ROUTE_STAGES := {
 	"second_fight": {"second_fought": true, "ended": false},
 	"wipe": {"fought": true, "won": false, "ended": true},
 }
+## Any internal id (a lower-case word with an underscore) in a sentence a player reads.
+const ID_PATTERN := "\b[a-z]+_[a-z0-9_]+\b"
 const STAGES: Array[String] = [
 	"met", "fought", "triage", "won", "contract", "hired", "prisoner", "paid", "storylet"
 ]
@@ -171,7 +173,11 @@ func _check_memory_names(first: Dictionary) -> void:
 			var about := str(entry.get("about", ""))
 			if about != "" and company.member(about) == null:
 				named += 1 if line.contains(company.name_of(about)) else 0
-	var ids := shown.filter(func(line: String) -> bool: return line.contains(MERC_ID_PREFIX))
+	var id_regex := RegEx.create_from_string(ID_PATTERN)
+	var ids := shown.filter(
+		func(line: String) -> bool:
+			return line.contains(MERC_ID_PREFIX) or id_regex.search(line) != null
+	)
 	var recruit := company.name_of("recruit_1")
 	check(
 		named > 0 and ids.is_empty() and recruit != "recruit_1" and recruit != "",
