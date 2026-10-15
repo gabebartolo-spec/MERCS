@@ -7,7 +7,7 @@ extends Node
 ## on a reachable cell moves; enemy turns play themselves after a short pause (BattleAi, which
 ## only acts on what it sees). A flat ring under each fighter says whose side they are on
 ## (placeholder until the hand-made cast's art carries it; slice.json "markers"); a downed
-## fighter's sprite goes and a dark ring marks where they fell. A strip along the bottom
+## fighter's sprite and ring go and the body stays (BattleMarks). A strip along the bottom
 ## left (clear of the help line at the top) shows the turn order from now
 ## (Battle.turn_order) and whether a side wavers; a word marker over each enemy's head shows
 ## its intent for the round until it acts (Battle.intent). The intents are one backed line
@@ -34,6 +34,9 @@ var panel: LoopPanel = null
 ## Display names by fighter id, for fighters the cast text keys do not name (the company's
 ## mercs, from their data); the others are named by their kind.
 var unit_names := {}
+## What the fight leaves on the field (blood at every hit, bodies) and the hit flashes (P6b).
+var marks := BattleMarks.new()
+var fx := BattleFx.new()
 
 var _origin := Vector2i.ZERO
 var _sight := 0
@@ -68,6 +71,7 @@ func begin(fight: Battle, origin: Vector2i, sight: int) -> void:
 		_sprites[fighter.id] = sprite
 		_rows.learn(sprite)
 		_rings[fighter.id] = _ring()
+	marks.begin(street_stage, world_point)
 	_make_hud()
 	if not panel.chosen.is_connected(_on_choice):
 		panel.chosen.connect(_on_choice)
@@ -77,6 +81,8 @@ func begin(fight: Battle, origin: Vector2i, sight: int) -> void:
 
 ## Takes the fighters off the street.
 func clear() -> void:
+	fx.clear(_sprites, battle)
+	marks.clear()
 	for unit_id: Variant in _sprites:
 		var sprite: Sprite3D = _sprites[unit_id]
 		street_stage.remove_merc(sprite)
@@ -153,6 +159,7 @@ func click_cell(street_cell: Vector2i) -> void:
 func _process(delta: float) -> void:
 	if battle == null:
 		return
+	fx.tick(delta, _sprites, battle)
 	if battle.is_over():
 		return
 	if battle.current().side == BattleUnit.ENEMY:
@@ -175,10 +182,13 @@ func _on_choice(choice_id: String) -> void:
 
 
 func _play(action: Dictionary) -> void:
-	if battle.apply(action).is_empty():
+	var events := battle.apply(action)
+	if events.is_empty():
 		return
 	acted.emit(action)
 	_refresh()
+	marks.record(events, battle, _sprites, fx)
+	fx.play(events, _sprites)
 	if battle.is_over():
 		finished.emit()
 	else:
@@ -249,11 +259,8 @@ func _refresh() -> void:
 		sprite.visible = not fighter.down
 		var ring: MeshInstance3D = _rings[fighter.id]
 		ring.position = world_point(fighter.cell) + Vector3.UP * _markers.num("markers", "lift_m")
-		var key := (
-			"down"
-			if fighter.down
-			else ("company" if fighter.side == BattleUnit.COMPANY else "enemy")
-		)
+		ring.visible = not fighter.down
+		var key := "company" if fighter.side == BattleUnit.COMPANY else "enemy"
 		var material := ring.material_override as StandardMaterial3D
 		material.albedo_color = _markers.colour("markers", key)
 
