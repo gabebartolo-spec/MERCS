@@ -4,6 +4,93 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
+## 2026-10-16 · D-112 · Lead (not director) · Lead calls made overnight, for the director's veto
+Calls: P1c ranged lines (walls block arrows and spears, fighters block neither, range 6 in data); #127 placeholder gear retuned to keep the slice at 89-109 wins in 200; orc skin option A (the golden's grass remapped to verdure, #118 r4, needs his golden decision before merge); P6c impact (deterministic, no physics raycasts, hit-stop is presentation only, #133); C0 split behind a facade with the five campaign routes pinned (#132); the orc head size (#118).
+Why: Each was the simplest option that kept a director ruling intact; none is a taste ruling.
+Changes: Data and presentation knobs only. Open for veto in the morning.
+
+## 2026-10-16 · D-111 · Director · Art that passes the critics is wired in; mercs 3-6 drafted for him; rabble kinds; subtle hit-stop; orc priority
+Words: grass "Darken to match golden" (one in-between verdure step, grass luma about 71); wire-in "Yes, wire it in"; mercs 3-6 "I draft, you pick" (3 candidates per slot; he chooses or rewrites); rabble kinds: peasant mobs, deserters, cultists, starving brigands (all four); hit-stop "Subtle, a few frames" (no shake); orc fix "Bulk and green-grey skin" (hulking frame, mossy grey-green apart from grass).
+Changes: Hit-stop in #133. Cast, tiles and palette PRs follow their critic loops (#118 open). Drafts: MERCS-builds/merc_candidates_2026-10-16.md.
+
+## 2026-10-16 · D-110 · Director · Contracts plan answers (Q-1 to Q-15 of #130)
+Words: Q-1 "enemies up to 12 or even 16 if theyre rabble" (rabble a separate weak kind, proper soldiers 4-8); Q-2 up to 6 deploy, 2 in reserve; Q-3 share of contract pay only; Q-4 share splits BY LEVEL; Q-5 daily wage by level; Q-6 split = advance vs on return; Q-7 reputation PER FACTION; Q-8 a bargaining trait per merc that he names (placeholders until then); Q-9 job win/lose as proposed; Q-10 towns buy and sell; Q-11 worn = one point weaker, worth less; Q-12 recruiting a prisoner "Not until you design it" (left out of contracts); Q-13 hunters only "if you took a sizeable amount of upfront money and abandon the job"; Q-14 one named death per 4 fights; Q-15 hunters grow with the grudge.
+Changes: `docs/plans/phase5_contracts.md` "Decided". C0 #132 and C4 reputation half #134 merged; C3 wages #135 and C2 negotiation #136 open; C1 in review.
+
+## 2026-10-16 · D-109 · Director · Contracts: four types, negotiated pay, failure has a cost
+Words: all four contract types (clear bandits, escort, hold a place, hunt a man); wages a daily wage plus a share; pay terms are negotiated ("you must negotiate"): the employer accepts, counters or walks by reputation and need, and a merc may step in once using traits; push too hard and he walks, name dented; failure or abandon costs reputation and grudges (badly broken deals send men after you).
+Changes: Plan #130; C4 #134 merged; C2 #136 open.
+
+## 2026-10-16 · D-108 · Director · After combat: prisoners, loot, armour cost, lethality, company size
+Words: prisoners "ransom, recruit, release, execute (all four)" (recruiting later set aside by Q-12, D-110); loot "yes, worn (battered) gear from fallen enemies"; armour strong but costly, the cost being slower to act plus price and upkeep (not fatigue, not movement); lethality a named-merc death every few fights; company cap 8; a typical fight roughly even, 4-8 enemies.
+Changes: Slower-to-act plate in #127. Prisoner, loot and upkeep work sits in Phase 5.
+
+## 2026-10-16 · D-107 · Director · Order of work: combat merges, art lands, then a playtest; then Contracts and the road
+Words: next playtest after combat merges AND art lands (cast, blood, tiles pass the critics); next depth pass after combat: Contracts and the road.
+Changes: Plan #130. Combat is merged except P1c ranged (in progress).
+
+## 2026-10-16 · D-106 · Director · Art: tiles by method B' (Claude-painted); heather three muted purples; orc skin grey-olive
+Words: tiles "method B'" (Claude-painted); heather "add 3 muted purples"; orc skin shifts to grey-olive, apart from the grass.
+Changes: Tile boards and cast #118 are in critic loops; the palette PR follows a SHIP.
+
+## 2026-10-16 · D-105 · Director · Bows are built next (P1c); spears get real two-cell reach
+Words: "build ranged (P1c) next"; "Spears: real 2-cell reach".
+Changes: P1c in progress (claude/p4-p1c-ranged).
+
+## 2026-10-16 · D-104 · Director · Hover odds show a percentage; MERCS Ledger ships B
+Words: hover odds show a PERCENTAGE ("Hit 40%"); Ledger "ship B" (grittier headings).
+Changes: Ledger B in #116. Battle.odds() in #127; the hover readout itself is P7, not built.
+
+## 2026-10-16 · D-103 · Director · The captain's fall breaks about half the company; sat-out dip stays 10; sergeant is the most-XP merc
+Words: the captain's fall breaks "ABOUT HALF" the company (steady veterans hold; shaky ones and recruits run); the sit-out dip stays 10; sergeant = most-XP merc; Vampyr blood-price frequency: "leave it".
+Changes: Placeholder resolves 4/5/6/6 in #123; sit-out and sergeant in #124.
+
+## 2026-10-15 · D-102 · Director · Blood at every hit; bodies stay
+Words: Q-G "At every hit": splashes on every wound, fading over the fight; bodies stay.
+Changes: #129 (blood, flash frame, bodies), #133 (spray along the blow, stains, hit-stop).
+
+## 2026-10-15 · D-101 · Director · The captain may sit out: no XP, a small morale dip
+Words: Q-F "No XP, small morale dip" (a field sergeant leads; the cost is shown before the fight).
+Changes: #124; XP in #125 (D-095).
+
+## 2026-10-15 · D-100 · Director · Withdraw: position decides
+Words: Q-E "Position decides": whoever reaches the map edge escapes; those engaged or too far back are left behind, captured or killed by a seeded roll on its own Rng stream.
+Changes: Rule in the combat plan (#114); no merged PR yet.
+
+## 2026-10-15 · D-099 · Director · The captain's death is a large morale fall
+Words: Q-D "Large morale fall": every unit on that side loses a big chunk of resolve at once; veterans can hold, shaky ones break (sharpened by D-103).
+Changes: #123.
+
+## 2026-10-15 · D-098 · Director · Surrender when cornered or the leader is down
+Words: Q-C "Cornered or leader down": a broken side runs if it has a way out; it surrenders, giving prisoners, when surrounded or pinned or its leader is down. Position decides.
+Changes: #123 (the non-psychic enemy that acts on it is #122).
+
+## 2026-10-15 · D-097 · Director · Armour is leather, mail, plate
+Words: Q-B "Leather, mail, plate": even the lightest is real armour; mail stops slashes not thrusts; plate turns cuts, is slow, and maces dent it.
+Changes: #127 (armour soaks, plate slow).
+
+## 2026-10-15 · D-096 · Director · Weapons are sword, axe, spear, mace, bow; each fighter has one weapon action plus four moves
+Words: Q-B "Sword, axe, spear, mace, bow" (axes break shields, maces beat plate, spears reach 2 cells, swords all-round, bows ranged); Q-A "1 weapon + 4 moves" (one weapon action from gear, four learnt moves, no item slot until items exist; 10 actions total cap).
+Changes: #121, #126 (weapon action replaces attack), #127 (shields, axes split them).
+
+## 2026-10-15 · D-095 · Director · XP from fights: surviving plus kills
+Changes: #125. Director 2026-10-15; his exact words are not recorded in the PR.
+
+## 2026-10-15 · D-094 · Director · Levels matter: small growth and new moves per level
+Changes: #120. Director 2026-10-15; his exact words are not recorded in the PR.
+
+## 2026-10-15 · D-093 · Director · UI and map colours are look B palette references
+Why: The director approved the look B colours on the real screens (D-085).
+Changes: #115 (one Palette lookup, `look_ui.json`, enforced by the look suite).
+
+## 2026-10-15 · D-092 · Director · MERCS gets its own pixel typeface
+Words: "yeah better to make a unique one" (after "consider using the same font my afl game uses"); grit in headings.
+Changes: MERCS Ledger, Regular + Display, original and owned (#116). `06_STYLE_ART.md` §7 still names two OFL faces and is due a wording fix.
+
+## 2026-10-15 · D-091 · Director · Combat depth is the first depth pass
+Why: Combat is where the mercs are seen; weapons, armour, morale, surrender and blood come before more systems.
+Changes: `docs/plans/phase4_combat.md` (#114); the combat rulings are D-096..D-102; the non-psychic enemy is #122.
+
 ## 2026-10-15 · D-090 · Director · Parallel Godot runs allowed; more builders when work is independent
 Words: "use as many godots as you want dont bottleneck yourself"; "build faster ... summon more builders if you need". Earlier the same night: "STOP OPENING GODOT", lifted with "OK GODOT is all yours".
 Why: Speed; one Godot per agent was the bottleneck.
@@ -282,111 +369,4 @@ Changes: `CLAUDE.md`, `03_TEAM_WORKFLOW.md`, `HANDOFF_TEMPLATE.md`, `MERGE_CI_AG
 Why: director's answer. Reaction scenes (one to three voices from traits and memories, with morale and loyalty consequences; an unpopular pick can cause a departure) are Phase 5 content; the appointment flag ships in Phase 2.
 Changes: `08_ROADMAP.md` Phases 2, 4, 5; `data/balance/captaincy.json` when created.
 
-## 2026-10-08 · D-024 · Director · A campaign starts with a small inherited company and a sitting captain (Q14)
-Why: director's answer. Keeps the captain mortal from the first hour; a short authored opening is Phase 8 content.
-Changes: `08_ROADMAP.md` Phases 2 and 8.
-
-## 2026-10-08 · D-023 · Director (clarified by Concept Lead; ratified with Q13–Q14) · The Three Pillars brief is integrated: the company is the player, the captain is a mortal office with succession, a company chronicle persists every member, down is not dead until triage, retreat is legitimate, regional recruitment pools, no rarity labels
-Why: the director added `Mercenary_Collector_Three_Pillars_Claude_Brief.docx` to the repo on 2026-10-08; it extends the original brief and conflicts with nothing in the pack. Both briefs now live in `docs/source-briefs/`.
-Changes: `00_VISION.md` (new section and additions table), `04_GUARDRAILS.md` A9, `08_ROADMAP.md` Phases 2–8, `11_OPEN_QUESTIONS.md` Q13–Q14, `12_SOURCES.md`. Director answers Q13 and Q14 before Phase 2.
-
-## 2026-10-08 · D-022 · Director · The Merge & CI agent may run `gh pr merge`
-Why: Claude Code's auto-mode classifier refused the merge agent's `gh pr merge` as "Merge Without Review", leaving the director to merge by hand. The director chose a shared allow rule over per-merge prompts or manual merges.
-Changes: `.claude/settings.json` (shared) allows only `gh pr merge`. All other review guards stand: PR required, green `test`, template, director look gates, audit comments.
-
-## 2026-10-08 · D-021 · Concept Lead · Phase 0 review rulings
-Why: the first six PRs exposed gaps in the pack, found by the Concept Lead's pre-merge audit.
-1. **No `Rng` autoload.** Sim code must not depend on autoloads (guardrail B3), so the random
-   stream wrapper is a RefCounted class `Rng` in `sim/core/rng.gd`, constructed from the seed in
-   the save model. The autoload list is five: `GameData`, `EventBus`, `SaveSystem`, `Settings`,
-   `Debug`. `05_STYLE_CODE.md` and `04_GUARDRAILS.md` B8 amended; PR #4 drops the autoload.
-2. **File names are snake_case** (`rng.gd`, `merc_gen.gd`); class names PascalCase. The layout
-   listing in `05_STYLE_CODE.md` is corrected; lints grep `rng.gd`.
-3. **Worktrees may live under `../MERCS-wt/<topic>` or the app's `.claude/worktrees/`.** The
-   four-worktree cap counts both. Guardrail C1 and `CLAUDE.md` amended.
-4. **Decision ids are assigned at merge.** A PR writes `D-TBD-<slug>`; the Merge & CI agent
-   assigns the next free number when it merges and fixes references in the same squash. This ends
-   the id collisions seen across PRs #1, #2 and #3.
-5. **Doc caps** are enforced by the `doc-caps` job in `lint.yml` (inline), not a `doc_caps.py`
-   script; it must also check `CLAUDE.md` at 120 lines. Docs amended.
-6. **Build artefact retention** is 30 days (PR #4), docs amended.
-7. **Agent-authored decisions** that clarify a director answer are attributed
-   "Director (clarified by <agent>, from Qn)"; a decision with no question trail is
-   "<agent> (pending director ratification)".
-8. **Sim never references any autoload, including `EventBus`.** The `LAYER-AUTOLOAD` lint rule
-   in PR #5 is correct. Sim objects expose their own signals or return typed event lists;
-   presentation relays them onto `EventBus`. `05_STYLE_CODE.md` amended.
-9. **The project lints must run in CI before the gate.** `lint.yml` gains a job that runs
-   `bash tools/lint/run_all.sh` (PR #1 or a follow-up to #5); until then guardrails A2, B3, B9
-   and B12 enforce nothing.
-Changes: `03_TEAM_WORKFLOW.md`, `04_GUARDRAILS.md`, `05_STYLE_CODE.md`, `09_REPO_AND_HOSTING.md`,
-`CLAUDE.md`, `MERGE_CI_AGENT.md`; `docs/audits/phase0_gate_plan.md` and
-`docs/specs/phase1_visual_proof.md` added.
-
-## 2026-10-08 · D-020 · Director · ChatGPT is removed from the team; document upkeep and the weekly summary belong to the Merge & CI agent
-Why: director's instruction.
-Changes: `README.md`, `03_TEAM_WORKFLOW.md`, `04_GUARDRAILS.md` C3, `MERGE_CI_AGENT.md`, `KICKOFF_PROMPTS.md`; `agent-briefs/CHATGPT_DOCS.md` deleted. D-006 is amended accordingly.
-
-## 2026-10-08 · D-019 · Director · Repo is public (Q-BP). Reverses D-011.
-Why: GitHub Free refuses branch protection on private repos; director chose public over paying for Pro. Merge & CI flagged that this exposes design docs, history and every future commit, and that `gitleaks` plus the licensing register become the only guard on what ships in the open.
-Changes: STATUS.md item 1; `09_REPO_AND_HOSTING.md` ("make it private" no longer applies). No banned or PENDING-licence asset may enter `assets/` while public.
-
-## 2026-10-08 · D-018 · Director (clarified by Art agent, from Q12) · The "Pixel-ART Style (Pony)" file is removed and its register row dropped
-Why: the file was a saved web page from a failed PixAI download (137 KB of HTML), not a model.
-Changes: `10_LICENSING_REGISTER.md` row removed; file sent to the Recycle Bin.
-
-## 2026-10-08 · D-017 · Art agent (pending director ratification) · The two Civitai-only models stay PENDING (concept only) because Civitai is region-blocked here
-Why: Civitai answers `REGION_BLOCKED` from this machine, so the permissions block cannot be read. Sprites are rendered (D-002), so these were only ever concept tools.
-Changes: `10_LICENSING_REGISTER.md` rows for `pixelArtDiffusionXL_spriteShaper` and the sprite-sheet LoRA carry the hash and the reason; neither may ship or train the portrait LoRA.
-
-## 2026-10-08 · D-016 · Director (clarified by Art agent, from Q12) · Uninstall four Unity editors; keep 6000.3.23f1
-Why: five editors were installed, not four; the director's Orc-Survivor project uses 6000.3.23f1. Clarifies D-015.
-Changes: `02_MACHINE_AND_LOCAL_AI.md` and `tools/machine_profile.json` list one remaining Unity editor.
-
-## 2026-10-08 · D-015 · Director · Banned Qwen-Image 2.1 files, Realistic Vision and the four unused Unity installs may be deleted (Q12)
-Changes: STATUS.md item 5 is unblocked; the Art agent deletes rather than quarantines.
-
-## 2026-10-08 · D-014 · Director · Tripo is available: 25,000 credits exist; any session that would spend more than 500 credits asks first (Q11)
-Why: director's instruction. Cloud GPU hours and LFS overage remain unapproved until asked.
-Changes: `CLAUDE.md` rule 8, `02_MACHINE_AND_LOCAL_AI.md`, `07_ASSET_PIPELINE.md`, `10_LICENSING_REGISTER.md` (paid tier: full rights, no attribution), `ART_AGENT.md`. The base body stays CC0 (D-002); Tripo serves equipment, props and concept meshes.
-
-## 2026-10-08 · D-013 · Director · Roster cap in the slice is twelve, six deployed (Q10)
-
-## 2026-10-08 · D-012 · Director · Square grid, eight facings (Q3). Ratifies D-005.
-
-## 2026-10-08 · D-011 · Director · Repo is private (Q2). Ratifies D-007.
-
-## 2026-10-08 · D-010 · Director · PC first, mouse and keyboard, Steam (Q1)
-Changes: UI rules in `06_STYLE_ART.md` §7 and `05_STYLE_CODE.md` assume hover and right-click inspect.
-
-## 2026-10-08 · D-001 · Concept Lead (pending director ratification) · Engine is Godot 4.7.2, GDScript static-typed
-Why: MIT licence, headless CLI, text scenes, existing team tooling from the AFL project.
-Changes: `01_ENGINE_DECISION.md`. Unity installs unused.
-
-## 2026-10-08 · D-002 · Concept Lead (pending) · Characters are rendered from one CC0 base body with modular equipment; no diffusion sprite frames
-Why: consistency by construction, no per-character generation cost, no licence exposure.
-Changes: `06_STYLE_ART.md`, `07_ASSET_PIPELINE.md`. Overrides the brief's Tripo-first character path.
-
-## 2026-10-08 · D-003 · Concept Lead (pending) · Qwen-Image 2.1 and Anima are BANNED from the product
-Why: research-only and non-commercial licences.
-Changes: `10_LICENSING_REGISTER.md`. The Art agent moves the files out of the models root in Phase 0.
-
-## 2026-10-08 · D-004 · Concept Lead (pending) · Portraits are the only shipped generative asset, from CLEARED models with a project-trained style LoRA
-Why: close-up payoff needs richness the sprite pipeline cannot give; a style LoRA and validator keep it consistent.
-Changes: `06_STYLE_ART.md` §5.
-
-## 2026-10-08 · D-005 · Concept Lead (pending) · Square grid, eight facings, shared between overworld and battle
-Why: one facing set; see `11_OPEN_QUESTIONS.md` Q3 for the director's call.
-
-## 2026-10-08 · D-006 · Concept Lead (pending) · Team is three Claude Code chats (Dev Lead Opus, Merge & CI Sonnet, Art Factory Opus); no idle-monitoring crons; document caps enforced in CI. (Amended by D-020: ChatGPT removed.)
-Why: AFL lessons: coordination load, idle agents, 6,600-line roadmap.
-Changes: `03_TEAM_WORKFLOW.md`, `04_GUARDRAILS.md`.
-
-## 2026-10-08 · D-007 · Concept Lead (pending) · Private mono-repo with LFS; vault on D:
-Why: `09_REPO_AND_HOSTING.md`.
-
-## 2026-10-08 · D-008 · Concept Lead (pending) · Generative video and the Three.js lab are parked until after Phase 8
-Why: 12 GB VRAM; no production need in the slice; fewer runtimes.
-
-## 2026-10-08 · D-009 · Concept Lead (pending) · No spend without a decision entry
-Why: director's instruction.
+Older entries (D-001 to D-024, 2026-10-08) are in `docs/archive/decisions_001_024.md`.
