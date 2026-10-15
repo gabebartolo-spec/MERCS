@@ -3,7 +3,7 @@
 One line per knob (docs/05_STYLE_CODE.md "Data"). Read by `sim/merc/company.gd` and `sim/merc/merc.gd` (Phase 2 M3).
 
 ## roster
-- `cap`: the most mercenaries the company can hold (vision: twelve). Every way of adding a merc obeys it; a deployment is smaller (battle.json).
+- `cap`: the most mercenaries the company can hold: eight (director 2026-10-16, "Company cap 8", Phase 5 C7; was the vision's twelve). Every way of adding a merc obeys it. Up to six deploy (the scenario's six `road_cells`, Q-2) and the rest wait in reserve.
 
 ## xp
 - `level_xp`: the experience a merc needs to reach each level, cumulative and rising: the first entry is level 1 (0), the second level 2, and so on. The last entry's level is the highest. One bar, filled by fighting and by story (vision, "Growth"); fights give most of it (below), storylets a small extra.

@@ -1,5 +1,5 @@
 {
-  "_comment": "Phase 2 M2 encounters on the road, by type (read by sim/world/world_sim.gd; the numbers are in data/balance/world.json 'encounters'). An ambush starts the fight at once with the enemy acting first; a patrol offers a fight or a toll. Each line-up is one possible set of enemies, rolled when the encounter is raised; cells are on the battle grid of scn_slice_loop (the company stands on its company_cells). Fighters name entries in data/balance/battle.json. Schema: data/schema/encounters.schema.json.",
+  "_comment": "Phase 2 M2 encounters on the road, by type (read by sim/world/world_sim.gd; the numbers are in data/balance/world.json 'encounters'). An ambush starts the fight at once with the enemy acting first; a patrol offers a fight or a toll. Each line-up is one possible set of enemies, rolled on the 'encounter' stream when the encounter is raised from those its place and day allow (Phase 5 C7, director: chosen by place and day, never by the company's strength): a plain list stands anywhere on any day; an object's optional 'places' (the terrain of the band's tile: road, plain, forest, hill) and 'from_day' (the first day it can come) narrow it, its 'fighters' are the list. Soldiers come 4-8 a fight, rabble (battle.json fighters marked 'rabble') 12-16 (data/caps.json enemies_soldiers, enemies_rabble). PLACEHOLDERS for the lead: every line-up, place and day here; cells are on the battle grid of scn_slice_loop (the company stands on its company_cells). Fighters name entries in data/balance/battle.json. Schema: data/schema/encounters.schema.json.",
   "encounters": [
     {
       "id": "enc_ambush",
@@ -7,14 +7,70 @@
       "enemy_first": true,
       "lineups": [
         [
-          { "fighter": "bandit", "cell": [4, 2] },
-          { "fighter": "bandit", "cell": [4, 6] }
+          {"fighter": "bandit", "cell": [4, 2]},
+          {"fighter": "bandit", "cell": [4, 6]},
+          {"fighter": "bandit", "cell": [5, 3]},
+          {"fighter": "bandit", "cell": [5, 5]}
         ],
         [
-          { "fighter": "bandit_chief", "cell": [5, 4] },
-          { "fighter": "bandit", "cell": [4, 2] },
-          { "fighter": "bandit", "cell": [4, 6] }
-        ]
+          {"fighter": "bandit_chief", "cell": [6, 4]},
+          {"fighter": "bandit", "cell": [4, 2]},
+          {"fighter": "bandit", "cell": [4, 6]},
+          {"fighter": "bandit", "cell": [5, 3]},
+          {"fighter": "bandit_spearman", "cell": [5, 5]}
+        ],
+        {
+          "from_day": 8,
+          "fighters": [
+            {"fighter": "bandit_chief", "cell": [6, 4]},
+            {"fighter": "bandit", "cell": [4, 1]},
+            {"fighter": "bandit", "cell": [4, 3]},
+            {"fighter": "bandit", "cell": [4, 5]},
+            {"fighter": "bandit", "cell": [4, 7]},
+            {"fighter": "bandit", "cell": [5, 4]},
+            {"fighter": "bandit_spearman", "cell": [5, 2]},
+            {"fighter": "bandit_spearman", "cell": [5, 6]}
+          ]
+        },
+        {
+          "places": ["forest", "hill"],
+          "fighters": [
+            {"fighter": "peasant_mob", "cell": [4, 1]},
+            {"fighter": "starving_brigand", "cell": [4, 2]},
+            {"fighter": "peasant_mob", "cell": [4, 3]},
+            {"fighter": "starving_brigand", "cell": [4, 4]},
+            {"fighter": "peasant_mob", "cell": [4, 5]},
+            {"fighter": "starving_brigand", "cell": [4, 6]},
+            {"fighter": "peasant_mob", "cell": [5, 1]},
+            {"fighter": "starving_brigand", "cell": [5, 2]},
+            {"fighter": "peasant_mob", "cell": [5, 3]},
+            {"fighter": "starving_brigand", "cell": [5, 4]},
+            {"fighter": "peasant_mob", "cell": [5, 5]},
+            {"fighter": "starving_brigand", "cell": [5, 6]}
+          ]
+        },
+        {
+          "places": ["forest", "hill"],
+          "from_day": 8,
+          "fighters": [
+            {"fighter": "cultist", "cell": [4, 0]},
+            {"fighter": "peasant_mob", "cell": [4, 1]},
+            {"fighter": "cultist", "cell": [4, 2]},
+            {"fighter": "peasant_mob", "cell": [4, 3]},
+            {"fighter": "cultist", "cell": [4, 4]},
+            {"fighter": "peasant_mob", "cell": [4, 5]},
+            {"fighter": "cultist", "cell": [4, 6]},
+            {"fighter": "peasant_mob", "cell": [4, 7]},
+            {"fighter": "cultist", "cell": [5, 0]},
+            {"fighter": "peasant_mob", "cell": [5, 1]},
+            {"fighter": "cultist", "cell": [5, 2]},
+            {"fighter": "peasant_mob", "cell": [5, 3]},
+            {"fighter": "cultist", "cell": [5, 4]},
+            {"fighter": "peasant_mob", "cell": [5, 5]},
+            {"fighter": "cultist", "cell": [5, 6]},
+            {"fighter": "peasant_mob", "cell": [5, 7]}
+          ]
+        }
       ]
     },
     {
@@ -23,14 +79,29 @@
       "enemy_first": false,
       "lineups": [
         [
-          { "fighter": "watchman", "cell": [9, 3] },
-          { "fighter": "watchman", "cell": [9, 5] }
+          {"fighter": "watchman", "cell": [8, 3]},
+          {"fighter": "watchman", "cell": [8, 5]},
+          {"fighter": "watchman", "cell": [9, 2]},
+          {"fighter": "watchman", "cell": [9, 6]}
         ],
         [
-          { "fighter": "watch_sergeant", "cell": [10, 4] },
-          { "fighter": "watchman", "cell": [9, 3] },
-          { "fighter": "watchman", "cell": [9, 5] }
-        ]
+          {"fighter": "watch_sergeant", "cell": [10, 4]},
+          {"fighter": "watchman", "cell": [8, 3]},
+          {"fighter": "watchman", "cell": [8, 5]},
+          {"fighter": "watchman", "cell": [9, 2]},
+          {"fighter": "watchman", "cell": [9, 6]}
+        ],
+        {
+          "from_day": 8,
+          "fighters": [
+            {"fighter": "watch_sergeant", "cell": [10, 4]},
+            {"fighter": "watchman", "cell": [8, 2]},
+            {"fighter": "watchman", "cell": [8, 4]},
+            {"fighter": "watchman", "cell": [8, 6]},
+            {"fighter": "watchman", "cell": [9, 3]},
+            {"fighter": "watchman", "cell": [9, 5]}
+          ]
+        }
       ]
     },
     {
@@ -39,10 +110,24 @@
       "enemy_first": false,
       "lineups": [
         [
-          { "fighter": "bandit_chief", "cell": [5, 4] },
-          { "fighter": "bandit", "cell": [4, 2] },
-          { "fighter": "bandit", "cell": [4, 6] }
-        ]
+          {"fighter": "bandit_chief", "cell": [6, 4]},
+          {"fighter": "bandit", "cell": [4, 2]},
+          {"fighter": "bandit", "cell": [4, 6]},
+          {"fighter": "bandit", "cell": [5, 3]},
+          {"fighter": "bandit", "cell": [5, 5]}
+        ],
+        {
+          "from_day": 8,
+          "fighters": [
+            {"fighter": "bandit_chief", "cell": [6, 4]},
+            {"fighter": "bandit", "cell": [4, 2]},
+            {"fighter": "bandit", "cell": [4, 4]},
+            {"fighter": "bandit", "cell": [4, 6]},
+            {"fighter": "bandit", "cell": [5, 3]},
+            {"fighter": "bandit", "cell": [5, 5]},
+            {"fighter": "bandit_spearman", "cell": [6, 2]}
+          ]
+        }
       ]
     },
     {
@@ -51,10 +136,28 @@
       "enemy_first": true,
       "lineups": [
         [
-          { "fighter": "bandit", "cell": [4, 2] },
-          { "fighter": "bandit", "cell": [4, 4] },
-          { "fighter": "bandit", "cell": [4, 6] }
-        ]
+          {"fighter": "bandit", "cell": [4, 2]},
+          {"fighter": "bandit", "cell": [4, 4]},
+          {"fighter": "bandit", "cell": [4, 6]},
+          {"fighter": "bandit", "cell": [5, 3]}
+        ],
+        {
+          "places": ["plain", "forest"],
+          "fighters": [
+            {"fighter": "deserter", "cell": [4, 1]},
+            {"fighter": "starving_brigand", "cell": [4, 2]},
+            {"fighter": "deserter", "cell": [4, 3]},
+            {"fighter": "starving_brigand", "cell": [4, 4]},
+            {"fighter": "deserter", "cell": [4, 5]},
+            {"fighter": "starving_brigand", "cell": [4, 6]},
+            {"fighter": "deserter", "cell": [5, 1]},
+            {"fighter": "starving_brigand", "cell": [5, 2]},
+            {"fighter": "deserter", "cell": [5, 3]},
+            {"fighter": "starving_brigand", "cell": [5, 4]},
+            {"fighter": "deserter", "cell": [5, 5]},
+            {"fighter": "starving_brigand", "cell": [5, 6]}
+          ]
+        }
       ]
     },
     {
@@ -63,8 +166,10 @@
       "enemy_first": false,
       "lineups": [
         [
-          { "fighter": "bandit_chief", "cell": [5, 4] },
-          { "fighter": "bandit", "cell": [4, 4] }
+          {"fighter": "bandit_chief", "cell": [5, 4]},
+          {"fighter": "bandit", "cell": [4, 3]},
+          {"fighter": "bandit", "cell": [4, 5]},
+          {"fighter": "bandit", "cell": [5, 2]}
         ]
       ]
     },

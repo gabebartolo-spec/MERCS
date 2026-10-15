@@ -1,7 +1,7 @@
 {
   "_comment": "The company and its one experience bar (Phase 2 milestone 3). Read by sim/merc/company.gd; company.md explains each knob.",
   "roster": {
-    "cap": 12
+    "cap": 8
   },
   "xp": {
     "level_xp": [0, 9, 25, 45, 70],
