@@ -58,8 +58,9 @@ static func company_cells(scenario: Dictionary) -> Array[Vector2i]:
 
 ## What WorldSim.resolve_encounter() takes: {"won": bool, "surrendered": bool, "prisoners":
 ## [enemy ids taken by the company], "fled": [enemy ids who ran], "captured": [company ids taken
-## by the enemy]}. A surrender ends the fight with the enemy's men alive: they are the
-## prisoners the hub's decision is about (Phase 4, director ruling Q-C).
+## by the enemy], "fallen_gear": the battle classes the enemy's fallen carried (Loot, Phase 5
+## C6)}. A surrender ends the fight with the enemy's men alive: they are the prisoners the hub's
+## decision is about (Phase 4, director ruling Q-C).
 static func result(battle: Battle) -> Dictionary:
 	var won := battle.is_over() and battle.winner == BattleUnit.COMPANY
 	var by_company := battle.routed == BattleUnit.ENEMY
@@ -69,8 +70,22 @@ static func result(battle: Battle) -> Dictionary:
 		"surrendered": battle.surrendered == BattleUnit.ENEMY,
 		"prisoners": battle.prisoners.duplicate() if by_company else [],
 		"fled": battle.fled.duplicate() if by_company else [],
-		"captured": battle.prisoners.duplicate() if taken else []
+		"captured": battle.prisoners.duplicate() if taken else [],
+		Loot.FALLEN_GEAR: fallen_gear(battle),
 	}
+
+
+## The battle classes the enemy's fallen carried, weapon then armour, enemy by enemy (Phase 5
+## C6: what loot is drawn from). The fled and the prisoners are not fallen.
+static func fallen_gear(battle: Battle) -> Array[String]:
+	var carried: Array[String] = []
+	for unit: BattleUnit in battle.units:
+		if unit.side != BattleUnit.ENEMY or not unit.down:
+			continue
+		for named: String in [unit.weapon_class, unit.armour_class]:
+			if named != "":
+				carried.append(named)
+	return carried
 
 
 ## The enemy's men the company took prisoner in a result() ([] when none or when absent).
