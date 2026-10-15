@@ -2,8 +2,9 @@ extends RefCounted
 ## The battle suite's reach checks (Phase 4 P1c; director 2026-10-16: "Build ranged next",
 ## spears "Yes, 2 cells", hit over a friend's shoulder), run by tests/run_battle_tests.gd: the
 ## straight line between two cells (BattleGrid.line_clear) is stopped by walls and props, never
-## by a fighter, and reads the same both ways; a bow shoots a foe within its reach (battle.json
-## "rules" "actions" "weapon" "bow" "reach") over anyone's head and is refused past it or
+## by a fighter, and reads the same both ways; a diagonal step between two walls is stopped,
+## as a man's step is (a corner gap, a staircase wall); a bow shoots a foe within its reach
+## (battle.json "rules" "actions" "weapon" "bow" "reach") over anyone's head, refused past it or
 ## through a wall; a spear strikes over an ally's shoulder two cells off, never through a wall;
 ## Battle.targets names exactly the foes the weapon action can strike now; the enemy shoots
 ## and thrusts from reach at what it sees and never at what it cannot (rule 6); a bow fight
@@ -23,6 +24,7 @@ var _check: Callable
 func run(check: Callable) -> void:
 	_check = check
 	_check_lines()
+	_check_corners()
 	_check_bow_reach()
 	_check_bow_walls()
 	_check_spear_over_ally()
@@ -89,6 +91,35 @@ func _check_lines() -> void:
 			+ (
 				"between two cells passes if either is open and reads the same both ways: %s"
 				% [[straight_blocked, around, beside, both_ways, squeezed, next_to]]
+			)
+		)
+	)
+
+
+## Lead's ruling on review of #139: a diagonal step of the line between two walls (both side
+## cells walled, the rule BattleGrid.steps_from holds a man to) stops it: a corner gap, a
+## staircase wall. One side open lets it through, as it lets a man.
+func _check_corners() -> void:
+	var grid := BattleGrid.new()
+	grid.setup({"size": GRID, "blocked": {Vector2i(2, 1): true, Vector2i(1, 2): true}})
+	var gap_shut := not grid.line_clear(Vector2i(1, 1), Vector2i(3, 3))
+	var gap_back := not grid.line_clear(Vector2i(3, 3), Vector2i(1, 1))
+	grid.setup({"size": GRID, "blocked": {Vector2i(2, 1): true}})
+	var one_open := grid.line_clear(Vector2i(1, 1), Vector2i(3, 3))
+	var stairs := {}
+	for i: int in 6:
+		stairs[Vector2i(5 - i, i)] = true
+	grid.setup({"size": GRID, "blocked": stairs})
+	var stairs_shut := not grid.line_clear(Vector2i(1, 1), Vector2i(4, 4))
+	var archer := _armed("c", BattleUnit.COMPANY, Vector2i(1, 1), "bow")
+	var shot := _struck(_battle([archer, _target(Vector2i(4, 4))], stairs), "bow")
+	_check.call(
+		gap_shut and gap_back and one_open and stairs_shut and not shot,
+		(
+			"a line through a corner gap or a staircase wall is stopped both ways, one open side "
+			+ (
+				"lets it pass, and the bow's shot through the stairs is refused: %s"
+				% [[gap_shut, gap_back, one_open, stairs_shut, not shot]]
 			)
 		)
 	)

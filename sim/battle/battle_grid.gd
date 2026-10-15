@@ -78,18 +78,44 @@ func is_free(cell: Vector2i, units: Array[BattleUnit]) -> bool:
 ## True when the straight line from a to b crosses no wall or prop and stays on the field (a
 ## bow's shot, a spear's thrust; Phase 4 P1c, director 2026-10-16: walls stop arrows and
 ## spears, no fighter does). The line steps one cell along the longer axis at a time and takes
-## the nearest cell on the other; where it runs exactly between two cells it passes if either
-## is open, so a line reads the same both ways. The end cells are not checked.
+## the nearest cell on the other; where it runs exactly between two cells it may take either
+## that is open. A diagonal step between two walls (both side cells walled, as steps_from holds
+## a man) stops it too: a corner gap or a staircase wall (lead's ruling on review of #139).
+## The line reads the same both ways. The end cells are not checked.
 func line_clear(a: Vector2i, b: Vector2i) -> bool:
 	var steps := gap(a, b)
-	for i: int in range(1, steps):
-		var open := false
-		for x: int in _crossed(a.x, b.x - a.x, i, steps):
-			for y: int in _crossed(a.y, b.y - a.y, i, steps):
-				open = open or _open(Vector2i(x, y))
-		if not open:
+	var here: Array[Vector2i] = [a]
+	for i: int in range(1, steps + 1):
+		var next: Array[Vector2i] = []
+		for cell: Vector2i in _line_cells(a, b, i):
+			if (i == steps or _open(cell)) and _passes(here, cell):
+				next.append(cell)
+		if next.is_empty():
 			return false
+		here = next
 	return true
+
+
+## The cells the line from a to b may stand on at step i (one, or two when exactly halfway).
+func _line_cells(a: Vector2i, b: Vector2i, i: int) -> Array[Vector2i]:
+	var steps := gap(a, b)
+	var out: Array[Vector2i] = []
+	for x: int in _crossed(a.x, b.x - a.x, i, steps):
+		for y: int in _crossed(a.y, b.y - a.y, i, steps):
+			out.append(Vector2i(x, y))
+	return out
+
+
+## True when the line can step to cell from one of the cells it may stand on: a straight step,
+## or a diagonal one with at least one side cell open.
+func _passes(from_cells: Array[Vector2i], cell: Vector2i) -> bool:
+	for from: Vector2i in from_cells:
+		var step := cell - from
+		if step.x == 0 or step.y == 0:
+			return true
+		if _open(from + Vector2i(step.x, 0)) or _open(from + Vector2i(0, step.y)):
+			return true
+	return false
 
 
 func _open(cell: Vector2i) -> bool:
