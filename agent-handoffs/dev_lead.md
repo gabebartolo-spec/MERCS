@@ -45,8 +45,8 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
   (no F-keys: M map, C company, L loop, H help, G frame time; smoke fails on KEY_F).
 - Walkable overworld (Opus): p2-walk, claude/p2-overworld-walk. Told: SliceKeys, slice_game <=400.
 - #87 M6 hub/economy MERGED (hub on B; economy inside the company save block; review PASS).
-- Board PR (Sonnet): `../MERCS-wt/board`, claude/board-1015: today's decisions + dated chapter
-  docs/brainstorms/2026-10-15-director-comments.md. Lead merges when green.
+- #88 board MERGED (D-072..D-081, docs/brainstorms/2026-10-15-director-comments.md). Name board
+  branches claude/board-after-<n> or merge_eligibility refuses them.
 - Rejected tools today: Rucol GAN (no licence), gmattie Data-Pixels (hand-typed pixels, no use).
 - M7 storylet+memory (Sonnet): p2-m7, claude/p2-m7-storylet.
 - Wiring (Sonnet): slice-m1, claude/p2-wiring (company fights road, hit->injury, triage panel).
@@ -79,7 +79,7 @@ data 96, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 13, slice 15,
 loop 4, sim_world 9, save 7, effect 4, overworld 8.
 
 ## Worktrees (5 / 4, director allows forced removal of finished ones)
-p2-walk, p2-m7, slice-m1 (wiring), art-look, board. Remove each when its PR merges.
+p2-walk, p2-m7, slice-m1 (wiring), art-look (4/4). Remove each when its PR merges.
 
 ## Co-lead playbook
 playbook: nothing new (2026-10-15; no worker findings yet).
