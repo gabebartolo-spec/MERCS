@@ -28,6 +28,8 @@ func run(check: Callable) -> void:
 	_share_is_owed_wages()
 	_dues_round_trip()
 	_old_save()
+	_dead_wages_forfeit()
+	_abandon_pays_no_share()
 
 
 func _company() -> Company:
@@ -233,4 +235,57 @@ func _old_save() -> void:
 	_check.call(
 		economy.pay_wages() and economy.owed == 0 and economy.payroll.dues.is_empty(),
 		"and paying clears the old debt with the new"
+	)
+
+
+## Director 2026-10-16: a merc who dies owing wages is not paid them; the company stops owing them
+## (the debt falls by his dues, the rest stands), also through a save and reload (JSON).
+func _dead_wages_forfeit() -> void:
+	var company := _company()
+	var economy := company.economy
+	var rng := Rng.from_seed(SEED)
+	for day: int in [1, 2]:
+		economy.on_day(company.roster, day, SITES, rng)
+	var orc_owed := Merc.whole(economy.payroll.dues.get("orc", 0))
+	var before := economy.owed
+	company.bury("orc")
+	_check.call(
+		orc_owed > 0 and economy.owed == before - orc_owed and not economy.payroll.dues.has("orc"),
+		(
+			"a dead merc's unpaid wages are forfeit: debt %d -> %d (he was owed %d)"
+			% [before, economy.owed, orc_owed]
+		)
+	)
+	var parsed: Variant = JSON.parse_string(JSON.stringify(company.state()))
+	var saved: Dictionary = parsed if parsed is Dictionary else {}
+	var reloaded := Company.restore(saved, Fixture.defs())
+	_check.call(
+		reloaded.economy.owed == economy.owed and not reloaded.economy.payroll.dues.has("orc"),
+		"the forfeit survives a save and reload"
+	)
+	economy.purse = economy.owed
+	_check.call(
+		economy.pay_wages() and economy.purse == 0,
+		"paying the debt costs the living only what they are owed"
+	)
+
+
+## Director 2026-10-16: when the company abandons a job and keeps the advance, the mercs get no
+## share of it: nothing is owed to any man, the purse keeps the advance.
+func _abandon_pays_no_share() -> void:
+	var company := _company()
+	var economy := company.economy
+	economy.refresh_board(0, SITES, Rng.from_seed(SEED))
+	var id := str(economy.board[0].get("id", ""))
+	economy.accept(id)
+	economy.board[0]["advance"] = Merc.whole(economy.board[0].get("reward", 0)) / 2
+	var purse := economy.purse
+	var owed := economy.owed
+	economy.abandon(id, company, 1)
+	_check.call(
+		economy.payroll.dues.is_empty() and economy.owed == owed and economy.purse == purse,
+		(
+			"abandoning a job gives the mercs no share of the kept advance (owed %d, dues %s)"
+			% [economy.owed, economy.payroll.dues]
+		)
 	)
