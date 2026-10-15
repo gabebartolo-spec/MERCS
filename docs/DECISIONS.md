@@ -4,6 +4,38 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
+## 2026-10-14 · D-071 · Director · Project Architect 3.0 adopted as the team structure for Phase 2
+Why: coder subagents own edit/build/test loops, retriever subagents handle reads over 300 lines, a fixed short return contract, a scripted merge-eligibility check, restart from handoff at about 150k. Rejected: keep-warm, critic agent, per-tool hooks, memory-file sprawl, Haiku.
+Changes: `agent-briefs/DEV_LEAD_OPUS.md`, `agent-briefs/MERGE_CI_AGENT.md`.
+
+## 2026-10-14 · D-070 · Director · The roadmap rewrite (board item 18, reshaped) is assigned to the Concept Lead
+Why: director, 2026-10-14, after the horizontal-slice interview. Done in #74.
+Changes: `docs/08_ROADMAP.md`.
+
+## 2026-10-14 · D-069 · Director · Phase 9 (vertical slice and success test) stays as the depth gate after the horizontal slice
+Why: the old Phases 2 to 7 are depth passes after Phase 2, in the order the director sets at the Phase 2 gate.
+Changes: `docs/08_ROADMAP.md`.
+
+## 2026-10-14 · D-068 · Director · No art credits spent this session (2026-10-14)
+Why: content and architecture first.
+
+## 2026-10-14 · D-067 · Director · Left out of the baseline: promotion lines and stage looks; trade, crafting, gladiator events; weather, rain and night; portraits and the final UI
+
+## 2026-10-14 · D-066 · Director · Phase 2 caps
+Why: 6 mercs at stage 1; one region, one hub, two or three hamlets, two or three procedural sites, two factions; wages and supplies as drain, contracts and loot (coin, supplies, generic equipment equipped for stats in a few slots, sprite and portrait unchanged) as income, amending the vision's "no general gear is shared between mercs" while the look rule holds; combat skeleton plus one terrain feature; the whole injury ladder, one of each, triage, death, chronicle; hire at the hub plus one prisoner choice (release, ransom, execute, recruit), captain's office and succession; one storylet plus the memory system; a player-effect fixture is the entry condition of every milestone.
+Changes: `docs/08_ROADMAP.md` Phase 2, `docs/00_VISION.md` gear-line bullet, Q18, Q21, Q22.
+
+## 2026-10-14 · D-065 · Director · Phase 2 starts now on placeholder sprites, in parallel with Phase 1; the look gate is signed when art lands
+Why: the cast is not needed to prove structure. Amends the roadmap's phase-order rule for Phase 1 only.
+
+## 2026-10-14 · D-064 · Director · One breadth phase (Phase 2) replaces the sequential proofs
+Why: dependency order; the director plays each milestone build and says carry on or wrong; one formal gate at the end (structural audit plus one play). Seams (save, tick, schemas, sim boundary) are only tested when every system talks to the others.
+Changes: `docs/08_ROADMAP.md` Phase 2; old Phases 2 to 7 become depth passes 3 to 8.
+
+## 2026-10-14 · D-063 · Director · Two goals: the vertical slice (the look) short term; the horizontal slice (a playable baseline, structurally sound, thin, not visually complete) medium term
+Why: "a playable baseline of the game ... structurally sound for us to build on".
+Changes: `docs/08_ROADMAP.md` shape.
+
 ## 2026-10-09 · D-062 · Director · Permanent injuries are considered for all spritework
 Why: director: "permanent injuries must be considered for all spritework". Injuries are separate layers on every stage, facing and clip.
 Changes: the sprite contract (Art, P1-ART-SLICE-CAST).

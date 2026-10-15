@@ -4,16 +4,16 @@ Cap: 150 lines. Edited only by the Merge & CI agent, in a board PR after each me
 merged PR's "Board and log" section (D-026, D-030). History rolls to `docs/archive/status_<month>.md`.
 
 ## Phase
-Current phase: **1 — Visual and factory proof** (Phase 0 gate PASS WITH NOTES, D-027; every Phase 0 item merged). Gate signer: Concept Lead.
+Current phase: **1 (art) and 2 (horizontal slice) in parallel (D-065)** (Phase 0 gate PASS WITH NOTES, D-027). Gate signer: Concept Lead.
 
 ## Agents
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | working | M5 loop flow (#66) and loop on screen (#67) merged; the director's F5 checkpoint build is main's `build.yml`; sprite layers compositing merged (#70, assets floor 13); next: loop presentation polish, then real layered art from Art (P1-ART-SLICE-CAST) | — | 2026-10-09 |
-| Merge & CI (Sonnet 5.5) | working | standing merge pass (D-030); board PR after each merge | — | 2026-10-08 |
-| Art Factory (Opus 5.5) | working | art route A chosen (D-059); assigned P1-ART-SLICE-CAST: the orc and the Vampyr at stage 1 (clay, gait, geared sheets with the injury starter set), branch claude/art-slice-cast in the art-publish worktree | claude/art-slice-cast | 2026-10-09 |
-| Concept Lead (Fable 5.1) | working | rewrite roadmap Phases 1 (caps, deliverables, gate), 2 and 6 for the hand-made cast (D-048) and add recommendations to Q15-Q22, the art parts after P1-ART-REFOCUS is approved; Project Architect adoption awaits the director | — | 2026-10-09 |
+| Dev Lead (Opus 5.5) | working | Phase 2 milestone 1 DONE (#75); milestone 2 in progress; awaiting the director's milestone 1 play review (F2 in the build) | claude/p2-m2-encounters | 2026-10-15 |
+| Merge & CI (Sonnet 5.5) | working | board PR after #75 (#72, #74, #75) | claude/board-after-75 | 2026-10-15 |
+| Art Factory (Opus 5.5) | awaiting director | paused; director 2026-10-15: keep Art paused, focus on the playable baseline; P1-ART-SLICE-CAST step 2 WIP on claude/art-slice-cast (art-publish worktree) | claude/art-slice-cast | 2026-10-15 |
+| Concept Lead (Fable 5.1) | working | interviewed the director on the horizontal-slice plan; roadmap rewrite (item 18) DONE in #74; leading Phase 2 under D-071 (milestone 1 in #75); next: milestone 2, travel and encounters, after the director's milestone review; Phase 2 structural audit at the gate | — | 2026-10-14 |
 
 States: working · running a check · awaiting director · blocked · available.
 
@@ -58,15 +58,20 @@ States: working · running a check · awaiting director · blocked · available.
 16. Merge & CI: sprite sheets under `assets/sprites/` are plain git (#56, D-046). DONE.
 
 17. Art Factory: P1-ART-REFOCUS, a written proposal (no renders) for making the hand-made cast: non-human builds, three stage looks per merc, bespoke gear lines, personal-detail variants for a returning playstyle, what of the current pipeline carries over, art cost for the slice and for 25 mercs; options with costs, to the director as a question; approval before any new art work. Assigned (D-051).
-18. Concept Lead: roadmap rewrite for the hand-made cast, Phases 1, 2 and 6, plus Q15-Q22 recommendations. Assigned (D-048).
+18. Concept Lead: roadmap rewrite for the hand-made cast and the horizontal-slice plan, plus Q15-Q22 recommendations. DONE (#74; D-048, D-063..D-071).
 20. Art Factory: P1-ART-SLICE-CAST, the orc and the Vampyr at stage 1: clay, gait, geared sheets with the injury starter set (D-059..D-062). Assigned.
 19. Merge & CI: vision revision (#63, D-047..D-058) merged; #61 superseded. DONE.
+
+### Phase 2 (horizontal slice, D-064)
+1. Dev Lead: milestone 1, map and world tick. DONE (#75).
+2. Dev Lead (builder): milestone 2, travel and encounters. Assigned (director 2026-10-15: start now while he plays milestone 1), branch claude/p2-m2-encounters.
 
 ## Waiting on the director
 - Confirm or change the Lead's reversible sketch calls in the slice loop (#66): a talked-down lookout slips away and the band starts shaken; a failed talk means he fights with them; the defeated cannot be recruited (pending Q21); the recruit is a placeholder until you design that cast member.
 - `data/caps.json` gains `scenarios: 1` for the slice's one scenario (#66, set by your slice goal); veto if wrong.
 - Tripo threshold (D-060): confirm in writing that the ask threshold rises from 500 to 2,000 credits per session; until then 500 stands.
-- Project Architect adoption (Concept Lead handoff).
+- Milestone 1 review: play F2 in the build; carry on or wrong.
+- Confirm or reorder milestones 3 and 4 (Concept Lead's order).
 - Mixamo: 10 of 14 clips are in the vault (D-029 sign-in); the rest wait on the director's sign-in.
 - Allow or decline deleting the unmerged, superseded remote branches `claude/p1-crisp-snap` (664434c) and `claude/p1-frame-time` (7236cdc), and `claude/p1-sheet-export-load` (d520808, superseded by #49); the permission classifier refused the first two.
 
@@ -80,7 +85,7 @@ States: working · running a check · awaiting director · blocked · available.
 0 / 10 GiB.
 
 ## Live worktrees
-4 / 4: `.claude/worktrees/dual-desktop-instances-a78d20`, `../MERCS-wt/art-proportions` (branch claude/art-freeze-c55), `../MERCS-wt/p1-stage-scale` (branch claude/p1-stage-55), `../MERCS-wt/board2` (this board PR).
+4 / 4: `../MERCS-wt/art-publish` (branch claude/art-slice-cast), `../MERCS-wt/slice-m1`, `../MERCS-wt/board` (this board PR), `../MERCS-wt/p2-m2` (branch claude/p2-m2-encounters).
 
 ## Logged for later (not assigned)
 - Phase 1, LOW, lint precision (Concept Lead review of #5): `strings.py` flags names in
