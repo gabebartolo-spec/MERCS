@@ -92,6 +92,13 @@
     "#667238",
     "#808c46"
    ]
+  },
+  {
+   "name": "verdure_mid",
+   "purpose": "grass mass: one step between verdure_1 and verdure_2, luma ~69 (director, 2026-10-16: grass B)",
+   "colours": [
+    "#40501d"
+   ]
   }
  ]
 }
