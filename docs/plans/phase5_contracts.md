@@ -297,14 +297,12 @@ the director's.
 | Q-13 | Hunters only "if you took a sizeable amount of upfront money and abandon the job" | C4; "sizeable" is Q-16 |
 | Q-14 | Lethality target 1 named death per 4 fights | C7 ledger |
 | Q-15 | Hunters grow with the grudge | C4 |
+| Q-16 | Sizeable advance = "Half the pay or more" | C4 data knob, 50% |
 
 Note on the Vision of the interview rulings above: the line "Prisoners: ransom, recruit, release,
 execute (all four)" is narrowed by Q-12 to three for this pass.
 
-## Open questions for the director (one decision each; recommended option first)
+## Open questions for the director
 
-- **Q-16 What is a "sizeable" advance (from Q-13)?** It is a data knob,
-  `economy.json` `standing.sizeable_advance`, so the number is not in code. Recommended: an
-  advance of at least half the contract's pay (stored as a percent). Other: a flat coin amount; any
-  advance above zero. Until answered the builder uses the placeholder and C4's fixture reads it
-  from data.
+None open. Q-16 "sizeable" advance: "Half the pay or more" (director 2026-10-16):
+`standing.sizeable_advance` = 50 (percent of the contract pay).
