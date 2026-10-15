@@ -8,6 +8,10 @@ const SAVE_PATH := "user://save_v1.json"
 ## The error load_game() leaves in a model when there is no save on disk.
 const ERROR_NO_FILE := "save_file_missing"
 
+## Set by whoever holds the optional blocks of the save (the story director: memories and
+## the storylets fired). Called at save time; returns {"wounds": {...}, "story": {...}}.
+var extras: Callable = Callable()
+
 
 func has_save() -> bool:
 	return FileAccess.file_exists(SAVE_PATH)
