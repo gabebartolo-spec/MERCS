@@ -1,42 +1,44 @@
-# Concept Lead handoff, 2026-10-09 AEDT
-Start from this file, CLAUDE.md, your brief (`agent-briefs/CONCEPT_LEAD_FABLE.md`), and the current phase section of `docs/08_ROADMAP.md` only (`docs/STATUS.md` names the phase).
-Account note: the director runs two Claude accounts. Day-to-day Phase 1 work is led from the other
-account's "MERCS BOSS" chat (acting lead + Dev Lead), with "MERCS SUPPORT" (Merge & CI) and
-"MERCS ART FACTORY". This role reviews gates and audits; it does not drive daily work there.
+# Concept Lead handoff, 2026-10-15 UTC (cloud session, archived on the director's order)
+Start from this file, CLAUDE.md, your brief (`agent-briefs/CONCEPT_LEAD_FABLE.md`), the Phase 2 section of
+`docs/08_ROADMAP.md`, and `docs/brainstorms/2026-10-14-horizontal-slice-plan.md` (the director's decisions).
 
-## State: awaiting director
+## State: archived; the director runs Phase 2 from a new session
 ## Task
-Phase 1 oversight. Next real task: Phase 1 sample review / gate when the Dev Lead's evidence pack lands.
+Phase 2 (horizontal slice) under Project Architect 3.0 (D-071): the lead briefs coder subagents, reviews
+their diffs and evidence, opens the PRs. Milestone 1 is on main (#75). Milestone 2 (travel and encounters
+into the existing battle) is NEXT and NOT started: it begins only when the director assigns it.
 ## Branch and commit
-docs/concept-lead-handoff (this file only). Nothing else open from this role.
+This file and the learnings entry only: `claude/concept-lead-handoff-3`. No other branch of this role is open.
 ## Files I own right now
-None open. Shipped by this role: #20 merge-workflow audit (D-030: autonomous Merge & CI, one board
-writer, routine git allowed, squash-only repo settings), #22 render pipeline skeleton (via subagent).
+None open. Shipped this session: #74 (brainstorm record, roadmap rewrite, Q15-Q22, briefs for PA3),
+#75 (milestone 1: WorldSim, RegionGen, WorldSite, SaveModel v1, data/balance/world.json, overworld on F2,
+SaveSystem to user://save_v1.json, suites sim_world 9, save 7, effect 4, overworld 8).
 ## Unfinished changes
-None in the repo.
+None. Deleted unpushed: `claude/p2-m2-encounters` (made by mistake on a wake-up; see learnings 2026-10-15).
 ## Evidence so far
-- Phase 0 gate PASS WITH NOTES (D-027), all gaps closed (#15–#18).
-- 2026-10-09 status check: no open PRs; main at #46. Art paused by the director (realistic QC round 3
-  fixes staged locally on claude/art-qc-c55, unrendered). Density pick (56 / 84 / 112 px) pending.
+- #75 CI green on head a2f07be with the real shard run (shard 1, harness self-test, four lints).
+- Milestone 1 capture (real F2 tap, 1920x1080 under xvfb) was sent to the director in chat.
+- Coder briefs that worked: scratchpad `briefs/m1a_world_sim.md`, `m1b_overworld.md` (cloud scratchpad,
+  not in the repo); shape: setup, study list with file:line, numbered deliverables, proof before report,
+  return contract under 300 tokens. Two defects caught in lead review before the PR: Rng stream states
+  lost precision through JSON (fixed: strings), closing the map freed the run (fixed: one director, hidden).
 ## Attempts (for the fix-loop rule)
 None open.
 ## Open decisions (waiting on the director)
-1. Resume Art (renders round-3 fixes and density samples, leading to the 56/84/112 decision).
-2. Which Project Architect 3.0 ideas to adopt. My recommendation, given in chat 2026-10-08:
-   adopt coder subagents owning edit/build/test loops, retriever subagents for reads >300 lines
-   (<=40-line file:line returns), a fixed <300-token return contract (STATUS · CHANGED · VERIFIED ·
-   PR/COMMIT · BLOCKER), a scripted merge-eligibility check, boss restart from handoff at ~150k.
-   Reject keep-warm, critic agent, per-tool hooks, memory-file sprawl, Haiku. Trial a scoped read
-   guard and a tiny usage report on AFL first (AFL boss transcript 185 MB vs MERCS 7 MB).
-3. Local models (local-models MCP): reason mode for reviews, verify everything, not during GPU jobs;
-   proposed licensing-register rows as dev tools (Gemma uncleared). Not yet in the repo.
+1. Milestone 1 review: play F2 in the build; carry on or wrong.
+2. Two Concept Lead calls in the rewrite, standing unless vetoed: the battle skeleton as milestone 4
+   (between the cast and wounds); Combat depth's "type chart" corrected to equipment physics (pillar 3).
+3. Recommendation: `STRICT_FROM_PHASE = 2` in `tools/lint/magic_numbers.py` and `caps.json` phase 2 in the
+   milestone 2 PR, so sim magic numbers are errors during the breadth phase.
+4. Still on the board from before: D-060 Tripo threshold, the slice sketch calls (#66), Mixamo sign-in,
+   the three superseded remote branches.
 ## Board drift for Merge & CI
-STATUS "Waiting on the director" still asks for the Mixamo sign-in (Art has 10 of 14 clips) and a
-merge-chat restart (done); Art row says working (paused).
+#74's and #75's "Board and log" sections carry the STATUS rows and D-063 to D-071; not yet on the board.
 ## Running jobs
-None.
+None. No pending check-in trigger.
 ## Rules learnt the hard way (keep under 10 lines)
-- Verify a peer is running (`get_session` isRunning, PR state) before reporting it as working.
-- Wake an idle peer with `send_message` to its session id; a `/loop` must be typed by the director.
-- A routine git refusal is a settings bug: fix `.claude/settings.json`, never hand the command over.
-- Delegate big reads and test loops to subagents; take back short summaries only.
+- A wake-up (merge event, check-in, subagent return) is not an assignment: do the event's work, report, wait.
+- Godot 4.7.2 linux headless runs in the cloud container (download the release zip); xvfb-run + opengl3
+  gives a real capture; headless gives none.
+- Two coders on one branch must run in sequence, never at once (same worktree).
+- Mark a PR ready before CI matters: drafts skip the Godot shards and `test` goes green vacuously.
