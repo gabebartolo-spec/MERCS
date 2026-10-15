@@ -1,0 +1,275 @@
+{
+  "company": {
+    "captain": "orc",
+    "economy": {
+      "board": [
+        {
+          "accepted": true,
+          "deadline": 8.0,
+          "faction": "fac_placeholder_b",
+          "id": "ctr_1",
+          "reward": 36.0,
+          "site": "site_wild_1"
+        },
+        {
+          "accepted": false,
+          "deadline": 6.0,
+          "faction": "fac_placeholder_a",
+          "id": "ctr_2",
+          "reward": 47.0,
+          "site": "site_wild_3"
+        },
+        {
+          "accepted": false,
+          "deadline": 7.0,
+          "faction": "fac_placeholder_a",
+          "id": "ctr_3",
+          "reward": 45.0,
+          "site": "site_hamlet_3"
+        }
+      ],
+      "board_day": 0.0,
+      "chronicle": [
+        {
+          "day": 0.0,
+          "key": "prisoner.release",
+          "merc": "orc"
+        }
+      ],
+      "hired": [
+        "recruit_1"
+      ],
+      "inventory": [],
+      "last_loot": {
+        "coin": 13.0,
+        "item": ""
+      },
+      "morale": 67.0,
+      "next_contract": 4.0,
+      "owed": 0.0,
+      "prisoner": {},
+      "purse": 44.0,
+      "unpaid_days": 0.0
+    },
+    "fallen": [
+      "merc_4"
+    ],
+    "roster": [
+      {
+        "gear": {
+          "armour": "",
+          "trinket": "",
+          "weapon": ""
+        },
+        "id": "orc",
+        "xp": 0.0
+      },
+      {
+        "gear": {
+          "armour": "",
+          "trinket": "",
+          "weapon": ""
+        },
+        "id": "vampyr",
+        "xp": 0.0
+      },
+      {
+        "gear": {
+          "armour": "",
+          "trinket": "",
+          "weapon": ""
+        },
+        "id": "merc_3",
+        "xp": 1.0
+      },
+      {
+        "gear": {
+          "armour": "",
+          "trinket": "",
+          "weapon": ""
+        },
+        "id": "merc_5",
+        "xp": 0.0
+      },
+      {
+        "gear": {
+          "armour": "",
+          "trinket": "",
+          "weapon": ""
+        },
+        "id": "merc_6",
+        "xp": 0.0
+      },
+      {
+        "gear": {
+          "armour": "",
+          "trinket": "",
+          "weapon": ""
+        },
+        "id": "recruit_1",
+        "xp": 0.0
+      }
+    ]
+  },
+  "ironman": true,
+  "rng": {
+    "seed": "424308",
+    "streams": {
+      "battle": "-2361960990300510030",
+      "contracts": "-933090147503874478",
+      "encounter": "-5540190666569214872",
+      "injury": "6920886811649738502",
+      "loot": "-1150782462005179986",
+      "parties": "1784843107925661652",
+      "story": "2327574984713461062",
+      "story_cast": "5808980914815876544",
+      "world": "-2035266319598105120"
+    }
+  },
+  "story": {
+    "fired": [
+      "st_unspoken_loss"
+    ],
+    "last_day": {
+      "st_unspoken_loss": 2.0
+    }
+  },
+  "version": 2.0,
+  "world": {
+    "at": "site_hub",
+    "band": [
+      45.0,
+      24.0
+    ],
+    "day": 2.0,
+    "encounter": {},
+    "haven": "site_hub",
+    "log": [
+      {
+        "outcome": "won",
+        "step": "encounter",
+        "supplies": 4.0,
+        "type": "ambush"
+      },
+      {
+        "site": "site_hub",
+        "step": "arrive"
+      },
+      {
+        "day": 1.0,
+        "step": "rest"
+      },
+      {
+        "day": 1.0,
+        "step": "tick",
+        "supplies": 32.0
+      },
+      {
+        "day": 2.0,
+        "step": "rest"
+      },
+      {
+        "day": 2.0,
+        "step": "tick",
+        "supplies": 30.0
+      }
+    ],
+    "march": 15.0,
+    "parties": [
+      {
+        "away_until": 6.0,
+        "budget": 0.0,
+        "chasing": false,
+        "home_x": 42.0,
+        "home_y": 24.0,
+        "id": "party_0",
+        "type": "ambush",
+        "x": 42.0,
+        "y": 24.0
+      }
+    ],
+    "supplies": 30.0
+  },
+  "wounds": {
+    "captain": "orc",
+    "chronicle": {
+      "entries": [
+        {
+          "cause": "bandit_1",
+          "day": 0.0,
+          "merc": "merc_4"
+        }
+      ]
+    },
+    "injuries": {},
+    "memories": {
+      "merc_3": [
+        {
+          "about": "merc_4",
+          "day": 0.0,
+          "key": "memory.comrade_died",
+          "params": {
+            "about": "merc_4"
+          }
+        },
+        {
+          "about": "vampyr",
+          "day": 2.0,
+          "key": "memory.grief_deepened",
+          "params": {
+            "about": "vampyr",
+            "storylet": "st_unspoken_loss"
+          }
+        }
+      ],
+      "merc_5": [
+        {
+          "about": "merc_4",
+          "day": 0.0,
+          "key": "memory.comrade_died",
+          "params": {
+            "about": "merc_4"
+          }
+        }
+      ],
+      "merc_6": [
+        {
+          "about": "merc_4",
+          "day": 0.0,
+          "key": "memory.comrade_died",
+          "params": {
+            "about": "merc_4"
+          }
+        }
+      ],
+      "orc": [
+        {
+          "about": "merc_4",
+          "day": 0.0,
+          "key": "memory.comrade_died",
+          "params": {
+            "about": "merc_4"
+          }
+        },
+        {
+          "about": "",
+          "day": 0.0,
+          "key": "memory.fate_release",
+          "params": {
+            "about": ""
+          }
+        }
+      ],
+      "vampyr": [
+        {
+          "about": "merc_4",
+          "day": 0.0,
+          "key": "memory.comrade_died",
+          "params": {
+            "about": "merc_4"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -13,6 +13,7 @@ extends "res://tests/lib/runner.gd"
 ## to the street. Seeded by design: the balance seed only (data/balance/world.json).
 ##   godot --headless --path . --script tests/run_overworld_tests.gd
 
+const InputKit := preload("res://tests/lib/input_kit.gd")
 const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const WINDOW_SIZE := Vector2i(1920, 1080)
 const LAYOUT_FRAMES := 3
@@ -69,6 +70,8 @@ func _check_open(game: SliceGame) -> void:
 	if director == null:
 		check(false, "M opens the overworld map (no director)")
 		return
+	await _frames(LAYOUT_FRAMES)
+	await InputKit.pick_mode(self, director)
 	await _frames(LAYOUT_FRAMES)
 	var world := director.world
 	var markers := 0
@@ -220,7 +223,7 @@ func _check_blocked_step(game: SliceGame) -> void:
 			"a tap of D into %s leaves the band and the panel says why" % kind
 		)
 		world.region.set_terrain(east, was)
-	var edge := game.overworld_director()._blocked_line(Vector2i(-world.band.x - 1, 0))
+	var edge := OverworldWords.blocked(world, Vector2i(-world.band.x - 1, 0))
 	check(edge == Text.t("world.panel.blocked_edge"), "a step off the map's edge says so")
 
 

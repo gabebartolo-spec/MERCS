@@ -9,6 +9,7 @@ extends "res://tests/lib/runner.gd"
 ## Seeded by design: the balance seed (data/balance/world.json) and Rng.from_seed.
 ##   godot --headless --path . --script tests/run_story_gui_tests.gd
 
+const InputKit := preload("res://tests/lib/input_kit.gd")
 const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const SAVE_SYSTEM := preload("res://presentation/autoload/save_system.gd")
 const DEAD := "fallen_comrade"
@@ -46,7 +47,7 @@ func _check_gui() -> void:
 	_mourn(game, story)
 	await _tap(KEY_M)
 	var map := game.overworld_director()
-	await _frames(LAYOUT_FRAMES)
+	await InputKit.pick_mode(self, map)
 	await _click_button(map.panel.button_for("rest"))
 	await _frames(LAYOUT_FRAMES)
 	check(story.is_open(), "resting with the memory shows the storylet")
@@ -136,6 +137,7 @@ func _check_gui_without_memory() -> void:
 	await _tap(KEY_M)
 	var map := game.overworld_director()
 	await _frames(LAYOUT_FRAMES)
+	await InputKit.pick_mode(self, map)
 	await _click_button(map.panel.button_for("rest"))
 	await _frames(LAYOUT_FRAMES)
 	check(not story.is_open(), "the same rest in a company without the memory shows no storylet")

@@ -83,7 +83,7 @@ func _process(delta: float) -> void:
 func step(delta: float) -> void:
 	_clock += delta
 	player.hold(Vector2i.ZERO if _paused() else _held.direction())
-	if _overworld_open() and not company_open() and not end_open():
+	if _overworld_open() and not company_open() and not hub_open() and not end_open():
 		_overworld.walk(_held.direction(), delta)
 	player.advance(delta)
 	_use_doors()

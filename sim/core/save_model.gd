@@ -34,17 +34,26 @@ var story := {}
 ## Whether the save's campaign is over. Optional key "ended" (absent reads as not ended; no
 ## version of its own), or a company with every merc dead. An ended save is never ok.
 var ended := false
+## Whether the campaign was begun on Ironman (the game saves itself at a fight's start, its end
+## and after its aftermath). Optional key "ironman" (absent reads as Off, so every older save
+## loads as it always did; no version of its own).
+var ironman := false
+## Ironman, a save written during a fight (the world's encounter is fighting): the actions the
+## battle took since it began (FightRecord, optional key "fight"), to replay on reload; [] in
+## any other save, so every older save loads as it always did; no version of its own.
+var fight_actions: Array[Dictionary] = []
 
 
 ## The Rng's seed and stream positions are written as strings: they are 64-bit ints, and
 ## JSON holds a number as a double, exact only up to 2^53. The company and the wounds block
-## are written when given; "ended" only when the campaign is over.
+## are written when given; "ended" only when the campaign is over, "ironman" only when on.
 static func to_dict(
 	world_sim: WorldSim,
 	source: Rng,
 	held: Company = null,
 	wounds_block: Dictionary = {},
-	is_ended: bool = false
+	is_ended: bool = false,
+	is_ironman: bool = false
 ) -> Dictionary:
 	var saved := {
 		"version": VERSION, "rng": _rng_as_text(source.state()), "world": world_sim.state()
@@ -55,6 +64,8 @@ static func to_dict(
 		saved["wounds"] = wounds_block
 	if is_ended:
 		saved["ended"] = true
+	if is_ironman:
+		saved["ironman"] = true
 	return saved
 
 
@@ -82,6 +93,9 @@ static func from_dict(
 	model.ended = (
 		current.get("ended", false) == true or (model.company != null and model.company.is_wiped())
 	)
+	model.ironman = current.get("ironman", false) == true
+	if model.world.is_fighting():
+		model.fight_actions = FightRecord.read(current)
 	model.ok = not model.ended
 	if model.ended:
 		model.error = ERROR_ENDED

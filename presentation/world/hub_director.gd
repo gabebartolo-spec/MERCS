@@ -9,10 +9,16 @@ extends Node
 ## contracts and hiring are done at the hub only; the pack and a prisoner anywhere. Hiding the
 ## panel (set_open) keeps everything as it is.
 
+## The hub's actions that commit a decision: under Ironman each is saved at once (`autosave`).
+const COMMITS: Array[String] = ["pay", "accept", "hire", "equip", "prisoner"]
+
 var company: Company = null
 var world: WorldSim = null
 var rng: Rng = null
 var panel: HubPanel = null
+## The overworld's autosave (OverworldDirector.autosave: writes only under Ironman), called after
+## each committed action so a quit cannot give the decision back (D-087).
+var autosave := Callable()
 
 var _layer: CanvasLayer = null
 var _inspected := ""
@@ -27,6 +33,7 @@ static func attach(game: SliceGame) -> HubDirector:
 	game.add_child(hub)
 	var map := game.overworld_director()
 	hub.begin(game.company_director().company, map.world, map.rng)
+	hub.autosave = map.autosave
 	return hub
 
 
@@ -102,6 +109,8 @@ func _on_action(action: String, id: String) -> void:
 		"close":
 			set_open(false)
 			return
+	if action in COMMITS and autosave.is_valid():
+		autosave.call()
 	_show()
 
 
