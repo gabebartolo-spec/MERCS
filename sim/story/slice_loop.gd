@@ -181,7 +181,7 @@ func _stat(kind: String, key: String) -> int:
 
 static func _cell(value: Variant) -> Vector2i:
 	var pair: Array = value if value is Array else []
-	if pair.size() < 2:
+	if pair.size() <= Vector2i.AXIS_Y:
 		return Vector2i.ZERO
 	var x: float = pair[0] if pair[0] is float or pair[0] is int else 0.0
 	var y: float = pair[1] if pair[1] is float or pair[1] is int else 0.0
