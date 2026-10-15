@@ -3,7 +3,7 @@
   "phase": 2,
   "caps": {
     "backgrounds": 0,
-    "traits": 0,
+    "traits": 2,
     "equipment": 6,
     "injuries": 3,
     "storylets": 1,
@@ -13,6 +13,10 @@
     "recruits": 6,
     "encounters": 2,
     "locations": 2,
-    "actions": 10
+    "actions": 10,
+    "weapon_classes": 5,
+    "armour_classes": 3,
+    "shields": 1,
+    "bows": 1
   }
 }

@@ -208,7 +208,7 @@ class Played:
 		world.set_lineups(lineups)
 		var site_ids := _site_ids()
 		world.day_hook = func(day: int) -> void:
-			company.economy.on_day(company.roster.size(), day, site_ids, rng)
+			company.economy.on_day(company.roster, day, site_ids, rng)
 		world.result_hook = func(kind: String, result: Dictionary) -> void:
 			if result.get("won", false) == true:
 				company.economy.take_loot(kind, rng)

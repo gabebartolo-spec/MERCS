@@ -40,7 +40,7 @@ func _company() -> Company:
 
 
 func _day(company: Company, day: int) -> void:
-	company.economy.on_day(company.roster.size(), day, SITES, Rng.from_seed(SEED))
+	company.economy.on_day(company.roster, day, SITES, Rng.from_seed(SEED))
 
 
 func _through_json(value: Dictionary) -> Dictionary:

@@ -1,7 +1,13 @@
 {
   "_comment": "The company's purse, wages, morale, contracts, loot, hiring and the prisoner choice (Phase 2 milestone 6). Read by sim/economy/. economy.md explains each knob. First numbers: the director tunes them.",
   "purse": {"start": 80},
-  "wages": {"per_merc_per_day": 2, "grace_days": 2, "morale_loss_per_day": 4, "paid_recovery": 2},
+  "wages": {
+    "day_by_level": [2, 3, 4, 5, 6],
+    "share_pct": 20,
+    "grace_days": 2,
+    "morale_loss_per_day": 4,
+    "paid_recovery": 2
+  },
   "morale": {"start": 60, "max": 100},
   "contracts": {
     "board_min": 1,
@@ -34,5 +40,15 @@
     "abandon_dent": 10,
     "sizeable_advance": 50,
     "grudge_growth": 1
+  },
+  "terms": {
+    "base_limit_pct": 90,
+    "reputation_weight_pct": 20,
+    "need_weight_pct": 10,
+    "advance_cost_pct": 25,
+    "counter_band_pct": 20,
+    "die_sides": 10,
+    "step_in_difficulty": 9,
+    "step_in_shift_pct": 10
   }
 }

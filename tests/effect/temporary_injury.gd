@@ -1,12 +1,12 @@
 extends "res://tests/lib/effect_case.gd"
 ## temporary_injury: a temporary wound weakens the merc in the next fight, until it heals.
-## The starting six on seed 424271: one road fight whose triage leaves every downed merc with
+## The starting six on seed 424201: one road fight whose triage leaves every downed merc with
 ## a temporary injury, then the next road fight on a fresh Rng (seed 424272), once the day
 ## after (the wounds still on) and once after they have healed.
 
 const Kit := preload("res://tests/lib/wiring_kit.gd")
 const Fixture := preload("res://tests/lib/company_fixture.gd")
-const FIRST := 424251
+const FIRST := 424201
 const SECOND := 424272
 const HEAL_DAYS := 60
 
