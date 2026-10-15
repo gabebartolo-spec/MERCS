@@ -33,6 +33,8 @@ var _game: SliceGame = null
 var _layer: CanvasLayer = null
 var _linked: OverworldDirector = null
 var _open := false
+## How many of the economy's decision lines are already in the memories.
+var _decisions_seen := 0
 
 
 ## Attaches a director to the game and reads the save on disk, if there is one.
@@ -111,6 +113,7 @@ func _process(_delta: float) -> void:
 		loop_director.loop.memory = memory
 		loop_director.loop.day = overworld.world.day if overworld != null else 0
 	_layer.visible = _open and overworld != null and overworld.is_open()
+	_remember_decisions()
 
 
 func _link(overworld: OverworldDirector) -> void:
@@ -122,6 +125,22 @@ func _link(overworld: OverworldDirector) -> void:
 	book.rng = overworld.rng
 	book.load_defs(_json(STORYLETS_DATA))
 	overworld.panel.chosen.connect(_on_overworld_choice)
+	_decisions_seen = book.company.economy.chronicle.size() if book.company != null else 0
+
+
+## The hub's decisions (the economy's chronicle lines, {"day", "merc", "key": "prisoner.<choice>"})
+## become a memory sentence on the merc who remembers them, once each.
+func _remember_decisions() -> void:
+	if book == null or book.company == null:
+		return
+	var lines := book.company.economy.chronicle
+	while _decisions_seen < lines.size():
+		var line := lines[_decisions_seen]
+		var choice := str(line.get("key", "")).trim_prefix("prisoner.")
+		memory.record(
+			str(line.get("merc", "")), Memory.KEY_FATE_PREFIX + choice, {}, Injury.num(line, "day")
+		)
+		_decisions_seen += 1
 
 
 func _on_overworld_choice(choice_id: String) -> void:

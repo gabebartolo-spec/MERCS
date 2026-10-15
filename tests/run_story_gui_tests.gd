@@ -43,10 +43,7 @@ func _check_gui() -> void:
 	var game := await _spawn()
 	var story := game.get_node("StoryDirector") as StoryDirector
 	check(story != null, "the game attaches a story director")
-	var ids: Array[String] = []
-	for merc: Merc in game.company_director().company.roster:
-		ids.append(merc.id)
-	story.memory.on_death(DEAD, ids, 2, Memory.KEY_COMRADE_DIED)
+	_mourn(game, story)
 	await _tap(KEY_M)
 	var map := game.overworld_director()
 	await _frames(LAYOUT_FRAMES)
@@ -78,9 +75,33 @@ func _check_gui() -> void:
 	await _click_button(map.panel.button_for("rest"))
 	await _frames(LAYOUT_FRAMES)
 	check(not story.is_open(), "a second rest does not repeat it")
+	await _check_decision(game, story)
 	await _check_inspect(game, mourner.id)
 	game.queue_free()
 	await process_frame
+
+
+## The hub's prisoner decision (an economy chronicle line) becomes a memory of the captain.
+func _check_decision(game: SliceGame, story: StoryDirector) -> void:
+	var company := game.company_director().company
+	company.economy.take_prisoner(5)
+	company.economy.decide_prisoner(company, "release", 5)
+	await _frames(LAYOUT_FRAMES)
+	var captain := company.captain_id
+	check(
+		story.memory.has_key(captain, "memory.fate_release"),
+		"a prisoner decision at the hub is remembered by the captain"
+	)
+	var count := story.memory.of(captain).size()
+	await _frames(LAYOUT_FRAMES)
+	check(story.memory.of(captain).size() == count, "and only once")
+
+
+func _mourn(game: SliceGame, story: StoryDirector) -> void:
+	var ids: Array[String] = []
+	for merc: Merc in game.company_director().company.roster:
+		ids.append(merc.id)
+	story.memory.on_death(DEAD, ids, 2, Memory.KEY_COMRADE_DIED)
 
 
 func _help_hidden(game: SliceGame) -> bool:

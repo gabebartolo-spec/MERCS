@@ -11,6 +11,10 @@ extends Node
 const MERCS_DATA := "res://data/mercs.json"
 const BATTLE_DATA := "res://data/balance/battle.json"
 const COMPANY_DATA := "res://data/balance/company.json"
+const ECONOMY_DATA := "res://data/balance/economy.json"
+const FACTIONS_DATA := "res://data/factions.json"
+const EQUIPMENT_DATA := "res://data/equipment.json"
+const RECRUITS_DATA := "res://data/recruits.json"
 const WORLD_DATA := "res://data/balance/world.json"
 const SAVE_SYSTEM := preload("res://presentation/autoload/save_system.gd")
 const SAVE_SYSTEM_PATH := ^"/root/SaveSystem"
@@ -32,6 +36,10 @@ static func defs() -> Dictionary:
 		"mercs": _json(MERCS_DATA),
 		"fighters": fighters if fighters is Dictionary else {},
 		"company": _json(COMPANY_DATA),
+		"economy": _json(ECONOMY_DATA),
+		"factions": _json(FACTIONS_DATA),
+		"equipment": _json(EQUIPMENT_DATA),
+		"recruits": _json(RECRUITS_DATA),
 	}
 
 
@@ -113,7 +121,7 @@ func _detail(merc: Merc) -> Dictionary:
 	return {
 		"id": merc.id,
 		"header": Text.t("company.header", {"name": merc.display_name, "level": merc.level()}),
-		"lines": _lines(merc),
+		"lines": _with_memories(merc),
 		"bar_value": earned if span > 0 else 1,
 		"bar_max": span if span > 0 else 1,
 		"bar_text": Text.t(bar_key, params),
@@ -122,7 +130,8 @@ func _detail(merc: Merc) -> Dictionary:
 	}
 
 
-func _lines(merc: Merc) -> Array[String]:
+## The merc's details as lines of words (also the hub's recruit inspection).
+static func lines(merc: Merc) -> Array[String]:
 	var lines: Array[String] = []
 	if merc.placeholder:
 		lines.append(Text.t("company.placeholder"))
@@ -144,11 +153,16 @@ func _lines(merc: Merc) -> Array[String]:
 		var held := worn if worn != "" else Text.t("company.slot.empty")
 		slots.append(Text.t("company.slot." + slot, {"gear": held}))
 	lines.append("   ".join(slots))
-	lines.append_array(_memory_lines(merc))
 	return lines
 
 
 ## What the merc remembers, one sentence a line (the story director holds the memories).
+func _with_memories(merc: Merc) -> Array[String]:
+	var all := lines(merc)
+	all.append_array(_memory_lines(merc))
+	return all
+
+
 func _memory_lines(merc: Merc) -> Array[String]:
 	var memory := StoryDirector.memory_of(self)
 	var entries: Array[Dictionary] = memory.of(merc.id) if memory != null else []
@@ -159,7 +173,7 @@ func _memory_lines(merc: Merc) -> Array[String]:
 	return lines
 
 
-func _gear_line(merc: Merc) -> String:
+static func _gear_line(merc: Merc) -> String:
 	if merc.stage_1_gear.is_empty():
 		return Text.t("company.gear_none")
 	return Text.t("company.gear", {"gear": ", ".join(merc.stage_1_gear)})

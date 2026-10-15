@@ -22,6 +22,9 @@ var stage_1_gear: Array[String] = []
 ## Slot -> generic gear id, "" for empty.
 var gear := {}
 var xp := 0
+## Generic-gear definitions by id (data/equipment.json), set by the Company that holds this
+## merc; with none, gear in the slots adds nothing.
+var items := {}
 
 var _moves_by_level := {}
 var _level_xp: Array[int] = []
@@ -61,8 +64,24 @@ static func make(def: Dictionary, fighters: Dictionary, level_xp: Array[int]) ->
 
 
 ## A stat by key (hp, attack, defense, damage, initiative, presence, resolve); 0 if absent.
+## The generic gear in the slots adds its bonus (D-066: stats only).
 func stat(key: String) -> int:
-	return whole(stats.get(key, 0))
+	return whole(stats.get(key, 0)) + bonus(key)
+
+
+## What the gear in the slots adds to one stat.
+func bonus(key: String) -> int:
+	var total := 0
+	for slot: String in SLOTS:
+		var worn: Variant = items.get(str(gear.get(slot, "")), {})
+		if not worn is Dictionary:
+			continue
+		var piece: Dictionary = worn
+		var numbers: Variant = piece.get("bonus", {})
+		if numbers is Dictionary:
+			var added: Dictionary = numbers
+			total += whole(added.get(key, 0))
+	return total
 
 
 ## The level the experience has reached: 1 at the first threshold, and so on, up to the last.
@@ -109,9 +128,12 @@ func moves() -> Array[String]:
 
 ## The fighter this merc is in a battle, from their data. The abilities come from the moves
 ## learnt (charge, blood_price); a leader is whoever the company's captain is, so the caller
-## says. Gear in the slots is for stats and adds nothing here yet.
+## says. Generic gear in the slots adds its bonus to the numbers.
 func to_battle_unit(side: int, at: Vector2i, leads: bool) -> BattleUnit:
 	var numbers := stats.duplicate()
+	for key: Variant in numbers:
+		if numbers[key] is int or numbers[key] is float:
+			numbers[key] = stat(str(key))
 	var learnt := moves()
 	numbers["ability_charge"] = Battle.ACTION_CHARGE in learnt
 	numbers["ability_blood_price"] = Battle.ACTION_BLOOD_PRICE in learnt
