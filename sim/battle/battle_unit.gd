@@ -27,6 +27,8 @@ const FACINGS: Array[Vector2i] = [
 ## The reference pair's move ids (battle.json "rules" "moves").
 const MOVE_CHARGE := "charge"
 const MOVE_BLOOD_PRICE := "blood_price"
+## The sketch's ability flags in fighter data, and the move each one stands for.
+const FLAGS := {"ability_charge": MOVE_CHARGE, "ability_blood_price": MOVE_BLOOD_PRICE}
 
 var id := ""
 var side := COMPANY
@@ -66,7 +68,8 @@ var can_blood_price: bool:
 
 ## stats: one fighter of battle.json "fighters": numbers, "leader", and "moves" as
 ## {move_id: true} (an Array of ids also reads); the sketch's "ability_charge" and
-## "ability_blood_price" flags still teach those moves.
+## "ability_blood_price" flags, when present, decide those two moves either way (a merc's
+## learnt moves outrank the fighter data, Merc.to_battle_unit).
 static func make(unit_id: String, unit_side: int, at: Vector2i, stats: Dictionary) -> BattleUnit:
 	var unit := BattleUnit.new()
 	unit.id = unit_id
@@ -82,10 +85,10 @@ static func make(unit_id: String, unit_side: int, at: Vector2i, stats: Dictionar
 	unit.presence = _int(stats, "presence", 0)
 	for move: String in _listed_moves(stats.get("moves", [])):
 		unit.teach(move, true)
-	if stats.get("ability_charge", false) == true:
-		unit.teach(MOVE_CHARGE, true)
-	if stats.get("ability_blood_price", false) == true:
-		unit.teach(MOVE_BLOOD_PRICE, true)
+	for flag: Variant in FLAGS:
+		if stats.has(flag):
+			var learnt: bool = stats.get(flag) == true
+			unit.teach(str(FLAGS[flag]), learnt)
 	return unit
 
 

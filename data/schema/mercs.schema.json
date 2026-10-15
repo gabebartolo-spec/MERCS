@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Mercenaries",
+  "description": "data/mercs.json: the hand-made cast, by id. Stats are numbers; stats_from optionally names an entry of data/balance/battle.json fighters whose numbers the merc's own stats are laid over (one source of truth for the reference pair). moves_by_level maps a level (\"1\", \"2\", ...) to the move ids learnt there. gear_slots are the three generic-gear slots (weapon, armour, trinket); null is empty. look is a sheet id or \"placeholder\". placeholder marks an entry the director has yet to author.",
+  "type": "object",
+  "required": ["mercs", "starting_captain"],
+  "additionalProperties": false,
+  "properties": {
+    "starting_captain": {"type": "string", "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$"},
+    "mercs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "species", "role", "stats", "moves_by_level", "stage_1_gear", "gear_slots", "look"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$"},
+          "name": {"type": "string", "minLength": 1},
+          "species": {"type": "string"},
+          "placeholder": {"type": "boolean"},
+          "role": {"type": "string", "minLength": 1},
+          "stats_from": {"type": "string", "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$"},
+          "stats": {
+            "type": "object",
+            "required": ["resolve"],
+            "additionalProperties": false,
+            "properties": {
+              "hp": {"type": "integer", "minimum": 1},
+              "attack": {"type": "integer", "minimum": 0},
+              "defense": {"type": "integer", "minimum": 0},
+              "damage": {"type": "integer", "minimum": 1},
+              "initiative": {"type": "integer", "minimum": 0},
+              "presence": {"type": "integer", "minimum": 0},
+              "resolve": {"type": "integer", "minimum": 0}
+            }
+          },
+          "moves_by_level": {
+            "type": "object",
+            "additionalProperties": false,
+            "patternProperties": {
+              "^[1-9][0-9]*$": {"type": "array", "items": {"type": "string", "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$"}}
+            }
+          },
+          "stage_1_gear": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "gear_slots": {
+            "type": "object",
+            "required": ["weapon", "armour", "trinket"],
+            "additionalProperties": false,
+            "properties": {
+              "weapon": {"type": ["string", "null"]},
+              "armour": {"type": ["string", "null"]},
+              "trinket": {"type": ["string", "null"]}
+            }
+          },
+          "look": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

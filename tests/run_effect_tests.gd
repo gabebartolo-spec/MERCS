@@ -10,7 +10,13 @@ extends "res://tests/lib/runner.gd"
 const EffectCase := preload("res://tests/lib/effect_case.gd")
 const CASE_DIR := "res://tests/effect"
 const EXPECTED_IDS: Array[String] = [
-	"world_tick", "world_map", "encounter_road", "encounter_toll", "battle_blocking", "battle_rout"
+	"world_tick",
+	"world_map",
+	"encounter_road",
+	"encounter_toll",
+	"company_merc",
+	"battle_blocking",
+	"battle_rout",
 ]
 
 

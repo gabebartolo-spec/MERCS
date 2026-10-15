@@ -3,7 +3,10 @@ extends "res://tests/lib/runner.gd"
 ## same dictionary; a run continued from a reload matches the uninterrupted run, also when
 ## the save has been through JSON; a save missing optional keys reads with defaults and is
 ## ok; a save from a newer version is refused with an error code; a version 0 fixture
-## (fixtures/save/v0.json) migrates to the current version and keeps its state. Encounters
+## (fixtures/save/v0.json) migrates to the current version and keeps its state; a version 1
+## fixture (v1.json, before the company) does too and reads as the starting six, the orc
+## captain; the company is saved and comes back equal.
+## Encounters
 ## (Phase 2 M2, no version bump: one new key with a default): a road's standing encounter
 ## survives a save through JSON and the run continues exactly as the uninterrupted one; an
 ## older save without the key loads with no encounter.
@@ -12,6 +15,8 @@ extends "res://tests/lib/runner.gd"
 
 const BALANCE := "res://data/balance/world.json"
 const V0_FIXTURE := "res://tests/fixtures/save/v0.json"
+const V1_FIXTURE := "res://tests/fixtures/save/v1.json"
+const Fixture := preload("res://tests/lib/company_fixture.gd")
 const SEED := 424242
 const STEPS := 6
 const SPLIT := 3
@@ -35,6 +40,8 @@ func run_checks() -> void:
 	_check_newer_version_refused()
 	_check_migrate_v0()
 	_check_rng_exact_through_json()
+	_check_company_round_trip()
+	_check_migrate_v1()
 	_check_encounter_through_json()
 	_check_old_save_has_no_encounter()
 	await process_frame
@@ -74,7 +81,12 @@ func _check_round_trip() -> void:
 	var second := SaveModel.to_dict(model.world, model.rng)
 	var version: int = first.get("version", 0)
 	check(
-		model.ok and model.error == "" and str(first) == str(second) and version == 1,
+		(
+			model.ok
+			and model.error == ""
+			and str(first) == str(second)
+			and version == SaveModel.VERSION
+		),
 		"to_dict -> from_dict -> to_dict gives the same save back, version %d" % version
 	)
 
@@ -190,6 +202,55 @@ func _check_rng_exact_through_json() -> void:
 	check(
 		exact,
 		"a stream position above 2^53 comes back from JSON identical and rolls the same next number"
+	)
+
+
+## The company rides in the save: written, read back (through JSON) and written again equal.
+func _check_company_round_trip() -> void:
+	var rng := Rng.from_seed(SEED)
+	var world := _world(rng)
+	var company := Company.start(Fixture.defs())
+	company.appoint("vampyr")
+	company.gain("merc_4", 12)
+	var first := SaveModel.to_dict(world, rng, company)
+	var parsed: Variant = JSON.parse_string(JSON.stringify(first))
+	var reread: Dictionary = parsed if parsed is Dictionary else {}
+	var model := SaveModel.from_dict(reread, _balance(), Fixture.defs())
+	var second := SaveModel.to_dict(model.world, model.rng, model.company) if model.ok else {}
+	check(
+		(
+			model.ok
+			and JSON.stringify(first) == JSON.stringify(second)
+			and model.company.captain_id == "vampyr"
+		),
+		"a save with a company round-trips through JSON: the Vampyr captain, experience kept"
+	)
+
+
+## A save from before the company: the world carries over, the company is the starting six.
+func _check_migrate_v1() -> void:
+	var fixture := _json(V1_FIXTURE)
+	var model := SaveModel.from_dict(fixture, _balance(), Fixture.defs())
+	var starting := Company.start(Fixture.defs())
+	var version_before: int = fixture.get("version", -1)
+	var after := SaveModel.to_dict(model.world, model.rng, model.company) if model.ok else {}
+	var version_after: int = after.get("version", -1)
+	check(
+		(
+			version_before == 1
+			and model.ok
+			and model.world.day == 2
+			and model.company.captain_id == "orc"
+			and JSON.stringify(model.company.state()) == JSON.stringify(starting.state())
+			and version_after == SaveModel.VERSION
+		),
+		(
+			(
+				"the version 1 fixture (no company) migrates to version %d with the starting "
+				+ "six, the orc captain"
+			)
+			% SaveModel.VERSION
+		)
 	)
 
 
