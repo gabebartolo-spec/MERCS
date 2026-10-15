@@ -32,6 +32,8 @@ import bpy
 from mathutils import Euler, Matrix, Quaternion, Vector
 
 PIPELINE = Path(__file__).resolve().parent
+sys.path.insert(0, str(PIPELINE))
+import kit_extras  # noqa: E402  (Blender runs this file with -P: the folder is not on the path)
 CAMERA_FILE = PIPELINE / "camera_rig.json"
 LIGHT_FILE = PIPELINE / "light_rig.json"
 PROPORTIONS_FILE = PIPELINE / "proportions.json"
@@ -373,12 +375,17 @@ def lean_bones(rig: bpy.types.Object, degrees: dict) -> None:
     bpy.context.view_layer.update()
 
 
-def apply_proportions(rig: bpy.types.Object, path: str, name: str, height_m: float, posture: dict) -> dict:
-    """Pose and scale bones for a sample variant, then refit the figure to height_m with feet on z = 0."""
+def apply_proportions(rig: bpy.types.Object, path: str, name: str, height_m: float, posture: dict,
+                      body_scale: dict | None = None) -> dict:
+    """Pose and scale bones for a sample variant, then refit the figure to height_m with feet on z = 0.
+    body_scale (bodies.json "bone_scale") multiplies the variant's: a merc's own head size, for one."""
     cfg = json.loads(Path(path).read_text(encoding="utf-8"))
     name = name or cfg["default"]
     spec = cfg["variants"][name]
-    scales = spec["bone_scale"]
+    scales = dict(spec["bone_scale"])
+    for bone, factor in (body_scale or {}).items():  # a number, or [x, y, z] in the bone's axes (y along it)
+        base = scales.get(bone, 1.0)
+        scales[bone] = [base * f for f in factor] if isinstance(factor, list) else base * factor
     aim = {**cfg.get("pose", {}).get("bone_direction", {}), **spec.get("bone_direction", {})}
     if not scales and not aim and not posture and not cfg.get("pose", {}).get("bone_twist_deg"):
         return {"variant": name, "rig_scale": 1.0, "height_m": None}
@@ -390,7 +397,7 @@ def apply_proportions(rig: bpy.types.Object, path: str, name: str, height_m: flo
         pb = rig.pose.bones.get(bone)
         if pb is None:
             raise SystemExit(f"variant {name}: no bone {bone}; bones are never added or renamed")
-        pb.scale = (factor, factor, factor)
+        pb.scale = tuple(factor) if isinstance(factor, list) else (factor, factor, factor)
     recentre_bones(rig, spec.get("recentre", {}))
     lo, hi = figure_extent_z(rig)
     s = height_m / (hi - lo)
@@ -433,7 +440,10 @@ def add_kit(rig: bpy.types.Object, path: str, keep: tuple[str, ...] = ()) -> dic
         groups[gname] = (Matrix.Translation(bone_point(rig, g["bone"], g.get("at", "head")) + Vector(g.get("offset_m", (0, 0, 0))))
                          @ euler_matrix(g.get("rot_deg", (0.0, 0.0, 0.0))))
     pieces = {n: p for n, p in cfg["pieces"].items() if not keep or n.startswith(keep)}
+    drapes = {n: p for n, p in pieces.items() if p["shape"] == "drape"}
     for name, piece in pieces.items():
+        if name in drapes:
+            continue
         pb = rig.pose.bones[piece["bone"]]
         head = rig.matrix_world @ pb.head
         tail = rig.matrix_world @ pb.tail
@@ -445,6 +455,8 @@ def add_kit(rig: bpy.types.Object, path: str, keep: tuple[str, ...] = ()) -> dic
         else:
             KIT_SHAPES[piece["shape"]]()
         obj = bpy.context.active_object
+        if "pleats" in piece:
+            kit_extras.pleat(obj, piece["pleats"], size[1])
         obj.name = f"{KIT_PREFIX}{name}"
         obj["kit_group"] = piece.get("group", name)
         obj["kit_material"] = piece.get("material", DEFAULT_KIT_MATERIAL)
@@ -466,9 +478,32 @@ def add_kit(rig: bpy.types.Object, path: str, keep: tuple[str, ...] = ()) -> dic
         obj.parent_bone = piece["bone"]
         bpy.context.view_layer.update()
         obj.matrix_world = world
+    shells = kit_extras.add_shells(rig, body_mesh(rig), cfg.get("shells", {}))
+    eye_cfg = cfg.get("eyes")
+    eyes = [kit_extras.add_eyes(body_mesh(rig), eye_cfg.get("push_m", 0.0) if isinstance(eye_cfg, dict) else 0.0)
+            ] if eye_cfg else []
+    bpy.context.view_layer.update()
+    for name, piece in drapes.items():  # after the shells and pieces: a cape hangs over all of them
+        solid = [o for o in bpy.data.objects if o.type == "MESH" and (o.parent == rig or o.get(kit_extras.EXTRA_FLAG))
+                 and o.name != kit_extras.EYES_NAME]
+        spec = dict(piece)
+        if "top_bone" in piece:  # the shoulder line, from the posed rig: [bone, head|tail|mid, dz metres]
+            bone, at, dz = piece["top_bone"]
+            spec["top_z_m"] = bone_point(rig, bone, at).z + dz
+        obj = kit_extras.drape(solid, spec)
+        obj.name = f"{KIT_PREFIX}{name}"
+        obj["kit_group"] = name
+        obj["kit_material"] = piece.get("material", DEFAULT_KIT_MATERIAL)
+        bpy.context.view_layer.update()
+        world = obj.matrix_world.copy()
+        obj.parent = rig
+        obj.parent_type = "BONE"
+        obj.parent_bone = piece["bone"]
+        bpy.context.view_layer.update()
+        obj.matrix_world = world
     bpy.context.view_layer.update()
     return {"file": rel_path(Path(path).resolve()), "sha256": sha256(Path(path)), "pieces": len(pieces),
-            "kept": list(keep)}
+            "kept": list(keep), "shells": shells, "features": eyes}
 
 
 CONTACT_M = 0.02  # a foot within this of its lowest height in the loop counts as planted (ground speed)
@@ -785,7 +820,8 @@ BONE_ATTR = "mercs_bone"  # point attribute: the vertex's dominant bone, carried
 
 
 def body_mesh(rig: bpy.types.Object) -> bpy.types.Object:
-    return next(o for o in rig.children if o.type == "MESH" and o.parent_type == "OBJECT")
+    return next(o for o in rig.children if o.type == "MESH" and o.parent_type == "OBJECT"
+                and not o.get(kit_extras.EXTRA_FLAG))
 
 
 def tag_dominant_bones(rig: bpy.types.Object) -> list[str]:
@@ -929,8 +965,9 @@ def apply_layers_pass(light: dict) -> dict:
 
 
 MATID_COLOURS = {"skin": "#ff0000", "iron": "#00ff00", "timber": "#0000ff", "cloth": "#ffff00",
-                 "bone": "#ff00ff", "soot": "#00ffff", "leather": "#ff8000"}  # IDs, never shipped
-FEATURE_MATERIALS = (("tusk", "bone"), ("tooth", "bone"), ("teeth", "bone"), ("eye", "soot"), ("nail", "bone"))
+                 "bone": "#ff00ff", "soot": "#00ffff", "leather": "#ff8000", "eye": "#8000ff",
+                 "mail": "#00ff80"}  # IDs, never shipped
+FEATURE_MATERIALS = (("tusk", "bone"), ("tooth", "bone"), ("teeth", "bone"), ("eye", "eye"), ("nail", "bone"))
 
 
 def apply_matid_pass() -> dict:
@@ -941,7 +978,7 @@ def apply_matid_pass() -> dict:
     for obj in bpy.data.objects:
         if obj.type != "MESH":
             continue
-        if obj.name.startswith(KIT_PREFIX):
+        if obj.name.startswith(KIT_PREFIX) or "kit_material" in obj:
             key = obj.get("kit_material", DEFAULT_KIT_MATERIAL)
         else:
             low = obj.name.lower()
@@ -1006,7 +1043,8 @@ def main() -> None:
     setup_render(cam, light)
     rig = body_rig()
     proportion = apply_proportions(rig, args.proportions, args.variant, body_height_m(args.body, cam),
-                                   body_spec(args.body).get("posture_lean_deg", {}))
+                                   body_spec(args.body).get("posture_lean_deg", {}),
+                                   body_spec(args.body).get("bone_scale", {}))
     keep = tuple(k for k in args.kit_keep.split(",") if k)
     kit = add_kit(rig, args.kit, keep) if args.kit else None
     checks = KitChecks(rig, args.kit) if (args.clip and args.kit) else None

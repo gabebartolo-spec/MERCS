@@ -1,7 +1,12 @@
 # Art handoff, 2026-10-15 AEDT
 Start from this file, CLAUDE.md, your brief, and the Lead ("main") messages. Load art-qa-critic before any visual review.
 
-## State: LOOK B LOCKED (director picked B "Peat and Ochre", 2026-10-15). PR open, awaiting review/merge. No jobs running.
+## State: cast fix round 5 pushed on PR #118 (claude/art-cast-fix), awaiting a fresh critic. No jobs running.
+Round 5 (2026-10-16, critic `scratchpad/crit118_r4/CRITIC.md`, `tools/look/cast_r5/` + README): palette from 99a1de4
+(verdure_mid_0, heather); skin_orc #2e3428 #485240 #7e8a73 #97a58b #b9c9ab (moss hue line, steps 0-1 inside the face
+only); orc heads hand-placed as planes (jaw wider than skull, brow shelf, mouth, tusks), plate one iron step darker,
+token head by hand; Vampyr darker armour, cuirass ridge, cape lining at the front, N folds; overworld golden from
+main with lit grass on verdure_mid_0, no dark rims (director to approve). Crops: `D:/MERCS-vault/renders/cast_r5_2026-10-16/`.
 Branch `claude/art-look-target` (worktree `MERCS-wt/art-look`), PR "art: lock look B Peat and Ochre as master palette
 and golden references". Lock-B layout (supersedes the option paths below):
 - `assets/palette/core.{json,gpl}` (44 colours that never change: soot, iron, bone, skins, cloth, heraldry, blood,
@@ -14,6 +19,26 @@ and golden references". Lock-B layout (supersedes the option paths below):
   its preprocess, so night frames are now byte-identical run to run (they were not: 1.1% of pixels moved).
 - check_assets_pixels.py checks assets/look_target/heartland and assets/golden against heartland; self-test 24/24.
 - Pipeline default pixelate.json still points at master_draft (average_m sheet + fixtures): switching is a separate step.
+
+## Cast fix (2026-10-15, branch claude/art-cast-fix; slop audit rows 7-9, 13-16)
+- Plate is now a shell conformed to the body (`tools/pipeline/kit_extras.py`: a masked copy of the body per shell,
+  smoothed and pushed out along the normals; the body skin under it is masked), so skin cannot poke through.
+  Kits list `shells`; primitives only add silhouette (orc: round layered pauldrons, wide fauld, belt, leather boots;
+  Vampyr: pointed pauldrons, high collar, short tassets, a pleated cape). Kit `eyes` pushes the MPFB eye helpers out
+  through the lids; build_sprites keeps one deliberate eye pixel per eye (weighted centre).
+- build_sprites: outline on the silhouette only (no inner lines), 1-2 px slots closed before the outline, interior
+  runs under 3 px merged (eyes kept), token hand edits in `tools/look/token_edits.json` (checked against the colour
+  they replace). average_m re-run on core + heartland; check_assets_pixels checks assets/sprites/ on heartland.
+- Rerun: `bash D:/MERCS-vault/renders/cast_fix_2026-10-15/render.sh <out>` (orc + Vampyr, colour, matid, normal),
+  then `python tools/look/build_sprites.py --renders <out> --palette assets/palette/biomes/heartland.json
+  --out assets/look_target/heartland/sprites --tag heartland`. Board: `D:/MERCS-vault/renders/cast_fix_2026-10-15/`.
+- Not done: goldens still show the old orc (re-capture after claude/art-desloppify lands).
+- Round 2 (fresh critic `D:/MERCS-vault/renders/cast_fix_2026-10-15/CRITIC.md`): kit_extras `drape` (hanging cape),
+  shell `bulge`, bodies.json per-merc `bone_scale` ([x,y,z] ok; orc head + broad short feet) and orc posture (no hump);
+  orc parts: plate/belt/fauld/`mail` (new matid)/knee cops/greaves/boots + gorget; build_sprites: no ramp starts at
+  soot 0, eyes on one row, eye rims + orc brow, eye off the edge, enclosed holes <= 80 px filled, orc token skin +1.
+  Feet now within 12 (validate_sheet passes). Rerun: `round2/render.sh <out>` (kit-keep adds gorget,knee). Board:
+  `round2/README.md`. Awaiting a fresh critic; never self-passed.
 
 ## Water fix (lead QC 2026-10-15: map water read as an asphalt road with a lane marking)
 - Cause: water was slate 1 lit by the warm sun (snapped to brown-greys), straight tile edges with a soil kerb,

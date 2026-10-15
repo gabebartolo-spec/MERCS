@@ -2,7 +2,7 @@
 
   python tools/look/make_palettes.py
 
-Each option is one coherent set of named ramps (06_STYLE_ART.md section 2), 64 colours. A ramp is
+Each option is one coherent set of named ramps (06_STYLE_ART.md section 2), 64 colours (heartland adds heather and verdure_mid: 68). A ramp is
 given by its darkest and lightest colour; the steps between are spaced evenly in OKLab, so lightness
 climbs evenly and any hue shift between the anchors (cool shadows, warm lights) is spread over the
 ramp. A ramp given as a list keeps those colours as they are (cloth pairs, heraldry, blood, fire).
@@ -35,12 +35,15 @@ PURPOSE = {
     "skin_pale": "the Vampyr's skin (index-mapped from skin_neutral)",
     "cloth_faded": "commoner and dark cloth: dull red pair, dull blue pair",
     "verdure": "grass, moss, leaves",
+    "heather": "heather, ling and moor flowers: three dusty purples (director, 2026-10-16)",
+    "verdure_mid": "grass mass: one step between verdure_1 and verdure_2, luma ~69 (director, 2026-10-16: darken to match golden)",
     "heraldry": "faction colours only: crimson, gold, blue, white, yellow",
     "blood": "overlay only: two reds and a dried brown",
     "fire": "torch and ember accents",
 }
 STEPS = {"soot": 4, "slate": 5, "iron": 5, "soil": 5, "timber": 5, "bone": 5, "skin_neutral": 5,
-         "skin_orc": 5, "skin_pale": 5, "verdure": 5}
+         "skin_orc": 5, "skin_pale": 5, "verdure": 5,
+         "heather": 3}
 ORDER = ["soot", "slate", "iron", "soil", "timber", "bone", "skin_neutral", "skin_orc", "skin_pale",
          "cloth_faded", "verdure", "heraldry", "blood", "fire"]
 
@@ -64,8 +67,10 @@ OPTIONS = {
         "ramps": {
             "soot": ("#17120f", "#45392f"), "slate": ("#34393d", "#aba693"), "iron": ("#2b2b2a", "#b6b1a3"),
             "soil": ("#2b1c11", "#a27a4e"), "timber": ("#321f0f", "#b68b51"), "bone": ("#8e7d5d", "#efe1bd"),
-            "skin_neutral": ("#4c2d1f", "#e0b48f"), "skin_orc": ("#283016", "#9ba15c"),
+            "skin_neutral": ("#4c2d1f", "#e0b48f"), "skin_orc": ["#2e3428", "#637251", "#94a179", "#afb88b", "#c1cb9c"],
             "skin_pale": ("#4b3d39", "#e1d3c2"), "verdure": ("#1e2a12", "#808c46"),
+            "heather": ("#3d2a41", "#94758a"),
+            "verdure_mid": ["#40501d"],  # luma 69.4; kept clear of skin_orc (not the plain OKLab midpoint)
             "cloth_faded": ["#7a3a26", "#a0573a", "#37474f", "#59706f"],
             "heraldry": ["#8a1d1d", "#bb3a2c", "#d29a2a", "#22488a", "#ece3cf", "#e0b92c"],
             "blood": ["#5c1010", "#80201a", "#4c2a18"], "fire": ["#e07a28", "#f6c64a"],
@@ -134,7 +139,7 @@ def gpl(name: str, ramps: list[dict]) -> str:
 
 NL = chr(10)
 CORE = ["soot", "iron", "bone", "skin_neutral", "skin_orc", "skin_pale", "cloth_faded", "heraldry", "blood", "fire"]
-BIOME = ["slate", "soil", "timber", "verdure"]
+BIOME = ["slate", "soil", "timber", "verdure", "heather", "verdure_mid"]  # heather, verdure_mid: biome-only, option B (2026-10-16); appended so no index moves
 PICKED = "B"  # director, 2026-10-15: option B "Peat and Ochre" is the look target
 BIOME_NAME = "heartland"
 AUDIT = REPO / "docs" / "audits" / "look_target" / "options"
@@ -178,7 +183,7 @@ def main() -> None:
         "ramps": ramps_of(opt, CORE)}, "MERCS core")
     save(OUT.parent / "biomes" / f"{BIOME_NAME}.json", {
         "_doc": f"MERCS biome palette '{BIOME_NAME}' (06 section 2): the core ramps (core.json) plus this "
-                "biome's ground, stone and sky (slate), soil, timber and foliage, and its light. From look "
+                "biome's ground, stone and sky (slate), soil, timber, foliage and heather, and its light. From look "
                 "option B 'Peat and Ochre', picked by the director 2026-10-15. Other biomes (kingdoms, "
                 "landscapes) are new files beside this one with the same ramp names.",
         "schema": "mercs.palette/1", "id": f"mercs_biome_{BIOME_NAME}", "status": "APPROVED", "approved": True,

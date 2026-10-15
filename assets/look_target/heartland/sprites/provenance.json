@@ -1,23 +1,27 @@
 {
-  "_doc": "Orc and Vampyr stage-1 blockouts rendered by the sprite pipeline (CC0 MPFB bodies, Blender primitives for kit), reduced to core + heartland.",
+  "_doc": "Orc and Vampyr stage-1 blockouts rendered by the sprite pipeline (CC0 MPFB bodies; plate as shells conformed to the body plus Blender primitives, kit_extras.py), reduced to core + heartland with the outline on the silhouette only, speckle merged and the tokens hand-edited (token_edits.json). Cast fix after the slop audit of 2026-10-15. Round 3 (2026-10-16): bodies, tokens and normal strips hand-repainted part by part in palette ramps (tools/look/cast_r3/); heads kept from the render. Round 4 (2026-10-16, tools/look/cast_r4/): the orc repainted inside the round-2 alpha (bulk back), skin on the green-grey skin_orc ramp, tusks in bone 3 (director: 'bulk and green-grey skin'); the Vampyr in his own armour (slim spaulders, no fauld box) with a fanned cape; tokens are the SE frames at half scale. Round 5 (2026-10-16, tools/look/cast_r5/): the orc's heads hand-placed as planes (broad jaw, brow shelf, mouth, tusks from the lower jaw), skin on the moss-hue skin_orc ramp, plate one iron step darker; the Vampyr's armour darker with a cuirass ridge and the cape lining showing at the front; the orc token head by hand. Round 6 (2026-10-16, tools/look/cast_r6/): the orc's heads rebuilt as skulls (rounded crown, brow arches, ears, nose, neck, a sloped back in profile) on a mossier skin_orc ramp; the orc token head redrawn so the tusks cross a straight mouth; the Vampyr's breastplate tapered to the waist with a plackart line and fauld lames, the lining as cape folds, and the E/W jaw blob replaced by a jaw line. Round 7 (2026-10-16, tools/look/cast_r7/): the orc's E/W ear a skin crease (no soot ring inside the skull); the Vampyr's five enclosed outline holes filled with soot 0 and an eye socket on his E/W head.",
   "asset": "look_target/heartland/sprites",
   "files": {
-    "orc_look_heartland.json": "3c1f14c70d1ad13c8b74aa155c0330018bd17e4f3efb874082821ee8bd0d25a9",
-    "orc_look_heartland.png": "91465a73f89af66721c6e0a616ca9386fce84788c382cc735f1674a0f3c38974",
-    "orc_look_heartland_normal.png": "d6b8936a746eb3040a4a906c77c54fca44d3e6b9a45776df2a6e91f1691f76ec",
+    "orc_look_heartland.json": "640ee5cd0a16a24fed5e4814d88d9fb466b87e415f5225993aadd5cc0457c314",
+    "orc_look_heartland.png": "2c9850c30f7ff3667ee8a87b5811e9ff1045fc135a640fc70b9ea8ddd5278eb1",
+    "orc_look_heartland_normal.png": "93a8835334fd0653469429ccb9016c80047b4f00a55ec676b2124804960a4623",
     "orc_token_heartland.json": "4f5645c4f632cb62bd820948cf098b9361215f0d2e5c03e377c91d5201f52c2c",
-    "orc_token_heartland.png": "fab11a6550e0a38a9946b324b576d106e83cfe84d9adbf9d56d9224d7942b5c3",
-    "vampyr_look_heartland.json": "8ec802ec4070a3675a1543c753ca6c23d2b91aea53d1772be4928d0885c4eb57",
-    "vampyr_look_heartland.png": "ad938ad022381dd395aaf7937e77ec538c22ea3cf02f78889de6c1fd051b5a3b",
-    "vampyr_look_heartland_normal.png": "c36ec865ad05c529af9857764b32ec720577aa83123b5a0514e99896bb9a59c3",
+    "orc_token_heartland.png": "d21668c42730e986f2c36d3210a84a84d27d70e168af90a82884ea220d0e69aa",
+    "vampyr_look_heartland.json": "a6fb9a60718573cc42097562efc4d1085ef03103815c4f9a6a0c8c76cb4cb94f",
+    "vampyr_look_heartland.png": "0c3e19b36f6c84985c957c5837695c1334af2f57941ddcffdd2d46732a42a47b",
+    "vampyr_look_heartland_normal.png": "9512a50f7e18a58736d2df57277edd7c37182f96f0e0992c36c3af45753c68c5",
     "vampyr_token_heartland.json": "4f5645c4f632cb62bd820948cf098b9361215f0d2e5c03e377c91d5201f52c2c",
-    "vampyr_token_heartland.png": "d696c00c12a189e10510a7232353ea19340cb0af6f650914ea15c93d9e8edbf4"
+    "vampyr_token_heartland.png": "5497e64365ede1ee86cf7f5c5c96d9531fac766d77108da96986494603db8dda"
   },
   "produced_by": {
-    "tools/pipeline/render_character.py": "d63ffb26d210188e",
+    "tools/pipeline/render_character.py": "c99e31ff5a17ed08",
+    "tools/pipeline/kit_extras.py": "159a7f3e0a9a4ea6",
     "tools/pipeline/pixelate.py": "703232efdc481053",
     "tools/pipeline/pack_sheets.py": "3fa9bc0dd2d20fb3",
-    "tools/look/build_sprites.py": "eb5304eac5d8533b"
+    "tools/pipeline/kits/orc_s1_blockout.json": "90d903e8fd1bcdf2",
+    "tools/pipeline/kits/vampyr_s1_blockout.json": "ee2c22dca07b2c50",
+    "tools/look/build_sprites.py": "fa6a36cfba532049",
+    "tools/look/token_edits.json": "9d374b47c64ff643"
   },
   "models": [],
   "licence_rows": [
@@ -26,6 +30,6 @@
     "Python, Pillow, NumPy"
   ],
   "seed": null,
-  "status": "prototype sprites for the golden references",
+  "status": "prototype sprites for the golden references; cast fix awaiting the director's look approval",
   "created": "2026-10-15"
 }

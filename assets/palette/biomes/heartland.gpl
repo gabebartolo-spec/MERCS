@@ -21,11 +21,11 @@ Columns: 6
 147 109  84	skin_neutral_2
 185 144 113	skin_neutral_3
 224 180 143	skin_neutral_4
- 40  48  22	skin_orc_0
- 66  74  38	skin_orc_1
- 94 102  55	skin_orc_2
-124 131  73	skin_orc_3
-155 161  92	skin_orc_4
+ 46  52  40	skin_orc_0
+ 99 114  81	skin_orc_1
+148 161 121	skin_orc_2
+175 184 139	skin_orc_3
+193 203 156	skin_orc_4
  75  61  57	skin_pale_0
 110  95  88	skin_pale_1
 147 132 122	skin_pale_2
@@ -66,3 +66,7 @@ Columns: 6
  76  89  43	verdure_2
 102 114  56	verdure_3
 128 140  70	verdure_4
+ 61  42  65	heather_0
+103  78 100	heather_1
+148 117 138	heather_2
+ 64  80  29	verdure_mid_0

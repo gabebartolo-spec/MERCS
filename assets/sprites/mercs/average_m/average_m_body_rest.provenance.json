@@ -2,18 +2,18 @@
   "_doc": "Provenance manifest (docs/10_LICENSING_REGISTER.md 'Provenance manifest'): covers the three files of this sheet. Rendered by the sprite pipeline from the CC0 MPFB base body; no generative model touched it.",
   "asset": "sprites/mercs/average_m/average_m_body_rest.json",
   "files": {
-    "average_m_body_rest.json": "4b6c0e66c3e1c15fc6067422721fe8402997cebef713a9460782f6ccbddb274f",
-    "average_m_body_rest.png": "9ac6c96aa33aa11c5201b25f0f45c0057925b3d5322e199530f8312539bc2015",
-    "average_m_body_rest_normal.png": "5823a78a7f0db880378088f8f25325e45d9929d88c273bc5aff42bb2b168ca74"
+    "average_m_body_rest.json": "3d9c26cee3127cb97b0c15797780667b51a0336dabff0e62267b1d8dcafa8107",
+    "average_m_body_rest.png": "118f2e297044ad9922e3ede058e872092ef7db3801a689443112c66964858c3b",
+    "average_m_body_rest_normal.png": "afbafb558545076ed1eede46d888c527520ae644936a80f674007a6ea99e10af"
   },
-  "produced_by": "tools/pipeline/render_character.py, pixelate.py, pack_sheets.py @ 80b1dcd (main, PR #52)",
+  "produced_by": "tools/pipeline/render_character.py, pixelate.py, pack_sheets.py (branch claude/art-cast-fix): re-run on the locked palette after the slop audit of 2026-10-15, outline on the silhouette only (no --parts inner lines); round 3 (2026-10-16): hand edits in skin_neutral only (arm shadow lines S/E/NW, back planes NW/NE, E thigh clumped), tools/look/cast_r3/avg_paint.py; round 4 (2026-10-16, tools/look/cast_r4/avg_paint.py): arm line carried down the forearm and a 1-px gap at the hand on SE/SW (19 px of alpha, the normal strip's alpha follows), E arm one line and thigh in two planes",
   "inputs": {
     "body_blend": "tools/pipeline/bodies/average_m.blend@95326b38dcd40621",
     "camera_rig": "tools/pipeline/camera_rig.json@c67f2acbf9918073",
     "light_rig": "tools/pipeline/light_rig.json@c246e0a0750c346e",
-    "pixelate_config": "tools/pipeline/pixelate.json@3f6f5ba7db17dbe8",
+    "pixelate_config": "assets/look_target/heartland/pixelate.json@e504d68e3a53b582",
     "proportions": "tools/pipeline/proportions.json@f0722e47bb29a532",
-    "render_script": "tools/pipeline/render_character.py@c673a4df1d639b59"
+    "render_script": "tools/pipeline/render_character.py@ea923b37759b29ab"
   },
   "clip": null,
   "models": [],
@@ -23,7 +23,6 @@
     "Python, Pillow, NumPy"
   ],
   "seed": null,
-  "palette_version": "master_draft (DRAFT)",
-  "created": "2026-10-09",
-  "identical_to": "tests/fixtures/pipeline/sheets/good/average_m_body_rest.json (same pipeline, same inputs)"
+  "palette_version": "core + heartland (look B 'Peat and Ochre', locked 2026-10-15)",
+  "created": "2026-10-15"
 }

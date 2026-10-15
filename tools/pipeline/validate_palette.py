@@ -3,7 +3,7 @@ pixel of every image given is one of its colours.
 
   python tools/pipeline/validate_palette.py --palette <palette.json> [image.png ...]
 
-The palette must be mercs.palette/1, hold 48 to 64 distinct colours in named ramps (palette_lib checks
+The palette must be mercs.palette/1, hold 48 to 72 distinct colours in named ramps (palette_lib checks
 schema and duplicates). For each image, pixels with alpha 0 are ignored; any other pixel whose RGB is not
 in the palette is counted. Prints one line per image (PASS/FAIL, off-palette pixel count, colours used)
 and exits 1 on any failure.
@@ -19,7 +19,7 @@ from palette_lib import load_palette  # noqa: E402
 from pngio import read_png  # noqa: E402
 
 MIN_COLOURS = 48
-MAX_COLOURS = 64
+MAX_COLOURS = 72  # core + biome cap (heather ramp, 2026-10-16)
 
 
 def check_image(path: Path, allowed: set[int]) -> tuple[int, int]:

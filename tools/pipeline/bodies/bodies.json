@@ -108,13 +108,13 @@
       },
       "doc": "Merc 'orc' (director's reference, 2026-10-09): big, bulky, mean; charges in on pure aggression, plate and a battle axe. Anchors: hunched shoulder mass on a thick short neck, heavy jaw with tusks, grey-green skin ramp (palette, not texture).",
       "posture_lean_deg": {
-        "mixamorig:Spine": 3.0,
-        "mixamorig:Spine1": 4.0,
-        "mixamorig:Spine2": 4.0,
-        "mixamorig:Neck": 3.0,
-        "mixamorig:Head": -10.0
+        "mixamorig:Spine": 0.0,
+        "mixamorig:Spine1": 1.0,
+        "mixamorig:Spine2": 2.0,
+        "mixamorig:Neck": 5.0,
+        "mixamorig:Head": -16.0
       },
-      "posture_doc": "Hunched predator: chest and shoulders rolled forward, head thrust forward and level, so the mass leads.",
+      "posture_doc": "Heavy, not hunchbacked (fresh critic 2026-10-15 item 4; was Spine 3, Spine1 4, Spine2 4, Neck 3, Head -10, which bowed the back into a hump): the back stays nearly straight, the neck juts forward and the head sits over the chest, so the barrel chest and gut lead; the chin is up a little, so the face, not the crown, meets the 45 degree camera.",
       "features": {
         "tusk_l": {
           "bone": "mixamorig:Head",
@@ -173,7 +173,25 @@
           "mixamorig:RightForeArm",
           "mixamorig:RightHand"
         ]
-      }
+      },
+      "bone_scale": {
+        "mixamorig:Head": [
+          1.24,
+          1.06,
+          1.16
+        ],
+        "mixamorig:LeftFoot": [
+          1.2,
+          0.88,
+          1.1
+        ],
+        "mixamorig:RightFoot": [
+          1.2,
+          0.88,
+          1.1
+        ]
+      },
+      "bone_scale_doc": "Head larger, broad more than tall (lead's call 2026-10-15, critic item 5): at 1:6.5 head-to-shoulders the face had no pixels. Width 1.24, height 1.06 (along the bone), depth 1.16 in the head bone's axes: a wide jaw and a low cranium, so from the 45 degree camera the face, not the crown, takes the extra pixels; about 1:5.5. Feet broad and short (width 1.2, length 0.88, height 1.1): at 2.02 m his booted toes reached 13-14 px below the pivot in SE and SW (camera_rig.json allows 12), and a shorter foot alone read as pegs under a giant."
     },
     "vampyr": {
       "height_m": 1.93,

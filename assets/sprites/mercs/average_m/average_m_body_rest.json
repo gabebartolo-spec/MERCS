@@ -4,7 +4,7 @@
   "layer": "body",
   "clip": "rest",
   "image": "average_m_body_rest.png",
-  "image_pixel_sha256": "5d0b33245c403cf81b6ee1992e69c14d3fc4035eaf2caf69c48598b29db3e04b",
+  "image_pixel_sha256": "8ac1b54b08c72ea54f2b08893977cf478259d5fd6a9d6c3acc397f1a0d506d8d",
   "frame_w": 176,
   "frame_h": 176,
   "frame_count": 8,
@@ -91,10 +91,10 @@
     "doc": "feet centre in frame pixels, the same in every frame"
   },
   "palette": {
-    "id": "master_draft",
-    "file": "tools/pipeline/palette/master_draft.json",
-    "sha256": "767b261e300cbe8962ace5dddb7337748f0752b0f067c2a826c578ffe23fcf3a",
-    "status": "DRAFT"
+    "id": "mercs_biome_heartland",
+    "file": "assets/palette/biomes/heartland.json",
+    "sha256": "17646055a4eaf699150661b2f72635bd7b08d4a34ac4fdb1f2f3db77c26cb5ac",
+    "status": "APPROVED"
   },
   "provenance": {
     "sources": [
@@ -154,15 +154,15 @@
       },
       "render_script": {
         "file": "tools/pipeline/render_character.py",
-        "sha256": "c673a4df1d639b5958706852fd76a3115a37fef914db3a98aa543d6a43c5f7ae"
+        "sha256": "ea923b37759b29abab02683d0328e25c04db14497fe5f2d1ed275a6158c653dd"
       },
       "proportions": {
         "file": "tools/pipeline/proportions.json",
         "sha256": "f0722e47bb29a53294e8db4b691c13b6b03748567097f8a59c4a7f0ca0657d8a"
       },
       "pixelate_config": {
-        "file": "tools/pipeline/pixelate.json",
-        "sha256": "3f6f5ba7db17dbe8d12df3607ba9c2f6fab04e6f5f726b7ebb063b597a52761e"
+        "file": "assets/look_target/heartland/pixelate.json",
+        "sha256": "e504d68e3a53b582ef89a08da6f3c8acc783fa60df3e1a8817642d49664c4aca"
       }
     },
     "tools": {
@@ -170,9 +170,9 @@
       "python": "3.14.7",
       "scripts": {
         "pngio.py": "c97d8df63884ddc60bfeb5ff6464c46b913c40f53939b6dcc7db856cffc6438c",
-        "palette_lib.py": "f22644e8a13658cb3543f958ed0d15c4521242dbf05ae06829ccba14cce085a0",
+        "palette_lib.py": "711b1376546d46903ae8e43c219b492e805d90475b04802248130a7273f20eed",
         "pixelate.py": "703232efdc4810538c2bfcc3f630a7c0de49b1ca57b9a1a0d12ab4149906a1c2",
-        "pack_sheets.py": "039780aa67ead7a246f285a1029f4055d01c1b064941383fb1c0bc8093df9e43"
+        "pack_sheets.py": "3fa9bc0dd2d20fb392308554be9a3712820ea387a776b7a714825b6563af8c12"
       }
     },
     "licence_rows": [
@@ -182,6 +182,6 @@
     ]
   },
   "normal_image": "average_m_body_rest_normal.png",
-  "normal_image_pixel_sha256": "acc6e23708b3c6c183682c533da955fb69ae3b3b3d34762b9ee4feaa137042d7",
+  "normal_image_pixel_sha256": "a6f2236246340a70e1f33ff5df2880fe2130e48b5e7946bad386e3ed3e37f758",
   "normal_doc": "camera-facing tangent space, OpenGL: R = screen right, G = screen up, B = toward camera, encoded n * 0.5 + 0.5; alpha copied from the colour frame"
 }

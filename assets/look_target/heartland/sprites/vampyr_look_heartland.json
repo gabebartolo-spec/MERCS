@@ -4,7 +4,7 @@
   "layer": "body",
   "clip": "rest",
   "image": "vampyr_look_heartland.png",
-  "image_pixel_sha256": "3de6bc60c9404127681ac05be7cae8e36604431e6079d99ab331201def41f464",
+  "image_pixel_sha256": "af54e31d549bf15c2b8014eabb4bf9fe7eb5a2df5cd9e11d600f360f0b7d9db9",
   "frame_w": 176,
   "frame_h": 176,
   "frame_count": 8,
@@ -93,7 +93,7 @@
   "palette": {
     "id": "mercs_biome_heartland",
     "file": "assets/palette/biomes/heartland.json",
-    "sha256": "71e24478eec0a3f8222103a10a8f42b8795948a70bdd54d8a310d0c2d0cb3844",
+    "sha256": "17646055a4eaf699150661b2f72635bd7b08d4a34ac4fdb1f2f3db77c26cb5ac",
     "status": "APPROVED"
   },
   "provenance": {
@@ -101,42 +101,42 @@
       {
         "file": "facing_0_S.png",
         "kind": "render_4x",
-        "sha256": "e685883add9955869ce5ff9e98d8971a49eb764b0af8e394156d72d179242a20"
+        "sha256": "106067ee4bfb6232f11f834205f17d8936c41672de6c878126e12b2395a700ae"
       },
       {
         "file": "facing_1_SE.png",
         "kind": "render_4x",
-        "sha256": "dfa414e9c40906af392481f4d1aa7e0603f004457ce4ade20269a8e42181c7ab"
+        "sha256": "b725338bfe5107018db3bdcfb56b6035cdcb313965d609dfa9f089e604711779"
       },
       {
         "file": "facing_2_E.png",
         "kind": "render_4x",
-        "sha256": "cb60d71661bf1dbe258d5a7c9f238483afe8e283596eb614f501388f3a3af7ac"
+        "sha256": "fe9fc2d59419da2ed5f570aed5ba6382c61bf6c299f9df409ff6a6be2f3c98e5"
       },
       {
         "file": "facing_3_NE.png",
         "kind": "render_4x",
-        "sha256": "98f161e888e14d0ed67c79b20d3ef718b9b9a0bb718f7f544cac9bce5d26b1ab"
+        "sha256": "adb86e2cb2c063b4a37f1dfbb1549ea1756ca3fb8e92be85cafb1eb7a3ea3a3a"
       },
       {
         "file": "facing_4_N.png",
         "kind": "render_4x",
-        "sha256": "0a286ebc0d44cb0fcf6ee92cd264ca00712b09eaaa001da510b2802ec79492cc"
+        "sha256": "d1fa2d54ffe2e1599fd2542e808a9e818e453312e01f17d807ab598ff251c1b1"
       },
       {
         "file": "facing_5_NW.png",
         "kind": "render_4x",
-        "sha256": "32d97751f03cb6c405c1bbaafbbc73094f2e03bbd97e98769aec1e3c81420db5"
+        "sha256": "becdbebd99521142fff16a05ab0fc8b30beab8d5cbc9ed6191895f768735a87b"
       },
       {
         "file": "facing_6_W.png",
         "kind": "render_4x",
-        "sha256": "7ae1c7e99626cd55f1fe908dafdf8a81ac2c0fedeae6d60ef48ccedbe46a86a6"
+        "sha256": "5487a0df363bac537ffa1552aa928005e3f94f4947a009d87251ea62d2c2114e"
       },
       {
         "file": "facing_7_SW.png",
         "kind": "render_4x",
-        "sha256": "145923c7d05684efb50f5897f4a0def8686546b18ca971e3a9aac960e973d382"
+        "sha256": "d252fd8fed7c16cbc78796bc655718b4d86d909872aec179ef442990cc65b292"
       }
     ],
     "inputs": {
@@ -154,7 +154,7 @@
       },
       "render_script": {
         "file": "tools/pipeline/render_character.py",
-        "sha256": "d63ffb26d210188e854d47161bfa98171a8c39b7f3ed353166ca8be31d7767c3"
+        "sha256": "c99e31ff5a17ed089c7f284e781b4a013adc229af2d34174e43b59c14cdfe449"
       },
       "proportions": {
         "file": "tools/pipeline/proportions.json",
@@ -162,16 +162,22 @@
       },
       "kit": {
         "file": "tools/pipeline/kits/vampyr_s1_blockout.json",
-        "sha256": "21b151786286c7026d99497a5de2cec4b9a4c7c913a0b68aafdcb5f1e176b0ad",
-        "pieces": 12,
+        "sha256": "ee2c22dca07b2c50f542d979aa5a26a153d2b939685123e7fe60131f18292e88",
+        "pieces": 7,
         "kept": [
           "collar",
-          "breastplate",
           "tassets",
           "pauldron",
-          "vambrace",
-          "greave",
           "cape"
+        ],
+        "shells": [
+          "shell_arms",
+          "shell_cuirass",
+          "shell_legs",
+          "shell_sabatons"
+        ],
+        "features": [
+          "feature_eyes"
         ]
       },
       "pixelate_config": {
@@ -196,6 +202,6 @@
     ]
   },
   "normal_image": "vampyr_look_heartland_normal.png",
-  "normal_image_pixel_sha256": "e90f07cce8126c737319d1773951094bdddd83ec69562ef464d889bf531a7185",
+  "normal_image_pixel_sha256": "22721b7647d554bfc494bbbeb7383fd18b928dbbd350e0efdc7e9f4167f6344d",
   "normal_doc": "camera-facing tangent space, OpenGL: R = screen right, G = screen up, B = toward camera, encoded n * 0.5 + 0.5; alpha copied from the colour frame"
 }
