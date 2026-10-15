@@ -14,6 +14,9 @@ extends Node
 ## Placeholder look.
 
 signal finished
+## Every action the battle applied, either side's, in order (Battle.apply's input): Ironman
+## records them so a reload can resume the fight (FightRecord). Raised before `finished`.
+signal acted(action: Dictionary)
 
 const MARKER_DATA := "res://data/balance/slice.json"
 const ENEMY_PAUSE_S := 0.45
@@ -135,6 +138,7 @@ func _on_choice(choice_id: String) -> void:
 func _play(action: Dictionary) -> void:
 	if battle.apply(action).is_empty():
 		return
+	acted.emit(action)
 	_refresh()
 	if battle.is_over():
 		finished.emit()

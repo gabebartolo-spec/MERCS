@@ -12,6 +12,8 @@ extends RefCounted
 
 ## The Rng stream an encounter's line-up is rolled on (never "world": the map never shifts).
 const ENCOUNTER_STREAM := "encounter"
+## The encounter's key once its fight has begun under Ironman: a reload resumes that fight.
+const FIGHTING := "fighting"
 
 var day := 0
 var supplies := 0
@@ -29,7 +31,8 @@ var haven := ""
 ## {"step": "encounter", "type": t, "outcome": "won"|"lost"|"paid", "supplies": change}.
 var log: Array[Dictionary] = []
 ## The encounter a party raised and nobody has settled yet, or {}: {"type", "party", "day",
-## "enemy_first", "enemies": [{"fighter", "cell"}]}. While it stands the band cannot move.
+## "enemy_first", "enemies": [{"fighter", "cell"}]}, and "fighting": true once its fight has
+## begun under Ironman (mark_fighting). While it stands the band cannot move.
 var encounter: Dictionary = {}
 ## Callables the hub's economy registers (Phase 2 M6, not saved): day_hook.call(day) after every
 ## day's tick; result_hook.call(encounter type, result) after a fight's result is applied.
@@ -114,6 +117,18 @@ func party(party_id: String) -> WorldParty:
 ## The standing encounter, or {} (a copy).
 func pending_encounter() -> Dictionary:
 	return encounter.duplicate(true)
+
+
+## Ironman: the standing encounter's fight has begun, so a reload goes back into it (with the
+## actions the save records, FightRecord) and never offers the encounter's choices again.
+func mark_fighting() -> void:
+	if not encounter.is_empty():
+		encounter[FIGHTING] = true
+
+
+## Whether the standing encounter's fight has begun under Ironman.
+func is_fighting() -> bool:
+	return encounter.get(FIGHTING, false) == true
 
 
 ## Settles the standing encounter with a battle's result ({"won": bool}, see

@@ -38,6 +38,10 @@ var ended := false
 ## and after its aftermath). Optional key "ironman" (absent reads as Off, so every older save
 ## loads as it always did; no version of its own).
 var ironman := false
+## Ironman, a save written during a fight (the world's encounter is fighting): the actions the
+## battle took since it began (FightRecord, optional key "fight"), to replay on reload; [] in
+## any other save, so every older save loads as it always did; no version of its own.
+var fight_actions: Array[Dictionary] = []
 
 
 ## The Rng's seed and stream positions are written as strings: they are 64-bit ints, and
@@ -90,6 +94,8 @@ static func from_dict(
 		current.get("ended", false) == true or (model.company != null and model.company.is_wiped())
 	)
 	model.ironman = current.get("ironman", false) == true
+	if model.world.is_fighting():
+		model.fight_actions = FightRecord.read(current)
 	model.ok = not model.ended
 	if model.ended:
 		model.error = ERROR_ENDED

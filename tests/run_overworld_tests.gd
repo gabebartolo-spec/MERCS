@@ -223,7 +223,7 @@ func _check_blocked_step(game: SliceGame) -> void:
 			"a tap of D into %s leaves the band and the panel says why" % kind
 		)
 		world.region.set_terrain(east, was)
-	var edge := game.overworld_director()._blocked_line(Vector2i(-world.band.x - 1, 0))
+	var edge := OverworldWords.blocked(world, Vector2i(-world.band.x - 1, 0))
 	check(edge == Text.t("world.panel.blocked_edge"), "a step off the map's edge says so")
 
 

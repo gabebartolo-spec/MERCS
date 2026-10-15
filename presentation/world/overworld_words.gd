@@ -5,6 +5,16 @@ extends RefCounted
 ## nothing.
 
 
+## Why a step was refused, in words: the edge of the land, water, or a town's walls.
+static func blocked(world: WorldSim, direction: Vector2i) -> String:
+	var target := world.band + direction
+	if not world.region.inside(target):
+		return Text.t("world.panel.blocked_edge")
+	if world.region.terrain(target) == TileRegion.Terrain.TOWN:
+		return Text.t("world.panel.blocked_building")
+	return Text.t("world.panel.blocked_water")
+
+
 ## The last encounter log entry in words: what the company won, lost or paid; `otherwise` when
 ## there is none.
 static func outcome(world: WorldSim, otherwise: String) -> String:

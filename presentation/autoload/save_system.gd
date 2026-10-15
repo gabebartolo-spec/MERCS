@@ -19,17 +19,18 @@ func has_save() -> bool:
 	return FileAccess.file_exists(SAVE_PATH)
 
 
-## Writes the run as it stands, with the company and its wounds block (CompanyWounds.state())
-## when there are some. A company with every merc dead marks the save ended (SaveModel), after
-## which it only ever shows the chronicle. Written with `ironman` as the caller set it. False
-## when the file could not be written.
+## Writes the run as it stands (to_save()). False when the file could not be written.
 func save_game(world: WorldSim, rng: Rng, company: Company = null, wounds: Dictionary = {}) -> bool:
-	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
-	if file == null:
-		push_warning(
-			"save failed: %s (%s)" % [SAVE_PATH, error_string(FileAccess.get_open_error())]
-		)
-		return false
+	return write(to_save(world, rng, company, wounds))
+
+
+## The run as it stands as a save, with the company and its wounds block
+## (CompanyWounds.state()) when there are some and the story block (extras). A company with
+## every merc dead marks the save ended (SaveModel), after which it only ever shows the
+## chronicle. Made with `ironman` as the caller set it.
+func to_save(
+	world: WorldSim, rng: Rng, company: Company = null, wounds: Dictionary = {}
+) -> Dictionary:
 	var saved := SaveModel.to_dict(
 		world, rng, company, wounds, company != null and company.is_wiped(), ironman
 	)
@@ -38,6 +39,18 @@ func save_game(world: WorldSim, rng: Rng, company: Company = null, wounds: Dicti
 		var story: Variant = more.get("story", {})
 		var block: Dictionary = story if story is Dictionary else {}
 		saved = SaveModel.with_story(saved, block)
+	return saved
+
+
+## Writes a save made by to_save() (or an Ironman fight's, FightRecord.saved()) to the one slot.
+## False when the file could not be written.
+func write(saved: Dictionary) -> bool:
+	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	if file == null:
+		push_warning(
+			"save failed: %s (%s)" % [SAVE_PATH, error_string(FileAccess.get_open_error())]
+		)
+		return false
 	file.store_string(JSON.stringify(saved, "\t"))
 	var error := file.get_error()
 	file.close()

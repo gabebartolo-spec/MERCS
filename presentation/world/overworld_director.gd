@@ -25,8 +25,6 @@ const SAVE := "save"
 const FIGHT := "fight"
 const TOLL := "toll"
 const CONTINUE := "continue"
-## Ironman: the encounter's key once Fight is chosen, saved before the battle is built.
-const FIGHTING := "fighting"
 const IRONMAN_ON := "ironman_on"
 const IRONMAN_OFF := "ironman_off"
 const ENCOUNTER_DATA := "res://data/encounters.json"
@@ -50,12 +48,17 @@ var wounds: CompanyWounds = null
 var street_stage: StreetStage = null
 var origin := Vector2i.ZERO
 ## The campaign's mode (chosen at its start, kept in the save): when on, the game saves itself
-## when a fight starts, when it ends and on Continue after its triage.
-var ironman := false
+## after every decision committed (CampaignSaves), a fight's every action included.
+var ironman: bool:
+	get:
+		return _store.ironman
+	set(value):
+		_store.ironman = value
 ## The street battle on screen, else null.
 var view: BattleView = null
 
 var _layer: CanvasLayer = null
+var _store := CampaignSaves.new()
 ## True from a fresh campaign's start until Ironman On/Off is chosen; nothing else moves.
 var _choosing := false
 var _walk: StageData = null
@@ -102,12 +105,14 @@ static func world_data() -> Dictionary:
 func begin() -> void:
 	var data := world_data()
 	var fresh := true
+	var taken: Array[Dictionary] = []
 	if _saves().has_save():
 		var model := _saves().load_game(data)
 		if model.ok:
 			world = model.world
 			rng = model.rng
 			ironman = model.ironman
+			taken = model.fight_actions
 			fresh = false
 	if world == null:
 		rng = Rng.from_seed(int(StageData.load_file(WORLD_DATA).num("world", "seed")))
@@ -132,10 +137,11 @@ func begin() -> void:
 	_layer.add_child(panel)
 	panel.chosen.connect(_on_choice)
 	add_child(MapCover.make(panel, map))
+	_store.bind(_saves(), world, rng, wounds)
 	_choosing = fresh
 	_show(_place_line())
-	if ironman and world.encounter.get(FIGHTING, false) == true:
-		_start_fight()
+	if ironman and world.is_fighting():
+		_start_fight(taken)
 
 
 ## Whether the map is on screen; the run lives on while it is hidden.
@@ -196,7 +202,7 @@ func walk(direction: Vector2i, delta: float) -> void:
 ## gate, a site's line, or the map redrawn.
 func _step(direction: Vector2i) -> void:
 	if not world.step(direction):
-		var line := _blocked_line(direction)
+		var line := OverworldWords.blocked(world, direction)
 		if panel.shown_body() != line:
 			_show(line)
 		return
@@ -209,16 +215,6 @@ func _step(direction: Vector2i) -> void:
 		_show(_place_line())
 	else:
 		map.show_world(world)
-
-
-## Why a step was refused, in words: the edge of the land, water, or a town's walls.
-func _blocked_line(direction: Vector2i) -> String:
-	var target := world.band + direction
-	if not world.region.inside(target):
-		return Text.t("world.panel.blocked_edge")
-	if world.region.terrain(target) == TileRegion.Terrain.TOWN:
-		return Text.t("world.panel.blocked_building")
-	return Text.t("world.panel.blocked_water")
 
 
 ## What the panel says where the band stands: a site's line at a site, else how to walk.
@@ -249,12 +245,14 @@ func _on_choice(choice_id: String) -> void:
 			if _after_triage.is_valid():
 				_after_triage.call()
 			_after_triage = Callable()
-			_autosave()
+			autosave()
 		TOLL:
 			world.pay_toll()
+			autosave()
 			_show(_outcome_line())
 		REST:
 			world.rest()
+			autosave()
 			_show(_place_line())
 		SAVE:
 			save_run()
@@ -273,21 +271,22 @@ func save_run() -> bool:
 		var body := Text.t("world.panel.save_busy") + "\n" + _triage
 		panel.present(Text.t("wiring.panel.title"), body, choices)
 		return false
-	var saved := _write()
+	var saved := _store.write()
 	_show(Text.t("world.panel.saved" if saved else "world.panel.save_failed"))
 	return saved
 
 
 ## Hides the map over the street and starts the battle the standing encounter leads into.
-func _start_fight() -> void:
+## Ironman: a reloaded fight is built the same way and its recorded actions replayed (`taken`),
+## so it stands at the turn it was left; every action from here is recorded (CampaignSaves).
+func _start_fight(taken: Array[Dictionary] = []) -> void:
 	if world.encounter.is_empty() or street_stage == null:
 		return
 	var battle_data := _json(BATTLE_DATA)
 	wounds.day = world.day
-	if ironman:
-		world.encounter[FIGHTING] = true
-	_autosave()
+	_store.begin_fight()
 	var battle := RoadFight.build(wounds, world.pending_encounter(), _scenario(), battle_data, rng)
+	_store.resume(taken.slice(0, FightRecord.replay(battle, taken)))
 	map.visible = false
 	view = BattleView.new()
 	add_child(view)
@@ -297,11 +296,15 @@ func _start_fight() -> void:
 	var rules: Dictionary = battle_data.get("rules", {})
 	var sight: int = rules.get("sight_cells", 0)
 	view.begin(battle, origin, sight)
+	view.acted.connect(_store.record)
 	view.finished.connect(_on_fight_over)
+	if battle.is_over():
+		_on_fight_over()
 
 
 ## The battle ended: the fighters leave the street, the sim applies the result, the map returns.
 func _on_fight_over() -> void:
+	_store.end_fight()
 	var result := EncounterBattle.result(view.battle)
 	view.clear()
 	view.queue_free()
@@ -320,20 +323,13 @@ func _on_fight_over() -> void:
 	_show(_outcome_line())
 	_show_triage()
 	if not _ended:
-		_autosave()
+		autosave()
 
 
-## Ironman: the run written as it stands, silently; saving only reads the Rng. Off: nothing.
-func _autosave() -> void:
-	if ironman:
-		_write()
-
-
-## The run written to the save on disk, in the campaign's mode. True when written.
-func _write() -> bool:
-	var saves := _saves()
-	saves.ironman = ironman
-	return saves.save_game(world, rng, company, wounds.state())
+## Ironman: the run written as it stands, silently, right after a committed decision (the hub's
+## too); saving only reads the Rng. Off: nothing.
+func autosave() -> void:
+	_store.autosave()
 
 
 ## The company is dead to the last merc: the save is marked ended at once (so closing the game
@@ -342,7 +338,7 @@ func _write() -> bool:
 func _end_campaign() -> void:
 	_ended = true
 	_after_triage = Callable()
-	_write()
+	_store.write()
 
 
 ## The triage panel after a road fight: what happened to whom, and Continue to the map.
@@ -358,33 +354,23 @@ func _outcome_line() -> String:
 	return OverworldWords.outcome(world, _place_line())
 
 
-## Redraws the map and shows the panel: the standing encounter's, or the body with Rest and
-## Save.
+## Redraws the map and shows the panel: a fresh campaign's first question (Ironman listed
+## first), else the standing encounter's (an ambush has only the fight; a patrol also offers the
+## toll while the supplies cover it), else the body with Rest and Save.
 func _show(body: String) -> void:
 	map.show_world(world)
 	if _choosing:
-		_show_ironman_choice()
+		OverworldWords.show(panel, OverworldWords.ironman(IRONMAN_ON, IRONMAN_OFF))
 		return
 	wounds.day = world.day
 	if not world.encounter.is_empty():
-		_show_encounter()
+		OverworldWords.show(panel, OverworldWords.encounter(world, FIGHT, TOLL))
 		return
 	var choices: Array[Dictionary] = [
 		{"id": REST, "label": Text.t("world.choice.rest")},
 		{"id": SAVE, "label": Text.t("world.choice.save")},
 	]
 	panel.present(Text.t("world.panel.title"), body, choices)
-
-
-## The campaign's first question: Ironman or saving by hand. Ironman is listed first.
-func _show_ironman_choice() -> void:
-	OverworldWords.show(panel, OverworldWords.ironman(IRONMAN_ON, IRONMAN_OFF))
-
-
-## The standing encounter's panel: what it is, and its choices. An ambush has only the
-## fight; a patrol also offers the toll while the supplies cover it.
-func _show_encounter() -> void:
-	OverworldWords.show(panel, OverworldWords.encounter(world, FIGHT, TOLL))
 
 
 func _scenario() -> Dictionary:
