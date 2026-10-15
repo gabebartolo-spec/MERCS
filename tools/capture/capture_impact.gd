@@ -1,29 +1,33 @@
 extends SceneTree
-## Captures one big hit of the slice's fight (Phase 4 P6c): the hit-stop frame, the blood in the
-## air, the drops landing and the stain they leave, as full frames of the street's logical image
-## shown at a whole-number scale and 2x crops around the struck fighter. Runs with a window (not
+## Captures one big hit of the slice's fight (Phase 4 P6c): the hit-stop frame, the drops out past
+## the silhouette (3 frames on), mid-arc, landing, and the stain they leave, as full frames of the
+## street's logical image shown at a whole-number scale and 2x crops framing the attacker and the
+## struck fighter together (so the blow's direction reads). Runs with a window (not
 ## --headless); the fight is played by BattleAi with the player's turns sent as the panel's
 ## choices, so the captures are the same fight every run. The view's processing is paused while
-## a picture is read back, so the four stages are the visual times named below.
+## a picture is read back, so the five stages are the visual times named below.
 ##
 ##   APPDATA=<scratch> godot --path . --fixed-fps 60 --resolution 1920x1080 \
 ##     --script tools/capture/capture_impact.gd -- --out=<dir> [--seed=1009] [--hit=1]
 ##
-## Writes <dir>/1_hold.png, 2_flight.png, 3_landing.png, 4_stain.png and the same with _crop.
+## --hit counts the big hits whose blow runs across the screen (attacker beside the target, so
+## the direction reads); a blow along the camera's view is skipped.
+##
+## Writes <dir>/1_hold.png, 2_out.png, 3_midarc.png, 4_landing.png, 5_stain.png, each with _crop.
 
 const Kit := preload("res://tests/lib/battle_view_kit.gd")
 const DEFAULT_SEED := 1009
 const WINDOW_SIZE := Vector2i(1920, 1080)
 const DEFAULT_HIT := 1
 const UHD_WIDTH := 3840
-const CROP_HALF_PX := 110
-## The crop centres this far above the struck fighter's feet (about mid-figure).
-const CROP_LIFT_M := 0.9
+## Logical pixels of ground kept around the two figures in the crop.
+const CROP_PAD_PX := 120
 const CROP_ZOOM := 2
 const FIGHT_FRAMES := 20000
-## Frames run after the hit-stop ends before each later picture (60 fps).
-const FLIGHT_FRAMES := 8
-const LANDING_FRAMES := 10
+## Frames run after the hit-stop ends before each later picture (60 fps; the flight is 24).
+const OUT_FRAMES := 3
+const MIDARC_FRAMES := 3
+const LANDING_FRAMES := 17
 const STAIN_FRAMES := 40
 
 var _args: Dictionary = {}
@@ -52,7 +56,7 @@ func _run() -> void:
 		var actor := view.battle.current()
 		if actor.side == BattleUnit.COMPANY and not view.impact.holding():
 			_company_turn(mounted, BattleAi.choose(view.battle, actor, Kit.sight()))
-		if view.impact.holding():
+		if view.impact.holding() and _sideways(mounted):
 			seen += 1
 			if seen == wanted:
 				await _shoot(out, mounted)
@@ -63,22 +67,51 @@ func _run() -> void:
 	quit(0)
 
 
-## The four pictures of the hit now being held.
+## Whether the blow now held runs more across the screen than along it.
+func _sideways(mounted: Kit.Mounted) -> bool:
+	var splat: Dictionary = mounted.view.marks.splats[-1]
+	var attacker := mounted.view.battle.unit(str(splat["by"]))
+	var struck := mounted.view.battle.unit(str(splat["unit"]))
+	if attacker == null or struck == null:
+		return false
+	var camera := mounted.stage.camera()
+	var step := (
+		camera.unproject_position(mounted.view.world_point(struck.cell))
+		- camera.unproject_position(mounted.view.world_point(attacker.cell))
+	)
+	return absf(step.x) > absf(step.y)
+
+
+## The five pictures of the hit now being held.
 func _shoot(out: String, mounted: Kit.Mounted) -> void:
 	var view := mounted.view
 	var splat: Dictionary = view.marks.splats[-1]
-	var target := view.battle.unit(str(splat["unit"]))
-	var feet := view.world_point(target.cell) + Vector3.UP * CROP_LIFT_M
 	print("big hit: %s on %s, damage %s" % [splat["by"], splat["unit"], splat["damage"]])
-	await _save(out, "1_hold", mounted, feet)
+	var area := _frame_both(mounted, str(splat["by"]), str(splat["unit"]))
+	await _save(out, "1_hold", mounted, area)
 	while view.impact.holding():
 		await process_frame
-	await _run_frames(FLIGHT_FRAMES)
-	await _save(out, "2_flight", mounted, feet)
+	await _run_frames(OUT_FRAMES)
+	await _save(out, "2_out", mounted, area)
+	await _run_frames(MIDARC_FRAMES)
+	await _save(out, "3_midarc", mounted, area)
 	await _run_frames(LANDING_FRAMES)
-	await _save(out, "3_landing", mounted, feet)
+	await _save(out, "4_landing", mounted, area)
 	await _run_frames(STAIN_FRAMES)
-	await _save(out, "4_stain", mounted, feet)
+	await _save(out, "5_stain", mounted, area)
+
+
+## The logical pixels covering the attacker's and the struck fighter's figures, padded.
+func _frame_both(mounted: Kit.Mounted, by: String, struck: String) -> Rect2i:
+	var area := Rect2()
+	for unit_id: String in [by, struck]:
+		var fighter := mounted.view.battle.unit(unit_id)
+		if fighter == null:
+			continue
+		var sprite := mounted.stage.extra_mercs[mounted.view.battle.units.find(fighter)]
+		var rect: Rect2 = BattleDropAim.figure(mounted.stage, sprite, 0.0)["rect"]
+		area = rect if area.size == Vector2.ZERO else area.merge(rect)
+	return Rect2i(area.grow(CROP_PAD_PX))
 
 
 func _run_frames(count: int) -> void:
@@ -86,9 +119,9 @@ func _run_frames(count: int) -> void:
 		await process_frame
 
 
-## The street's own logical image at a whole-number scale to 4K width, and a 2x crop around
-## the struck fighter; the view is paused while it is read back.
-func _save(out: String, name: String, mounted: Kit.Mounted, feet: Vector3) -> void:
+## The street's own logical image at a whole-number scale to 4K width, and a 2x crop of the
+## area; the view is paused while it is read back.
+func _save(out: String, name: String, mounted: Kit.Mounted, area: Rect2i) -> void:
 	mounted.view.set_process(false)
 	await RenderingServer.frame_post_draw
 	var holder := mounted.stage.find_child("LogicalViewport", true, false) as SubViewport
@@ -100,14 +133,12 @@ func _save(out: String, name: String, mounted: Kit.Mounted, feet: Vector3) -> vo
 	var big := logical.duplicate() as Image
 	big.resize(logical.get_width() * scale, logical.get_height() * scale, Image.INTERPOLATE_NEAREST)
 	big.save_png(out.path_join(name + ".png"))
-	var at := Vector2i(mounted.stage.camera().unproject_position(feet))
-	var half := Vector2i(CROP_HALF_PX, CROP_HALF_PX)
-	var area := Rect2i(at - half, half * 2).intersection(Rect2i(Vector2i.ZERO, logical.get_size()))
-	var crop := logical.get_region(area)
+	var inside := area.intersection(Rect2i(Vector2i.ZERO, logical.get_size()))
+	var crop := logical.get_region(inside)
 	var zoom := scale * CROP_ZOOM
 	crop.resize(crop.get_width() * zoom, crop.get_height() * zoom, Image.INTERPOLATE_NEAREST)
 	crop.save_png(out.path_join(name + "_crop.png"))
-	print("%s: logical %s, crop %s at x%d" % [name, logical.get_size(), area, zoom])
+	print("%s: logical %s, crop %s at x%d" % [name, logical.get_size(), inside, zoom])
 
 
 func _company_turn(mounted: Kit.Mounted, action: Dictionary) -> void:

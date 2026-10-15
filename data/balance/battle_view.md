@@ -34,15 +34,18 @@ The death pool under a fallen fighter's torso (same two blood reds, drying with 
 - `pool_m`: the death pool, lowest (under the body).
 - `splat_m`, `body_m`: metres above the ground the splats and bodies lie, both above the side ring's top (0.022 m) so the ring does not hide them; the body is lower so blood lies over it.
 
-## spray (P6c, director 2026-10-16: blood flies along the blow and stains where it lands)
-Read by `presentation/battle/battle_spray.gd`. Drops are flat squares that face the camera, in the blood ramp's two reds, at the figures' pixel size. Each drop lands on one of its splat's own pixels; the splat shows when the first drop lands. Every drop's variation is seeded from its hit (round, hit number, attacker, target); no clock, no sim stream.
-- `drops_base`, `drops_per_damage`, `drops_max`: drops a hit throws = base + damage x per-damage, capped.
-- `drop_px_max`: a drop is a square of 1 to this many logical pixels a side.
-- `chest_m`: metres above the struck fighter's feet the drops leave from.
-- `push_m`: how far (metres, at mid-flight) a drop's path bows out along the blow (attacker's cell to the target's).
-- `arc_m`: how far (metres, at mid-flight) a drop's path rises above the straight line to its spot.
-- `flight_s`: visual seconds from leaving the chest to landing.
-- `delay_spread_s`: each drop leaves up to this many visual seconds after the blow (seeded), so they do not move as one block.
+## spray (P6c, director 2026-10-16: blood flies along the blow and stains where it lands; lead QC round 1)
+Read by `presentation/battle/battle_spray.gd` and `battle_drop_aim.gd`. Drops are flat squares that face the camera, in the blood ramp's two reds, at the figures' pixel size. They leave the hit point at torso height, burst out past the silhouette along the blow as it shows on screen and up, then fall onto the splat: each lands on one of its splat's own pixels (from the splat's side down the blow), and the splat shows when the first lands. Over the struck figure a drop is drawn just behind it, so it never paints over the body. Every drop's variation is seeded from its hit (round, hit number, attacker, target); no clock, no sim stream.
+- `drops_base`, `drops_per_damage`, `drops_max`: drops a hit throws = base + damage x per-damage, capped (10 to 16).
+- `drop_px_max`: a drop is a square of 1 to this many logical pixels a side (mixed sizes).
+- `torso_share`: the hit point's height, as a share of the struck figure's drawn height above its feet.
+- `push_m`: how far (metres in the figure's picture plane, at the burst's peak) a drop flies out along the blow (0.9: far enough that drops thrown sideways are past the silhouette by their 3rd frame, checked in the impact suite).
+- `arc_m`: how far (same plane) it rises at the burst's peak before it falls.
+- `cone_deg`: each drop's burst is turned by a seeded angle up to this many degrees either side of the blow on screen, so the drops spray rather than fly in a line.
+- `reach_min`: each drop flies a seeded share of push_m and arc_m between this and 1, so they spread.
+- `behind_m`: how far behind the struck figure's plane a drop is drawn while it is over the figure's picture.
+- `flight_s`: visual seconds from leaving the hit point to landing (the burst peaks a quarter of the way through, so a drop is clear of the silhouette within about 3 frames).
+- `delay_spread_s`: each drop leaves up to this many visual seconds after the blow (seeded).
 
 ## hit_stop (P6c)
 Read by `presentation/battle/battle_impact.gd`. A big hit holds the battle picture (flash, flying blood, the pause before the enemy's next turn) for a few rendered frames. It runs on the battle view's own visual clock: the sim is never paused or slowed and `Engine.time_scale` is never touched, so the battle log is the same with it on or off. The player's toggle is the Settings autoload's `hit_stop` (default on); both must be on.

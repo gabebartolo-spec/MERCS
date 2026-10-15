@@ -194,7 +194,7 @@ func _play(action: Dictionary) -> void:
 	_refresh()
 	marks.record(events, battle, _sprites, fx)
 	fx.play(events, _sprites)
-	impact.play(events, battle, marks)
+	impact.play(events, battle, marks, _sprites)
 	if battle.is_over():
 		finished.emit()
 	else:

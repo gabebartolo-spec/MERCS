@@ -42,9 +42,12 @@ func begin(stage: StreetStage, ground: Callable, view: Node) -> void:
 
 
 ## Takes one applied action's events: blood for every hit, landing on its splat in marks, and a
-## hold on the biggest. Call after marks.record (the splats must exist).
-func play(events: Array[Dictionary], battle: Battle, marks: BattleMarks) -> void:
-	spray.launch(events, battle, marks)
+## hold on the biggest. Call after marks.record (the splats must exist); sprites are the
+## fighters' figures by id (the blood leaves the struck one's picture).
+func play(
+	events: Array[Dictionary], battle: Battle, marks: BattleMarks, sprites: Dictionary = {}
+) -> void:
+	spray.launch(events, battle, marks, sprites)
 	if not hit_stop_on:
 		return
 	for event: Dictionary in events:

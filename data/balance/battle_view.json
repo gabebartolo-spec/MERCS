@@ -36,15 +36,18 @@
     "body_m": 0.05
   },
   "spray": {
-    "drops_base": 2,
+    "drops_base": 10,
     "drops_per_damage": 1,
-    "drops_max": 8,
-    "drop_px_max": 2,
-    "chest_m": 1.1,
-    "push_m": 0.35,
-    "arc_m": 0.3,
-    "flight_s": 0.3,
-    "delay_spread_s": 0.08
+    "drops_max": 16,
+    "drop_px_max": 3,
+    "torso_share": 0.6,
+    "push_m": 0.9,
+    "arc_m": 0.35,
+    "cone_deg": 30,
+    "reach_min": 0.75,
+    "behind_m": 0.05,
+    "flight_s": 0.4,
+    "delay_spread_s": 0.03
   },
   "hit_stop": {
     "on": true,

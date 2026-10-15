@@ -2,8 +2,10 @@ extends "res://tests/lib/runner.gd"
 ## Impact suite (Phase 4 P6c, director 2026-10-16): blood thrown by each blow lands exactly on
 ## the splat BattleMarks laid for that hit (each drop on one of the splat's own pixels), and the
 ## splat shows only once a drop has landed, then stays; drops face the camera, are one blood red,
-## one or two logical pixels at the figures' pixel size, and bow out along the blow; the same
-## fight throws the same drops in two runs. Hit-stop (director 03:17, "Subtle, a few frames", no
+## 1 to 3 logical pixels at the figures' pixel size, 10 to 16 per hit; they leave the struck
+## figure at torso height, burst out past its silhouette along the blow within 3 frames, and are
+## never drawn over the body (lead QC round 1, tests/lib/spray_checks.gd); the same fight throws
+## the same drops in two runs. Hit-stop (director 03:17, "Subtle, a few frames", no
 ## screen shake) holds only the picture: the same fight with it on and off (the Settings toggle)
 ## gives the same battle log, and with it on the presentation takes longer by the held frames,
 ## held only after big hits, with the camera still. The fight is the slice's on the street at
@@ -11,6 +13,7 @@ extends "res://tests/lib/runner.gd"
 ##   godot --headless --fixed-fps 60 --path . --script tests/run_impact_tests.gd
 
 const Kit := preload("res://tests/lib/battle_view_kit.gd")
+const Spray := preload("res://tests/lib/spray_checks.gd")
 const InputKit := preload("res://tests/lib/input_kit.gd")
 const DATA_PATH := "res://data/balance/battle_view.json"
 const WINDOW_SIZE := Vector2i(1920, 1080)
@@ -22,6 +25,9 @@ const TEXEL_TOLERANCE := 0.15
 const SUBTLE_MIN_FRAMES := 3
 const SUBTLE_MAX_FRAMES := 5
 const MID := 0.5
+## Lead QC round 1: 10 to 16 drops a hit.
+const MIN_DROPS := 10
+const MAX_DROPS := 16
 const DROP_REFS: Array[String] = ["blood:0", "blood:1"]
 
 
@@ -42,6 +48,12 @@ class Run:
 	var shown_at_end := true
 	var still_camera := true
 	var held_after_big := true
+	var behind := true
+	var torso := false
+	var along := false
+	var counts := false
+	var sizes: Array[int] = []
+	var clear: Array[int] = []
 
 
 func suite_name() -> String:
@@ -55,13 +67,14 @@ func run_checks() -> void:
 	var on := await _play(true)
 	var again := await _play(true)
 	var off := await _play(false)
+	_report(on, off)
 	check(on.flew and on.drops.size() > 0, "blows throw drops that fly (%d)" % on.drops.size())
 	check(on.hidden_until_land, "a splat shows only once its first drop has landed")
 	check(on.shown_at_end, "every splat is on the field at the end and every drop has landed")
 	check(on.on_splat, "every drop lands on one of its own splat's pixels (the splat spot)")
 	check(on.looks, "a drop faces the camera, is one blood red, 1 to drop_px_max pixels square")
 	check(on.texel, "a drop's pixel is the figures' pixel size where it flies")
-	check(_along_blow(on.drops), "drops bow out along the blow (attacker to target)")
+	_check_shape(on)
 	check(on.drops_text == again.drops_text, "the same fight throws the same drops in two runs")
 	check(on.log_text == off.log_text, "hit-stop on or off: the battle log is identical")
 	check(on.held > 0 and off.held == 0, "hit-stop holds frames on (%d), none off" % on.held)
@@ -72,6 +85,41 @@ func run_checks() -> void:
 	check(on.big_hits > 0 and on.held_after_big, "the picture is held only after a big hit")
 	check(on.still_camera, "a hit-stop holds the camera still (no screen shake)")
 	check(is_equal_approx(Engine.time_scale, 1.0), "Engine.time_scale is never touched")
+
+
+## The spray as the lead's QC asked (round 1): count, sizes, torso start, burst, not over the body.
+func _check_shape(on: Run) -> void:
+	check(on.counts, "every hit throws 10 to 16 drops")
+	check(on.sizes == [1, 2, 3], "drops come in mixed sizes, 1 to 3 pixels (%s)" % [on.sizes])
+	check(on.torso, "drops leave the struck figure's picture at torso height")
+	check(on.along, "drops burst out along the blow on screen, away from the attacker")
+	check(Spray.spread_ok(on.drops), "each hit's drops spray out in a cone, not one line")
+	check(
+		on.clear[0] * 2 > on.drops.size() and on.clear[1] > 0 and on.clear[2] == on.clear[1],
+		(
+			"by their 3rd frame drops are out past the silhouette (%d of %d; sideways blows %d of %d)"
+			% [on.clear[0], on.drops.size(), on.clear[2], on.clear[1]]
+		)
+	)
+	check(on.behind, "a drop over the struck figure is drawn behind it (never over the body)")
+
+
+## One line of figures for the PR's evidence.
+func _report(on: Run, off: Run) -> void:
+	print(
+		(
+			"IMPACT drops %d, clear by frame 3 %d (sideways %d of %d), frames on %d off %d, held %d"
+			% [
+				on.drops.size(),
+				on.clear[0],
+				on.clear[2],
+				on.clear[1],
+				on.end_frames,
+				off.end_frames,
+				on.held
+			]
+		)
+	)
 
 
 ## The director's ruling in the data: a few frames, on by default.
@@ -138,6 +186,7 @@ func _play(hit_stop: bool) -> Run:
 	await InputKit.frames(self, SETTLE)
 	_look(mounted, run)
 	_check_landed(mounted, run)
+	_check_spray(mounted, run)
 	run.log_text = var_to_str(view.battle.log)
 	run.drops.assign(view.impact.spray.drops.duplicate(true))
 	run.drops_text = var_to_str(run.drops)
@@ -146,6 +195,17 @@ func _play(hit_stop: bool) -> Run:
 	settings.set(&"hit_stop", true)
 	await process_frame
 	return run
+
+
+## The spray's on-screen shape after the fight, before it is cleared (tests/lib/spray_checks.gd).
+func _check_spray(mounted: Kit.Mounted, run: Run) -> void:
+	var spray := mounted.view.impact.spray
+	var share := StageData.load_file(DATA_PATH).num("spray", "torso_share")
+	run.torso = Spray.torso_ok(spray, mounted.stage, share)
+	run.along = Spray.along_blow_ok(spray, mounted.stage)
+	run.clear = Spray.clear_counts(spray, mounted.stage)
+	run.counts = Spray.counts_ok(spray.drops, MIN_DROPS, MAX_DROPS)
+	run.sizes = Spray.sizes(spray.drops)
 
 
 ## How many of the splats laid since `before` came from a big hit.
@@ -170,6 +230,7 @@ func _look(mounted: Kit.Mounted, run: Run) -> void:
 		if node != null:
 			var shown := landed.has(drop["splat"])
 			run.hidden_until_land = run.hidden_until_land and node.visible == shown
+	run.behind = run.behind and Spray.behind_ok(spray, mounted.stage)
 	for number: int in spray.drops.size():
 		var sprite := spray.node_of_drop(number)
 		if sprite == null or not sprite.visible:
@@ -227,23 +288,6 @@ func _check_landed(mounted: Kit.Mounted, run: Run) -> void:
 			and land.distance_to(spot) < LAND_TOLERANCE_M
 			and ends.distance_to(land) < LAND_TOLERANCE_M
 		)
-
-
-## Mid-flight, a drop with a blow direction sits off the straight line toward the blow.
-func _along_blow(drops: Array[Dictionary]) -> bool:
-	var spray := BattleSpray.new()
-	var pushed := 0
-	for drop: Dictionary in drops:
-		var push: Vector3 = drop["push"]
-		if push == Vector3.ZERO:
-			continue
-		var start: Vector3 = drop["start"]
-		var land: Vector3 = drop["land"]
-		var line := start.lerp(land, MID)
-		if (spray.point_at(drop, MID) - line).dot(push) <= 0.0:
-			return false
-		pushed += 1
-	return pushed > 0
 
 
 func _company_turn(mounted: Kit.Mounted, action: Dictionary) -> void:
