@@ -12,7 +12,9 @@ const PREFIX := "party_"
 
 ## The parties of every type in the balance (types in name order), each on its own free,
 ## walkable tile at least min_spawn_tiles from the hub's entrance and off every entrance.
-static func spawn(knobs: Dictionary, region: TileRegion, hub: Vector2i, rng: Rng) -> Array[WorldParty]:
+static func spawn(
+	knobs: Dictionary, region: TileRegion, hub: Vector2i, rng: Rng
+) -> Array[WorldParty]:
 	var parties: Array[WorldParty] = []
 	var taken := {}
 	for type: String in types(knobs):
@@ -40,7 +42,9 @@ static func _free_tile(
 ) -> Vector2i:
 	var reach := _num(knobs, "min_spawn_tiles")
 	for _try: int in _num(knobs, "spawn_tries"):
-		var at := Vector2i(rng.roll(STREAM, 0, region.width - 1), rng.roll(STREAM, 0, region.height - 1))
+		var at := Vector2i(
+			rng.roll(STREAM, 0, region.width - 1), rng.roll(STREAM, 0, region.height - 1)
+		)
 		var far := TileRegion.gap(at, hub) >= reach
 		if far and region.passable(at) and region.site_at(at).is_empty() and not taken.has(at):
 			return at
@@ -59,7 +63,9 @@ static func advance(
 		party.chasing = TileRegion.gap(party.tile, band) <= _num(own, "sight_tiles")
 		if contact(party, band):
 			return true
-		var next := _chase(party, band, region) if party.chasing else _wander(party, own, region, rng)
+		var next := (
+			_chase(party, band, region) if party.chasing else _wander(party, own, region, rng)
+		)
 		if next == party.tile or party.budget < region.cost(next):
 			break
 		party.budget -= region.cost(next)

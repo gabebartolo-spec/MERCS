@@ -53,7 +53,9 @@ static func make(game: SliceGame) -> OverworldDirector:
 	var director := OverworldDirector.new()
 	director.company = game.company_director().company
 	director.street_stage = game.stage()
-	var battle_origin := StageData.load_file(SliceGame.SLICE_DATA).floats("loop", "battle_origin_xz")
+	var battle_origin := StageData.load_file(SliceGame.SLICE_DATA).floats(
+		"loop", "battle_origin_xz"
+	)
 	director.origin = Vector2i(int(battle_origin[0]), int(battle_origin[1]))
 	game.add_child(director)
 	director.begin()

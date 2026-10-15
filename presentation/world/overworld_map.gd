@@ -134,7 +134,9 @@ func _draw() -> void:
 		draw_circle(tile_centre(_world.region.entrance(site.id)), radius, _colour("site"))
 	for party: WorldParty in _world.parties:
 		if party.active(_world.day):
-			_draw_token(party.tile, _data.num("map", "party_radius_px"), _colour(party.type), party.chasing)
+			_draw_token(
+				party.tile, _data.num("map", "party_radius_px"), _colour(party.type), party.chasing
+			)
 	_draw_token(_world.band, _data.num("map", "band_radius_px"), _colour("band"), true)
 
 

@@ -17,6 +17,7 @@ extends "res://tests/lib/runner.gd"
 
 const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const World := preload("res://tests/lib/world_fixture.gd")
+const InputKit := preload("res://tests/lib/input_kit.gd")
 const BATTLE_DATA := "res://data/balance/battle.json"
 const WINDOW_SIZE := Vector2i(1920, 1080)
 const LAYOUT_FRAMES := 3
@@ -73,7 +74,8 @@ func _saves() -> SAVE_SYSTEM:
 func _game_with(kind: String, gap: int) -> SliceGame:
 	var data := World.data()
 	var world_block: Dictionary = data.get("world", {})
-	var rng := Rng.from_seed(world_block.get("seed", 0))
+	var balance_seed: int = world_block.get("seed", 0)
+	var rng := Rng.from_seed(balance_seed)
 	var world := WorldSim.new()
 	world.start(data, rng)
 	world.parties.clear()
@@ -102,7 +104,7 @@ func _walk_into(director: OverworldDirector) -> int:
 	while world.encounter.is_empty() and taps < TAP_LIMIT and not world.parties.is_empty():
 		var to := world.parties[0].tile - world.band
 		var step := Vector2i(signi(to.x), 0) if to.x != 0 else Vector2i(0, signi(to.y))
-		await _tap(KEY_BY_STEP[step])
+		await _tap(_key_for(step))
 		taps += 1
 	await _frames(LAYOUT_FRAMES)
 	return taps
@@ -188,6 +190,7 @@ func _check_fight_returns(game: SliceGame, director: OverworldDirector, before: 
 	var lost: int = _knobs("patrol").get("loss_supplies", 0)
 	var expected := supplies + loot if won else maxi(0, supplies - lost)
 	var band: Vector2i = before.get("band", Vector2i.ZERO)
+	var mercs: int = before.get("mercs", -1)
 	var place := band if won else world.region.entrance(RegionGen.HUB_ID)
 	var site := OverworldMap.site_name(world.site(world.haven))
 	var line := Text.t(
@@ -198,7 +201,7 @@ func _check_fight_returns(game: SliceGame, director: OverworldDirector, before: 
 		(
 			not director.in_fight()
 			and director.map.visible
-			and game.stage().extra_mercs.size() == int(before.get("mercs", -1))
+			and game.stage().extra_mercs.size() == mercs
 			and world.encounter.is_empty()
 			and world.band == place
 			and world.supplies == expected
@@ -220,8 +223,12 @@ func _check_toll(director: OverworldDirector) -> void:
 	var supplies := world.supplies
 	await _click_button(director.panel.button_for(OverworldDirector.TOLL))
 	await _frames(LAYOUT_FRAMES)
+	var paid_line := director.panel.shown_body()
 	var band := world.band
-	await _tap(KEY_S)
+	for step: Vector2i in KEY_BY_STEP:
+		if world.region.passable(world.band + step):
+			await _tap(_key_for(step))
+			break
 	check(
 		(
 			party != null
@@ -230,12 +237,12 @@ func _check_toll(director: OverworldDirector) -> void:
 			and world.supplies == supplies - toll
 			and not director.map.party_marker(party.id).visible
 			and world.band != band
-			and (
-				director.panel.shown_body()
-				== Text.t("world.encounter.outcome.paid", {"supplies": toll, "site": ""})
-			)
+			and paid_line == Text.t("world.encounter.outcome.paid", {"supplies": toll, "site": ""})
 		),
-		"Pay the toll: no fight, %d supplies paid, the patrol leaves the map, the band walks on" % toll
+		(
+			"Pay the toll: no fight, %d supplies paid, the patrol leaves the map, the band walks on"
+			% toll
+		)
 	)
 
 
@@ -265,7 +272,10 @@ func _check_ambush(director: OverworldDirector) -> void:
 			and director.world.encounter.is_empty()
 			and str(entry.get("step")) == "encounter"
 		),
-		"walking into bandits: only Fight, the enemy strikes first, and the map returns (%s)" % entry.get("outcome")
+		(
+			"walking into bandits: only Fight, the enemy strikes first, and the map returns (%s)"
+			% entry.get("outcome")
+		)
 	)
 
 
@@ -278,7 +288,7 @@ func _check_avoid(director: OverworldDirector) -> void:
 	var walked := 0
 	for _tap_index: int in NEAR:
 		var band := world.band
-		await _tap(KEY_BY_STEP[step])
+		await _tap(_key_for(step))
 		walked += 1 if world.band != band else 0
 	var sight: int = _party_knobs("ambush").get("sight_tiles", 0)
 	check(
@@ -371,38 +381,18 @@ func _clear_save() -> void:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_SYSTEM.SAVE_PATH))
 
 
+func _key_for(step: Vector2i) -> Key:
+	var code: Key = KEY_BY_STEP.get(step, KEY_NONE)
+	return code
+
+
 func _frames(count: int) -> void:
-	for _frame: int in count:
-		await process_frame
+	await InputKit.frames(self, count)
 
 
 func _click_button(button: Button) -> void:
-	# A freshly shown panel lays its buttons out over the next frames.
-	await _frames(LAYOUT_FRAMES)
-	if button == null or not is_instance_valid(button):
-		return
-	var at := button.get_global_rect().get_center()
-	for pressed: bool in [true, false]:
-		var click := InputEventMouseButton.new()
-		click.button_index = MOUSE_BUTTON_LEFT
-		click.position = at
-		click.global_position = at
-		click.pressed = pressed
-		Input.parse_input_event(click)
-		Input.flush_buffered_events()
-		await process_frame
-
-
-func _press_key(code: Key, pressed: bool) -> void:
-	var event := InputEventKey.new()
-	event.keycode = code
-	event.physical_keycode = code
-	event.pressed = pressed
-	Input.parse_input_event(event)
-	Input.flush_buffered_events()
-	await process_frame
+	await InputKit.click(self, button)
 
 
 func _tap(code: Key) -> void:
-	await _press_key(code, true)
-	await _press_key(code, false)
+	await InputKit.tap(self, code)

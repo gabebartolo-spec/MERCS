@@ -135,7 +135,10 @@ func _check_win() -> void:
 			and party.away_until == world.day + away
 			and _last_outcome(world) == "won"
 		),
-		"a win loots %d supplies, the band stays and the bandits are gone for %d days" % [loot, away]
+		(
+			"a win loots %d supplies, the band stays and the bandits are gone for %d days"
+			% [loot, away]
+		)
 	)
 
 

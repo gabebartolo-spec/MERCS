@@ -84,9 +84,12 @@ func _check_open(game: SliceGame) -> void:
 			and panel.button_for(world.sites[1].id) == null
 		),
 		(
-			"F2 opens the map on day 0, the band's token centred on the hub's gate, %d markers,"
-			+ " Rest and Save and no travel buttons"
-		) % markers
+			(
+				"F2 opens the map on day 0, the band's token centred on the hub's gate, %d markers,"
+				+ " Rest and Save and no travel buttons"
+			)
+			% markers
+		)
 	)
 
 
@@ -118,8 +121,16 @@ func _check_tap_walks(game: SliceGame) -> void:
 	var hub_after := director.map.marker_for(RegionGen.HUB_ID).get_global_rect().get_center()
 	var tile_px := hub.y - hub_after.y
 	check(
-		world.band == before + Vector2i(0, 1) and world.march > 0 and tile_px > 0.0 and _token_centred(director),
-		"a tap of S walks the band one tile south (%s) and the map scrolls %d px under it" % [world.band, tile_px]
+		(
+			world.band == before + Vector2i(0, 1)
+			and world.march > 0
+			and tile_px > 0.0
+			and _token_centred(director)
+		),
+		(
+			"a tap of S walks the band one tile south (%s) and the map scrolls %d px under it"
+			% [world.band, tile_px]
+		)
 	)
 
 
@@ -132,7 +143,10 @@ func _check_hold_repeats(game: SliceGame) -> void:
 	var walked := world.band - before
 	check(
 		walked.x == 0 and walked.y > 1 and walked.y < HOLD_FRAMES,
-		"holding S for %d frames walks the band on %d tiles, a tile at a time" % [HOLD_FRAMES, walked.y]
+		(
+			"holding S for %d frames walks the band on %d tiles, a tile at a time"
+			% [HOLD_FRAMES, walked.y]
+		)
 	)
 
 
@@ -152,10 +166,7 @@ func _check_not_at_gate(game: SliceGame) -> void:
 	await _tap(KEY_F2)
 	await _tap(KEY_ESCAPE)
 	check(
-		(
-			director.is_open()
-			and director.panel.shown_body() == Text.t("world.panel.not_at_gate")
-		),
+		director.is_open() and director.panel.shown_body() == Text.t("world.panel.not_at_gate"),
 		"F2 and Escape away from the hub's gate keep the map and say the street is through the gate"
 	)
 
@@ -173,8 +184,17 @@ func _check_gate_cuts_to_street(game: SliceGame) -> void:
 	await _hold(KEY_D)
 	await _settle(game)
 	check(
-		world.band == gate and world.at == RegionGen.HUB_ID and not director.is_open() and game.player.cell != start,
-		"%d taps of W walk the band back into the hub's gate: the map hides and D walks the street" % taps
+		(
+			taps > 0
+			and world.band == gate
+			and world.at == RegionGen.HUB_ID
+			and not director.is_open()
+			and game.player.cell != start
+		),
+		(
+			"%d taps of W walk the band back into the hub's gate: the map hides and D walks the street"
+			% taps
+		)
 	)
 
 
@@ -209,8 +229,16 @@ func _check_save_and_load(game: SliceGame) -> void:
 		model.ok and JSON.stringify(model.world.state()) == JSON.stringify(director.world.state())
 	)
 	check(
-		_saves().has_save() and in_user_dir and equal and model.rng.seed_value == director.rng.seed_value,
-		"clicking Save writes %s under the run's user dir (%s) and it loads back equal (%s)" % [path, in_user_dir, equal]
+		(
+			_saves().has_save()
+			and in_user_dir
+			and equal
+			and model.rng.seed_value == director.rng.seed_value
+		),
+		(
+			"clicking Save writes %s under the run's user dir (%s) and it loads back equal (%s)"
+			% [path, in_user_dir, equal]
+		)
 	)
 
 
@@ -229,7 +257,10 @@ func _check_continue_from_save(game: SliceGame) -> void:
 	check(
 		continued and hidden,
 		(
-			"a fresh session's first F2 continues the save (day %d) and Escape on the gate goes back to the street"
+			(
+				"a fresh session's first F2 continues the save (day %d) and Escape on the gate"
+				+ " goes back to the street"
+			)
 			% model.world.day
 		)
 	)
