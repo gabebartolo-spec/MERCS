@@ -9,6 +9,7 @@ extends RefCounted
 ## - BattleIntents (battle_intents.gd): each enemy's round plan from what it sees (BattleAi);
 ## - BattleActions (battle_actions.gd): move, attack, wait and the learnt moves, legal or not;
 ## - BattleKit (battle_kit.gd): a fighter's kit, his weapon action and up to four techniques;
+## - BattleRanged (battle_ranged.gd): reach and the line a shot or a spear thrust needs;
 ## - BattleResolver (battle_resolver.gd): one blow's rolls, damage, the hit hook, a down;
 ## - BattleMorale (battle_morale.gd): each side's morale, shaken and breaking, the captain's fall;
 ## - BattleEnd (battle_end.gd): a wipe, a rout or a surrender ends the fight;
@@ -70,7 +71,7 @@ func setup(rules: Dictionary, field: Dictionary, fighters: Array[BattleUnit], rn
 	_turns.setup(fighters, _morale)
 	_morale.setup(rules)
 	_resolver.setup(_rules, rng, _morale)
-	_actions.setup(_rules, _resolver)
+	_actions.setup(_rules, _resolver, _grid)
 	winner = -1
 	routed = -1
 	surrendered = -1
@@ -200,6 +201,19 @@ func kit(unit_id: String) -> Array[String]:
 func odds(action: Dictionary) -> Dictionary:
 	var target := unit(str(action.get("target", "")))
 	return _resolver.odds(current(), target, move_def(str(action.get("type", ""))))
+
+
+## The ids of the foes the fighter's weapon action (his kit's first) strikes from where he
+## stands: within its reach, along a line no wall stops (BattleRanged, Phase 4 P1c); [] for no
+## such fighter. The battle view's buttons and the AI read it.
+func targets(unit_id: String) -> Array[String]:
+	var out: Array[String] = []
+	var fighter := unit(unit_id)
+	if fighter == null:
+		return out
+	for foe: BattleUnit in _actions.ranged.targets(fighter, units, _actions.kit.of(fighter)[0]):
+		out.append(foe.id)
+	return out
 
 
 ## A new round: each standing enemy who has not broken plans what it will do from what it

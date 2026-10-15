@@ -6,6 +6,8 @@ extends RefCounted
 ## engaged and his walk ends there, so a front-liner standing in front of a back-liner stops
 ## attackers from walking past him to reach the one behind (the shieldman literally stands in
 ## front of the archer; vision "Combat"). Every standing fighter blocks; there are no numbers.
+## The straight line between two cells (line_clear, Phase 4 P1c) is what a shot or a spear's
+## thrust needs: walls and props stop it, fighters never do (director 2026-10-16).
 
 var size := Vector2i.ONE
 var blocked := {}
@@ -71,6 +73,72 @@ func is_free(cell: Vector2i, units: Array[BattleUnit]) -> bool:
 		if fighter.cell == cell and not fighter.down:
 			return false
 	return true
+
+
+## True when the straight line from a to b crosses no wall or prop and stays on the field (a
+## bow's shot, a spear's thrust; Phase 4 P1c, director 2026-10-16: walls stop arrows and
+## spears, no fighter does). The line steps one cell along the longer axis at a time and takes
+## the nearest cell on the other; where it runs exactly between two cells it may take either
+## that is open. A diagonal step between two walls (both side cells walled, as steps_from holds
+## a man) stops it too: a corner gap or a staircase wall (lead's ruling on review of #139).
+## The line reads the same both ways. The end cells are not checked.
+func line_clear(a: Vector2i, b: Vector2i) -> bool:
+	var steps := gap(a, b)
+	var here: Array[Vector2i] = [a]
+	for i: int in range(1, steps + 1):
+		var next: Array[Vector2i] = []
+		for cell: Vector2i in _line_cells(a, b, i):
+			if (i == steps or _open(cell)) and _passes(here, cell):
+				next.append(cell)
+		if next.is_empty():
+			return false
+		here = next
+	return true
+
+
+## The cells the line from a to b may stand on at step i (one, or two when exactly halfway).
+func _line_cells(a: Vector2i, b: Vector2i, i: int) -> Array[Vector2i]:
+	var steps := gap(a, b)
+	var out: Array[Vector2i] = []
+	for x: int in _crossed(a.x, b.x - a.x, i, steps):
+		for y: int in _crossed(a.y, b.y - a.y, i, steps):
+			out.append(Vector2i(x, y))
+	return out
+
+
+## True when the line can step to cell from one of the cells it may stand on: a straight step,
+## or a diagonal one with at least one side cell open.
+func _passes(from_cells: Array[Vector2i], cell: Vector2i) -> bool:
+	for from: Vector2i in from_cells:
+		var step := cell - from
+		if step.x == 0 or step.y == 0:
+			return true
+		if _open(from + Vector2i(step.x, 0)) or _open(from + Vector2i(0, step.y)):
+			return true
+	return false
+
+
+func _open(cell: Vector2i) -> bool:
+	return (
+		cell.x >= 0
+		and cell.y >= 0
+		and cell.x < size.x
+		and cell.y < size.y
+		and not blocked.has(cell)
+	)
+
+
+## Where a line along one axis stands at step i of steps: the nearest whole cell, or both
+## neighbours when it is exactly halfway (whole-number arithmetic, no rounding rule to drift).
+static func _crossed(start: int, delta: int, i: int, steps: int) -> Array[int]:
+	var scaled := delta * i
+	var rest := posmod(scaled, steps)
+	var low := start + floori(float(scaled - rest) / float(steps))
+	if rest + rest < steps:
+		return [low]
+	if rest + rest > steps:
+		return [low + 1]
+	return [low, low + 1]
 
 
 static func adjacent(a: Vector2i, b: Vector2i) -> bool:

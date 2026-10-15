@@ -10,7 +10,8 @@ extends "res://tests/lib/runner.gd"
 ## golden logs (several seeded fights hashed and pinned) in tests/battle/golden_checks.gd;
 ## Phase 4's morale, captain's fall, rout and surrender in tests/battle/morale_checks.gd; the
 ## enemy that is not psychic (rule 6) in tests/battle/ai_checks.gd; the
-## action kit (Phase 4 P1a: weapon action + learnt moves, reach, the cap) in kit_checks.gd.
+## action kit (Phase 4 P1a: weapon action + learnt moves, reach, the cap) in kit_checks.gd;
+## the bow's shot and the spear over a shoulder, walls in the line (P1c) in ranged_checks.gd.
 ## Seeded by design: every roll comes from Rng.from_seed with a fixed seed.
 ##   godot --headless --path . --script tests/run_battle_tests.gd
 
@@ -28,6 +29,7 @@ const MoraleChecks := preload("res://tests/battle/morale_checks.gd")
 const AiChecks := preload("res://tests/battle/ai_checks.gd")
 const KitChecks := preload("res://tests/battle/kit_checks.gd")
 const GearChecks := preload("res://tests/battle/gear_checks.gd")
+const RangedChecks := preload("res://tests/battle/ranged_checks.gd")
 
 
 func suite_name() -> String:
@@ -50,6 +52,7 @@ func run_checks() -> void:
 	AiChecks.new().run(check)
 	KitChecks.new().run(check)
 	GearChecks.new().run(check)
+	RangedChecks.new().run(check)
 	await process_frame
 
 
