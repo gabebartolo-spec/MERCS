@@ -4,8 +4,8 @@ extends "res://tests/lib/runner.gd"
 ## buttons. On the balance seed the road to the second hamlet raises a patrol: the panel says
 ## what it is with Fight and Pay the toll, the company stays where it was, F2 and Escape keep
 ## the encounter; Fight closes the map and starts the street battle (the company acts first),
-## and when it ends the fighters leave the street, the result is applied and the map reopens
-## with the outcome in words. Paying the toll skips the fight. A saved world on another seed
+## and when it ends the fighters leave the street, the result is applied and the triage panel
+## opens (Continue returns to the map, with the outcome in words). Paying the toll skips the fight. A saved world on another seed
 ## has an ambush on its first road: only Fight, the enemy strikes first. A save taken with an
 ## encounter standing reopens on its panel. The company's moves in the fight use the sim's
 ## BattleAi for the choice; attacks and waits are real clicks, a move calls click_cell().
@@ -136,7 +136,7 @@ func _check_fight_starts(game: SliceGame, director: OverworldDirector) -> void:
 	var on_street := game.stage().extra_mercs.size() - mercs_before
 	check(
 		(
-			battle.units.size() == enemies.size() + 2
+			battle.units.size() == enemies.size() + director.wounds.fielded.size()
 			and battle.current().side == BattleUnit.COMPANY
 			and on_street == battle.units.size()
 			and director.in_fight()
@@ -173,6 +173,8 @@ func _outcome_words(director: OverworldDirector, won: bool, before: Dictionary) 
 ## The fight to its end: fighters off the street, the result applied, the map back in words.
 func _check_fight_returns(game: SliceGame, director: OverworldDirector, before: Dictionary) -> void:
 	var won := await _finish_fight(director)
+	await _frames(LAYOUT_FRAMES)
+	await _click_button(director.panel.button_for(OverworldDirector.CONTINUE))
 	await _frames(LAYOUT_FRAMES)
 	var expected := _supplies_after(won, before)
 	var mercs: int = before.get("mercs", -1)
@@ -254,6 +256,8 @@ func _ambush_on(road: String) -> void:
 		director.in_fight() and director.view.battle.current().side == BattleUnit.ENEMY
 	)
 	await _finish_fight(director)
+	await _frames(LAYOUT_FRAMES)
+	await _click_button(director.panel.button_for(OverworldDirector.CONTINUE))
 	await _frames(LAYOUT_FRAMES)
 	var entry: Dictionary = director.world.log.back()
 	check(

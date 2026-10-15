@@ -12,6 +12,8 @@ const MERCS_DATA := "res://data/mercs.json"
 const BATTLE_DATA := "res://data/balance/battle.json"
 const COMPANY_DATA := "res://data/balance/company.json"
 const WORLD_DATA := "res://data/balance/world.json"
+const INJURY_RULES := "res://data/balance/injury.json"
+const INJURY_DATA := "res://data/injuries.json"
 const SAVE_SYSTEM := preload("res://presentation/autoload/save_system.gd")
 const SAVE_SYSTEM_PATH := ^"/root/SaveSystem"
 const STAT_KEYS: Array[String] = [
@@ -19,6 +21,8 @@ const STAT_KEYS: Array[String] = [
 ]
 
 var company: Company = null
+## What the company has suffered: injuries, the chronicle, the memories (the game's one).
+var wounds: CompanyWounds = null
 var panel: CompanyPanel = null
 
 var _layer: CanvasLayer = null
@@ -47,9 +51,29 @@ static func load_company(from: Node) -> Company:
 	return Company.start(defs())
 
 
-## Builds the screen, hidden, for `shared`, the company the game holds.
-func begin(shared: Company) -> void:
+## The wounds of `held`, from the "wounds" block of the save on disk when there is one. The
+## Rng is a stand-in until the overworld binds the world's own (CompanyWounds.bind).
+static func load_wounds(from: Node, held: Company) -> CompanyWounds:
+	var saved := {}
+	var saves := from.get_node_or_null(SAVE_SYSTEM_PATH) as SAVE_SYSTEM
+	if saves != null and saves.has_save():
+		var model := saves.load_game(_json(WORLD_DATA), defs())
+		saved = model.wounds
+	var injuries: Variant = _json(INJURY_DATA).get("injuries", [])
+	var list: Array = injuries if injuries is Array else []
+	return CompanyWounds.make(held, saved, Rng.from_seed(0), _json(INJURY_RULES), list)
+
+
+## Builds the screen, hidden, for the company and wounds the save on disk holds (or new).
+func begin_from_save(from: Node) -> void:
+	var held := load_company(from)
+	begin(held, load_wounds(from, held))
+
+
+## Builds the screen, hidden, for `shared`, the company the game holds, and its wounds.
+func begin(shared: Company, suffered: CompanyWounds = null) -> void:
 	company = shared
+	wounds = suffered if suffered != null else load_wounds(self, shared)
 	_layer = CanvasLayer.new()
 	add_child(_layer)
 	panel = CompanyPanel.new()
@@ -93,11 +117,15 @@ func _show() -> void:
 				"label": Text.t("company.row", {"name": merc.display_name, "mark": mark})
 			}
 		)
+	for entry: Dictionary in wounds.chronicle().entries:
+		var gone := str(entry.get("merc", ""))
+		var fallen_name := company.name_of(gone)
+		rows.append({"id": gone, "label": Text.t("company.fallen.row", {"name": fallen_name})})
 	var params := {"count": company.roster.size(), "cap": company.cap()}
 	panel.show_roster(Text.t("company.panel.title", params), rows)
 	var merc := company.member(_selected)
 	if merc == null:
-		panel.show_detail({"header": Text.t("company.panel.pick")})
+		panel.show_detail(_fallen_detail(_selected))
 		return
 	panel.show_detail(_detail(merc))
 
@@ -122,6 +150,44 @@ func _detail(merc: Merc) -> Dictionary:
 	}
 
 
+## The detail of a dead merc: his chronicle line and that he is gone. Anyone else (or
+## nobody) reads as the prompt to pick.
+func _fallen_detail(merc_id: String) -> Dictionary:
+	for entry: Dictionary in wounds.chronicle().entries:
+		if entry.get("merc", "") == merc_id:
+			var line := Text.t(
+				"chronicle.death",
+				{
+					"name": company.name_of(merc_id),
+					"day": Merc.whole(entry.get("day", 0)),
+					"cause": TriageText.name_of(str(entry.get("cause", "")), company)
+				}
+			)
+			return {
+				"header": Text.t("company.fallen.title", {"name": company.name_of(merc_id)}),
+				"lines": [line, Text.t("company.fallen.gone")]
+			}
+	return {"header": Text.t("company.panel.pick")}
+
+
+## The merc's injuries in words (empty when there are none), then what a permanent one
+## changes about the role.
+func _injury_lines(merc: Merc) -> Array[String]:
+	var lines: Array[String] = []
+	var names: Array[String] = []
+	for row: Dictionary in wounds.injuries_of(merc.id):
+		var kind := str(row.get("kind", ""))
+		var params := {
+			"name": Text.t(str(row.get("name_key", ""))), "day": Merc.whole(row.get("until_day", 0))
+		}
+		names.append(Text.t("company.injury.%s" % kind, params))
+		if str(row.get("role_key", "")) != "":
+			lines.append(Text.t(str(row.get("role_key", ""))))
+	if not names.is_empty():
+		lines.insert(0, Text.t("company.injuries", {"list": ", ".join(names)}))
+	return lines
+
+
 func _lines(merc: Merc) -> Array[String]:
 	var lines: Array[String] = []
 	if merc.placeholder:
@@ -129,6 +195,7 @@ func _lines(merc: Merc) -> Array[String]:
 	if merc.species != "":
 		lines.append(Text.t("company.species", {"species": merc.species}))
 	lines.append(merc.role)
+	lines.append_array(_injury_lines(merc))
 	var stats: Array[String] = []
 	for key: String in STAT_KEYS:
 		stats.append(Text.t("company.stat." + key, {"value": merc.stat(key)}))

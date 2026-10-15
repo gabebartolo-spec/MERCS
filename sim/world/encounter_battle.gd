@@ -2,22 +2,29 @@ class_name EncounterBattle
 extends RefCounted
 ## Builds the street battle an encounter on the road leads into (Phase 2 M2), from the same
 ## data the slice loop's battle uses: the company, its cells and the grid come from the
-## authored scenario (the roster replaces them in milestone 3), the enemies from the pending
+## authored scenario (the roster replaces them: CompanyWounds), the enemies from the pending
 ## encounter, the fighters and rules from data/balance/battle.json. An ambush gives the enemy
 ## the first turn. Reads the Rng "battle" stream through Battle. The sim decides every roll.
 
 
 ## scenario: one entry of data/scenarios.json; battle_data: data/balance/battle.json;
-## pending: WorldSim.pending_encounter().
+## pending: WorldSim.pending_encounter(); company_units: the company's fighters from
+## CompanyWounds.units() (the road fields the roster); with none, the scenario's own pair.
 static func build(
-	pending: Dictionary, scenario: Dictionary, battle_data: Dictionary, rng: Rng
+	pending: Dictionary,
+	scenario: Dictionary,
+	battle_data: Dictionary,
+	rng: Rng,
+	company_units: Array[BattleUnit] = []
 ) -> Battle:
 	var setup := _dict(scenario, "battle")
 	var fighters_data := _dict(battle_data, "fighters")
-	var fighters: Array[BattleUnit] = []
+	var fighters: Array[BattleUnit] = company_units.duplicate()
 	var cells := _list(setup, "company_cells")
 	var company := _list(scenario, "company")
 	for i: int in mini(company.size(), cells.size()):
+		if not company_units.is_empty():
+			break
 		var kind := str(company[i])
 		fighters.append(
 			BattleUnit.make(kind, BattleUnit.COMPANY, _cell(cells[i]), _dict(fighters_data, kind))
@@ -38,6 +45,14 @@ static func build(
 	if pending.get("enemy_first", false) == true:
 		battle.give_first_turn(BattleUnit.ENEMY)
 	return battle
+
+
+## The scenario's cells for the company, in order (where CompanyWounds.units() stands them).
+static func company_cells(scenario: Dictionary) -> Array[Vector2i]:
+	var cells: Array[Vector2i] = []
+	for entry: Variant in _list(_dict(scenario, "battle"), "company_cells"):
+		cells.append(_cell(entry))
+	return cells
 
 
 ## What WorldSim.resolve_encounter() takes: {"won": bool, "surrendered": bool}.

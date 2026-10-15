@@ -16,6 +16,7 @@ const REST := "rest"
 const SAVE := "save"
 const FIGHT := "fight"
 const TOLL := "toll"
+const CONTINUE := "continue"
 const ENCOUNTER_DATA := "res://data/encounters.json"
 const SCENARIOS := "res://data/scenarios.json"
 const SCENARIO_ID := "scn_slice_loop"
@@ -31,6 +32,8 @@ var panel: LoopPanel = null
 var map: OverworldMap = null
 ## The company saved with the world (the game's one Company, set by the owner before begin()).
 var company: Company = null
+## What the company has suffered (injuries, the chronicle); the game's one, set with it.
+var wounds: CompanyWounds = null
 ## Set by SliceGame before begin(): the street the fight is drawn on and the street cell
 ## under battle cell (0, 0).
 var street_stage: StreetStage = null
@@ -39,7 +42,15 @@ var origin := Vector2i.ZERO
 var view: BattleView = null
 
 var _balance: Dictionary = {}
+## The triage after a road fight, shown until Continue; empty when none stands.
+var _triage := ""
 var _layer: CanvasLayer = null
+
+
+## Takes the company and its wounds from the company screen's director: the game's one.
+func adopt(screen: CompanyDirector) -> void:
+	company = screen.company
+	wounds = screen.wounds
 
 
 ## Continues the save on disk, or starts a fresh region, and shows the map and the choices.
@@ -57,6 +68,11 @@ func begin() -> void:
 		world.start(_balance, rng)
 	var lineups: Array = _json(ENCOUNTER_DATA).get("encounters", [])
 	world.set_lineups(lineups)
+	if company == null:
+		company = CompanyDirector.load_company(self)
+	if wounds == null:
+		wounds = CompanyDirector.load_wounds(self, company)
+	wounds.bind(rng)
 	_layer = CanvasLayer.new()
 	add_child(_layer)
 	map = OverworldMap.new()
@@ -86,6 +102,7 @@ func set_open(open: bool) -> void:
 	_layer.visible = open
 	if open:
 		_show(Text.t("world.panel.body"))
+		_show_triage()
 
 
 func _on_choice(choice_id: String) -> void:
@@ -94,6 +111,9 @@ func _on_choice(choice_id: String) -> void:
 	match choice_id:
 		FIGHT:
 			_start_fight()
+		CONTINUE:
+			_triage = ""
+			_show(_outcome_line())
 		TOLL:
 			world.pay_toll()
 			_show(_outcome_line())
@@ -101,7 +121,7 @@ func _on_choice(choice_id: String) -> void:
 			world.rest()
 			_show(Text.t("world.panel.body"))
 		SAVE:
-			var saved := _saves().save_game(world, rng, company)
+			var saved := _saves().save_game(world, rng, company, wounds.state())
 			_show(Text.t("world.panel.saved" if saved else "world.panel.save_failed"))
 		_:
 			world.travel_to(choice_id)
@@ -113,12 +133,14 @@ func _start_fight() -> void:
 	if world.encounter.is_empty() or street_stage == null:
 		return
 	var battle_data := _json(BATTLE_DATA)
-	var battle := EncounterBattle.build(world.pending_encounter(), _scenario(), battle_data, rng)
+	wounds.day = world.day
+	var battle := RoadFight.build(wounds, world.pending_encounter(), _scenario(), battle_data, rng)
 	map.visible = false
 	view = BattleView.new()
 	add_child(view)
 	view.street_stage = street_stage
 	view.panel = panel
+	view.unit_names = RoadFight.names(wounds)
 	var rules: Dictionary = battle_data.get("rules", {})
 	var sight: int = rules.get("sight_cells", 0)
 	view.begin(battle, origin, sight)
@@ -131,9 +153,20 @@ func _on_fight_over() -> void:
 	view.clear()
 	view.queue_free()
 	view = null
+	var events := wounds.resolve()
 	world.resolve_encounter(result)
 	map.visible = true
+	_triage = RoadFight.triage_body(_outcome_line(), events, wounds)
 	_show(_outcome_line())
+	_show_triage()
+
+
+## The triage panel after a road fight: what happened to whom, and Continue to the map.
+func _show_triage() -> void:
+	if _triage == "":
+		return
+	var choices: Array[Dictionary] = [{"id": CONTINUE, "label": Text.t("wiring.continue")}]
+	panel.present(Text.t("wiring.panel.title"), _triage, choices)
 
 
 ## The last encounter log entry in words: what the company won, lost or paid.
@@ -154,6 +187,7 @@ func _outcome_line() -> String:
 ## Redraws the map and lists the day's choices: each road out, a rest, a save.
 func _show(body: String) -> void:
 	map.show_world(world)
+	wounds.day = world.day
 	if not world.encounter.is_empty():
 		_show_encounter()
 		return

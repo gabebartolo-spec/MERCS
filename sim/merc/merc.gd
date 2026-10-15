@@ -109,9 +109,12 @@ func moves() -> Array[String]:
 
 ## The fighter this merc is in a battle, from their data. The abilities come from the moves
 ## learnt (charge, blood_price); a leader is whoever the company's captain is, so the caller
-## says. Gear in the slots is for stats and adds nothing here yet.
-func to_battle_unit(side: int, at: Vector2i, leads: bool) -> BattleUnit:
-	var numbers := stats.duplicate()
+## says. Gear in the slots is for stats and adds nothing here yet. `fit` are the merc's
+## numbers as injuries leave them (CompanyWounds); empty means the numbers in `stats`.
+func to_battle_unit(
+	side: int, at: Vector2i, leads: bool, fit: Dictionary = {}
+) -> BattleUnit:
+	var numbers := (fit if not fit.is_empty() else stats).duplicate()
 	var learnt := moves()
 	numbers["ability_charge"] = Battle.ACTION_CHARGE in learnt
 	numbers["ability_blood_price"] = Battle.ACTION_BLOOD_PRICE in learnt

@@ -217,7 +217,7 @@ func end_loop() -> void:
 func toggle_overworld() -> void:
 	if _overworld == null:
 		_overworld = OverworldDirector.new()
-		_overworld.company = company_director().company
+		_overworld.adopt(company_director())
 		_overworld.street_stage = _stage
 		var origin := _data.floats("loop", "battle_origin_xz")
 		_overworld.origin = Vector2i(int(origin[0]), int(origin[1]))
@@ -242,7 +242,7 @@ func company_director() -> CompanyDirector:
 	if _company_director == null:
 		_company_director = CompanyDirector.new()
 		add_child(_company_director)
-		_company_director.begin(CompanyDirector.load_company(self))
+		_company_director.begin_from_save(self)
 	return _company_director
 
 

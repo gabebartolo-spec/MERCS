@@ -118,5 +118,19 @@
   "battle.intent.advance": "Advances on {target}",
   "battle.intent.hold": "Holds",
   "battle.move.charge": "Charge {target}",
-  "battle.move.blood_price": "Blood price on {target}"
+  "battle.move.blood_price": "Blood price on {target}",
+  "wiring.panel.title": "After the fight",
+  "wiring.none": "Nobody went down.",
+  "wiring.outcome.wound": "{name} went down and got up again: {injury}.",
+  "wiring.outcome.temporary": "{name} went down with {injury}, and is fit again on day {day}.",
+  "wiring.outcome.permanent": "{name} went down and lives, but with {injury} for good. {role}",
+  "wiring.cause_unknown": "an unseen hand",
+  "wiring.continue": "Continue",
+  "company.injuries": "Injuries: {list}",
+  "company.injury.temporary": "{name} (until day {day})",
+  "company.injury.permanent": "{name} (for good)",
+  "company.injury.wound": "{name}",
+  "company.fallen.row": "{name}  [fallen]",
+  "company.fallen.title": "Fallen: {name}",
+  "company.fallen.gone": "Gone from the company for good."
 }
