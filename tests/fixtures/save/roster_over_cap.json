@@ -1,0 +1,215 @@
+{
+  "version": 2,
+  "rng": {
+    "seed": "424242",
+    "streams": {
+      "world": "8065442071378377217",
+      "parties": "3350216144221037245"
+    }
+  },
+  "world": {
+    "day": 0,
+    "supplies": 30,
+    "at": "site_hub",
+    "band": [
+      45,
+      31
+    ],
+    "march": 0,
+    "haven": "site_hub",
+    "log": [],
+    "encounter": {},
+    "parties": [
+      {
+        "id": "party_0",
+        "type": "ambush",
+        "x": 32,
+        "y": 12,
+        "home_x": 32,
+        "home_y": 12,
+        "budget": 0,
+        "away_until": 0,
+        "chasing": false
+      },
+      {
+        "id": "party_1",
+        "type": "ambush",
+        "x": 22,
+        "y": 12,
+        "home_x": 22,
+        "home_y": 12,
+        "budget": 0,
+        "away_until": 0,
+        "chasing": false
+      },
+      {
+        "id": "party_2",
+        "type": "ambush",
+        "x": 48,
+        "y": 13,
+        "home_x": 48,
+        "home_y": 13,
+        "budget": 0,
+        "away_until": 0,
+        "chasing": false
+      },
+      {
+        "id": "party_3",
+        "type": "patrol",
+        "x": 32,
+        "y": 34,
+        "home_x": 32,
+        "home_y": 34,
+        "budget": 0,
+        "away_until": 0,
+        "chasing": false
+      },
+      {
+        "id": "party_4",
+        "type": "patrol",
+        "x": 29,
+        "y": 28,
+        "home_x": 29,
+        "home_y": 28,
+        "budget": 0,
+        "away_until": 0,
+        "chasing": false
+      }
+    ]
+  },
+  "company": {
+    "captain": "orc",
+    "roster": [
+      {
+        "id": "orc",
+        "xp": 0,
+        "gear": {
+          "weapon": "",
+          "armour": "",
+          "trinket": ""
+        }
+      },
+      {
+        "id": "vampyr",
+        "xp": 0,
+        "gear": {
+          "weapon": "",
+          "armour": "",
+          "trinket": ""
+        }
+      },
+      {
+        "id": "merc_3",
+        "xp": 0,
+        "gear": {
+          "weapon": "",
+          "armour": "",
+          "trinket": ""
+        }
+      },
+      {
+        "id": "merc_4",
+        "xp": 0,
+        "gear": {
+          "weapon": "",
+          "armour": "",
+          "trinket": ""
+        }
+      },
+      {
+        "id": "merc_5",
+        "xp": 0,
+        "gear": {
+          "weapon": "",
+          "armour": "",
+          "trinket": ""
+        }
+      },
+      {
+        "id": "merc_6",
+        "xp": 0,
+        "gear": {
+          "weapon": "",
+          "armour": "",
+          "trinket": ""
+        }
+      },
+      {
+        "id": "recruit_1",
+        "xp": 0,
+        "gear": {
+          "weapon": "",
+          "armour": "",
+          "trinket": ""
+        }
+      },
+      {
+        "id": "recruit_2",
+        "xp": 0,
+        "gear": {
+          "weapon": "",
+          "armour": "",
+          "trinket": ""
+        }
+      },
+      {
+        "id": "recruit_3",
+        "xp": 0,
+        "gear": {
+          "weapon": "",
+          "armour": "",
+          "trinket": ""
+        }
+      },
+      {
+        "id": "recruit_4",
+        "xp": 0,
+        "gear": {
+          "weapon": "",
+          "armour": "",
+          "trinket": ""
+        }
+      },
+      {
+        "id": "recruit_5",
+        "xp": 0,
+        "gear": {
+          "weapon": "",
+          "armour": "",
+          "trinket": ""
+        }
+      },
+      {
+        "id": "recruit_6",
+        "xp": 0,
+        "gear": {
+          "weapon": "",
+          "armour": "",
+          "trinket": ""
+        }
+      }
+    ],
+    "fallen": [],
+    "economy": {
+      "purse": 40,
+      "owed": 0,
+      "unpaid_days": 0,
+      "morale": 60,
+      "board": [],
+      "next_contract": 1,
+      "board_day": 0,
+      "inventory": [],
+      "hired": [
+        "recruit_1",
+        "recruit_2",
+        "recruit_3",
+        "recruit_4",
+        "recruit_5",
+        "recruit_6"
+      ],
+      "prisoner": {},
+      "last_loot": {},
+      "chronicle": []
+    }
+  }
+}
