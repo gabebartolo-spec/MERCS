@@ -92,9 +92,8 @@ static func mount(tree: SceneTree, seed_value: int) -> Mounted:
 	return mounted
 
 
-## Takes a mounted fight off the tree.
+## Takes a mounted fight off the tree (the caller has already cleared the view).
 static func unmount(mounted: Mounted) -> void:
-	mounted.view.clear()
 	mounted.view.queue_free()
 	mounted.layer.queue_free()
 	mounted.stage.queue_free()

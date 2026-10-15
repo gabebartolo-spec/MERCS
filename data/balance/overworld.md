@@ -19,10 +19,12 @@ All in logical pixels: the map is drawn at 1x on the same texel grid as the stre
 - `repeat_s`: then one step per this many seconds while the key stays down.
 
 ## colours
-Placeholder colours, as red, green, blue from 0 to 1.
-- `plain_rgb`, `road_rgb`, `forest_rgb`, `hill_rgb`, `water_rgb`, `town_rgb`: each terrain's tile.
-- `band_rgb`: the band's token (the company's colour on the street's battle rings).
-- `ambush_rgb`, `patrol_rgb`: bandits' and a patrol's tokens, by encounter type.
-- `site_rgb`: a site's marker.
-- `ring_rgb`: the outline round the band.
-- `chase_rgb`: the chase ring round a party that has seen the band (white, a colour no token, marker or outline shares).
+Colours of the look-B palette.
+- Every colour here is a palette reference "ramp:index" (core.json or the heartland biome; presentation/palette.gd), never RGB.
+- `plain`, `road`, `forest`, `hill`, `water`, `town`: each terrain's tile.
+- `void`: what shows past the region's edge (a dark soot frame, not a terrain).
+- `band`: the band's token (the company's colour on the street's battle rings).
+- `ambush`, `patrol`: bandits' and a patrol's tokens, by encounter type.
+- `site`: a site's marker.
+- `ring`: the outline round the band.
+- `chase`: the chase ring round a party that has seen the band (heraldry white, a colour no token, marker or outline shares).

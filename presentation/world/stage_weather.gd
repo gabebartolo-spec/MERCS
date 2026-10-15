@@ -58,7 +58,7 @@ static func _streak(data: StageData, block: String) -> QuadMesh:
 		streak.size = Vector2(size[0], size[1])
 	var material := StandardMaterial3D.new()
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	material.albedo_color = data.rgb(block, "color_rgb")
+	material.albedo_color = data.colour(block, "colour")
 	material.billboard_mode = BaseMaterial3D.BILLBOARD_FIXED_Y
 	material.billboard_keep_scale = true
 	streak.material = material

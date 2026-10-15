@@ -21,6 +21,8 @@ const BLOOD_REFS: Array[String] = ["blood:0", "blood:1", "blood:2", "soot:2"]
 const SAMPLE_HITS := 24
 const MAX_DAMAGE := 7
 const NOWHERE := Vector2i(-1, -1)
+const HALF_CELL_M := 0.5
+const HALF_ROW_M := 0.85
 
 
 ## What a played fight gave: the battle, every event, the wounds and the falls.
@@ -46,6 +48,7 @@ class Pictures:
 class Seen:
 	extends RefCounted
 	var flashed := false
+	var bone := false
 	var nodes := true
 	var inside := true
 	var texel := true
@@ -152,7 +155,7 @@ func _check_pictures() -> void:
 	var marks := BattleMarks.new()
 	var allowed: Array[Color] = []
 	for ref: String in BLOOD_REFS:
-		allowed.append(BattleMarks.ref_colour(ref))
+		allowed.append(Palette.colour(ref))
 	var view := StageData.load_file(BattleMarks.DATA_PATH)
 	var side := Merc.whole(view.num("splat", "half_px")) * 2 + 1
 	var smallest := Merc.whole(view.num("splat", "satellite_min_px"))
@@ -256,9 +259,9 @@ func _check_scene() -> void:
 	check(view.battle.is_over(), "the scene fight is played to its end by clicks")
 	_check_drawn(mounted, seen)
 	await InputKit.frames(self, SETTLE)
-	check(view.fx().active() == 0, "every flash has ended and given the frame back")
+	check(view.fx.active() == 0, "every flash has ended and given the frame back")
 	_check_bodies(mounted)
-	var marks := view.marks()
+	var marks := view.marks
 	var kept := marks.bodies.size()
 	await InputKit.frames(self, SETTLE)
 	check(
@@ -275,7 +278,7 @@ func _check_drawn(mounted: Kit.Mounted, seen: Seen) -> void:
 	for entry: Dictionary in mounted.view.battle.log:
 		if entry.get("type") == "hit":
 			wounds += 1
-	var drawn := mounted.view.marks().splats.size()
+	var drawn := mounted.view.marks.splats.size()
 	check(
 		wounds > 0 and drawn == wounds, "the view drew one splat per wound in the log (%d)" % wounds
 	)
@@ -286,32 +289,56 @@ func _check_drawn(mounted: Kit.Mounted, seen: Seen) -> void:
 		"splats are one logical pixel per texel at a whole-number screen scale"
 	)
 	check(seen.flashed, "a wounded fighter showed its flash frame")
+	check(seen.bone, "the flash frame is the fighter's own silhouette in bone, nothing else")
 
 
 ## Notes what one frame of the scene shows: a flash, and each splat's node and place.
 func _look(mounted: Kit.Mounted, seen: Seen) -> void:
 	var view := mounted.view
-	seen.flashed = seen.flashed or view.fx().active() > 0
-	var marks := view.marks()
+	seen.flashed = seen.flashed or view.fx.active() > 0
+	if not seen.bone:
+		seen.bone = _flash_is_bone(mounted)
+	var marks := view.marks
 	for splat: Dictionary in marks.splats:
 		var node := marks.node_of(splat)
 		seen.nodes = seen.nodes and node != null
 		if node == null:
 			continue
 		var logged: Vector2i = splat["cell"]
-		var at := mounted.origin + logged
-		seen.inside = seen.inside and _within(node.position, at)
+		seen.inside = seen.inside and _within(node.position, view.world_point(logged))
 		seen.texel = seen.texel and is_equal_approx(node.pixel_size, mounted.stage.texel_m())
 
 
-## Whether a world point lies over the street cell.
-func _within(point: Vector3, cell: Vector2i) -> bool:
-	return Rect2(Vector2(cell), Vector2.ONE).has_point(Vector2(point.x, point.z))
+## Whether a flashing fighter's sprite now draws only bone-white pixels (its own silhouette).
+func _flash_is_bone(mounted: Kit.Mounted) -> bool:
+	var bone := Palette.colour(BattleFx.FLASH_REF)
+	for fighter: BattleUnit in mounted.view.battle.units:
+		if not mounted.view.fx.is_flashing(fighter.id):
+			continue
+		var sprite := mounted.stage.extra_mercs[mounted.view.battle.units.find(fighter)]
+		var material := sprite.material_override as ShaderMaterial
+		var texture: Texture2D = material.get_shader_parameter(&"albedo_texture")
+		var image := texture.get_image().get_region(Rect2i(sprite.region_rect))
+		var solid := 0
+		for y: int in image.get_height():
+			for x: int in image.get_width():
+				var c := image.get_pixel(x, y)
+				if c.a >= 1.0 and c != bone:
+					return false
+				solid += 1 if c.a >= 1.0 else 0
+		return solid > 0
+	return false
+
+
+## Whether a world point lies over a cell: in its column, and nearer its row's centre than
+## half a row (the rows stand a figure's height apart since the readable battle screen).
+func _within(point: Vector3, centre: Vector3) -> bool:
+	return absf(point.x - centre.x) < HALF_CELL_M and absf(point.z - centre.z) < HALF_ROW_M
 
 
 func _check_bodies(mounted: Kit.Mounted) -> void:
 	var view := mounted.view
-	var marks := view.marks()
+	var marks := view.marks
 	var on_field := marks.bodies.size() > 0
 	var gone := true
 	for body: Dictionary in marks.bodies:
@@ -320,7 +347,8 @@ func _check_bodies(mounted: Kit.Mounted) -> void:
 		on_field = on_field and node != null and node.is_inside_tree() and node.visible
 		on_field = on_field and fighter.down
 		on_field = on_field and body["cell"] == _last_hit_cell(view.battle, fighter.id)
-		gone = gone and not view.sprite_of(fighter.id).visible
+		var sprite := mounted.stage.extra_mercs[view.battle.units.find(fighter)]
+		gone = gone and not sprite.visible
 	check(on_field, "each fallen fighter's body is on the field at the end of the fight")
 	check(gone, "a fallen fighter's standing sprite has gone, the body stays")
 

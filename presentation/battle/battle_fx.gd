@@ -108,7 +108,7 @@ func _bone_of(texture: Texture2D) -> Texture2D:
 		return known
 	var image := texture.get_image()
 	image.convert(Image.FORMAT_RGBA8)
-	var bone := BattleMarks.ref_colour(FLASH_REF)
+	var bone := Palette.colour(FLASH_REF)
 	for y: int in image.get_height():
 		for x: int in image.get_width():
 			if image.get_pixel(x, y).a >= OPAQUE:

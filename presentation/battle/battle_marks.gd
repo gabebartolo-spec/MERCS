@@ -11,7 +11,6 @@ extends RefCounted
 ## frames replace it (placeholder). Numbers: data/balance/battle_view.json.
 
 const DATA_PATH := "res://data/balance/battle_view.json"
-const CORE_PATH := "res://assets/palette/core.json"
 const EVENT_HIT := "hit"
 const EVENT_DOWN := "down"
 const FRESH := 0
@@ -21,13 +20,9 @@ const DRY := 2
 const AGE_REFS := [["blood:1", "blood:0"], ["blood:0", "blood:2"], ["blood:2", "soot:2"]]
 const NOWHERE := Vector2i(-1, -1)
 const NEIGHBOURS: Array[Vector2i] = [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
-const CLEAR := Color(0.0, 0.0, 0.0, 0.0)
 const PAIR := 2
 const FILL_NEIGHBOURS := 3
 const GROW_TRIES := 20000
-const SEPARATOR := ":"
-
-static var _ramps: Dictionary = {}
 
 ## One entry per wound, in order: {index, cell, unit, by, damage, born, jitter, level}.
 var splats: Array[Dictionary] = []
@@ -36,49 +31,18 @@ var bodies: Array[Dictionary] = []
 
 var _data: StageData = StageData.load_file(DATA_PATH)
 var _stage: StreetStage = null
-var _origin := Vector2i.ZERO
+var _ground := Callable()
 var _hits := 0
 var _actions := 0
 var _nodes: Dictionary = {}
 
 
-## The colour a palette reference ("blood:1") names, read from the core palette file.
-static func ref_colour(ref: String) -> Color:
-	if _ramps.is_empty():
-		_load_ramps()
-	var parts := ref.split(SEPARATOR)
-	if parts.size() == PAIR and _ramps.has(parts[0]) and parts[1].is_valid_int():
-		var steps: Array = _ramps[parts[0]]
-		var step := int(parts[1])
-		if step >= 0 and step < steps.size():
-			return steps[step]
-	push_error("battle marks: unknown palette reference '%s'" % ref)
-	return CLEAR
-
-
-static func _load_ramps() -> void:
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(CORE_PATH))
-	var file: Dictionary = parsed if parsed is Dictionary else {}
-	var list: Variant = file.get("ramps", [])
-	if not list is Array:
-		return
-	var ramps: Array = list
-	for entry: Variant in ramps:
-		var ramp: Dictionary = entry if entry is Dictionary else {}
-		var steps: Array[Color] = []
-		var colours: Variant = ramp.get("colours", [])
-		if colours is Array:
-			var hexes: Array = colours
-			for hex: Variant in hexes:
-				steps.append(Color.html(str(hex)))
-		_ramps[str(ramp.get("name", ""))] = steps
-
-
-## Draws onto this stage; origin is the street cell under battle cell (0, 0). Without a stage
-## the marks are still recorded (the model the tests read) but no node is made.
-func begin(stage: StreetStage, origin: Vector2i) -> void:
+## Draws onto this stage; ground turns a battle cell into the world point at its centre
+## (BattleView.world_point). Without a stage the marks are still recorded (the model the tests
+## read) but no node is made.
+func begin(stage: StreetStage, ground: Callable) -> void:
 	_stage = stage
-	_origin = origin
+	_ground = ground
 
 
 ## Takes one applied action's events: a splat per hit, a body per fall, and ages every splat.
@@ -170,11 +134,11 @@ func splat_image(index: int, damage: int, level: int) -> Image:
 ## The blot's pixels as a picture: fill, with a shadow edge along its lower and right sides.
 func _paint(pixels: Dictionary, half: int, level: int) -> Image:
 	var refs: Array = AGE_REFS[clampi(level, FRESH, DRY)]
-	var fill := ref_colour(str(refs[0]))
-	var shade := ref_colour(str(refs[1]))
+	var fill := Palette.colour(str(refs[0]))
+	var shade := Palette.colour(str(refs[1]))
 	var size := half * PAIR + 1
 	var image := Image.create(size, size, false, Image.FORMAT_RGBA8)
-	image.fill(CLEAR)
+	image.fill(Palette.CLEAR)
 	var edge := {}
 	for key: Variant in pixels:
 		var cell: Vector2i = key
@@ -316,10 +280,10 @@ func _sprite(lift_m: float) -> Sprite3D:
 
 
 func _place(sprite: Sprite3D, cell: Vector2i, jitter: Vector2i) -> void:
-	var at := _origin + cell
+	var centre: Vector3 = _ground.call(cell)
 	var texel := _stage.texel_m()
 	sprite.position = Vector3(
-		at.x + 0.5 + jitter.x * texel, sprite.position.y, at.y + 0.5 + jitter.y * texel
+		centre.x + jitter.x * texel, sprite.position.y, centre.z + jitter.y * texel
 	)
 
 

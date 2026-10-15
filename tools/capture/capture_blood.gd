@@ -13,8 +13,9 @@ const Kit := preload("res://tests/lib/battle_view_kit.gd")
 const InputKit := preload("res://tests/lib/input_kit.gd")
 const DEFAULT_SEED := 1009
 const DEFAULT_MID_HITS := 4
-const SHOW_SCALE := 4
-const CROP := Rect2i(160, 140, 640, 400)
+const UHD_WIDTH := 3840
+const CROP_PAD_PX := 120.0
+const FLASH_HOLD_FRAMES := 40
 const SETTLE_FRAMES := 30
 const FIGHT_FRAMES := 6000
 
@@ -47,42 +48,53 @@ func _run() -> void:
 			await _company_turn(mounted, BattleAi.choose(battle, actor, Kit.sight()))
 		else:
 			await process_frame
-		if not flashed and view.fx().active() > 0:
+		if not flashed and view.fx.active() > 0:
 			flashed = true
-			await process_frame
-			_save(out, "flash", mounted)
-		if not mid_done and view.marks().splats.size() >= mid_hits and view.fx().active() == 0:
+			view.set_process(false)  # hold the flash on screen while the picture is read back
+			await InputKit.frames(self, FLASH_HOLD_FRAMES)
+			await _save(out, "flash", mounted)
+			view.set_process(true)
+		if not mid_done and view.marks.splats.size() >= mid_hits and view.fx.active() == 0:
 			mid_done = true
 			await InputKit.frames(self, SETTLE_FRAMES)
-			_save(out, "mid", mounted)
+			await _save(out, "mid", mounted)
 	await InputKit.frames(self, SETTLE_FRAMES)
-	_save(out, "end", mounted)
-	print(
-		(
-			"splats %d bodies %d over %s"
-			% [view.marks().splats.size(), view.marks().bodies.size(), out]
-		)
-	)
+	await _save(out, "end", mounted)
+	print("splats %d bodies %d over %s" % [view.marks.splats.size(), view.marks.bodies.size(), out])
 	quit(0)
 
 
-## The street's own logical image (the window's copy is cropped by the container), shown at
-## whole 4x: one art pixel is a 4x4 block; and a crop of the battle area.
+## The street's own logical image (the window's copy is cropped by the container), shown at a
+## whole-number scale to 4K width: one art pixel is a block of equal size; and the middle
+## half of it, the battle area.
 func _save(out: String, name: String, mounted: Kit.Mounted) -> void:
+	await RenderingServer.frame_post_draw
 	var holder := mounted.stage.find_child("LogicalViewport", true, false) as SubViewport
+	holder.get_texture().get_image()  # the first read of a texture can return an old frame
+	await RenderingServer.frame_post_draw
 	var logical := holder.get_texture().get_image()
+	var scale := maxi(1, UHD_WIDTH / logical.get_width())
 	var big := logical.duplicate() as Image
-	big.resize(
-		logical.get_width() * SHOW_SCALE,
-		logical.get_height() * SHOW_SCALE,
-		Image.INTERPOLATE_NEAREST
-	)
+	big.resize(logical.get_width() * scale, logical.get_height() * scale, Image.INTERPOLATE_NEAREST)
 	big.save_png(out.path_join(name + ".png"))
-	var crop := logical.get_region(CROP)
-	crop.resize(
-		crop.get_width() * SHOW_SCALE, crop.get_height() * SHOW_SCALE, Image.INTERPOLATE_NEAREST
-	)
+	var crop := logical.get_region(_battle_area(mounted, logical.get_size()))
+	crop.resize(crop.get_width() * scale, crop.get_height() * scale, Image.INTERPOLATE_NEAREST)
 	crop.save_png(out.path_join(name + "_crop.png"))
+	print("%s: logical %s shown x%d" % [name, logical.get_size(), scale])
+
+
+## The logical pixels the fighters cover, padded, kept inside the picture.
+func _battle_area(mounted: Kit.Mounted, size: Vector2i) -> Rect2i:
+	var area := Rect2()
+	var first := true
+	for fighter: BattleUnit in mounted.view.battle.units:
+		var feet := mounted.stage.camera().unproject_position(
+			mounted.view.world_point(fighter.cell)
+		)
+		area = Rect2(feet, Vector2.ZERO) if first else area.expand(feet)
+		first = false
+	var padded := Rect2i(area.grow(CROP_PAD_PX))
+	return padded.intersection(Rect2i(Vector2i.ZERO, size))
 
 
 func _company_turn(mounted: Kit.Mounted, action: Dictionary) -> void:
