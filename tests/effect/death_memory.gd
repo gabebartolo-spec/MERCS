@@ -34,7 +34,7 @@ func _after(downed: Array) -> String:
 	var world := WorldSim.new()
 	var rng := Rng.from_seed(SEED)
 	world.start(world_balance, rng)
-	var text := JSON.stringify(SaveModel.to_dict(world, rng, aftermath.state(mercs)))
+	var text := JSON.stringify(SaveModel.to_dict(world, rng, null, aftermath.state(mercs)))
 	var parsed: Dictionary = JSON.parse_string(text)
 	var model := SaveModel.from_dict(parsed, world_balance)
 	var back := Aftermath.restore(model.wounds, rng, rules, [])

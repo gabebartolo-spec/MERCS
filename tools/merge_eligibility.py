@@ -12,7 +12,8 @@ import json
 import re
 import sys
 
-REQUIRED_CHECKS = ("test", "doc-caps", "gitleaks", "project-lints")
+# gdlint added 2026-10-15: #81 merged with gdformat red because it was not on this list.
+REQUIRED_CHECKS = ("test", "doc-caps", "gitleaks", "project-lints", "gdlint")
 SECTIONS = ("Evidence", "Not exercised", "Board and log", "[MERGE NOTE]")
 BOARD_FILES = ("docs/STATUS.md", "docs/DECISIONS.md")
 BOARD_BRANCH = re.compile(r"^docs/board-after-")

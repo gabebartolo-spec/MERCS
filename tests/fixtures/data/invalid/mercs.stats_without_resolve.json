@@ -1,0 +1,1 @@
+{"_comment": "expect: required", "starting_captain": "orc", "mercs": [{"id": "orc", "name": "The Orc", "species": "orc", "role": "Charges in.", "stats": {"hp": 16}, "moves_by_level": {"1": ["move"]}, "stage_1_gear": [], "gear_slots": {"weapon": null, "armour": null, "trinket": null}, "look": "placeholder"}]}

@@ -10,6 +10,8 @@ extends "res://tests/lib/runner.gd"
 const AUTOLOADS: Array[String] = ["Debug", "EventBus", "GameData", "SaveSystem", "Settings"]
 const AUTOLOAD_DIR := "*res://presentation/autoload/"
 const FRAMES_UP := 3
+## The smallest base text size that reads on a 4K TV at 2x (director, 2026-10-15).
+const MIN_FONT_SIZE := 24
 const WARNING_AS_ERROR := 2
 const STRICT_WARNINGS: Array[String] = [
 	"debug/gdscript/warnings/untyped_declaration",
@@ -22,6 +24,11 @@ const PROJECT_SETTINGS: Dictionary = {
 	"rendering/renderer/rendering_method": "forward_plus",
 	"display/window/size/viewport_width": 1920,
 	"display/window/size/viewport_height": 1080,
+	# Director, 2026-10-15: "the game needs to display on a 4k tv, i cant read any of the text".
+	"display/window/size/mode": DisplayServer.WINDOW_MODE_FULLSCREEN,
+	"display/window/stretch/mode": "canvas_items",
+	"display/window/stretch/aspect": "keep",
+	"gui/theme/custom": "res://ui/theme/base_theme.tres",
 }
 
 
@@ -31,6 +38,7 @@ func suite_name() -> String:
 
 func run_checks() -> void:
 	_check_settings()
+	_check_text_size()
 	_check_autoloads()
 	_check_scripts_compile()
 	await _check_main_scene()
@@ -44,6 +52,14 @@ func _check_settings() -> void:
 		var value: Variant = ProjectSettings.get_setting(key)
 		var same: bool = value == PROJECT_SETTINGS[key]
 		check(same, "%s is %s, not %s" % [key, PROJECT_SETTINGS[key], value])
+
+
+func _check_text_size() -> void:
+	var theme := load(str(ProjectSettings.get_setting("gui/theme/custom", ""))) as Theme
+	var size := theme.default_font_size if theme != null else 0
+	check(
+		size >= MIN_FONT_SIZE, "the base text size is at least %d, not %d" % [MIN_FONT_SIZE, size]
+	)
 
 
 func _check_autoloads() -> void:

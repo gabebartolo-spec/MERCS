@@ -57,9 +57,13 @@ var _interior_entry := Vector2i.ZERO
 var _interior_exit := Vector2i.ZERO
 var _frame_ms := 0.0
 var _help: Label = null
+## The key help and the frame time; hidden while a choice panel is up (the map or the loop),
+## which words its own keys and would sit over the help (director, 2026-10-15, 4K TV).
+var _hud: CanvasLayer = null
 var _frame_label: Label = null
 var _loop: LoopDirector = null
 var _overworld: OverworldDirector = null
+var _company_director: CompanyDirector = null
 
 
 func _ready() -> void:
@@ -165,10 +169,19 @@ func _on_key(key: InputEventKey) -> void:
 		_help.visible = not _help.visible
 	elif code == KEY_F3:
 		_frame_label.visible = not _frame_label.visible
-	elif code == KEY_F5:
+	else:
+		_on_screen_key(code)
+
+
+func _on_screen_key(code: Key) -> void:
+	if code == KEY_F5:
 		start_loop()
 	elif code == KEY_F2:
 		toggle_overworld()
+	elif code == KEY_F4:
+		company_director().set_open(not company_open())
+	elif code == KEY_ESCAPE and company_open():
+		_company_director.set_open(false)
 	elif code == KEY_ESCAPE and _overworld_open():
 		end_overworld()
 
@@ -204,6 +217,7 @@ func end_loop() -> void:
 func toggle_overworld() -> void:
 	if _overworld == null:
 		_overworld = OverworldDirector.new()
+		_overworld.company = company_director().company
 		_overworld.street_stage = _stage
 		var origin := _data.floats("loop", "battle_origin_xz")
 		_overworld.origin = Vector2i(int(origin[0]), int(origin[1]))
@@ -223,13 +237,26 @@ func end_overworld() -> void:
 		_overworld.set_open(false)
 
 
+## The company screen (F4), hidden until first used; its Company is the game's one.
+func company_director() -> CompanyDirector:
+	if _company_director == null:
+		_company_director = CompanyDirector.new()
+		add_child(_company_director)
+		_company_director.begin(CompanyDirector.load_company(self))
+	return _company_director
+
+
+func company_open() -> bool:
+	return _company_director != null and _company_director.is_open()
+
+
 func _overworld_open() -> bool:
 	return _overworld != null and _overworld.is_open()
 
 
 ## Walking waits while the loop example or the overworld map has the player's attention.
 func _paused() -> bool:
-	return _loop != null or _overworld_open()
+	return _loop != null or _overworld_open() or company_open()
 
 
 func _held_direction() -> Vector2i:
@@ -317,6 +344,7 @@ func _clip(path: String) -> SheetClip:
 
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()
+	_hud = layer
 	add_child(layer)
 	_help = Label.new()
 	_help.text = Text.t("slice.help")
@@ -330,6 +358,7 @@ func _build_hud() -> void:
 
 ## Places every merc and the camera, and shows each merc's current facing.
 func _sync() -> void:
+	_hud.visible = not (_overworld_open() or company_open() or _loop != null)
 	# From the fight on, the camera stays on the field and the street's walkers step aside.
 	var arena := _arena()
 	var fighting := arena != null

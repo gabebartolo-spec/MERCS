@@ -29,6 +29,8 @@ var world: WorldSim = null
 var rng: Rng = null
 var panel: LoopPanel = null
 var map: OverworldMap = null
+## The company saved with the world (the game's one Company, set by the owner before begin()).
+var company: Company = null
 ## Set by SliceGame before begin(): the street the fight is drawn on and the street cell
 ## under battle cell (0, 0).
 var street_stage: StreetStage = null
@@ -99,7 +101,7 @@ func _on_choice(choice_id: String) -> void:
 			world.rest()
 			_show(Text.t("world.panel.body"))
 		SAVE:
-			var saved := _saves().save_game(world, rng)
+			var saved := _saves().save_game(world, rng, company)
 			_show(Text.t("world.panel.saved" if saved else "world.panel.save_failed"))
 		_:
 			world.travel_to(choice_id)

@@ -350,7 +350,7 @@ func _check_save_reload() -> void:
 	var world := WorldSim.new()
 	var rng := Rng.from_seed(SEED)
 	world.start(world_balance, rng)
-	var text := JSON.stringify(SaveModel.to_dict(world, rng, aftermath.state(mercs)))
+	var text := JSON.stringify(SaveModel.to_dict(world, rng, null, aftermath.state(mercs)))
 	var through_json: Dictionary = JSON.parse_string(text)
 	var model := SaveModel.from_dict(through_json, world_balance)
 	var back := Aftermath.restore(model.wounds, Rng.from_seed(SEED), Kit.rules(), Kit.defs())
