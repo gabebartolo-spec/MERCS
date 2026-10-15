@@ -60,6 +60,8 @@ static func restore(saved: Dictionary, defs: Dictionary) -> Company:
 		for dead: Variant in buried:
 			company.fallen.append(str(dead))
 	company.economy = Economy.restore(_section(saved, "economy"), defs)
+	for dead: String in company.fallen:
+		company.economy.forfeit_dues(dead)
 	for row: Variant in rows:
 		if not row is Dictionary:
 			continue

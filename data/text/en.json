@@ -153,6 +153,7 @@
   "hub.contract.taken": "Accepted: {faction}, {site}, {reward} coin, by day {deadline}.",
   "hub.terms.step_in_won": "Stepped in and talked the paymaster up.",
   "hub.terms.step_in_lost": "Stepped in to talk the paymaster up, and talked him down.",
+  "hub.terms.no_advance": "They won't pay up front: you walked out on them.",
   "hub.recruits.title": "Recruits (a hire costs {cost} coin)",
   "hub.recruits.none": "No one is looking for work.",
   "hub.recruits.full": "The roster is full.",

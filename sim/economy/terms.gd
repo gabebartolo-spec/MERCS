@@ -26,6 +26,8 @@ const PERCENT := 100
 ## Chronicle keys (data/text/en.json) for the merc who stepped in.
 const KEY_STEP_WON := "hub.terms.step_in_won"
 const KEY_STEP_LOST := "hub.terms.step_in_lost"
+## The contract screen's line when a faction pays nothing up front (see Standing.no_advance).
+const KEY_NO_ADVANCE := "hub.terms.no_advance"
 
 var _standing: Standing = null
 var _rules := {}
@@ -83,12 +85,24 @@ func limit_pct(row: Dictionary) -> int:
 	)
 
 
+## Whether this contract's paymaster will pay anything up front (false after the company
+## walked out on his faction, until it finishes a job for them).
+func advance_open(row: Dictionary) -> bool:
+	return _standing == null or _standing.pays_advance(str(row.get("faction", "")))
+
+
+## The advance an ask can carry: what was asked, or nothing from a faction that is closed to it.
+func advance_for(row: Dictionary, advance: int) -> int:
+	return advance if advance_open(row) else 0
+
+
 ## The employer's reply to an ask of `price` coin with `advance` of it paid now, computed:
 ## {"reply", "reputation", "need", "limit_pct", "ask_pct", "counter_price", "counter_advance"}.
 ## An advance costs him more than coin on return ("advance_cost_pct" of each coin). Inside his
 ## limit he accepts; up to "counter_band_pct" past it he counters at his limit (the same
 ## advance, or less if the price falls below it); further, he walks.
 func judge(row: Dictionary, price: int, advance: int) -> Dictionary:
+	advance = advance_for(row, advance)
 	var reward := maxi(1, Merc.whole(row.get("reward", 0)))
 	var faction := str(row.get("faction", ""))
 	var limit := limit_pct(row)
@@ -122,6 +136,7 @@ func negotiate(
 	var advance := Merc.whole(ask.get("advance", 0))
 	if row.is_empty() or row.get("accepted") == true or advance < 0 or advance > price:
 		return {"reply": ""}
+	advance = advance_for(row, advance)
 	var check := _step_in(economy, company, row, ask)
 	var result := judge(row, price, advance)
 	result["check"] = check
