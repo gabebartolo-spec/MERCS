@@ -132,6 +132,7 @@
   "hub.status": "Coin {purse}   Morale {morale}",
   "hub.wages.clear": "Wages are paid up.",
   "hub.wages.owed": "Wages owed: {owed} coin ({per_day} a day for {count} mercenaries). Days unpaid: {days}.",
+  "hub.armoury.upkeep": "Armour upkeep: {upkeep} coin a day, owed with the wages.",
   "hub.pay": "Pay the wages ({owed} coin)",
   "hub.away": "Wages, contracts and hiring are done at the hub.",
   "hub.contracts.title": "Contracts",

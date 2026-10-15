@@ -35,23 +35,28 @@ const SEEDS := {
 ## surrendered man, released at the hub; the release is now remembered by the merc who reacts
 ## most strongly (merc_3, economy.json "prisoner" "reactions") beside the captain, so the save
 ## gains that one chronicle line and memory. 6e3ccee3... -> a9086cba...; the rest hold.
+## Re-pinned by Phase 5 C6 (claude/c6-armoury): armour upkeep goes on the day's bill, so every
+## route where the plated orc or Vampyr is on the roster when a day ticks owes more (win, toll,
+## second_fight, job/424316); loot is drawn from the fallen's gear, so second_fight/424316's
+## first win (only the chief's mace fell: no piece) skips the pick and its second fight's loot
+## rolls move. loss and wipe (the orc and Vampyr are dead) and job/424308 (no day ticks) hold.
 ## Re-pinned by Phase 5 C7 (claude/c7-road): the road's line-ups grew to 4-8 soldiers (or
 ## 12-16 rabble off the road) and are drawn from those the place and day allow, so every route
 ## that meets an encounter on the map fights a bigger band; toll (paid, no fight), job and
 ## loss/424316 hold.
 const GOLDEN := {
-	"win/424310": "4c974be15bed0c5b331ac216cfd4adda57fed910dc794338e5c242d59bd6a38c",
-	"win/424311": "b24c97d1b5fcb6dec8236b705c3e40ee35b7a011ba918283bffbcb04d2c139ea",
-	"loss/424308": "349aa5b355698567ed053bc0dc4f7015235a58d87465065a69110048ef2d6a0b",
+	"win/424310": "764f232048becec9da60b5a7fae1853b3945d6306dbeb9aebd5cc96e55640f07",
+	"win/424311": "17afc3759f22468bd32a194872b128bee1b5d5754d23c2dc18f0fdb3761a867e",
+	"loss/424308": "78527d9fb2aeea09260487d334b9cf12c1a433219f7ff89de46564a9ed4daf1c",
 	"loss/424316": "ae1491173ccf7b35563033ab048932fe88b7f9e34b0a41d32b40520df5a03e9b",
-	"toll/424308": "f7854fd802c0402b11b5db2308d06987f6c919bfc4131c39b4677ca6bbdfe58f",
-	"toll/424316": "17feb8d953f76ef6c83866a38e3495b25339802f083bb4d238335984d1128f81",
-	"second_fight/424308": "88ed71d3c3ea8f7bb31fbeaa680ea79819e690aebf45a37ae53b8da140f1e065",
-	"second_fight/424316": "17f1351e854a5ff9ff9313e70350b696d670cf5f7309a50731602d7201cfaa14",
-	"wipe/424308": "90ca7d0846980e50963ffe9ae27abebcc7469312d4165bb1e858c44236990d0a",
-	"wipe/424316": "166f60989c2a7aa80be42896f7b0077ca87f530cce370c067d936ca989fe7c23",
+	"toll/424308": "6f97c63c31c7cdfb03baaa5448afd92670b8eff5ca12eddeff3aa2bdcb7a237a",
+	"toll/424316": "84a0597763a649f8d644d6499dfe34a8e5e5819a63ced8ff4db6ff5af0f5c32a",
+	"second_fight/424308": "103cd6e36d52f8077fc5dd802e9374d0130abef94290398d4d69467346cb1de7",
+	"second_fight/424316": "594df2ada0769fa67cf4f0e2bb5d46be6af7827b7812fd90a5f7b5c88b262d4e",
+	"wipe/424308": "c2a1651d45788bdf39496e475bd3408d4f021f5fd1c1167f75c7d4be8b8b3bcb",
+	"wipe/424316": "052a22183247a44ae3feb842e7d98f0dbb0d355a1dd08c7e4e99145b4e4bde9c",
 	"job/424308": "17748c59ae8ea3b7a71d4af78836d37084877417e699dfa05fcef4486130f2c1",
-	"job/424316": "468e33572bdfc88f0221c974e6bac8bf834d876660fce1eefc472a410ce79f6e",
+	"job/424316": "5173a1b21a140efe63db148bc7f21ddb990b170587ea6f374c471a22d8dda873",
 }
 
 

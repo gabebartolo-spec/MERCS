@@ -138,7 +138,7 @@ func _check_save_round_trip() -> void:
 	var company := _company()
 	var economy := company.economy
 	_day(company, 1)
-	economy.take_loot("patrol", Rng.from_seed(SEED))
+	economy.take_loot("patrol", Rng.from_seed(SEED), {})
 	economy.accept(str(economy.board[0]["id"]))
 	economy.captives.take(1)
 	economy.hire(company, "recruit_1")
