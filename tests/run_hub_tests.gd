@@ -1,6 +1,6 @@
 extends "res://tests/lib/runner.gd"
-## Hub suite (Phase 2 milestone 6: HubDirector, HubPanel, F6). Real input reaches the game
-## through Input.parse_input_event at 1920x1080: a real F6 opens the hub with wages, a contract
+## Hub suite (Phase 2 milestone 6: HubDirector, HubPanel, B). Real input reaches the game
+## through Input.parse_input_event at 1920x1080: a real B opens the hub with wages, a contract
 ## board, three recruits and the pack, and walking pauses; real rest clicks on the map make
 ## wages fall due and a real click pays them; real clicks accept a contract, inspect and hire
 ## a placeholder recruit (the F4 company shows the hire); a won fight (the world's result
@@ -72,7 +72,7 @@ func _w(value: Variant) -> int:
 
 
 func _check_open() -> void:
-	await _tap(KEY_F6)
+	await _tap(KEY_B)
 	await _frames(LAYOUT_FRAMES)
 	var panel := _hub().panel
 	var economy := _economy()
@@ -97,7 +97,7 @@ func _check_open() -> void:
 			and _game.player.cell == start
 		),
 		(
-			"F6 opens the hub: wages paid up, %d contracts, %d recruits, an empty pack; walking waits"
+			"B opens the hub: wages paid up, %d contracts, %d recruits, an empty pack; walking waits"
 			% [accepts, hires]
 		)
 	)
@@ -109,12 +109,12 @@ func _status() -> Dictionary:
 
 func _check_wages_by_clicks() -> void:
 	await _tap(KEY_ESCAPE)
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	var map_panel := _game.overworld_director().panel
 	for _day: int in REST_DAYS:
 		await _click_button(map_panel.button_for(OverworldDirector.REST))
-	await _tap(KEY_F2)
-	await _tap(KEY_F6)
+	await _tap(KEY_M)
+	await _tap(KEY_B)
 	await _frames(LAYOUT_FRAMES)
 	var panel := _hub().panel
 	var economy := _economy()
@@ -311,11 +311,11 @@ func _check_away() -> void:
 		"away from the hub there are no wages, contracts or recruits to act on, only a line saying so"
 	)
 	_hub().world.at = RegionGen.HUB_ID
-	await _tap(KEY_F6)
+	await _tap(KEY_B)
 
 
 func _check_save() -> void:
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	await _click_button(_game.overworld_director().panel.button_for(OverworldDirector.SAVE))
 	var model := _saves().load_game(_json(WORLD_BALANCE), CompanyDirector.defs())
 	var saved := _economy()
@@ -332,7 +332,7 @@ func _check_save() -> void:
 		),
 		"the overworld's Save writes the economy: purse, morale, hires, board and the blade"
 	)
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 
 
 func _saves() -> SAVE_SYSTEM:

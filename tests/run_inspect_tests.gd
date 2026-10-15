@@ -1,7 +1,7 @@
 extends "res://tests/lib/runner.gd"
 ## Inspect suite (Phase 2 milestone 3: CompanyDirector, CompanyPanel, the SaveSystem autoload).
 ## Real input events reach the game through Input.parse_input_event, never a handler call: a
-## real F4 tap opens the company with a row per merc and the captain marked; a real click on a
+## real C tap opens the company with a row per merc and the captain marked; a real click on a
 ## roster row shows that merc's name, level, role words, stats, moves at their level, own gear
 ## line, the three generic slots and the experience bar; a placeholder says so; a real click
 ## on the office button makes them captain (the row marks move, the button goes); a held key
@@ -54,10 +54,10 @@ func _spawn() -> SliceGame:
 
 
 func _check_open(game: SliceGame) -> void:
-	await _tap(KEY_F4)
+	await _tap(KEY_C)
 	var director := game.company_director()
 	if director == null:
-		check(false, "F4 opens the company (no director)")
+		check(false, "C opens the company (no director)")
 		return
 	await _frames(LAYOUT_FRAMES)
 	var panel := director.panel
@@ -77,7 +77,7 @@ func _check_open(game: SliceGame) -> void:
 			and panel.header_text() == "The Orc, level 1"
 		),
 		(
-			"F4 opens the company: a row for each of the %d mercs, the orc marked captain and shown"
+			"C opens the company: a row for each of the %d mercs, the orc marked captain and shown"
 			% rows
 		)
 	)
@@ -135,9 +135,9 @@ func _check_placeholder(game: SliceGame) -> void:
 func _check_experience_bar(game: SliceGame) -> void:
 	var director := game.company_director()
 	var panel := director.panel
-	await _tap(KEY_F4)
+	await _tap(KEY_C)
 	game.company_director().company.gain("vampyr", BLOOD_PRICE_XP)
-	await _tap(KEY_F4)
+	await _tap(KEY_C)
 	await _click_button(panel.row_for("vampyr"))
 	var bar := panel.bar()
 	check(
@@ -182,9 +182,9 @@ func _check_appoint(game: SliceGame) -> void:
 
 func _check_hide_keeps_screen(game: SliceGame) -> void:
 	var director := game.company_director()
-	await _tap(KEY_F4)
+	await _tap(KEY_C)
 	var hidden := is_instance_valid(director) and not director.is_open()
-	await _tap(KEY_F4)
+	await _tap(KEY_C)
 	check(
 		(
 			hidden
@@ -192,14 +192,14 @@ func _check_hide_keeps_screen(game: SliceGame) -> void:
 			and director.is_open()
 			and director.company.captain_id == "vampyr"
 		),
-		"F4 hides the company and shows it again: the same screen, the Vampyr still captain"
+		"C hides the company and shows it again: the same screen, the Vampyr still captain"
 	)
 
 
 ## The captain picked here is in the save the overworld writes (a real click on its Save).
 func _check_saved_captain(game: SliceGame) -> void:
-	await _tap(KEY_F4)
-	await _tap(KEY_F2)
+	await _tap(KEY_C)
+	await _tap(KEY_M)
 	var overworld := game.overworld_director()
 	await _click_button(overworld.panel.button_for(OverworldDirector.SAVE))
 	var model := _saves().load_game(_json(WORLD_BALANCE), CompanyDirector.defs())
@@ -212,11 +212,11 @@ func _check_saved_captain(game: SliceGame) -> void:
 		),
 		"the overworld's Save writes the company: the Vampyr captain with his experience"
 	)
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 
 
 func _check_fresh_session(game: SliceGame) -> void:
-	await _tap(KEY_F4)
+	await _tap(KEY_C)
 	await _frames(LAYOUT_FRAMES)
 	var director := game.company_director()
 	var panel := director.panel

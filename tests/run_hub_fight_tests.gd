@@ -47,7 +47,7 @@ func _tap(code: Key) -> void:
 ## A real fight on the road: the hub opens on a prisoner exactly when the company won.
 func _check_real_fight() -> void:
 	var game := await _spawn()
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	var director := game.overworld_director()
 	await _click_button(director.panel.button_for(PATROL_ROAD))
 	await _click_button(director.panel.button_for(OverworldDirector.FIGHT))

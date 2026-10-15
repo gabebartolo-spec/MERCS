@@ -1,9 +1,9 @@
 class_name SliceGame
 extends Node
-## The art direction slice (docs/specs/art_direction_slice.md §1, §3): the street stage made
-## playable: walk by keys or clicks, a crowd, T time of day, R rain, F1 help, F3 frame time.
-## F5 starts the loop (LoopDirector), F2 the overworld map, F4 the company, F6 the hub; walking
-## pauses while any is open and the same key or Escape hides it. Presentation: no randomness.
+## The art direction slice (docs/specs/art_direction_slice.md): the street made playable. One
+## merc walks by keys (WASD or arrows) or a click; a crowd walks fixed routes; the door leads
+## to the interior. Command keys are letters (SliceKeys): time of day, rain, help, frame time,
+## the loop, the map, the company, the hub. Escape closes a panel. Presentation only.
 
 const STAGE_SCENE := preload("res://presentation/world/street_stage.tscn")
 const SLICE_DATA := "res://data/balance/slice.json"
@@ -53,10 +53,12 @@ var _loop: LoopDirector = null
 var _overworld: OverworldDirector = null
 var _company_director: CompanyDirector = null
 var _hub: HubDirector = null
+var _keys: SliceKeys = null
 
 
 func _ready() -> void:
 	_data = StageData.load_file(SLICE_DATA)
+	_keys = SliceKeys.new(SliceKeys.ACTIONS)
 	_stage = STAGE_SCENE.instantiate() as StreetStage
 	_stage.auto_walk = false
 	# The stage's logical screen (stage.json "pixel") at the largest whole scale that fits.
@@ -145,37 +147,37 @@ func _on_key(key: InputEventKey) -> void:
 		_held[code] = key.pressed
 	elif not key.pressed:
 		return
-	elif code == KEY_T:
+	elif _keys.action(code) == &"time_of_day":
 		var next := (int(_stage.time_of_day) + 1) % StageLighting.TimeOfDay.size()
 		_stage.set_conditions(next as StageLighting.TimeOfDay, _stage.rain)
 		_shown.clear()
-	elif code == KEY_R:
+	elif _keys.action(code) == &"rain":
 		_stage.set_conditions(_stage.time_of_day, not _stage.rain)
 		_shown.clear()
-	elif code == KEY_F1:
+	elif _keys.action(code) == &"help":
 		_help.visible = not _help.visible
-	elif code == KEY_F3:
+	elif _keys.action(code) == &"frame_time":
 		_frame_label.visible = not _frame_label.visible
 	else:
 		_on_screen_key(code)
 
 
 func _on_screen_key(code: Key) -> void:
-	if code == KEY_F5:
+	var action := _keys.action(code)
+	if action == &"loop":
 		start_loop()
-	elif code == KEY_F2:
+	elif action == &"map":
 		toggle_overworld()
-	elif code == KEY_F4:
+	elif action == &"company":
 		company_director().set_open(not company_open())
-	elif code == KEY_F6:
+	elif action == &"hub":
 		hub_director().set_open(not hub_open())
-	elif code == KEY_ESCAPE and (company_open() or hub_open()):
+	elif action == SliceKeys.CLOSE and (company_open() or hub_open()):
 		(_company_director if company_open() else _hub).set_open(false)
-	elif code == KEY_ESCAPE and _overworld_open():
+	elif action == SliceKeys.CLOSE and _overworld_open():
 		end_overworld()
 
 
-## Starts the loop example from its seed (slice.json "loop"), ending any pass in progress.
 func start_loop() -> void:
 	end_loop()
 	_loop = LoopDirector.new()
@@ -200,8 +202,8 @@ func end_loop() -> void:
 	_shown.clear()
 
 
-## Shows the overworld map over the street, or hides it when open. The first F2 creates the
-## director (continuing the save on disk, if any); later ones show and hide the same one.
+## Shows the overworld map, or hides it when open. The first M creates the director (continuing
+## the save on disk, if any); later ones show and hide the same one.
 func toggle_overworld() -> void:
 	if _overworld == null:
 		_overworld = OverworldDirector.new()
@@ -220,13 +222,12 @@ func overworld_director() -> OverworldDirector:
 	return _overworld
 
 
-## Hides the map; the run it holds stays for the next F2.
 func end_overworld() -> void:
 	if _overworld != null:
 		_overworld.set_open(false)
 
 
-## The company screen (F4), hidden until first used; its Company is the game's one.
+## The company screen (C), hidden until first used; its Company is the game's one.
 func company_director() -> CompanyDirector:
 	if _company_director == null:
 		_company_director = CompanyDirector.new()
@@ -239,7 +240,7 @@ func company_open() -> bool:
 	return _company_director != null and _company_director.is_open()
 
 
-## The hub screen (F6); the overworld (and so the world) is made, hidden, if need be.
+## The hub screen; the overworld (and so the world) is made, hidden, if need be.
 func hub_director() -> HubDirector:
 	if _hub == null:
 		toggle_overworld()
@@ -255,7 +256,7 @@ func _overworld_open() -> bool:
 	return _overworld != null and _overworld.is_open()
 
 
-## Walking waits while the loop example or the overworld map has the player's attention.
+## Walking waits while a panel or the loop has the player's attention.
 func _paused() -> bool:
 	return _loop != null or _overworld_open() or company_open() or hub_open()
 
@@ -332,7 +333,6 @@ func _load_frames() -> void:
 	_idle = _clip(IDLE_SHEET)
 	if _rest != null:
 		_stage.use_sheet(MERC_SHEET, player.facing)
-	# Moving at the walk clip's own ground speed keeps the planted foot still.
 	if _walk != null and _walk.ground_speed_mps > 0.0:
 		player.speed_m_s = _walk.ground_speed_mps
 		for walker: GridWalker in crowd:
