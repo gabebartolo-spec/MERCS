@@ -1,8 +1,8 @@
 extends "res://tests/lib/runner.gd"
 ## Road suite (Phase 2 M2: an encounter on the road, on screen). Real input events reach the
-## game through Input.parse_input_event: F2 and Escape taps, real mouse clicks on the panel's
+## game through Input.parse_input_event: M and Escape taps, real mouse clicks on the panel's
 ## buttons. On the balance seed the road to the second hamlet raises a patrol: the panel says
-## what it is with Fight and Pay the toll, the company stays where it was, F2 and Escape keep
+## what it is with Fight and Pay the toll, the company stays where it was, M and Escape keep
 ## the encounter; Fight closes the map and starts the street battle (the company acts first),
 ## and when it ends the fighters leave the street, the result is applied and the triage panel
 ## opens (Continue returns to the map, with the outcome in words). Paying the toll skips the fight. A saved world on another seed
@@ -33,7 +33,7 @@ func run_checks() -> void:
 	root.size = WINDOW_SIZE
 	_clear_save()
 	var game := await _spawn()
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	var director := game.overworld_director()
 	await _check_patrol_raised(director)
 	await _check_encounter_holds(game, director)
@@ -49,7 +49,7 @@ func run_checks() -> void:
 	await process_frame
 	_clear_save()
 	var tolled := await _spawn()
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	await _check_toll(tolled.overworld_director())
 	tolled.queue_free()
 	await process_frame
@@ -101,12 +101,12 @@ func _check_patrol_raised(director: OverworldDirector) -> void:
 
 
 func _check_encounter_holds(game: SliceGame, director: OverworldDirector) -> void:
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	var hidden := not director.is_open()
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	await _tap(KEY_ESCAPE)
 	var escaped := not director.is_open()
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	check(
 		(
 			hidden
@@ -116,12 +116,12 @@ func _check_encounter_holds(game: SliceGame, director: OverworldDirector) -> voi
 			and str(director.world.encounter.get("type")) == "patrol"
 			and director.panel.shown_body() == _expected_body(director)
 		),
-		"F2 and Escape hide the map and bring it back on the same standing encounter"
+		"M and Escape hide the map and bring it back on the same standing encounter"
 	)
 
 
 ## Fight closes the map on the street battle: the company's turn first, every fighter on the
-## street, and F2 cannot close the map under the fight.
+## street, and M cannot close the map under the fight.
 func _check_fight_starts(game: SliceGame, director: OverworldDirector) -> void:
 	var mercs_before := game.stage().extra_mercs.size()
 	var enemies: Array = director.world.encounter.get("enemies", [])
@@ -132,7 +132,7 @@ func _check_fight_starts(game: SliceGame, director: OverworldDirector) -> void:
 		check(false, "Fight starts the street battle (it did not start)")
 		return
 	var battle := director.view.battle
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	var on_street := game.stage().extra_mercs.size() - mercs_before
 	check(
 		(
@@ -143,7 +143,7 @@ func _check_fight_starts(game: SliceGame, director: OverworldDirector) -> void:
 			and director.is_open()
 		),
 		(
-			"Fight closes the map on the street battle: %d fighters, the company first, F2 cannot close it"
+			"Fight closes the map on the street battle: %d fighters, the company first, M cannot close it"
 			% battle.units.size()
 		)
 	)
@@ -229,7 +229,7 @@ func _check_toll(director: OverworldDirector) -> void:
 	)
 
 
-## A saved world on the ambush seed, loaded by the game's own first F2.
+## A saved world on the ambush seed, loaded by the game's own first M.
 func _check_ambush() -> void:
 	var rng := Rng.from_seed(AMBUSH_SEED)
 	var world := WorldSim.new()
@@ -241,7 +241,7 @@ func _check_ambush() -> void:
 
 func _ambush_on(road: String) -> void:
 	var game := await _spawn()
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	var director := game.overworld_director()
 	await _click_button(director.panel.button_for(road))
 	await _frames(LAYOUT_FRAMES)
@@ -280,7 +280,7 @@ func _ambush_on(road: String) -> void:
 	_clear_save()
 
 
-## A save written with an encounter standing: the next session's first F2 reopens on it.
+## A save written with an encounter standing: the next session's first M reopens on it.
 func _check_saved_encounter() -> void:
 	var rng := Rng.from_seed(AMBUSH_SEED)
 	var world := WorldSim.new()
@@ -290,7 +290,7 @@ func _check_saved_encounter() -> void:
 	world.travel_to(world.destinations()[0])
 	_saves().save_game(world, rng)
 	var game := await _spawn()
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	var director := game.overworld_director()
 	await _frames(LAYOUT_FRAMES)
 	check(

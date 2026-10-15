@@ -1,16 +1,10 @@
 class_name SliceGame
 extends Node
-## The art direction slice, milestone M1 (docs/specs/art_direction_slice.md §1, §3): the
-## street stage made playable. One merc walks the grid by keys (WASD or arrows, diagonals
-## by two keys) or by a click on the ground; the camera follows in whole logical pixels; a
-## crowd walks fixed routes; T steps the time of day, R toggles rain, F1 the key help, F3
-## the frame time; the door in the street leads to the one interior and back. Numbers come
-## from data/balance/slice.json and stage.json, text from data/text. F5 starts (or restarts)
-## the loop example (LoopDirector): panels, then a battle on an open patch of street during
-## which the camera watches the fight and walking pauses. F2 opens the overworld map
-## (OverworldDirector): the region, the company's day and supplies, and the road choices;
-## walking pauses while it is open, and F2 again or Escape hides it. The director lives
-## for the session, so a day travelled and not yet saved is there when the map reopens.
+## The art direction slice (docs/specs/art_direction_slice.md): the street made playable. One
+## merc walks by keys (WASD or arrows) or a click; the camera follows; a crowd walks fixed
+## routes; the door leads to the interior. Command keys are letters from slice.json "keys"
+## (SliceKeys): time of day, rain, help, frame time, the loop example (LoopDirector), the map
+## (OverworldDirector, which lives for the session) and the company. Escape closes a panel.
 ## Presentation only: nothing here is random, and walking the hub decides no outcome.
 
 const STAGE_SCENE := preload("res://presentation/world/street_stage.tscn")
@@ -64,10 +58,12 @@ var _frame_label: Label = null
 var _loop: LoopDirector = null
 var _overworld: OverworldDirector = null
 var _company_director: CompanyDirector = null
+var _keys: SliceKeys = null
 
 
 func _ready() -> void:
 	_data = StageData.load_file(SLICE_DATA)
+	_keys = SliceKeys.new(SliceKeys.ACTIONS)
 	_stage = STAGE_SCENE.instantiate() as StreetStage
 	_stage.auto_walk = false
 	# The stage's logical screen (stage.json "pixel"), at the largest whole scale the window
@@ -158,31 +154,32 @@ func _on_key(key: InputEventKey) -> void:
 		_held[code] = key.pressed
 	elif not key.pressed:
 		return
-	elif code == KEY_T:
+	elif _keys.action(code) == &"time_of_day":
 		var next := (int(_stage.time_of_day) + 1) % StageLighting.TimeOfDay.size()
 		_stage.set_conditions(next as StageLighting.TimeOfDay, _stage.rain)
 		_shown.clear()
-	elif code == KEY_R:
+	elif _keys.action(code) == &"rain":
 		_stage.set_conditions(_stage.time_of_day, not _stage.rain)
 		_shown.clear()
-	elif code == KEY_F1:
+	elif _keys.action(code) == &"help":
 		_help.visible = not _help.visible
-	elif code == KEY_F3:
+	elif _keys.action(code) == &"frame_time":
 		_frame_label.visible = not _frame_label.visible
 	else:
 		_on_screen_key(code)
 
 
 func _on_screen_key(code: Key) -> void:
-	if code == KEY_F5:
+	var action := _keys.action(code)
+	if action == &"loop":
 		start_loop()
-	elif code == KEY_F2:
+	elif action == &"map":
 		toggle_overworld()
-	elif code == KEY_F4:
+	elif action == &"company":
 		company_director().set_open(not company_open())
-	elif code == KEY_ESCAPE and company_open():
+	elif action == SliceKeys.CLOSE and company_open():
 		_company_director.set_open(false)
-	elif code == KEY_ESCAPE and _overworld_open():
+	elif action == SliceKeys.CLOSE and _overworld_open():
 		end_overworld()
 
 
@@ -211,7 +208,7 @@ func end_loop() -> void:
 	_shown.clear()
 
 
-## Shows the overworld map over the street, or hides it when it is open. The first F2
+## Shows the overworld map over the street, or hides it when it is open. The first M
 ## creates the director (which continues the save on disk, if any); later ones show and
 ## hide the same one, so the run stays as it is until the player saves.
 func toggle_overworld() -> void:
@@ -231,13 +228,13 @@ func overworld_director() -> OverworldDirector:
 	return _overworld
 
 
-## Hides the map; the run it holds stays for the next F2.
+## Hides the map; the run it holds stays for the next M.
 func end_overworld() -> void:
 	if _overworld != null:
 		_overworld.set_open(false)
 
 
-## The company screen (F4), hidden until first used; its Company is the game's one.
+## The company screen (C), hidden until first used; its Company is the game's one.
 func company_director() -> CompanyDirector:
 	if _company_director == null:
 		_company_director = CompanyDirector.new()
