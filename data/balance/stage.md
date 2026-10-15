@@ -54,6 +54,7 @@ Used when the stage's `lighting` export is RAIN_NIGHT (sample set 2, spec §4); 
 ## pixel
 - `logical_width_px`, `logical_height_px`: the whole-screen mode SubViewport size (960 × 540, the director's density pick 2026-10-09; it was 640 × 360).
 - `integer_scale`: the whole-screen scale to the 1920 × 1080 window (2; the slice picks ×4 itself on a 4K window).
+- `fight_zoom`: in a fight the logical viewport is this many times larger and its scale this many times smaller (2: 1920 by 1080 logical at x1, x2 on a 4K window), so six fighters a side, a figure's height apart, fit on screen with every texel still a whole number of window pixels.
 
 ## capture
 - `settle_frames`: frames rendered before a still is saved.

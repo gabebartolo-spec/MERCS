@@ -10,7 +10,10 @@ extends Node
 ## fighter's sprite goes and a dark ring marks where they fell. A strip along the bottom
 ## left (clear of the help line at the top) shows the turn order from now
 ## (Battle.turn_order) and whether a side wavers; a word marker over each enemy's head shows
-## its intent for the round until it acts (Battle.intent), kept off the panel's text.
+## its intent for the round until it acts (Battle.intent). The intents are one backed line
+## per enemy in a lane at the top left, named by enemy, clear of the side panel; nothing floats
+## over the bodies. Rows of the battle grid are drawn a figure's height apart on screen
+## (BattleRows) so neighbours never overlap; two fighters with one name are numbered.
 ## Placeholder look.
 
 signal finished
@@ -21,11 +24,8 @@ signal acted(action: Dictionary)
 const MARKER_DATA := "res://data/balance/slice.json"
 const ENEMY_PAUSE_S := 0.45
 const HUD_MARGIN_PX := 12.0
-## The gap in logical pixels between a fighter's head and the intent marker (a figure is
-## the stage's sprite_height_px tall on screen wherever it stands), and the outline.
-const INTENT_GAP_PX := 18
-## The gap an intent marker keeps from the panel's edge when it is moved clear of it.
-const PANEL_GAP_PX := 6.0
+## The intent lane's top edge in window pixels at 1080p: under the help line.
+const LANE_TOP_PX := 56.0
 const NOWHERE := Vector2i(-1, -1)
 var battle: Battle = null
 ## Set before begin(): the street to draw on and the panel to speak through.
@@ -44,6 +44,13 @@ var _wait_s := 0.0
 var _hud: CanvasLayer = null
 var _order_label: Label = null
 var _intent_labels := {}
+var _lane: PanelContainer = null
+var _order_box: PanelContainer = null
+var _names := {}
+var _rows: BattleRows = null
+var _mid := Vector2.ZERO
+var _was_logical := Vector2i.ZERO
+var _was_scale := 0
 
 
 ## Places one sprite per fighter and shows the first turn.
@@ -51,9 +58,15 @@ func begin(fight: Battle, origin: Vector2i, sight: int) -> void:
 	battle = fight
 	_origin = origin
 	_sight = sight
+	_names = BattleNames.of(battle, unit_names)
+	_rows = BattleRows.new(street_stage)
+	_zoom_out()
+	_mid = _field_mid()
 	_markers = StageData.load_file(MARKER_DATA)
 	for fighter: BattleUnit in battle.units:
-		_sprites[fighter.id] = street_stage.add_merc(world_point(fighter.cell))
+		var sprite := street_stage.add_merc(world_point(fighter.cell))
+		_sprites[fighter.id] = sprite
+		_rows.learn(sprite)
 		_rings[fighter.id] = _ring()
 	_make_hud()
 	if not panel.chosen.is_connected(_on_choice):
@@ -75,6 +88,9 @@ func clear() -> void:
 		_hud.queue_free()
 		_hud = null
 	_intent_labels.clear()
+	_lane = null
+	_order_box = null
+	_zoom_back()
 
 
 ## The turn order strip's words (tests read it).
@@ -90,15 +106,40 @@ func intent_label(unit_id: String) -> Label:
 	return label
 
 
-## The world point at the centre of a battle cell.
+## The intent lane's rectangle on the HUD layer (empty when no enemy has a plan).
+func lane_rect() -> Rect2:
+	if _lane == null or not _lane.visible:
+		return Rect2()
+	return Rect2(_lane.position, _lane.size)
+
+
+## The world point at the centre of a battle cell. The middle row of the field (where the
+## fight began) stands on the street at its own row; the others are spaced by BattleRows.
 func world_point(cell: Vector2i) -> Vector3:
-	var at := _origin + cell
-	return Vector3(at.x + 0.5, 0.0, at.y + 0.5)
+	var depth := _rows.depth_of(cell.y - _mid.y)
+	return Vector3(_origin.x + cell.x + 0.5, 0.0, _origin.y + _mid.y + 0.5 + depth)
 
 
-## The centre of the battle field, for the camera.
+## The street cell (origin + battle cell) under a ground point: the click's cell.
+func street_cell_at(ground: Vector3) -> Vector2i:
+	var rows := _rows.rows_of(ground.z - (_origin.y + _mid.y + 0.5))
+	return Vector2i(floori(ground.x), _origin.y + roundi(_mid.y + rows))
+
+
+## The middle of the field the fight began on, for the camera.
 func centre() -> Vector3:
-	return world_point(Vector2i.ZERO).lerp(world_point(_field_far()), 0.5)
+	return Vector3(_origin.x + _mid.x + 0.5, 0.0, _origin.y + _mid.y + 0.5)
+
+
+## The screen rectangle the drawn figure of each fighter covers (the opaque pixels of its
+## frame, not the frame's empty cell), in the camera's viewport pixels (tests compare them:
+## neighbours must not overlap).
+func sprite_rects() -> Dictionary:
+	var out := {}
+	for unit_id: Variant in _sprites:
+		var sprite: Sprite3D = _sprites[unit_id]
+		out[unit_id] = _rows.figure_rect(sprite)
+	return out
 
 
 ## A click on a street cell: on a company turn, a move to that cell if reachable.
@@ -112,7 +153,6 @@ func click_cell(street_cell: Vector2i) -> void:
 func _process(delta: float) -> void:
 	if battle == null:
 		return
-	_place_intents()
 	if battle.is_over():
 		return
 	if battle.current().side == BattleUnit.ENEMY:
@@ -236,18 +276,35 @@ func _ring() -> MeshInstance3D:
 func _make_hud() -> void:
 	_hud = CanvasLayer.new()
 	add_child(_hud)
-	_order_label = _hud_label()
+	_order_box = _backed()
+	_order_label = _hud_label(_order_box)
+	_lane = _backed()
+	var lines := VBoxContainer.new()
+	_lane.add_child(lines)
 	for fighter: BattleUnit in battle.units:
 		if fighter.side == BattleUnit.ENEMY:
-			_intent_labels[fighter.id] = _hud_label()
+			_intent_labels[fighter.id] = _hud_label(lines)
 
 
-func _hud_label() -> Label:
+func _hud_label(parent: Node) -> Label:
 	var label := Label.new()
 	UiLook.outlined(label)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_hud.add_child(label)
+	parent.add_child(label)
 	return label
+
+
+## A panel behind HUD text: the theme's panel, made opaque so the world never shows through.
+func _backed() -> PanelContainer:
+	var box := PanelContainer.new()
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hud.add_child(box)
+	var style := box.get_theme_stylebox(&"panel") as StyleBoxFlat
+	if style != null:
+		style = style.duplicate() as StyleBoxFlat
+		style.bg_color.a = 1.0
+		box.add_theme_stylebox_override(&"panel", style)
+	return box
 
 
 ## The turn order from now and any wavering side; each enemy's plan for the round.
@@ -260,60 +317,65 @@ func _refresh_hud() -> void:
 		if battle.is_shaken(side):
 			line += " " + Text.t("battle.shaken." + BattleUnit.SIDE_KEYS[side])
 	_order_label.text = line
-	var strip := _order_label.get_minimum_size()
-	var view := _order_label.get_viewport_rect().size
-	_order_label.position = Vector2(HUD_MARGIN_PX, view.y - strip.y - HUD_MARGIN_PX)
+	_order_box.reset_size()
+	var strip := _order_box.get_combined_minimum_size()
+	var view := _order_box.get_viewport_rect().size
+	_order_box.position = Vector2(HUD_MARGIN_PX, view.y - strip.y - HUD_MARGIN_PX)
+	var shown := 0
 	for unit_id: Variant in _intent_labels:
 		var label: Label = _intent_labels[unit_id]
 		var plan := battle.intent(str(unit_id))
 		label.visible = not plan.is_empty() and not battle.is_over()
 		if plan.is_empty():
 			continue
+		shown += 1
 		var target := battle.unit(str(plan.get("target", "")))
 		var params := {"target": _name(target) if target != null else ""}
-		label.text = Text.t("battle.intent." + str(plan.get("kind", "")), params)
-	_place_intents()
-
-
-## Keeps each intent marker over its enemy's head on screen.
-func _place_intents() -> void:
-	var camera := street_stage.camera()
-	var scale := 1.0
-	if street_stage.pixel_mode == StreetStage.PixelMode.WHOLE_SCREEN:
-		scale = float(street_stage.screen_scale())
-	for unit_id: Variant in _intent_labels:
-		var label: Label = _intent_labels[unit_id]
-		var sprite: Sprite3D = _sprites[unit_id]
-		var head := camera.unproject_position(sprite.global_position)
-		head.y -= street_stage.sprite_height_px + INTENT_GAP_PX
-		var at := head * scale
-		var size := label.get_minimum_size()
-		label.position = _clear_of_panel(Rect2(at - Vector2(size.x / 2.0, size.y), size)).position
-
-
-## The marker's rectangle, moved left of the panel when it would sit on the panel's text.
-func _clear_of_panel(rect: Rect2) -> Rect2:
-	if panel == null or not panel.visible:
-		return rect
-	var blocked := panel.get_global_rect()
-	if rect.intersects(blocked):
-		rect.position.x = maxf(0.0, blocked.position.x - rect.size.x - PANEL_GAP_PX)
-	return rect
-
-
-func _field_far() -> Vector2i:
-	var far := Vector2i.ZERO
-	for fighter: BattleUnit in battle.units:
-		far = far.max(fighter.cell)
-	return far
+		label.text = Text.t(
+			"battle.intent.line",
+			{
+				"who": _name(battle.unit(str(unit_id))),
+				"plan": Text.t("battle.intent." + str(plan.get("kind", "")), params)
+			}
+		)
+	_lane.visible = shown > 0
+	_lane.reset_size()
+	_lane.position = Vector2(HUD_MARGIN_PX, LANE_TOP_PX)
 
 
 func _name(fighter: BattleUnit) -> String:
-	if unit_names.has(fighter.id):
-		return str(unit_names[fighter.id])
-	var kind := fighter.id.rstrip("0123456789").trim_suffix("_")
-	var key := ("cast.%s.name" if fighter.side == BattleUnit.COMPANY else "enemy.%s.name") % kind
-	return Text.t(key)
+	return str(_names.get(fighter.id, fighter.id))
+
+
+## Zooms the stage out for the fight (data "pixel" "fight_zoom": the logical viewport that many
+## times larger, its upscale that many times smaller, so every texel stays a whole number of
+## window pixels and six fighters a figure's height apart fit on screen).
+func _zoom_out() -> void:
+	var zoom := int(street_stage.stage_data.num("pixel", "fight_zoom"))
+	_was_logical = street_stage.logical_size_px
+	_was_scale = street_stage.integer_scale
+	var base_scale := street_stage.screen_scale()
+	street_stage.logical_size_px = street_stage.logical_size() * zoom
+	street_stage.integer_scale = maxi(1, base_scale / zoom)
+	if street_stage.pixel_mode == StreetStage.PixelMode.WHOLE_SCREEN:
+		PixelScreen.refit(street_stage)
+
+
+func _zoom_back() -> void:
+	street_stage.logical_size_px = _was_logical
+	street_stage.integer_scale = _was_scale
+	if street_stage.pixel_mode == StreetStage.PixelMode.WHOLE_SCREEN:
+		PixelScreen.refit(street_stage)
+
+
+## The middle of the cells the fighters stand on at the start.
+func _field_mid() -> Vector2:
+	var low := Vector2i(1000, 1000)
+	var high := Vector2i(-1000, -1000)
+	for fighter: BattleUnit in battle.units:
+		low = low.min(fighter.cell)
+		high = high.max(fighter.cell)
+	return Vector2(low + high) / 2.0
 
 
 static func _adjacent(a: Vector2i, b: Vector2i) -> bool:

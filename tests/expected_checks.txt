@@ -8,7 +8,7 @@ stage_scale 11
 stage_light 8
 assets 13
 slice 16
-battle 23
+battle 26
 loop 8
 sim_world 11
 sim_encounters 11
@@ -28,8 +28,9 @@ hub_fight 1
 story 60
 story_gui 17
 campaign 6
-panels 11
+panels 13
 campaign_end 11
 ironman 12
 ironman_resume 22
 look 17
+perf 14

@@ -41,6 +41,9 @@ window/stretch/aspect="keep"
 [gui]
 
 theme/custom="res://ui/theme/base_theme.tres"
+theme/default_font_antialiasing=0
+theme/default_font_hinting=1
+theme/default_font_subpixel_positioning=0
 
 [rendering]
 
