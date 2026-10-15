@@ -7,6 +7,8 @@ extends RefCounted
 ## without one reads as the starting six with the orc captain. No disk access: writing and
 ## reading files is presentation's.
 
+## Version 1 grew the world's optional "encounter" key (Phase 2 M2: an encounter standing on
+## the road) without a bump: a save without it reads as no encounter, so nothing moves.
 ## The save formats, oldest first; each one past UNVERSIONED has a migration arm below.
 enum Format { UNVERSIONED, FIRST, COMPANY }
 

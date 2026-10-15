@@ -10,6 +10,7 @@ signal chosen(choice_id: String)
 const MARGIN_PX := 12
 const WIDTH_SHARE := 0.42
 const BUTTON_PREFIX := &"Choice_"
+const META_ID := &"choice_id"
 
 var _title := Label.new()
 var _body := Label.new()
@@ -39,6 +40,7 @@ func present(title: String, body: String, choices: Array[Dictionary]) -> void:
 		var button := Button.new()
 		var choice_id := str(choice.get("id", ""))
 		button.name = String(BUTTON_PREFIX) + choice_id
+		button.set_meta(META_ID, choice_id)
 		button.text = str(choice.get("label", ""))
 		button.pressed.connect(chosen.emit.bind(choice_id))
 		_buttons.add_child(button)
@@ -46,9 +48,22 @@ func present(title: String, body: String, choices: Array[Dictionary]) -> void:
 	_fit()
 
 
+## The body text now shown (tests read the words a player would).
+func shown_body() -> String:
+	return _body.text
+
+
 ## The button for a choice id, or null (tests click it with the mouse).
 func button_for(choice_id: String) -> Button:
-	return _buttons.get_node_or_null(NodePath(String(BUTTON_PREFIX) + choice_id)) as Button
+	# By the id kept on each button: an id like "attack:bandit_0" cannot be a node path.
+	for child: Node in _buttons.get_children():
+		if (
+			child is Button
+			and child.get_meta(META_ID, "") == choice_id
+			and not child.is_queued_for_deletion()
+		):
+			return child as Button
+	return null
 
 
 func _fit() -> void:

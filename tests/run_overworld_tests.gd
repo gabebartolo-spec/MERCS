@@ -180,12 +180,13 @@ func _check_save_and_load(game: SliceGame) -> void:
 	)
 
 
-## A road taken, the map hidden with F2 and shown again: the same director, with the day and
-## the site it had, not a reload from disk or a fresh start.
+## A day passed, the map hidden with F2 and shown again: the same director, with the day and
+## the site it had, not a reload from disk or a fresh start. (A rest, not a road: a long road
+## may raise an encounter, which has its own suite, road.)
 func _check_hidden_keeps_run(game: SliceGame) -> void:
 	var director := game.overworld_director()
-	var to := director.world.destinations()[0]
-	await _click_button(director.panel.button_for(to))
+	var to := director.world.at
+	await _click_button(director.panel.button_for(OverworldDirector.REST))
 	var day := director.world.day
 	await _tap(KEY_F2)
 	var hidden := is_instance_valid(director) and not director.is_open()

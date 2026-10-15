@@ -88,7 +88,7 @@ func _check_pick(game: SliceGame) -> void:
 	var panel := game.company_director().panel
 	await _click_button(panel.row_for("vampyr"))
 	var lines := panel.lines_text()
-	var vampyr := game.company().member("vampyr")
+	var vampyr := game.company_director().company.member("vampyr")
 	check(
 		(
 			panel.shown_id() == "vampyr"
@@ -136,7 +136,7 @@ func _check_experience_bar(game: SliceGame) -> void:
 	var director := game.company_director()
 	var panel := director.panel
 	await _tap(KEY_F4)
-	game.company().gain("vampyr", BLOOD_PRICE_XP)
+	game.company_director().company.gain("vampyr", BLOOD_PRICE_XP)
 	await _tap(KEY_F4)
 	await _click_button(panel.row_for("vampyr"))
 	var bar := panel.bar()
@@ -162,13 +162,13 @@ func _check_walking_paused(game: SliceGame) -> void:
 func _check_appoint(game: SliceGame) -> void:
 	var director := game.company_director()
 	var panel := director.panel
-	var before := JSON.stringify(game.company().state())
+	var before := JSON.stringify(game.company_director().company.state())
 	await _click_button(panel.appoint_button())
 	var mark := Text.t("company.mark.captain").strip_edges()
 	check(
 		(
-			game.company().captain_id == "vampyr"
-			and JSON.stringify(game.company().state()) != before
+			game.company_director().company.captain_id == "vampyr"
+			and JSON.stringify(game.company_director().company.state()) != before
 			and panel.row_for("vampyr").text.contains(mark)
 			and not panel.row_for("orc").text.contains(mark)
 			and not panel.appoint_button().visible

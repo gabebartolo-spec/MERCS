@@ -47,7 +47,7 @@ static func load_company(from: Node) -> Company:
 	return Company.start(defs())
 
 
-## Shows the roster for `shared`, the company the game holds.
+## Builds the screen, hidden, for `shared`, the company the game holds.
 func begin(shared: Company) -> void:
 	company = shared
 	_layer = CanvasLayer.new()
@@ -57,7 +57,7 @@ func begin(shared: Company) -> void:
 	panel.picked.connect(_pick)
 	panel.appoint_requested.connect(_appoint)
 	_selected = company.captain_id
-	_show()
+	set_open(false)
 
 
 func is_open() -> bool:

@@ -1,0 +1,37 @@
+{
+  "_comment": "Phase 2 M2 encounters on the road, by type (read by sim/world/world_sim.gd; the numbers are in data/balance/world.json 'encounters'). An ambush starts the fight at once with the enemy acting first; a patrol offers a fight or a toll. Each line-up is one possible set of enemies, rolled when the encounter is raised; cells are on the battle grid of scn_slice_loop (the company stands on its company_cells). Fighters name entries in data/balance/battle.json. Schema: data/schema/encounters.schema.json.",
+  "encounters": [
+    {
+      "id": "enc_ambush",
+      "type": "ambush",
+      "enemy_first": true,
+      "lineups": [
+        [
+          { "fighter": "bandit", "cell": [4, 2] },
+          { "fighter": "bandit", "cell": [4, 6] }
+        ],
+        [
+          { "fighter": "bandit_chief", "cell": [5, 4] },
+          { "fighter": "bandit", "cell": [4, 2] },
+          { "fighter": "bandit", "cell": [4, 6] }
+        ]
+      ]
+    },
+    {
+      "id": "enc_patrol",
+      "type": "patrol",
+      "enemy_first": false,
+      "lineups": [
+        [
+          { "fighter": "watchman", "cell": [9, 3] },
+          { "fighter": "watchman", "cell": [9, 5] }
+        ],
+        [
+          { "fighter": "watch_sergeant", "cell": [10, 4] },
+          { "fighter": "watchman", "cell": [9, 3] },
+          { "fighter": "watchman", "cell": [9, 5] }
+        ]
+      ]
+    }
+  ]
+}

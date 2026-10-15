@@ -11,8 +11,7 @@ extends Node
 ## (OverworldDirector): the region, the company's day and supplies, and the road choices;
 ## walking pauses while it is open, and F2 again or Escape hides it. The director lives
 ## for the session, so a day travelled and not yet saved is there when the map reopens. F4
-## opens the company (CompanyDirector): the roster, the captain, one merc's details; the
-## Company it shows is the one the overworld saves.
+## opens the company (CompanyDirector: roster, captain, details), the one the map saves.
 ## Presentation only: nothing here is random, and walking the hub decides no outcome.
 
 const STAGE_SCENE := preload("res://presentation/world/street_stage.tscn")
@@ -62,7 +61,6 @@ var _help: Label = null
 var _frame_label: Label = null
 var _loop: LoopDirector = null
 var _overworld: OverworldDirector = null
-var _company: Company = null
 var _company_director: CompanyDirector = null
 
 
@@ -117,16 +115,25 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	var click := event as InputEventMouseButton
 	if click != null and click.pressed and click.button_index == MOUSE_BUTTON_LEFT:
-		if _overworld_open() or company_open():
-			return
-		var cell := ground_cell_at(click.position)
-		if not cell.has(&"cell"):
-			return
-		var target: Vector2i = cell[&"cell"]
-		if _loop == null:
-			player.walk_to(target)
-		elif _loop.in_battle():
-			_loop.view.click_cell(target)
+		_on_ground_click(click.position)
+
+
+## A left click on the street: walk there, or a move in the battle on screen. Nothing while
+## the map is open, except in a fight on the road.
+func _on_ground_click(window_position: Vector2) -> void:
+	var fighting := _overworld != null and _overworld.in_fight()
+	if _overworld_open() and not fighting:
+		return
+	var cell := ground_cell_at(window_position)
+	if not cell.has(&"cell"):
+		return
+	var target: Vector2i = cell[&"cell"]
+	if fighting:
+		_overworld.view.click_cell(target)
+	elif _loop == null:
+		player.walk_to(target)
+	elif _loop.in_battle():
+		_loop.view.click_cell(target)
 
 
 ## The street cell under a window position, as {&"cell": Vector2i}, or {} off the ground.
@@ -171,7 +178,7 @@ func _on_screen_key(code: Key) -> void:
 	elif code == KEY_F2:
 		toggle_overworld()
 	elif code == KEY_F4:
-		toggle_company()
+		company_director().set_open(not company_open())
 	elif code == KEY_ESCAPE and company_open():
 		_company_director.set_open(false)
 	elif code == KEY_ESCAPE and _overworld_open():
@@ -209,7 +216,10 @@ func end_loop() -> void:
 func toggle_overworld() -> void:
 	if _overworld == null:
 		_overworld = OverworldDirector.new()
-		_overworld.company = company()
+		_overworld.company = company_director().company
+		_overworld.street_stage = _stage
+		var origin := _data.floats("loop", "battle_origin_xz")
+		_overworld.origin = Vector2i(int(origin[0]), int(origin[1]))
 		add_child(_overworld)
 		_overworld.begin()
 		return
@@ -226,25 +236,13 @@ func end_overworld() -> void:
 		_overworld.set_open(false)
 
 
-## The company the game plays with: the save on disk's, else the starting six; made on first
-## use and shared with the overworld, which saves it.
-func company() -> Company:
-	if _company == null:
-		_company = CompanyDirector.load_company(self)
-	return _company
-
-
-## Shows the company screen over the street, or hides it when it is open.
-func toggle_company() -> void:
+## The company screen, made hidden on first use. Its Company is the game's one (the save on
+## disk's, else the starting six), shared with the overworld, which saves it.
+func company_director() -> CompanyDirector:
 	if _company_director == null:
 		_company_director = CompanyDirector.new()
 		add_child(_company_director)
-		_company_director.begin(company())
-		return
-	_company_director.set_open(not _company_director.is_open())
-
-
-func company_director() -> CompanyDirector:
+		_company_director.begin(CompanyDirector.load_company(self))
 	return _company_director
 
 
@@ -360,8 +358,9 @@ func _build_hud() -> void:
 ## Places every merc and the camera, and shows each merc's current facing.
 func _sync() -> void:
 	# From the fight on, the camera stays on the field and the street's walkers step aside.
-	var fighting := _loop != null and _loop.view != null
-	_stage.focus_on(_loop.view.centre() if fighting else _ground(player))
+	var arena := _arena()
+	var fighting := arena != null
+	_stage.focus_on(arena.centre() if fighting else _ground(player))
 	_stage.stand_at(_ground(player))
 	_stage.merc().visible = not fighting
 	_face(_stage.merc(), player, _clock)
@@ -370,6 +369,13 @@ func _sync() -> void:
 		_stage.move_extra(i, _ground(crowd[i]))
 		extras[i].visible = not fighting
 		_face(extras[i], crowd[i], _clock - CROWD_PHASE_S * (i + 1))
+
+
+## The battle on screen, from the loop example or from an encounter on the road, or null.
+func _arena() -> BattleView:
+	if _loop != null and _loop.view != null:
+		return _loop.view
+	return _overworld.view if _overworld != null else null
 
 
 ## Shows the frame a merc should have now: its facing, from walk while it moves and idle
