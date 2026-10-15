@@ -1,12 +1,13 @@
 extends "res://tests/lib/effect_case.gd"
-## encounter_toll: encounters on the road. The same seed (424243) and the same journey (the
-## hub's first road), with encounters on against a chance of 0: with them the company is
-## stopped, loses the fight and is back at the hub short of supplies; without them it
-## arrives. (M2 fixture: the system on and off leave the company in a different place.)
+## encounter_toll: parties on the map. The same seed (424242) and the same walk toward a tile
+## three steps out: with a band of bandits standing there the company is stopped, loses the
+## fight and falls back to the hub short of supplies; with no party it arrives.
 
-const BALANCE := "res://data/balance/world.json"
-const ENCOUNTERS := "res://data/encounters.json"
-const SEED := 424243
+const Fixture := preload("res://tests/lib/world_fixture.gd")
+const SEED := 424242
+const OUT := 3
+const NEAR := 3
+const WALK_LIMIT := 20
 
 
 func id() -> String:
@@ -14,19 +15,20 @@ func id() -> String:
 
 
 func run() -> Dictionary:
-	var on_balance := json(BALANCE)
-	var off_balance := on_balance.duplicate(true)
-	var encounters: Dictionary = off_balance.get("encounters", {})
-	encounters["chance_per_day"] = 0
-	return {"on": _journey(on_balance), "off": _journey(off_balance)}
+	return {"on": _journey(true), "off": _journey(false)}
 
 
-func _journey(balance: Dictionary) -> String:
-	var world := WorldSim.new()
-	world.start(balance, Rng.from_seed(SEED))
-	var lineups: Array = json(ENCOUNTERS).get("encounters", [])
-	world.set_lineups(lineups)
-	world.travel_to(world.destinations()[0])
+func _journey(with_party: bool) -> String:
+	var world := Fixture.world(SEED)
+	world.parties.clear()
+	Fixture.out_of_town(world, OUT)
+	var party := Fixture.lone_party(world, "ambush", NEAR)
+	if party == null:
+		return "no tile for the party"
+	var target := party.tile
+	if not with_party:
+		world.parties.clear()
+	Fixture.walk_toward(world, target, WALK_LIMIT)
 	if not world.encounter.is_empty():
 		world.resolve_encounter({"won": false})
-	return "%d supplies at %s on day %d" % [world.supplies, world.at, world.day]
+	return "%d supplies at %s on day %d" % [world.supplies, world.band, world.day]

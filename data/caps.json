@@ -11,6 +11,7 @@
     "scenarios": 1,
     "mercs": 6,
     "recruits": 6,
-    "encounters": 2
+    "encounters": 2,
+    "locations": 2
   }
 }

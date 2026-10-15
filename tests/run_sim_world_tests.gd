@@ -1,19 +1,22 @@
 extends "res://tests/lib/runner.gd"
-## Sim world suite (WorldSim, RegionGen, WorldSite; data/balance/world.json): the same seed
-## lays out the same region and another seed a different one; the counts and ids match the
-## balance; no two sites share a cell and every site is reachable from the hub by roads of
-## the balance's length; travel off the roads is refused and changes nothing; a road costs
-## its days and each day's supplies; supplies stop at 0 and the company is marked starving;
-## a restored state continues exactly as the uninterrupted run.
+## Sim world suite (WorldSim, RegionGen, TileGen, TileRegion, WorldSite; data/balance/world.json,
+## data/locations.json): the same seed lays out the same tile map and another seed a different
+## one; the counts and ids match the balance; each site's entrance is its own road tile and
+## every entrance can be walked to from the hub's; the hand-made stamps are laid as authored;
+## the map holds every terrain; a step onto water, a town wall, off the map or further than
+## one tile is refused and changes nothing; steps cost their terrain's units and a day's worth
+## ticks a day and its supplies; supplies stop at 0 and the company is marked starving; a
+## restored state continues exactly as the uninterrupted run.
 ## Seeded by design: Rng.from_seed(424242) and 424243
 ##   godot --headless --path . --script tests/run_sim_world_tests.gd
 
-const BALANCE := "res://data/balance/world.json"
+const Fixture := preload("res://tests/lib/world_fixture.gd")
 const SEED := 424242
 const OTHER_SEED := 424243
-const STEPS := 6
-const SPLIT := 3
+const STEPS := 12
+const SPLIT := 5
 const HUNGRY_DAYS := 40
+const LAND_WALK := 30
 
 
 func suite_name() -> String:
@@ -22,82 +25,64 @@ func suite_name() -> String:
 
 func run_checks() -> void:
 	_check_same_seed_same_region()
-	_check_other_seed_other_region()
+	_check_other_seed_other_map()
 	_check_counts()
-	_check_placement()
+	_check_entrances()
 	_check_connected()
-	_check_travel_refused()
-	_check_travel_costs()
+	_check_stamps()
+	_check_terrain_mix()
+	_check_step_refused()
+	_check_step_costs()
 	_check_starving()
 	_check_restore_continues()
 	await process_frame
 
 
-func _balance() -> Dictionary:
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(BALANCE))
-	return parsed if parsed is Dictionary else {}
-
-
-func _world(seed_value: int) -> WorldSim:
-	var world := WorldSim.new()
-	world.start(_balance(), Rng.from_seed(seed_value))
+## A world with no parties: nothing can stop the band.
+func _alone(seed_value: int) -> WorldSim:
+	var world := Fixture.world(seed_value)
+	world.parties.clear()
 	return world
 
 
 func _region() -> Dictionary:
-	return _balance().get("region", {})
+	return Fixture.data().get("region", {})
 
 
 func _company() -> Dictionary:
-	return _balance().get("company", {})
-
-
-## Every road once, as "a-b" with a < b, sorted.
-func _roads(world: WorldSim) -> Array[String]:
-	var pairs: Array[String] = []
-	for site: WorldSite in world.sites:
-		for other: String in site.neighbour_ids():
-			if site.id < other:
-				pairs.append("%s-%s" % [site.id, other])
-	pairs.sort()
-	return pairs
-
-
-## A scripted walk, steps `first` to `last` (exclusive) of one sequence: on even steps
-## travel along the first road out, on odd steps rest. Splitting it keeps the sequence.
-func _walk(world: WorldSim, first: int, last: int) -> void:
-	for i: int in range(first, last):
-		if i % 2 == 0:
-			world.travel_to(world.destinations()[0])
-		else:
-			world.rest()
+	return Fixture.data().get("company", {})
 
 
 func _check_same_seed_same_region() -> void:
-	var a := _world(SEED)
-	var b := _world(SEED)
+	var a := Fixture.world(SEED)
+	var b := Fixture.world(SEED)
 	check(
-		str(a.state()) == str(b.state()) and not a.sites.is_empty(),
-		"the same seed lays out the same region and starts the same state"
+		(
+			str(a.state()) == str(b.state())
+			and a.region.picture() == b.region.picture()
+			and not a.sites.is_empty()
+		),
+		"the same seed lays out the same tile map and starts the same state"
 	)
 
 
-func _check_other_seed_other_region() -> void:
-	var a := _world(SEED)
-	var b := _world(OTHER_SEED)
-	var cells_a := a.sites.map(func(s: WorldSite) -> Vector2i: return Vector2i(s.x, s.y))
-	var cells_b := b.sites.map(func(s: WorldSite) -> Vector2i: return Vector2i(s.x, s.y))
+func _check_other_seed_other_map() -> void:
+	var a := Fixture.world(SEED)
+	var b := Fixture.world(OTHER_SEED)
+	var same_size := a.region.width == b.region.width and a.region.height == b.region.height
 	check(
-		str(cells_a) != str(cells_b) or _roads(a) != _roads(b),
-		"another seed moves the sites or lays other roads (%s vs %s)" % [_roads(a), _roads(b)]
+		same_size and a.region.picture() != b.region.picture(),
+		(
+			"another seed lays another tile map of the same size (%d x %d)"
+			% [a.region.width, a.region.height]
+		)
 	)
 
 
 func _check_counts() -> void:
-	var world := _world(SEED)
+	var world := Fixture.world(SEED)
 	var hamlets: int = _region().get("hamlets", 0)
 	var wilds: int = _region().get("sites", 0)
-	var hubs := world.sites.filter(func(s: WorldSite) -> bool: return s.id == RegionGen.HUB_ID)
 	var named := (
 		world.site("site_hamlet_%d" % hamlets) != null
 		and world.site("site_wild_%d" % wilds) != null
@@ -105,15 +90,15 @@ func _check_counts() -> void:
 	)
 	check(
 		(
-			hubs.size() == 1
-			and _of_kind(world, WorldSite.Kind.HUB) == 1
+			_of_kind(world, WorldSite.Kind.HUB) == 1
 			and _of_kind(world, WorldSite.Kind.HAMLET) == hamlets
 			and _of_kind(world, WorldSite.Kind.WILD) == wilds
 			and named
 			and world.at == RegionGen.HUB_ID
+			and world.band == world.region.entrance(RegionGen.HUB_ID)
 		),
 		(
-			"one hub, %d hamlets and %d wild sites, named and counted as the balance says"
+			"one hub, %d hamlets and %d wild sites as the balance says; the band at the hub's gate"
 			% [hamlets, wilds]
 		)
 	)
@@ -123,92 +108,176 @@ func _of_kind(world: WorldSim, kind: WorldSite.Kind) -> int:
 	return world.sites.filter(func(s: WorldSite) -> bool: return s.kind == kind).size()
 
 
-func _check_placement() -> void:
-	var world := _world(SEED)
-	var width: int = _region().get("grid_w", 0)
-	var height: int = _region().get("grid_h", 0)
+func _check_entrances() -> void:
+	var world := Fixture.world(SEED)
 	var seen := {}
-	var inside := true
+	var fine := true
 	for site: WorldSite in world.sites:
-		seen[Vector2i(site.x, site.y)] = true
-		inside = inside and site.x >= 0 and site.x < width and site.y >= 0 and site.y < height
+		var gate := world.region.entrance(site.id)
+		seen[gate] = true
+		fine = fine and world.region.inside(gate)
+		fine = fine and world.region.terrain(gate) == TileRegion.Terrain.ROAD
+		fine = fine and world.region.site_at(gate) == site.id
 	check(
-		inside and seen.size() == world.sites.size(),
-		"every site sits on its own cell of the %d x %d grid" % [width, height]
+		fine and seen.size() == world.sites.size(),
+		"every site has its own entrance tile, on the map and on a road"
 	)
 
 
 func _check_connected() -> void:
-	var world := _world(SEED)
-	var low: int = _region().get("road_min_days", 0)
-	var high: int = _region().get("road_max_days", 0)
-	var in_range := true
-	var symmetric := true
-	for site: WorldSite in world.sites:
-		for other: String in site.neighbour_ids():
-			var days := site.days_to(other)
-			in_range = in_range and days >= low and days <= high
-			symmetric = symmetric and world.site(other).days_to(site.id) == days
+	var failures: Array[String] = []
+	for seed_value: int in [SEED, OTHER_SEED]:
+		var world := Fixture.world(seed_value)
+		var reached := _walkable_from(world, world.region.entrance(RegionGen.HUB_ID))
+		for site: WorldSite in world.sites:
+			if not reached.has(world.region.entrance(site.id)):
+				failures.append("%d:%s" % [seed_value, site.id])
 	check(
-		_reachable(world).size() == world.sites.size() and in_range and symmetric,
-		"every site is reachable from the hub by two-way roads of %d to %d days" % [low, high]
+		failures.is_empty(),
+		"every site's entrance can be walked to from the hub's: unreachable %s" % [failures]
 	)
 
 
-func _reachable(world: WorldSim) -> Dictionary:
-	var seen := {RegionGen.HUB_ID: true}
-	var queue: Array[String] = [RegionGen.HUB_ID]
+func _walkable_from(world: WorldSim, start: Vector2i) -> Dictionary:
+	var seen := {start: true}
+	var queue: Array[Vector2i] = [start]
 	while not queue.is_empty():
-		var next_id: String = queue.pop_front()
-		var here := world.site(next_id)
-		if here == null:
-			continue
-		for other: String in here.neighbour_ids():
-			if not seen.has(other):
-				seen[other] = true
-				queue.append(other)
+		var here: Vector2i = queue.pop_front()
+		for step: Vector2i in TileRegion.STEPS:
+			var next := here + step
+			if world.region.passable(next) and not seen.has(next):
+				seen[next] = true
+				queue.append(next)
 	return seen
 
 
-func _check_travel_refused() -> void:
-	var world := _world(SEED)
-	var before := str(world.state())
-	var far := ""
-	for site: WorldSite in world.sites:
-		if site.id != world.at and not site.is_neighbour(world.at):
-			far = site.id
-	var refused := not world.travel_to(far) and not world.travel_to("site_nowhere")
+## Every '#' of the hub's and the hamlets' stamps is a town wall around their entrances.
+func _check_stamps() -> void:
+	var world := Fixture.world(SEED)
+	var walls := 0
+	var wrong: Array[String] = []
+	var stamps: Array = Fixture.data().get("locations", [])
+	for entry: Variant in stamps:
+		var stamp: Dictionary = entry
+		var rows: Array = stamp.get("rows", [])
+		for site: WorldSite in world.sites:
+			if TileGen.KIND_KEYS[site.kind] != str(stamp.get("site_kind")):
+				continue
+			var origin := world.region.entrance(site.id) - _gate_in(rows)
+			for tile: Vector2i in _walls_of(rows):
+				walls += 1
+				if world.region.terrain(origin + tile) != TileRegion.Terrain.TOWN:
+					wrong.append("%s %s" % [site.id, origin + tile])
 	check(
-		far != "" and refused and str(world.state()) == before,
-		"travel to a site with no road from here is refused and changes nothing"
+		walls > 0 and wrong.is_empty(),
+		"the hand-made stamps are laid as authored (%d walls; wrong: %s)" % [walls, wrong]
 	)
 
 
-func _check_travel_costs() -> void:
-	var world := _world(SEED)
+func _gate_in(rows: Array) -> Vector2i:
+	for y: int in rows.size():
+		var found := str(rows[y]).find(TileGen.GATE)
+		if found >= 0:
+			return Vector2i(found, y)
+	return Vector2i.ZERO
+
+
+func _walls_of(rows: Array) -> Array[Vector2i]:
+	var walls: Array[Vector2i] = []
+	for y: int in rows.size():
+		var row := str(rows[y])
+		for x: int in row.length():
+			if row[x] == TileGen.WALL:
+				walls.append(Vector2i(x, y))
+	return walls
+
+
+func _check_terrain_mix() -> void:
+	var world := Fixture.world(SEED)
+	var kinds := {}
+	for tile: int in world.region.tiles:
+		kinds[tile] = true
+	check(
+		kinds.size() == TileRegion.Terrain.size(),
+		"the map holds road, plain, forest, hills, water and town walls (%d kinds)" % kinds.size()
+	)
+
+
+func _check_step_refused() -> void:
+	var world := _alone(SEED)
+	var before := str(world.state())
+	var wall := world.band + Vector2i(0, -1)
+	var refused := (
+		world.region.terrain(wall) == TileRegion.Terrain.TOWN
+		and not world.step(Vector2i(0, -1))
+		and not world.step(Vector2i(2, 0))
+		and not world.step(Vector2i.ZERO)
+	)
+	var water := _beside_water(world)
+	var shore: Vector2i = water[0]
+	var wade: Vector2i = water[1]
+	world.band = shore
+	var at_water := str(world.state())
+	refused = refused and wade != Vector2i.ZERO and not world.step(wade)
+	refused = refused and str(world.state()) == at_water
+	world.band = Vector2i.ZERO
+	var at_corner := str(world.state())
+	refused = refused and not world.step(Vector2i(-1, 0)) and str(world.state()) == at_corner
+	world.band = world.region.entrance(RegionGen.HUB_ID)
+	check(
+		refused and str(world.state()) == before,
+		"a step into a town wall, onto water, off the map or of two tiles is refused; nothing changes"
+	)
+
+
+## [a walkable tile, the step from it onto water].
+func _beside_water(world: WorldSim) -> Array:
+	for y: int in world.region.height:
+		for x: int in world.region.width:
+			var here := Vector2i(x, y)
+			for step: Vector2i in TileRegion.STEPS:
+				var next := here + step
+				var water := world.region.terrain(next) == TileRegion.Terrain.WATER
+				if world.region.passable(here) and water and world.region.inside(next):
+					return [here, step]
+	return [Vector2i.ZERO, Vector2i.ZERO]
+
+
+## Walks out of the hub's gate and back, over and over: each step costs its tile's units;
+## every full day's worth ticks a day and its supplies, the rest waits in `march`.
+func _check_step_costs() -> void:
+	var world := _alone(SEED)
 	var per_day: int = _company().get("supplies_per_day", 0)
 	var start: int = _company().get("start_supplies", 0)
-	var to: String = world.destinations()[0]
-	var days := world.site(world.at).days_to(to)
-	var moved := world.travel_to(to)
+	var march: Dictionary = Fixture.data().get("march", {})
+	var units_per_day: int = march.get("units_per_day", 0)
+	var units := 0
+	var steps := 0
+	for walk: int in LAND_WALK:
+		if not world.step(Vector2i(0, 1) if walk % 2 == 0 else Vector2i(0, -1)):
+			break
+		units += world.region.cost(world.band)
+		steps += 1
 	var ticks := world.log.filter(func(e: Dictionary) -> bool: return e.get("step") == "tick")
+	var days := units / units_per_day
 	check(
 		(
-			moved
-			and world.at == to
+			steps == LAND_WALK
+			and days > 0
 			and world.day == days
 			and ticks.size() == days
+			and world.march == units % units_per_day
 			and world.supplies == start - days * per_day
 		),
 		(
-			"a road of %d days moves the company there, costs %d days and %d supplies a day"
-			% [days, days, per_day]
+			"%d steps cost %d units: %d days at %d a day, %d supplies a day, %d units carried"
+			% [steps, units, days, units_per_day, per_day, world.march]
 		)
 	)
 
 
 func _check_starving() -> void:
-	var world := _world(SEED)
+	var world := _alone(SEED)
 	for _day: int in HUNGRY_DAYS:
 		world.rest()
 	var starving := world.log.filter(
@@ -231,17 +300,25 @@ func _check_starving() -> void:
 	)
 
 
+## Parties on the map: the run split by a restore (the Rng's streams carried as a save does)
+## walks on exactly as the run that never stopped.
 func _check_restore_continues() -> void:
-	var whole := _world(SEED)
-	_walk(whole, 0, STEPS)
-	var paused := _world(SEED)
-	_walk(paused, 0, SPLIT)
-	var resumed := WorldSim.restore(paused.state(), _balance(), Rng.from_seed(SEED))
-	_walk(resumed, SPLIT, STEPS)
+	var whole := Fixture.world(SEED)
+	Fixture.scripted(whole, 0, STEPS)
+	var paused_rng := Rng.from_seed(SEED)
+	var paused := WorldSim.new()
+	paused.start(Fixture.data(), paused_rng)
+	var lineups: Array = Fixture.json(Fixture.ENCOUNTERS).get("encounters", [])
+	paused.set_lineups(lineups)
+	Fixture.scripted(paused, 0, SPLIT)
+	var carried := Rng.restore(paused_rng.state())
+	var resumed := WorldSim.restore(paused.state(), Fixture.data(), carried)
+	resumed.set_lineups(lineups)
+	Fixture.scripted(resumed, SPLIT, STEPS)
 	check(
-		str(resumed.state()) == str(whole.state()) and resumed.day == whole.day,
+		str(resumed.state()) == str(whole.state()) and resumed.day == whole.day and whole.day > 0,
 		(
-			"restore(state()) after %d steps then %d more equals the uninterrupted run"
-			% [SPLIT, STEPS - SPLIT]
+			"restore(state()) after %d moves then %d more equals the uninterrupted run (day %d)"
+			% [SPLIT, STEPS - SPLIT, whole.day]
 		)
 	)

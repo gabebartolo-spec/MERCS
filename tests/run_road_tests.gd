@@ -1,28 +1,33 @@
 extends "res://tests/lib/runner.gd"
-## Road suite (Phase 2 M2: an encounter on the road, on screen). Real input events reach the
-## game through Input.parse_input_event: M and Escape taps, real mouse clicks on the panel's
-## buttons. On the balance seed the road to the second hamlet raises a patrol: the panel says
-## what it is with Fight and Pay the toll, the company stays where it was, M and Escape keep
-## the encounter; Fight closes the map and starts the street battle (the company acts first),
-## and when it ends the fighters leave the street, the result is applied and the map reopens
-## with the outcome in words. Paying the toll skips the fight. A saved world on another seed
-## has an ambush on its first road: only Fight, the enemy strikes first. A save taken with an
-## encounter standing reopens on its panel. The company's moves in the fight use the sim's
-## BattleAi for the choice; attacks and waits are real clicks, a move calls click_cell().
-## Seeded by design: the balance seed (data/balance/world.json) and Rng.from_seed(424243).
+## Road suite (Phase 2, encounters on the walkable overworld, on screen). Real input events
+## reach the game through Input.parse_input_event: M and Escape taps, walking-key taps, real
+## mouse clicks on the panel's buttons, with the root at 1920 x 1080. Each case saves a world
+## on the balance seed with the band three tiles out of the hub's gate and one party placed
+## near it, and the game's own first M loads it. Walking into a patrol raises it: the panel
+## words it with Fight and the toll, the band is stopped (keys, M and Escape change
+## nothing); Fight hides the map and starts the street battle (the company acts first), and
+## when it ends the fighters leave the street, the result is applied and the map returns with
+## the outcome in words. Paying the toll skips the fight and the patrol leaves the map. An
+## ambush offers only Fight and the enemy strikes first. A party out of sight does not come
+## for a band walking away. A save taken with an encounter standing reopens on its panel. In
+## the fight BattleAi picks the company's moves; attacks and waits are real clicks.
+## Seeded by design: the balance seed (data/balance/world.json).
 ##   godot --headless --path . --script tests/run_road_tests.gd
 
 const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
-const BALANCE := "res://data/balance/world.json"
-const ENCOUNTERS := "res://data/encounters.json"
-const BATTLE_DATA := "res://data/balance/battle.json"
+const World := preload("res://tests/lib/world_fixture.gd")
+const InputKit := preload("res://tests/lib/input_kit.gd")
 const WINDOW_SIZE := Vector2i(1920, 1080)
 const LAYOUT_FRAMES := 3
-const FIGHT_FRAMES := 6000
-const AMBUSH_SEED := 424243
-## The second hamlet's road raises a patrol on the balance seed.
-const PATROL_ROAD := "site_hamlet_2"
+const OUT := 3
+const NEAR := 3
+## Beyond every party type's sight (data/balance/world.json "parties").
+const FAR := 7
+const TAP_LIMIT := 8
 const SAVE_SYSTEM := preload("res://presentation/autoload/save_system.gd")
+const KEY_BY_STEP := {
+	Vector2i(0, -1): KEY_W, Vector2i(0, 1): KEY_S, Vector2i(-1, 0): KEY_A, Vector2i(1, 0): KEY_D
+}
 
 
 func suite_name() -> String:
@@ -32,29 +37,27 @@ func suite_name() -> String:
 func run_checks() -> void:
 	root.size = WINDOW_SIZE
 	_clear_save()
-	var game := await _spawn()
-	await _tap(KEY_M)
+	var game := await _game_with("patrol", NEAR)
 	var director := game.overworld_director()
-	await _check_patrol_raised(director)
-	await _check_encounter_holds(game, director)
+	await _check_patrol_met(director)
+	await _check_encounter_holds(director)
 	var before := {
 		"supplies": director.world.supplies,
-		"days_left": director.world.encounter.get("days_left", 0),
-		"to": director.world.encounter.get("to", ""),
+		"band": director.world.band,
 		"mercs": game.stage().extra_mercs.size(),
 	}
 	await _check_fight_starts(game, director)
 	await _check_fight_returns(game, director, before)
-	game.queue_free()
-	await process_frame
-	_clear_save()
-	var tolled := await _spawn()
-	await _tap(KEY_M)
+	await _close(game)
+	var tolled := await _game_with("patrol", NEAR)
 	await _check_toll(tolled.overworld_director())
-	tolled.queue_free()
-	await process_frame
-	_clear_save()
-	await _check_ambush()
+	await _close(tolled)
+	var ambushed := await _game_with("ambush", NEAR)
+	await _check_ambush(ambushed.overworld_director())
+	await _close(ambushed)
+	var avoided := await _game_with("ambush", FAR)
+	await _check_avoid(avoided.overworld_director())
+	await _close(avoided)
 	await _check_saved_encounter()
 	_clear_save()
 
@@ -63,72 +66,97 @@ func _saves() -> SAVE_SYSTEM:
 	return root.get_node(^"SaveSystem") as SAVE_SYSTEM
 
 
-func _spawn() -> SliceGame:
+## Saves a world on the balance seed, the band OUT tiles south of the hub's gate and one party
+## of `kind` `gap` tiles from it, then opens the game and its map (the first M loads it).
+func _game_with(kind: String, gap: int) -> SliceGame:
+	var data := World.data()
+	var world_block: Dictionary = data.get("world", {})
+	var balance_seed: int = world_block.get("seed", 0)
+	var rng := Rng.from_seed(balance_seed)
+	var world := WorldSim.new()
+	world.start(data, rng)
+	world.parties.clear()
+	World.out_of_town(world, OUT)
+	World.lone_party(world, kind, gap)
+	_saves().save_game(world, rng)
 	var packed: PackedScene = load(SLICE_SCENE) as PackedScene
 	var game: SliceGame = packed.instantiate() as SliceGame
 	root.add_child(game)
 	await process_frame
+	await _tap(KEY_M)
+	await _frames(LAYOUT_FRAMES)
 	return game
+
+
+func _close(game: SliceGame) -> void:
+	game.queue_free()
+	await process_frame
+	_clear_save()
+
+
+## Taps the walking key toward the lone party until its encounter stands. The taps.
+func _walk_into(director: OverworldDirector) -> int:
+	var world := director.world
+	var taps := 0
+	while world.encounter.is_empty() and taps < TAP_LIMIT and not world.parties.is_empty():
+		var to := world.parties[0].tile - world.band
+		var step := Vector2i(signi(to.x), 0) if to.x != 0 else Vector2i(0, signi(to.y))
+		await _tap(_key_for(step))
+		taps += 1
+	await _frames(LAYOUT_FRAMES)
+	return taps
 
 
 ## What the encounter panel should say for the standing encounter.
 func _expected_body(director: OverworldDirector) -> String:
 	var found := director.world.encounter
-	var site := OverworldMap.site_name(director.world.site(str(found.get("to", ""))))
-	var params := {"site": site, "day": director.world.day, "toll": director.world.toll_cost()}
+	var params := {"day": director.world.day, "toll": director.world.toll_cost()}
 	return Text.t("world.encounter.%s.body" % found.get("type"), params)
 
 
-func _check_patrol_raised(director: OverworldDirector) -> void:
-	await _click_button(director.panel.button_for(PATROL_ROAD))
-	await _frames(LAYOUT_FRAMES)
-	var found := director.world.encounter
+func _check_patrol_met(director: OverworldDirector) -> void:
+	var taps := await _walk_into(director)
+	var world := director.world
+	var party := world.party(str(world.encounter.get("party", "")))
+	var token := director.map.party_marker(party.id) if party != null else null
 	check(
 		(
-			str(found.get("type")) == "patrol"
-			and director.world.at == RegionGen.HUB_ID
+			str(world.encounter.get("type")) == "patrol"
+			and token != null
+			and token.visible
+			and TileRegion.gap(party.tile, world.band) <= 1
 			and director.panel.shown_body() == _expected_body(director)
 			and director.panel.button_for(OverworldDirector.FIGHT) != null
 			and director.panel.button_for(OverworldDirector.TOLL) != null
 			and director.panel.button_for(OverworldDirector.REST) == null
-			and director.panel.button_for(PATROL_ROAD) == null
 		),
-		(
-			"clicking the road to %s raises a patrol: the panel words it with Fight and the toll"
-			% PATROL_ROAD
-		)
+		"%d taps walk the band into the patrol: the panel words it with Fight and the toll" % taps
 	)
 
 
-func _check_encounter_holds(game: SliceGame, director: OverworldDirector) -> void:
-	await _tap(KEY_M)
-	var hidden := not director.is_open()
-	await _tap(KEY_M)
-	await _tap(KEY_ESCAPE)
-	var escaped := not director.is_open()
-	await _tap(KEY_M)
+func _check_encounter_holds(director: OverworldDirector) -> void:
+	var band := director.world.band
+	for code: Key in [KEY_S, KEY_A, KEY_M, KEY_ESCAPE]:
+		await _tap(code)
 	check(
 		(
-			hidden
-			and escaped
-			and director.is_open()
-			and game.overworld_director() == director
+			director.is_open()
+			and director.world.band == band
 			and str(director.world.encounter.get("type")) == "patrol"
 			and director.panel.shown_body() == _expected_body(director)
 		),
-		"M and Escape hide the map and bring it back on the same standing encounter"
+		"while the patrol stands, walking keys, M and Escape change nothing"
 	)
 
 
-## Fight closes the map on the street battle: the company's turn first, every fighter on the
+## Fight hides the map on the street battle: the company's turn first, every fighter on the
 ## street, and M cannot close the map under the fight.
 func _check_fight_starts(game: SliceGame, director: OverworldDirector) -> void:
 	var mercs_before := game.stage().extra_mercs.size()
 	var enemies: Array = director.world.encounter.get("enemies", [])
 	await _click_button(director.panel.button_for(OverworldDirector.FIGHT))
 	await _frames(LAYOUT_FRAMES)
-	var started := director.in_fight() and not director.map.visible
-	if not started:
+	if not (director.in_fight() and not director.map.visible):
 		check(false, "Fight starts the street battle (it did not start)")
 		return
 	var battle := director.view.battle
@@ -143,106 +171,90 @@ func _check_fight_starts(game: SliceGame, director: OverworldDirector) -> void:
 			and director.is_open()
 		),
 		(
-			"Fight closes the map on the street battle: %d fighters, the company first, M cannot close it"
+			"Fight hides the map on the street battle: %d fighters, the company first, M cannot close it"
 			% battle.units.size()
 		)
 	)
 
 
-## The supplies the company should hold after a patrol fight that started from `before`.
-func _supplies_after(won: bool, before: Dictionary) -> int:
-	var supplies: int = before.get("supplies", 0)
-	var days_left: int = before.get("days_left", 0)
-	var loot: int = _knobs("patrol").get("win_supplies", 0)
-	var lost: int = _knobs("patrol").get("loss_supplies", 0)
-	return supplies + loot - _per_day() * days_left if won else maxi(0, supplies - lost)
-
-
-## The outcome line the panel should show after a patrol fight.
-func _outcome_words(director: OverworldDirector, won: bool, before: Dictionary) -> String:
-	var supplies: int = before.get("supplies", 0)
-	var loot: int = _knobs("patrol").get("win_supplies", 0)
-	var lost: int = _knobs("patrol").get("loss_supplies", 0)
-	var site := OverworldMap.site_name(director.world.site(director.world.at))
-	return Text.t(
-		"world.encounter.outcome.%s" % ("won" if won else "lost"),
-		{"supplies": loot if won else mini(supplies, lost), "site": site}
-	)
-
-
 ## The fight to its end: fighters off the street, the result applied, the map back in words.
 func _check_fight_returns(game: SliceGame, director: OverworldDirector, before: Dictionary) -> void:
-	var won := await _finish_fight(director)
+	var won := await InputKit.finish_fight(self, director)
 	await _frames(LAYOUT_FRAMES)
-	var expected := _supplies_after(won, before)
+	var world := director.world
+	var expected := _after_fight(world, won, before)
 	var mercs: int = before.get("mercs", -1)
-	var place := str(before.get("to", "")) if won else RegionGen.HUB_ID
-	var entry: Dictionary = director.world.log.back()
-	var line := _outcome_words(director, won, before)
+	var place: Vector2i = expected.get("band")
+	var supplies: int = expected.get("supplies")
 	check(
 		(
 			not director.in_fight()
 			and director.map.visible
 			and game.stage().extra_mercs.size() == mercs
-			and director.world.encounter.is_empty()
-			and str(entry.get("step")) == "encounter"
-			and director.world.at == place
-			and director.world.supplies == expected
-			and director.panel.shown_body() == line
+			and world.encounter.is_empty()
+			and world.band == place
+			and world.supplies == supplies
+			and director.panel.shown_body() == str(expected.get("line"))
 			and director.panel.button_for(OverworldDirector.SAVE) != null
 		),
 		(
-			"the fight ended %s: fighters off the street, supplies %d, company at %s, result in words"
-			% ["won" if won else "lost", director.world.supplies, place]
+			"the fight ended %s: fighters off the street, supplies %d, the band at %s, result in words"
+			% ["won" if won else "lost", world.supplies, place]
 		)
 	)
 
 
+## What a patrol fight that started from `before` should leave: {"supplies", "band", "line"}.
+func _after_fight(world: WorldSim, won: bool, before: Dictionary) -> Dictionary:
+	var supplies: int = before.get("supplies", 0)
+	var loot: int = _knobs("patrol").get("win_supplies", 0)
+	var lost: int = _knobs("patrol").get("loss_supplies", 0)
+	var band: Vector2i = before.get("band", Vector2i.ZERO)
+	var site := OverworldMap.site_name(world.site(world.haven))
+	return {
+		"supplies": supplies + loot if won else maxi(0, supplies - lost),
+		"band": band if won else world.region.entrance(RegionGen.HUB_ID),
+		"line":
+		Text.t(
+			"world.encounter.outcome.%s" % ("won" if won else "lost"),
+			{"supplies": loot if won else mini(supplies, lost), "site": site}
+		),
+	}
+
+
 func _check_toll(director: OverworldDirector) -> void:
+	await _walk_into(director)
+	var world := director.world
+	var party := world.party(str(world.encounter.get("party", "")))
 	var toll: int = _knobs("patrol").get("toll_supplies", 0)
-	var supplies := director.world.supplies
-	await _click_button(director.panel.button_for(PATROL_ROAD))
-	await _frames(LAYOUT_FRAMES)
-	var drain := _per_day()
-	var days_left: int = director.world.encounter.get("days_left", 0)
+	var supplies := world.supplies
 	await _click_button(director.panel.button_for(OverworldDirector.TOLL))
 	await _frames(LAYOUT_FRAMES)
-	var entry: Dictionary = director.world.log.back()
-	var days: int = director.world.site(PATROL_ROAD).days_to(RegionGen.HUB_ID)
-	var spent := drain * days
+	var paid_line := director.panel.shown_body()
+	var band := world.band
+	for step: Vector2i in KEY_BY_STEP:
+		if world.region.passable(world.band + step):
+			await _tap(_key_for(step))
+			break
 	check(
 		(
-			not director.in_fight()
-			and director.world.at == PATROL_ROAD
-			and director.world.encounter.is_empty()
-			and str(entry.get("outcome")) == "paid"
-			and director.world.supplies == supplies - toll - spent
-			and days_left >= 0
-			and (
-				director.panel.shown_body()
-				== Text.t("world.encounter.outcome.paid", {"supplies": toll, "site": ""})
-			)
+			party != null
+			and not director.in_fight()
+			and world.encounter.is_empty()
+			and world.supplies == supplies - toll
+			and not director.map.party_marker(party.id).visible
+			and world.band != band
+			and paid_line == Text.t("world.encounter.outcome.paid", {"supplies": toll, "site": ""})
 		),
-		"Pay the toll: no fight, %d supplies paid, the road goes on to %s" % [toll, PATROL_ROAD]
+		(
+			"Pay the toll: no fight, %d supplies paid, the patrol leaves the map, the band walks on"
+			% toll
+		)
 	)
 
 
-## A saved world on the ambush seed, loaded by the game's own first M.
-func _check_ambush() -> void:
-	var rng := Rng.from_seed(AMBUSH_SEED)
-	var world := WorldSim.new()
-	world.start(_json(BALANCE), rng)
-	var road := world.destinations()[0]
-	_saves().save_game(world, rng)
-	await _ambush_on(road)
-
-
-func _ambush_on(road: String) -> void:
-	var game := await _spawn()
-	await _tap(KEY_M)
-	var director := game.overworld_director()
-	await _click_button(director.panel.button_for(road))
-	await _frames(LAYOUT_FRAMES)
+func _check_ambush(director: OverworldDirector) -> void:
+	await _walk_into(director)
 	var found := str(director.world.encounter.get("type"))
 	var only_fight := (
 		director.panel.button_for(OverworldDirector.FIGHT) != null
@@ -253,7 +265,8 @@ func _ambush_on(road: String) -> void:
 	var enemy_first := (
 		director.in_fight() and director.view.battle.current().side == BattleUnit.ENEMY
 	)
-	await _finish_fight(director)
+	if director.in_fight():
+		await InputKit.finish_fight(self, director)
 	await _frames(LAYOUT_FRAMES)
 	var entry: Dictionary = director.world.log.back()
 	check(
@@ -267,79 +280,70 @@ func _ambush_on(road: String) -> void:
 			and str(entry.get("step")) == "encounter"
 		),
 		(
-			"the ambush on %s offers only Fight, the enemy strikes first, and the map returns (%s)"
-			% [road, entry.get("outcome")]
+			"walking into bandits: only Fight, the enemy strikes first, and the map returns (%s)"
+			% entry.get("outcome")
 		)
 	)
-	game.queue_free()
-	await process_frame
-	_clear_save()
+
+
+## Bandits beyond their sight do not come for a band walking away from them.
+func _check_avoid(director: OverworldDirector) -> void:
+	var world := director.world
+	var party := world.parties[0]
+	var away := world.band - party.tile
+	var step := Vector2i(0, signi(away.y)) if away.y != 0 else Vector2i(signi(away.x), 0)
+	var walked := 0
+	for _tap_index: int in NEAR:
+		var band := world.band
+		await _tap(_key_for(step))
+		walked += 1 if world.band != band else 0
+	var sight: int = _knobs("ambush", "parties").get("sight_tiles", 0)
+	check(
+		(
+			walked == NEAR
+			and world.encounter.is_empty()
+			and not party.chasing
+			and TileRegion.gap(party.tile, world.band) > sight
+		),
+		(
+			"bandits %d tiles off (sight %d) do not come for a band walking away: still %d off"
+			% [FAR, sight, TileRegion.gap(party.tile, world.band)]
+		)
+	)
 
 
 ## A save written with an encounter standing: the next session's first M reopens on it.
 func _check_saved_encounter() -> void:
-	var rng := Rng.from_seed(AMBUSH_SEED)
-	var world := WorldSim.new()
-	world.start(_json(BALANCE), rng)
-	var lineups: Array = _json(ENCOUNTERS).get("encounters", [])
-	world.set_lineups(lineups)
-	world.travel_to(world.destinations()[0])
-	_saves().save_game(world, rng)
-	var game := await _spawn()
+	var met := await _game_with("ambush", NEAR)
+	var director := met.overworld_director()
+	await _walk_into(director)
+	var standing := str(director.world.encounter.get("type"))
+	_saves().save_game(director.world, director.rng)
+	met.queue_free()
+	await process_frame
+	var packed: PackedScene = load(SLICE_SCENE) as PackedScene
+	var fresh: SliceGame = packed.instantiate() as SliceGame
+	root.add_child(fresh)
+	await process_frame
 	await _tap(KEY_M)
-	var director := game.overworld_director()
+	var reopened := fresh.overworld_director()
 	await _frames(LAYOUT_FRAMES)
 	check(
 		(
-			not world.encounter.is_empty()
-			and str(director.world.encounter.get("type")) == str(world.encounter.get("type"))
-			and director.panel.button_for(OverworldDirector.FIGHT) != null
-			and director.panel.shown_body() == _expected_body(director)
+			standing == "ambush"
+			and str(reopened.world.encounter.get("type")) == "ambush"
+			and reopened.panel.button_for(OverworldDirector.FIGHT) != null
+			and reopened.panel.shown_body() == _expected_body(reopened)
 		),
-		"a save taken with a %s standing reopens on its panel" % world.encounter.get("type")
+		"a save taken with an ambush standing reopens on its panel"
 	)
-	game.queue_free()
+	fresh.queue_free()
 	await process_frame
 
 
-## Plays the company's turns through the panel and waits out the enemy's until the battle is
-## over. True when the company won.
-func _finish_fight(director: OverworldDirector) -> bool:
-	var view := director.view
-	var battle := view.battle
-	var rules: Dictionary = _json(BATTLE_DATA).get("rules", {})
-	var sight: int = rules.get("sight_cells", 0)
-	for _frame: int in FIGHT_FRAMES:
-		if battle.is_over():
-			break
-		var actor := battle.current()
-		if actor.side == BattleUnit.COMPANY:
-			await _company_turn(director, BattleAi.choose(battle, actor, sight))
-		else:
-			await process_frame
-	return battle.winner == BattleUnit.COMPANY
-
-
-func _company_turn(director: OverworldDirector, action: Dictionary) -> void:
-	var kind := str(action.get("type", ""))
-	if kind == Battle.ACTION_MOVE:
-		var to: Vector2i = action.get("to", Vector2i.ZERO)
-		director.view.click_cell(director.origin + to)
-		await process_frame
-		return
-	var choice_id := Battle.ACTION_WAIT
-	if kind == Battle.ACTION_ATTACK:
-		choice_id = "%s:%s" % [Battle.ACTION_ATTACK, action.get("target")]
-	await _click_button(director.panel.button_for(choice_id))
-
-
-func _per_day() -> int:
-	var company: Dictionary = _json(BALANCE).get("company", {})
-	return company.get("supplies_per_day", 0)
-
-
-func _knobs(kind: String) -> Dictionary:
-	var block: Dictionary = _json(BALANCE).get("encounters", {})
+## One type's block of a data/balance/world.json section ("encounters" or "parties").
+func _knobs(kind: String, section: String = "encounters") -> Dictionary:
+	var block: Dictionary = World.data().get(section, {})
 	var found: Variant = block.get(kind, {})
 	return found if found is Dictionary else {}
 
@@ -349,43 +353,18 @@ func _clear_save() -> void:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_SYSTEM.SAVE_PATH))
 
 
-func _json(path: String) -> Dictionary:
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
-	return parsed if parsed is Dictionary else {}
+func _key_for(step: Vector2i) -> Key:
+	var code: Key = KEY_BY_STEP.get(step, KEY_NONE)
+	return code
 
 
 func _frames(count: int) -> void:
-	for _frame: int in count:
-		await process_frame
+	await InputKit.frames(self, count)
 
 
 func _click_button(button: Button) -> void:
-	# A freshly shown panel lays its buttons out over the next frames.
-	await _frames(LAYOUT_FRAMES)
-	if button == null or not is_instance_valid(button):
-		return
-	var at := button.get_global_rect().get_center()
-	for pressed: bool in [true, false]:
-		var click := InputEventMouseButton.new()
-		click.button_index = MOUSE_BUTTON_LEFT
-		click.position = at
-		click.global_position = at
-		click.pressed = pressed
-		Input.parse_input_event(click)
-		Input.flush_buffered_events()
-		await process_frame
-
-
-func _press_key(code: Key, pressed: bool) -> void:
-	var event := InputEventKey.new()
-	event.keycode = code
-	event.physical_keycode = code
-	event.pressed = pressed
-	Input.parse_input_event(event)
-	Input.flush_buffered_events()
-	await process_frame
+	await InputKit.click(self, button)
 
 
 func _tap(code: Key) -> void:
-	await _press_key(code, true)
-	await _press_key(code, false)
+	await InputKit.tap(self, code)
