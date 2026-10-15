@@ -4,6 +4,16 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
+## 2026-10-15 · D-090 · Director · Parallel Godot runs allowed; more builders when work is independent
+Words: "use as many godots as you want dont bottleneck yourself"; "build faster ... summon more builders if you need". Earlier the same night: "STOP OPENING GODOT", lifted with "OK GODOT is all yours".
+Why: Speed; one Godot per agent was the bottleneck.
+Changes: Each Godot run keeps its own APPDATA, offscreen, killed by PID; a stop order stops every run at once. The four-coder cap (D-072) is not a ceiling for independent work.
+
+## 2026-10-15 · D-089 · Director · Heartland gets a water ramp; no slop in any art we make
+Words: "add water colours"; "if you're making the art yourself you gotta be aboslutely brutal with your QA, NO SLOP will be tolerated, desloppify"; "you need to become the worlds leading expert on what constitutes AI SLOP ART".
+Why: The palette had no second water tone; agent-made art needs a hard bar.
+Changes: Water ramp water_deep #1c2a33, water_low #2e3e48, water_high #42565d, water_glint #a3b7ad (proposal, lands with the palette dedupe PR). Bar: skill ai-slop-art (scanner slop_scan.py); SHIP/FIX verdicts by a fresh critic. The look-B golden's 1-px dither and palette near-duplicates are being re-rendered for his A/B.
+
 ## 2026-10-15 · D-088 · Director · Texel Studio may be installed locally for the tile trial
 Words: answer "Allow the install" (self-hosted engine at github EYamanS/texel-studio cde7bdd, local Ollama, no spend).
 Why: Third column of the terrain-tile trial (D-080); register row CLEARED for self-hosted internal use.
