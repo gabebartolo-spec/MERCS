@@ -8,6 +8,7 @@ extends RefCounted
 ## - BattleTurns (battle_turns.gd): the strict turn order by initiative (ties by id), rounds;
 ## - BattleIntents (battle_intents.gd): each enemy's round plan from what it sees (BattleAi);
 ## - BattleActions (battle_actions.gd): move, attack, wait and the learnt moves, legal or not;
+## - BattleKit (battle_kit.gd): a fighter's kit, his weapon action and up to four techniques;
 ## - BattleResolver (battle_resolver.gd): one blow's rolls, damage, the hit hook, a down;
 ## - BattleMorale (battle_morale.gd): each side's morale, shaken and breaking;
 ## - BattleEnd (battle_end.gd): a wipe or a rout ends the fight;
@@ -168,6 +169,14 @@ func apply(action: Dictionary) -> Array[Dictionary]:
 ## The definition of a learnt move (battle.json "rules" "moves"), or {}.
 func move_def(move: String) -> Dictionary:
 	return _rules.move_def(move)
+
+
+## The fighter's action kit (BattleKit, P1a): his weapon action ("attack" without a class),
+## then his learnt techniques, at most loadout_max; [] for no such fighter. Move, attack and
+## wait are always open besides.
+func kit(unit_id: String) -> Array[String]:
+	var fighter := unit(unit_id)
+	return _actions.kit.of(fighter) if fighter != null else []
 
 
 ## A new round: each standing enemy plans what it will do from what it can see.

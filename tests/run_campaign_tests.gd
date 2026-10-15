@@ -10,12 +10,22 @@ extends "res://tests/lib/runner.gd"
 ##   godot --headless --path . --script tests/run_campaign_tests.gd
 
 const Campaign := preload("res://tests/lib/campaign_kit.gd")
+const Routes := preload("res://tests/lib/route_kit.gd")
 const Fixture := preload("res://tests/lib/company_fixture.gd")
 const World := preload("res://tests/lib/world_fixture.gd")
 const SEED := 424310
 const OTHER_SEED := 424311
 const V2_FIXTURE := "res://tests/fixtures/save/v2.json"
 const MERC_ID_PREFIX := "merc_"
+## What each extra route must have really done (route_kit.gd), beside the byte-for-byte replay.
+const ROUTE_STAGES := {
+	"loss": {"fought": true, "won": false, "ended": false},
+	"toll": {"toll_paid": true, "ended": false},
+	"second_fight": {"second_fought": true, "ended": false},
+	"wipe": {"fought": true, "won": false, "ended": true},
+}
+## Any internal id (a lower-case word with an underscore) in a sentence a player reads.
+const ID_PATTERN := "\b[a-z]+_[a-z0-9_]+\b"
 const STAGES: Array[String] = [
 	"met", "fought", "triage", "won", "contract", "hired", "prisoner", "paid", "storylet"
 ]
@@ -33,7 +43,52 @@ func run_checks() -> void:
 	_check_reload(first)
 	_check_v2_fixture()
 	_check_memory_names(first)
+	for route: String in Routes.ROUTES:
+		_check_route(route)
+	_check_wipe_reads_ended()
 	await process_frame
+
+
+## A lost fight, a toll paid, a second fight and the campaign's end: each on one seed twice
+## ends in the same save, byte for byte, on another seed in a different one, and really
+## happened (tools/audit/route_replay.sh plays the same pairs in two processes).
+func _check_route(route: String) -> void:
+	var first := Routes.run(route, SEED)
+	var again := Routes.run(route, SEED)
+	var other := Routes.run(route, OTHER_SEED)
+	var stages: Dictionary = first["stages"]
+	var wanted: Dictionary = ROUTE_STAGES[route]
+	var missing: Array[String] = []
+	for stage: String in wanted:
+		if stages.get(stage, false) != wanted[stage]:
+			missing.append(stage)
+	check(
+		(
+			missing.is_empty()
+			and str(first["save"]) == str(again["save"])
+			and str(first["save"]) != str(other["save"])
+		),
+		(
+			(
+				"route %s: the same seed twice ends in the same save, another seed in a different one, "
+				+ "and it really happened (stages off: %s)"
+			)
+			% [route, missing]
+		)
+	)
+
+
+## The wipe route's save says the campaign ended and reads back as not ok.
+func _check_wipe_reads_ended() -> void:
+	var played := Routes.run("wipe", SEED)
+	var parsed: Variant = JSON.parse_string(str(played["save"]))
+	var saved: Dictionary = parsed if parsed is Dictionary else {}
+	var model := SaveModel.from_dict(saved, World.data(), Fixture.defs())
+	var marked: bool = saved.get("ended", false) == true
+	check(
+		marked and model.ended and not model.ok,
+		"the wipe route's save marks the campaign ended and does not load as playable"
+	)
 
 
 func _check_replay(first: Dictionary) -> void:
@@ -118,7 +173,11 @@ func _check_memory_names(first: Dictionary) -> void:
 			var about := str(entry.get("about", ""))
 			if about != "" and company.member(about) == null:
 				named += 1 if line.contains(company.name_of(about)) else 0
-	var ids := shown.filter(func(line: String) -> bool: return line.contains(MERC_ID_PREFIX))
+	var id_regex := RegEx.create_from_string(ID_PATTERN)
+	var ids := shown.filter(
+		func(line: String) -> bool:
+			return line.contains(MERC_ID_PREFIX) or id_regex.search(line) != null
+	)
 	var recruit := company.name_of("recruit_1")
 	check(
 		named > 0 and ids.is_empty() and recruit != "recruit_1" and recruit != "",

@@ -1,1 +1,1 @@
-{"_comment": "expect: expected [\"number\", \"boolean\", \"array\", \"object\"], got string", "damage_curve": "linear"}
+{"_comment": "expect: 'linear' does not match", "damage_curve": "linear"}

@@ -250,12 +250,12 @@ func _refresh() -> void:
 		var ring: MeshInstance3D = _rings[fighter.id]
 		ring.position = world_point(fighter.cell) + Vector3.UP * _markers.num("markers", "lift_m")
 		var key := (
-			"down_rgb"
+			"down"
 			if fighter.down
-			else ("company_rgb" if fighter.side == BattleUnit.COMPANY else "enemy_rgb")
+			else ("company" if fighter.side == BattleUnit.COMPANY else "enemy")
 		)
 		var material := ring.material_override as StandardMaterial3D
-		material.albedo_color = _markers.rgb("markers", key)
+		material.albedo_color = _markers.colour("markers", key)
 
 
 func _ring() -> MeshInstance3D:
@@ -288,6 +288,7 @@ func _make_hud() -> void:
 
 func _hud_label(parent: Node) -> Label:
 	var label := Label.new()
+	UiLook.outlined(label)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	parent.add_child(label)
 	return label
