@@ -6,8 +6,9 @@ One line per knob (docs/05_STYLE_CODE.md "Data"). Read by `sim/economy/` (Phase 
 - `start`: the coin the company begins with.
 
 ## wages
-- `per_merc_per_day`: coin owed for each mercenary on the roster, every day that ticks.
-- `grace_days`: days without paying that cost nothing; the day after, morale starts to fall.
+- `day_by_level`: a mercenary's wage for one day, by his level (first entry level 1; past the end, the last entry). Owed for each mercenary on the roster, every day that ticks (Phase 5 C3, director Q-5: the daily wage is by level). Placeholder numbers.
+- `share_pct`: percent of a completed contract's pay owed to the mercs who fought the job, split by level (each cut weighted by his level, rounded down; director Q-3, Q-4). Owed with the wages: a share left unpaid counts as owed wages and costs morale the same way. Placeholder number.
+- `grace_days`: days without paying (wages or share) that cost nothing; the day after, morale starts to fall.
 - `morale_loss_per_day`: morale lost on each day past the grace while wages stand unpaid.
 - `paid_recovery`: morale regained each time the whole debt is paid.
 

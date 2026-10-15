@@ -4,16 +4,18 @@ Cap: 150 lines. Edited only by the Merge & CI agent, in a board PR after each me
 merged PR's "Board and log" section (D-026, D-030). History rolls to `docs/archive/status_<month>.md`.
 
 ## Phase
-Current phase: **1 (art, look target first) and 2 (horizontal slice) in parallel (D-065)** (Phase 0 gate PASS WITH NOTES, D-027). Gate signer: Concept Lead.
+Current phase: **4 (combat depth, D-091) and 5 (Contracts and the road) in progress; art in critic loops** (Phase 2 horizontal slice built and playtested, D-084; Phase 0 gate PASS WITH NOTES, D-027). Gate signer: Concept Lead.
+Phase 4: merged P1a (#121, #126), P1b equipment physics (#127), P2 morale and surrender (#123), P4 deploy or delegate (#124), P5 non-psychic enemy (#122), P6b/P6c blood and hit-stop (#129, #133), XP (#125), levels (#120), Ledger typeface (#116). Open: P1c ranged and spear reach (in progress), P7 hover odds (not built).
+Phase 5: plan #130; C0 economy facade (#132) and C4 reputation half (#134) merged; C3 wages (#135) merging; C1 and C2 (#136) in review.
 
 ## Agents
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | working | Phase 2 all milestones merged; gate gaps #101 merged; Ironman #103 (sim review next); coder cap 4 (D-072) | claude/ironman (#103) | 2026-10-15 |
-| Merge & CI (Sonnet 5.5) | working | board PR after #75-#87 (D-072..D-081) | claude/board-1015 | 2026-10-15 |
-| Art Factory (Opus 5.5) | working | look B locked (#100, D-085/D-086); terrain-tile trial: Blender vs Retro Diffusion merged (#104), Texel Studio column next (D-088) | vault D:/MERCS-vault/renders/tile_trial_2026-10-15 | 2026-10-15 |
-| Concept Lead (Fable 5.1) | available | roadmap rewrite DONE (#74); handoff in #77 (open); Phase 2 structural audit at the gate | claude/concept-lead-handoff (#77) | 2026-10-15 |
+| Dev Lead (Opus 5.5) | working | Combat depth merged except P1c ranged (in progress); contracts C0, C3, C4 merged or merging, C1 and C2 in review; overnight team of builders (D-090) | claude/p4-p1c-ranged | 2026-10-16 |
+| Merge & CI (Sonnet 5.5) | working | board PR after #134 (D-091..D-112) | docs/board-after-134 | 2026-10-16 |
+| Art Factory (Opus 5.5) | working | cast fix #118 and tile boards (method B', D-106) in critic loops; palette PR (heather, water ramp, grey-olive) after SHIP | claude/tiles-b6, #118 | 2026-10-16 |
+| Concept Lead (Fable 5.1) | available | roadmap rewrite DONE (#74); handoff #77 open | claude/concept-lead-handoff (#77) | 2026-10-15 |
 
 States: working · running a check · awaiting director · blocked · available.
 
@@ -70,20 +72,24 @@ States: working · running a check · awaiting director · blocked · available.
 5. Milestone 5, wounds, triage, death, chronicle, succession (sim). DONE (#82); wiring after M3/M4.
 6. Milestone 6, wages, contracts, loot, hiring, the prisoner choice. DONE (#87).
 7. Milestone 7, one storylet plus the memory system. DONE (#89).
-Extras: lint magic numbers are errors (#79); `tools/merge_eligibility.sh` (#78); 4K display fix (#83); gdlint required (#84); letter keys replace function keys (#86); walkable overworld (#93, D-078); wiring (#90); campaign ends on a wipe (#98, D-083); gate pack (#97, `docs/audits/phase2_gate/README.md`); gate gaps (#101); Ironman (#103, open, D-087). Full-loop playtest passed (D-084).
-Art: look target B "Peat and Ochre" locked (#100, D-085); palette = core + biome sets (D-086). Terrain-tile trial running (D-080, D-082, D-088).
+Extras: lint magic numbers are errors (#79); `tools/merge_eligibility.sh` (#78); 4K display fix (#83); gdlint required (#84); letter keys replace function keys (#86); walkable overworld (#93, D-078); wiring (#90); campaign ends on a wipe (#98, D-083); gate pack (#97, `docs/audits/phase2_gate/README.md`); gate gaps (#101); Ironman (#103, D-087, merged). Full-loop playtest passed (D-084).
+Art: look target B "Peat and Ochre" locked (#100, D-085); palette = core + biome sets (D-086). Terrain tiles: method B' Claude-painted (D-106), boards in critic loops; art that passes the critics is wired in (D-111).
 
 ## Waiting on the director
+- Pick mercs 3-6 from `MERCS-builds/merc_candidates_2026-10-16.md` (12 drafts, D-111); name the bargaining trait per merc (D-110 Q-8).
+- The overworld golden before and after (grass remap, #118 r4); cast look after critic SHIP; tile board after SHIP.
+- A dead merc's unpaid wages: paid with the whole debt (current) or forfeited?
+- Balance flag (#127): with placeholder plate the Vampyr never falls over seeds 424200-426400; target is a named death per 4 fights (D-110); tune after his playtest.
 - Author `merc_3` to `merc_6` (#81), the six recruits, the two factions and the generic items (#87); placeholders stand until then.
 - Confirm or reorder milestones 3 and 4 (both built).
 - Veto lists: #80, #81, #82, #85, #87 (calls in each PR body); `caps.json` gains `encounters`, `equipment`, `factions`, `recruits`, `scenarios`.
-- Pick the terrain-tile method from the trial board (Blender rig, Retro Diffusion, Texel Studio) when the lead shows it. The Phase 2 gate playthrough (`docs/audits/phase2_gate/README.md`).
+- The Phase 2 gate playthrough (`docs/audits/phase2_gate/README.md`).
 - Tripo threshold (D-060): confirm 500 -> 2,000 credits per session in writing; 500 stands.
 - Mixamo: 10 of 14 clips are in the vault; the rest wait on his sign-in (D-029).
 - Allow or decline deleting superseded remote branches `claude/p1-crisp-snap`, `claude/p1-frame-time`, `claude/p1-sheet-export-load`.
 
 ## Merge queue
-#77 open (Concept Lead handoff, docs). #103 Ironman (sim review before merge).
+#77 open (Concept Lead handoff, docs). #118 cast (critic loop). #135 C3, #136 C2 (review). P1c in progress.
 
 ## GPU jobs
 (none)
@@ -92,7 +98,7 @@ Art: look target B "Peat and Ochre" locked (#100, D-085); palette = core + biome
 0 / 10 GiB.
 
 ## Live worktrees
-1 / 4: `../MERCS-wt/ironman` (claude/ironman, #103).
+Check `bash tools/lint/worktrees.sh`; limit 4 (D-021).
 
 ## Logged for later (not assigned)
 - Phase 1, LOW, lint precision (Concept Lead review of #5): `strings.py` flags names in

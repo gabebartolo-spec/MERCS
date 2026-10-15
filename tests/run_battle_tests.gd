@@ -27,6 +27,7 @@ const GoldenChecks := preload("res://tests/battle/golden_checks.gd")
 const MoraleChecks := preload("res://tests/battle/morale_checks.gd")
 const AiChecks := preload("res://tests/battle/ai_checks.gd")
 const KitChecks := preload("res://tests/battle/kit_checks.gd")
+const GearChecks := preload("res://tests/battle/gear_checks.gd")
 
 
 func suite_name() -> String:
@@ -48,6 +49,7 @@ func run_checks() -> void:
 	MoraleChecks.new().run(check)
 	AiChecks.new().run(check)
 	KitChecks.new().run(check)
+	GearChecks.new().run(check)
 	await process_frame
 
 

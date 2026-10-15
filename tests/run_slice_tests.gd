@@ -284,6 +284,13 @@ func _check_loop_panels() -> void:
 	game.queue_free()
 
 
+## A fighter's name as the battle strip shows it (a merc's cast name, an enemy's kind).
+func _shown_name(fighter: BattleUnit) -> String:
+	var kind := fighter.id.rstrip("0123456789").trim_suffix("_")
+	var side_key := "cast.%s.name" if fighter.side == BattleUnit.COMPANY else "enemy.%s.name"
+	return Text.t(side_key % kind)
+
+
 ## A real click on Fight opens the battle (Phase 2 milestone 4): the strip at the top reads
 ## the turn order from the fighter whose turn it is, and every enemy shows its plan for the
 ## round in words over its head, on screen.
@@ -293,7 +300,7 @@ func _check_battle_hud(director: LoopDirector) -> void:
 		check(false, "clicking Fight opens the battle with its turn order and intent markers")
 		return
 	var actor := view.battle.current()
-	var first := Text.t("cast.%s.name" % actor.id)
+	var first := _shown_name(actor)
 	var screen := Rect2(Vector2.ZERO, Vector2(WINDOW_SIZE))
 	var marked := 0
 	var enemies := 0
@@ -309,7 +316,7 @@ func _check_battle_hud(director: LoopDirector) -> void:
 	var order := view.order_text()
 	var bandit := order.find(Text.t("enemy.bandit.name"))
 	check(
-		order.contains(first) and order.find(first) < bandit and enemies > 0 and marked == enemies,
+		order.contains(first) and order.find(first) <= bandit and enemies > 0 and marked == enemies,
 		(
 			"clicking Fight shows the turn order from %s and an intent over each enemy (%s; %d/%d)"
 			% [first, order, marked, enemies]

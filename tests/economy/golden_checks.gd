@@ -12,7 +12,7 @@ extends RefCounted
 const Campaign := preload("res://tests/lib/campaign_kit.gd")
 const Routes := preload("res://tests/lib/route_kit.gd")
 const WIN := "win"
-## Each route and the two seeds it is played on (the campaign suite's, run_campaign_tests.gd).
+## Each route and the two seeds it is played on (the campaign suite's until P1b).
 const SEEDS := {
 	"win": [424310, 424311],
 	"loss": [424308, 424316],
@@ -22,15 +22,18 @@ const SEEDS := {
 }
 ## Pinned before the economy.gd split (claude/c0-economy-split); "route/seed" -> SHA-256 of the
 ## final save text.
+## Re-pinned by Phase 4 P1b (equipment physics): gear moves the fights in win/424310,
+## win/424311, loss/424316 and both second_fight routes; toll, wipe and loss/424308 hold.
+## The win route keeps 424310/424311 (the campaign suite now plays 424230 for its stages).
 const GOLDEN := {
-	"win/424310": "b0e5255a80c3dd821a9a53aa2c4220c5b4ff5aa97a241124f2105331406e72da",
-	"win/424311": "16f42f04427d73411dd49471adc36623c9abf784f6f0f2d75174eb8de3fa3f04",
+	"win/424310": "5c1f1811707028b16af9296272187b96927e53234d03250e091415676b457ad2",
+	"win/424311": "4e1668a71db586f77bb60b7b1ae16002ace987e3f4228cc07c6497f89ab0c5de",
 	"loss/424308": "bf24e8ad4f759ec41f11f782bb6fab625ffa194275174d76859d3e5c8d67687c",
-	"loss/424316": "03e981bba5f58a61e5b2609da8b7683f0edcd2751808c7bcd140c47ccd00bcd3",
+	"loss/424316": "cb5ab3c18517fa9cd91c9170ecab471529814502b0d13f6fe5fec926038d49a7",
 	"toll/424308": "07b3f8c3aee0d23d81887b9f460df4c10f060d63b96bb96472a0b1d9b24592ad",
 	"toll/424316": "6ebb4b56cf86829e401bae68b0fbdf364f02aa31168e3eaf25fe096f3fb0e9ad",
-	"second_fight/424308": "cd473eb2ad14db1d9a0be0f3d8f1dd8ae8507a2db88559a062c215da01f83b85",
-	"second_fight/424316": "3cb79ddecfaa680c9260df267aedfa4637ea345dd717aed97e109927d68690a4",
+	"second_fight/424308": "30aad0112527a441979eec18605dfd858d0565751148ee10ba152066f7d718ed",
+	"second_fight/424316": "db6c417a6547ab5c92f6c8021880277ccb91f08b860564957b467841bf9b277f",
 	"wipe/424308": "d8cca9bde2564397726057206f8f69099013637e2a0fe261c9d4550f44ed8bde",
 	"wipe/424316": "902fba124f6b0e7486a73fc9c7df605cf7253634e194be2a0b440aef16690f9a",
 }

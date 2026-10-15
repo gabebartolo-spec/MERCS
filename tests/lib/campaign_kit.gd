@@ -139,7 +139,7 @@ class Played:
 			site_ids.append(world.sites[i].id)
 		company.economy.refresh_board(world.day, site_ids, rng)
 		world.day_hook = func(day: int) -> void:
-			company.economy.on_day(company.roster.size(), day, site_ids, rng)
+			company.economy.on_day(company.roster, day, site_ids, rng)
 		world.result_hook = func(kind: String, result: Dictionary) -> void:
 			if result.get("won", false) == true:
 				company.economy.take_loot(kind, rng)

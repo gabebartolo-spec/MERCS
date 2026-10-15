@@ -9,7 +9,7 @@ extends "res://tests/lib/runner.gd"
 ## real clicks and letter keys at 1920x1080 through a lost fight, the final screen and a new
 ## campaign.
 ## Seeded by design: the fights use MercPlay on seed 424271; the GUI fight is an ambush met by
-## walking on world seed 424270.
+## walking on world seed 424273.
 ##   godot --headless --path . --script tests/run_campaign_end_tests.gd
 
 const End := preload("res://tests/lib/end_kit.gd")

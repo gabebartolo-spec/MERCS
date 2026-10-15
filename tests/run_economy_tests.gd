@@ -12,6 +12,8 @@ extends "res://tests/lib/runner.gd"
 const Fixture := preload("res://tests/lib/company_fixture.gd")
 const GoldenChecks := preload("res://tests/economy/golden_checks.gd")
 const TermsChecks := preload("res://tests/economy/terms_checks.gd")
+const TermsDealChecks := preload("res://tests/economy/terms_deal_checks.gd")
+const PayrollChecks := preload("res://tests/economy/payroll_checks.gd")
 const SEED := 424242
 const OTHER_SEED := 7
 const WEEK := 7
@@ -34,6 +36,8 @@ func run_checks() -> void:
 	_check_loot()
 	GoldenChecks.new().run(check)
 	TermsChecks.new().run(check)
+	TermsDealChecks.new().run(check)
+	PayrollChecks.new().run(check)
 	await process_frame
 
 
@@ -42,7 +46,7 @@ func _company() -> Company:
 
 
 func _day(company: Company, day: int) -> void:
-	company.economy.on_day(company.roster.size(), day, SITES, Rng.from_seed(SEED))
+	company.economy.on_day(company.roster, day, SITES, Rng.from_seed(SEED))
 
 
 func _through_json(value: Dictionary) -> Dictionary:
@@ -111,7 +115,7 @@ func _check_recruits_and_gear() -> void:
 
 func _check_wages_fall_due() -> void:
 	var company := _company()
-	var per_day: int = company.economy.wage_per_day(company.roster.size())
+	var per_day: int = company.economy.wage_per_day(company.roster)
 	check(per_day > 0, "a roster of six costs coin every day, got %d" % per_day)
 	_day(company, 1)
 	_day(company, 2)
@@ -122,8 +126,7 @@ func _check_wages_fall_due() -> void:
 	)
 	company.add("recruit_1")
 	check(
-		company.economy.wage_per_day(company.roster.size()) > per_day,
-		"a bigger roster costs more a day"
+		company.economy.wage_per_day(company.roster) > per_day, "a bigger roster costs more a day"
 	)
 
 

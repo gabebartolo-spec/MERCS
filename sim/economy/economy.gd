@@ -12,6 +12,8 @@ extends RefCounted
 ## - ContractBook (contract_book.gd, `book`): the board, accept, complete, expire;
 ## - Prisoners (prisoners.gd, `captives`): the waiting prisoner and the four choices;
 ## - Terms (terms.gd, `terms`): the ask, the employer's reply, the step-in (C2).
+## - Payroll (payroll.gd, `payroll`): each merc's daily wage by level, his share of a
+##   contract's pay, and who is owed what (Phase 5 C3).
 ## - Standing (standing.gd, `standing`): the name with each faction and the grudges (C4).
 ## The facade keeps at most 14 public methods; a package prefers a module or a field read
 ## through state() over a new one.
@@ -37,6 +39,8 @@ var book := ContractBook.new()
 var captives := Prisoners.new()
 ## Negotiation (negotiate(); reputation(id), odds(merc_id), judge() are read there).
 var terms := Terms.new()
+## The wages and the share by merc (day_wage(merc), dues are read there).
+var payroll := Payroll.new()
 ## The company's name with each faction and its grudges (reputation(faction) is read there).
 var standing := Standing.new()
 ## The posted contracts: Contracts records plus "id" ("ctr_<n>"). Held by the book.
@@ -81,6 +85,7 @@ static func restore(saved: Dictionary, defs: Dictionary) -> Economy:
 	economy.purse = maxi(0, _num(saved, "purse", economy.purse))
 	economy.owed = maxi(0, _num(saved, "owed", 0))
 	economy.unpaid_days = maxi(0, _num(saved, "unpaid_days", 0))
+	economy.payroll.restore(_dict(saved, "dues"))
 	economy.morale = clampi(_num(saved, "morale", economy.morale), 0, economy._max_morale())
 	economy.book.next_contract = maxi(1, _num(saved, "next_contract", 1))
 	economy.book.board_day = _num(saved, "board_day", 0)
@@ -98,6 +103,8 @@ static func restore(saved: Dictionary, defs: Dictionary) -> Economy:
 	return economy
 
 
+## The save. "dues" (who is owed what, Phase 5 C3) is written only while someone is owed, so
+## a save with nobody owed reads as it did before C3.
 ## The economy as a save holds it; "standing" is left out until it has moved (an optional key,
 ## so a game that never touched a name saves as before C4).
 func state() -> Dictionary:
@@ -115,6 +122,8 @@ func state() -> Dictionary:
 		"last_loot": last_loot.duplicate(),
 		"chronicle": chronicle.duplicate(true),
 	}
+	if not payroll.dues.is_empty():
+		saved["dues"] = payroll.dues.duplicate()
 	if not standing.is_new():
 		saved["standing"] = standing.state()
 	return saved
@@ -125,19 +134,21 @@ func items() -> Dictionary:
 	return _items
 
 
-## The coin wages cost each day for a roster of this size.
-func wage_per_day(roster_size: int) -> int:
-	return roster_size * _rule("wages", "per_merc_per_day")
+## The coin wages cost each day for this roster: each merc's wage by his level (Payroll).
+func wage_per_day(roster: Array[Merc]) -> int:
+	return payroll.wage_per_day(roster)
 
 
-## A day has passed. The day's wages fall due; wages unpaid past the grace cost morale; old
-## contracts lapse; and a fresh board is posted when none stands or the last has aged out.
-## site_ids: the places a contract may name; rng: the world's Rng ("contracts" stream).
-func on_day(roster_size: int, day: int, site_ids: Array[String], rng: Rng) -> void:
-	owed += wage_per_day(roster_size)
+## A day has passed. Each merc's wage falls due; wages (and any share) unpaid past the grace
+## cost morale; old contracts lapse; and a fresh board is posted when none stands or the last
+## has aged out. site_ids: the places a contract may name; rng: the world's Rng ("contracts"
+## stream).
+func on_day(roster: Array[Merc], day: int, site_ids: Array[String], rng: Rng) -> void:
+	owed += payroll.fall_due(roster)
 	unpaid_days += 1
 	if unpaid_days > _rule("wages", "grace_days"):
 		morale = maxi(0, morale - _rule("wages", "morale_loss_per_day"))
+	_lapse_advances(day)
 	book.expire(day)
 	if board.is_empty() or day - book.board_day >= _rule("contracts", "refresh_days"):
 		refresh_board(day, site_ids, rng)
@@ -151,6 +162,7 @@ func pay_wages() -> bool:
 	purse -= owed
 	owed = 0
 	unpaid_days = 0
+	payroll.clear()
 	morale = mini(_max_morale(), morale + _rule("wages", "paid_recovery"))
 	return true
 
@@ -165,13 +177,17 @@ func accept(id: String) -> bool:
 	return book.accept(id)
 
 
-## Completes an accepted contract: it pays its reward, less any advance already paid (C2), and
-## leaves the board. False otherwise.
-func complete(id: String) -> bool:
+## Completes an accepted contract: it pays its reward, less any advance already paid (C2),
+## and leaves the board; the mercs who fought the job are owed their share of the whole agreed
+## pay, advance included, by level (Payroll.share); a share unpaid counts as owed wages.
+## False otherwise.
+func complete(id: String, fought: Array[Merc] = []) -> bool:
 	var row := book.complete(id)
 	if row.is_empty():
 		return false
-	purse += _num(row, "reward", 0) - _num(row, "advance", 0)
+	var reward := _num(row, "reward", 0)
+	purse += reward - _num(row, "advance", 0)
+	owed += payroll.share(reward, fought)
 	standing.completed(str(row.get("faction", "")))
 	return true
 
@@ -184,10 +200,7 @@ func abandon(id: String, company: Company, day: int) -> bool:
 	var row := book.contract(id)
 	if row.is_empty() or row.get("accepted") != true:
 		return false
-	board.erase(row)
-	var grew := standing.abandoned(row, company.captain_id, day)
-	var key := "standing.grudge" if grew else "standing.abandon"
-	chronicle.append({"day": day, "merc": company.captain_id, "key": key})
+	_walk_away(row, company.captain_id, day)
 	return true
 
 
@@ -266,6 +279,26 @@ func decide_prisoner(company: Company, choice: String, day: int) -> bool:
 	return captives.decide(self, company, choice, day)
 
 
+## The company walks away from an accepted row (abandon, or a lapse after an advance).
+func _walk_away(row: Dictionary, captain_id: String, day: int) -> void:
+	board.erase(row)
+	var grew := standing.abandoned(row, captain_id, day)
+	var key := "standing.grudge" if grew else "standing.abandon"
+	chronicle.append({"day": day, "merc": captain_id, "key": key})
+
+
+## An accepted contract with an advance taken that reaches its deadline undone is walked away
+## from as abandon() is (review of #136): the advance is kept, the name dents, a sizeable one
+## grows a grudge; the captain who agreed the terms remembers it. Without an advance a lapse
+## stays silent, as before C2.
+func _lapse_advances(day: int) -> void:
+	for row: Dictionary in board.duplicate():
+		if row.get("accepted") != true or _num(row, "advance", 0) <= 0:
+			continue
+		if _num(row, "deadline", 0) < day:
+			_walk_away(row, str(row.get("captain", "")), day)
+
+
 func _max_morale() -> int:
 	return _rule("morale", "max")
 
@@ -282,6 +315,7 @@ func _read(defs: Dictionary) -> void:
 		_items[str(def.get("id", ""))] = def
 	book.setup(_dict(_rules, "contracts"), factions)
 	captives.setup(_dict(_rules, "prisoner"), _recruits, _max_morale())
+	payroll.setup(_dict(_rules, "wages"))
 	standing.setup(_dict(_rules, "standing"))
 	terms.setup(_dict(_rules, "terms"), factions, _rows(_dict(defs, "traits"), "traits"), standing)
 
