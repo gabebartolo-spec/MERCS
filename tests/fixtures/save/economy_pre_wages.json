@@ -1,0 +1,51 @@
+{
+  "_comment": "The economy block of a save written before Phase 5 C3 (tests/fixtures/save/v2.json's, with a debt standing): no \"dues\" key. tests/economy/payroll_checks.gd loads it.",
+  "board": [
+    {
+      "accepted": true,
+      "deadline": 8.0,
+      "faction": "fac_placeholder_b",
+      "id": "ctr_1",
+      "reward": 36.0,
+      "site": "site_wild_1"
+    },
+    {
+      "accepted": false,
+      "deadline": 6.0,
+      "faction": "fac_placeholder_a",
+      "id": "ctr_2",
+      "reward": 47.0,
+      "site": "site_wild_3"
+    },
+    {
+      "accepted": false,
+      "deadline": 7.0,
+      "faction": "fac_placeholder_a",
+      "id": "ctr_3",
+      "reward": 45.0,
+      "site": "site_hamlet_3"
+    }
+  ],
+  "board_day": 0.0,
+  "chronicle": [
+    {
+      "day": 0.0,
+      "key": "prisoner.release",
+      "merc": "orc"
+    }
+  ],
+  "hired": [
+    "recruit_1"
+  ],
+  "inventory": [],
+  "last_loot": {
+    "coin": 13.0,
+    "item": ""
+  },
+  "morale": 67.0,
+  "next_contract": 4.0,
+  "owed": 24.0,
+  "prisoner": {},
+  "purse": 44.0,
+  "unpaid_days": 3.0
+}
