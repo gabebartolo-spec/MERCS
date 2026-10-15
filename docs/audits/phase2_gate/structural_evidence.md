@@ -208,7 +208,7 @@ Full run, checks per suite (floor in `tests/expected_checks.txt`; every suite at
 
 ## 8. Gaps closed (PR `claude/p2-effect-fixtures`, tests and harness only)
 
-Gap 4, eight systems without an on/off fixture. Seven now have one in `tests/effect/`
+Gap 4, eight systems without an on/off fixture. All but XP now have one (eight cases, turn order and intent split in two) in `tests/effect/`
 (`Effect tests: 27 checks, 0 failures`, floor 19 to 27); each prints `EFFECT <id>: <on> vs <off>`
 on a pinned seed. Each case was run and read before it was kept; `turn_order` first failed (the
 orc already opened, so on equalled off) and was fixed by setting the initiative on both sides.
