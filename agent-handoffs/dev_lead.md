@@ -41,15 +41,20 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
 - Pending from him: author merc_3..merc_6; confirm/reorder M3/M4; the veto lists in #80-#82.
 
 ## Running (builder subagents of this session; they die with it)
-- M3 = PR #81 (sim review PASS posted): coder merging main (#83) again, then merge it.
-- M5 = PR #82 (sim review PASS posted, green): merge AFTER #81; ask its coder to merge main then.
+- #81 M3 company MERGED (save v2, F4). #83 4K MERGED. #84 (gdlint required in merge_eligibility;
+  smoke gdformat fix; main's gdlint is red until it lands): auto-merge watcher in this session.
+- M5 = PR #82 (sim review PASS): coder told to merge main after #84, then merge #82.
 - M4 battle skeleton (Opus): `../MERCS-wt/slice-m1`, claude/p2-m4-battle.
-- Walkable overworld (Opus, rebuilds M1/M2 to his design goal): `../MERCS-wt/p2-walk`,
-  claude/p2-overworld-walk.
+- Walkable overworld (Opus): `../MERCS-wt/p2-walk`, claude/p2-overworld-walk (told: slice_game.gd
+  is at 400 lines, split before adding).
+- M6 hub/economy/recruitment (Sonnet): `../MERCS-wt/p2-m6`, claude/p2-m6-hub (economy in
+  sim/economy/, one-line hook in WorldSim._tick; placeholder recruits).
+gdlint/gdformat locally: `python -m gdtoolkit.linter|formatter` (not on PATH).
 Wiring after merges: company -> encounters, M4 hit hook -> M5 injuries, a triage screen.
 
 ## Next for the lead
-0. Next free slot: M6 (hub, economy, recruitment), after #81 merges; then the wiring task.
+0. Next free slot: the wiring task (company fights encounters, hits -> injuries, triage screen),
+   then M7 storylet + memory.
 1. Review M2 and M3 PRs (mercs-sim-review on the save keys, fixtures failing first, real taps),
    merge on green (merge_eligibility.sh once it lands), fetch the build, ask him to play.
 2. Record his milestone verdicts the same turn; ask him to author the four placeholder mercs
@@ -63,10 +68,10 @@ Wiring after merges: company -> encounters, M4 hit hook -> M5 injuries, a triage
 data 96, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 13, slice 15, battle 14,
 loop 4, sim_world 9, save 7, effect 4, overworld 8.
 
-## Worktrees (4 / 4)
-p2-m3, p2-m5, slice-m1 (M4), art-publish (Art paused; clean, branch pushed at 99b3fdf).
-Removing art-publish with --force (only .godot/.import untracked) was refused by the permission
-classifier; ask the director to allow it or accept 5 while four coders run.
+## Worktrees (7 / 4: OVER CAP - ask the director to allow removals)
+art-publish (paused), display-4k (#84), p2-m3 (merged; plain remove refused: untracked files),
+p2-m5, p2-m6, p2-walk, slice-m1 (M4). `git worktree remove --force` is refused by the permission
+classifier; the director must allow it or remove them himself.
 
 ## Co-lead playbook
 playbook: nothing new (2026-10-15; no worker findings yet).
