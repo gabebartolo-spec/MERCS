@@ -40,7 +40,8 @@ func _fight(battle: Dictionary, merc: Dictionary, defs: Array) -> String:
 	var turns := 0
 	while not fight.is_over() and turns < TURN_LIMIT:
 		var actor := fight.current()
-		fight.apply({"type": "attack", "target": "chief" if actor.id == "orc" else "orc"})
+		var blow := fight.kit(actor.id)[0]
+		fight.apply({"type": blow, "target": "chief" if actor.id == "orc" else "orc"})
 		turns += 1
 	var orc_hp := fight.unit("orc").hp
 	var chief_hp := fight.unit("chief").hp

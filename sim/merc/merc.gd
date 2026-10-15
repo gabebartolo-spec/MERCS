@@ -8,6 +8,8 @@ extends RefCounted
 ## the sprite (D-066). Nothing here rolls and nothing reads the clock.
 
 const SLOTS: Array[String] = ["weapon", "armour", "trinket"]
+## The slots whose gear has a battle class, and the BattleUnit data key each feeds.
+const CLASS_KEYS := {"weapon": BattleGear.WEAPON_KEY, "armour": BattleGear.ARMOUR_KEY}
 
 var id := ""
 var display_name := ""
@@ -19,6 +21,9 @@ var placeholder := false
 ## stats laid over it.
 var stats := {}
 var stage_1_gear: Array[String] = []
+## The battle classes of the merc's own gear (data/mercs.json "gear_line": "weapon", "armour",
+## "shield"); empty when the data names none.
+var gear_line := {}
 ## Slot -> generic gear id, "" for empty.
 var gear := {}
 var xp := 0
@@ -58,6 +63,10 @@ static func make(def: Dictionary, fighters: Dictionary, level_xp: Array[int]) ->
 	if gear_line is Array:
 		for item: Variant in gear_line:
 			merc.stage_1_gear.append(str(item))
+	var line: Variant = def.get("gear_line", {})
+	if line is Dictionary:
+		var classes: Dictionary = line
+		merc.gear_line = classes.duplicate()
 	var slots: Variant = def.get("gear_slots", {})
 	var named: Dictionary = slots if slots is Dictionary else {}
 	for slot: String in SLOTS:
@@ -169,7 +178,36 @@ func to_battle_unit(side: int, at: Vector2i, leads: bool, fit: Dictionary = {}) 
 	numbers["ability_charge"] = Battle.ACTION_CHARGE in learnt
 	numbers["ability_blood_price"] = Battle.ACTION_BLOOD_PRICE in learnt
 	numbers["leader"] = leads
+	numbers.merge(gear_classes(), true)
 	return BattleUnit.make(id, side, at, numbers)
+
+
+## The initiative the merc acts at in a fight: his stat with his armour's slowness (BattleGear
+## rule 4). rules: data/balance/battle.json "rules" (its "gear" block).
+func fighting_initiative(rules: Dictionary) -> int:
+	var unit := to_battle_unit(BattleUnit.COMPANY, Vector2i.ZERO, false)
+	var gear: Variant = rules.get(BattleGear.GEAR_KEY, {})
+	var block: Dictionary = gear if gear is Dictionary else {}
+	return unit.initiative + BattleGear.armour_initiative(block, unit.armour_class)
+
+
+## The battle classes the merc fights with (BattleGear.dress keys): the gear line's, and for a
+## slot it leaves open, the class of the generic gear worn there (D-066: the look still shows
+## the gear line). Slots with neither are left out, so a stats_from fighter's "gear" applies.
+func gear_classes() -> Dictionary:
+	var out := {}
+	for slot: String in CLASS_KEYS:
+		var key := str(CLASS_KEYS[slot])
+		var named := str(gear_line.get(slot, ""))
+		if named == "":
+			var worn: Variant = items.get(str(gear.get(slot, "")), {})
+			var piece: Dictionary = worn if worn is Dictionary else {}
+			named = str(piece.get("class", ""))
+		if named != "":
+			out[key] = named
+	if gear_line.get(BattleGear.SHIELD) == true:
+		out[BattleGear.SHIELD] = true
+	return out
 
 
 ## What the save keeps of this merc: experience and the gear in the slots.

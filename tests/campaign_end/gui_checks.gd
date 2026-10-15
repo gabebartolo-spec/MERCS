@@ -5,7 +5,8 @@ extends RefCounted
 ## every fallen merc's name, day, cause and memories, the keys dead behind it, Begin again,
 ## and a new campaign of the starting six. Then a game started on an ended save opens on the
 ## same screen and plays nothing on from it. Seeded by design: the ambush is met by walking
-## on world seed 424270, played by BattleAi.
+## on world seed 424273 (re-picked when the orc's plate, Phase 4 P1b, let him win at 424270),
+## played by BattleAi.
 
 const End := preload("res://tests/lib/end_kit.gd")
 const Kit := preload("res://tests/lib/wiring_kit.gd")
@@ -14,7 +15,7 @@ const Real := preload("res://tests/lib/input_kit.gd")
 const World := preload("res://tests/lib/world_fixture.gd")
 const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const SAVE_SYSTEM := preload("res://presentation/autoload/save_system.gd")
-const GUI_SEED := 424270
+const GUI_SEED := 424273
 const NEAR := 3
 const TAP_LIMIT := 8
 const LAYOUT_FRAMES := 3

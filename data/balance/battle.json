@@ -35,6 +35,22 @@
         "damage_bonus": 3
       }
     },
+    "gear": {
+      "min_damage": 1,
+      "weapons": {
+        "sword": {"cut": true},
+        "axe": {"cut": true, "breaks_shields": true},
+        "spear": {"thrust": true},
+        "mace": {"crush": true},
+        "bow": {"thrust": true}
+      },
+      "armour": {
+        "leather": {"soak": 1},
+        "mail": {"soak": 2, "gaps": {"thrust": true}},
+        "plate": {"soak": 3, "gaps": {"crush": true}, "initiative": -1}
+      },
+      "shield": {"defense": 2}
+    },
     "actions": {
       "weapon": {
         "sword": {
@@ -61,6 +77,7 @@
   },
   "fighters": {
     "orc": {
+      "gear": {"axe": true, "plate": true},
       "hp": 16,
       "attack": 2,
       "defense": 3,
@@ -74,6 +91,7 @@
       "leader": true
     },
     "vampyr": {
+      "gear": {"sword": true, "plate": true},
       "hp": 12,
       "attack": 3,
       "defense": 2,
@@ -86,6 +104,16 @@
       }
     },
     "bandit": {
+      "gear": {"sword": true, "leather": true},
+      "hp": 8,
+      "attack": 1,
+      "defense": 1,
+      "damage": 4,
+      "resolve": 4,
+      "initiative": 3
+    },
+    "bandit_spearman": {
+      "gear": {"spear": true, "mail": true},
       "hp": 8,
       "attack": 1,
       "defense": 1,
@@ -94,6 +122,7 @@
       "initiative": 3
     },
     "bandit_chief": {
+      "gear": {"mace": true},
       "hp": 10,
       "attack": 2,
       "defense": 2,
@@ -103,6 +132,7 @@
       "leader": true
     },
     "watchman": {
+      "gear": {"spear": true, "mail": true, "shield": true},
       "hp": 9,
       "attack": 2,
       "defense": 2,
@@ -111,6 +141,7 @@
       "initiative": 3
     },
     "watch_sergeant": {
+      "gear": {"sword": true, "plate": true},
       "hp": 11,
       "attack": 2,
       "defense": 3,
