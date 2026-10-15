@@ -57,6 +57,9 @@ var _interior_entry := Vector2i.ZERO
 var _interior_exit := Vector2i.ZERO
 var _frame_ms := 0.0
 var _help: Label = null
+## The key help and the frame time; hidden while a choice panel is up (the map or the loop),
+## which words its own keys and would sit over the help (director, 2026-10-15, 4K TV).
+var _hud: CanvasLayer = null
 var _frame_label: Label = null
 var _loop: LoopDirector = null
 var _overworld: OverworldDirector = null
@@ -317,6 +320,7 @@ func _clip(path: String) -> SheetClip:
 
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()
+	_hud = layer
 	add_child(layer)
 	_help = Label.new()
 	_help.text = Text.t("slice.help")
@@ -330,6 +334,7 @@ func _build_hud() -> void:
 
 ## Places every merc and the camera, and shows each merc's current facing.
 func _sync() -> void:
+	_hud.visible = not _overworld_open() and _loop == null
 	# From the fight on, the camera stays on the field and the street's walkers step aside.
 	var arena := _arena()
 	var fighting := arena != null
