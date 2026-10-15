@@ -162,13 +162,16 @@ func fighting_order() -> Array[String]:
 	return ids
 
 
-## The dead leave the roster for good. False (and no change) when the id is not on it. The
+## The dead leave the roster for good, and the wages owed them are forfeit. False (and no
+## change) when the id is not on it. The
 ## captain's office is not handed on here: the succession (Aftermath) names who takes it.
 func bury(id: String) -> bool:
 	var merc := member(id)
 	if merc == null:
 		return false
 	roster.erase(merc)
+	if economy != null:
+		economy.forfeit_dues(id)
 	if id not in fallen:
 		fallen.append(id)
 	if captain_id == id:

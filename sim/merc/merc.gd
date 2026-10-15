@@ -14,6 +14,8 @@ const CLASS_KEYS := {"weapon": BattleGear.WEAPON_KEY, "armour": BattleGear.ARMOU
 var id := ""
 var display_name := ""
 var species := ""
+## "m" or "f" (data/mercs.json "sex"): the words that name this merc follow it (pronouns).
+var sex := "m"
 var role := ""
 var look := ""
 var placeholder := false
@@ -44,6 +46,7 @@ static func make(def: Dictionary, fighters: Dictionary, level_xp: Array[int]) ->
 	merc.id = str(def.get("id", ""))
 	merc.display_name = str(def.get("name", ""))
 	merc.species = str(def.get("species", ""))
+	merc.sex = "f" if str(def.get("sex", "m")) == "f" else "m"
 	merc.role = str(def.get("role", ""))
 	merc.look = str(def.get("look", ""))
 	merc.placeholder = def.get("placeholder", false) == true

@@ -1,0 +1,7 @@
+{
+  "_comment": "The hub's contract screens (Phase 5 C8, presentation/world/terms_panel.gd): how far one click on the terms screen moves the ask. hub.md explains each knob. Not a rule of the employer's (that is economy.json 'terms').",
+  "terms": {
+    "price_step_pct": 5,
+    "advance_step_pct": 25
+  }
+}

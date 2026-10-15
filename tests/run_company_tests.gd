@@ -87,7 +87,7 @@ func _check_cast_in_data() -> void:
 			or slots.values().any(func(v: Variant) -> bool: return v != null)
 		):
 			bad.append(str(def.get("id")) + " slots")
-		if placeholder and not str(def.get("name", "")).begins_with("Unnamed "):
+		if placeholder and str(def.get("name", "")).begins_with("Unnamed"):
 			bad.append(str(def.get("id")) + " name")
 	check(
 		ids == STARTING_IDS and bad.is_empty(),

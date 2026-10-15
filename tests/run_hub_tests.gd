@@ -75,7 +75,7 @@ func _check_open() -> void:
 	await _frames(LAYOUT_FRAMES)
 	var panel := _hub().panel
 	var economy := _economy()
-	var accepts := _count("accept", economy.board)
+	var accepts := _count(ContractRows.TALK, economy.board)
 	var hires := _count("hire", economy.offers())
 	var start := _game.player.cell
 	await _hold(KEY_D)
@@ -163,11 +163,16 @@ func _check_contract_and_hire() -> void:
 	var panel := _hub().panel
 	var economy := _economy()
 	var id := str(economy.board[0]["id"])
-	await _click_button(panel.button_for("accept", id))
-	var taken := panel.button_for("accept", id)
+	await _click_button(panel.button_for(ContractRows.TALK, id))
+	await _click_button(panel.button_for("offer", id))
+	await _click_button(panel.button_for("back", "board"))
 	check(
-		str(economy.book.contract(id)["accepted"]) == "true" and taken != null and taken.disabled,
-		"a real click on a contract accepts it: the sim has it taken, the button is spent"
+		(
+			str(economy.book.contract(id)["accepted"]) == "true"
+			and panel.button_for(ContractRows.TALK, id) == null
+			and panel.button_for(ContractRows.ABANDON, id) != null
+		),
+		"real clicks talk a contract's terms and offer the posted pay: it is taken, walk-away shown"
 	)
 	await _click_button(panel.button_for("inspect", "recruit_1"))
 	check(
@@ -234,7 +239,9 @@ func _prisoner_buttons() -> int:
 func _check_all_on_screen() -> void:
 	var screen := Rect2(Vector2.ZERO, Vector2(WINDOW_SIZE))
 	var off: Array[String] = []
-	for action: String in ["pay", "accept", "inspect", "hire", "prisoner", "equip", "wearer"]:
+	for action: String in [
+		"pay", "talk", "abandon", "inspect", "hire", "prisoner", "equip", "wearer"
+	]:
 		for id: String in _ids():
 			var button := _hub().panel.button_for(action, id)
 			if button != null and not screen.encloses(button.get_global_rect()):
@@ -312,7 +319,7 @@ func _check_away() -> void:
 	check(
 		(
 			panel.shown_text().contains(Text.t("hub.away"))
-			and panel.button_for("accept", board_id) == null
+			and panel.button_for(ContractRows.TALK, board_id) == null
 			and panel.button_for("hire", "recruit_2") == null
 			and panel.button_for("pay", "wages") == null
 		),
@@ -363,19 +370,7 @@ func _frames(count: int) -> void:
 
 
 func _click_button(button: Button) -> void:
-	await _frames(LAYOUT_FRAMES)
-	if button == null or not is_instance_valid(button):
-		return
-	var at := button.get_global_rect().get_center()
-	for pressed: bool in [true, false]:
-		var click := InputEventMouseButton.new()
-		click.button_index = MOUSE_BUTTON_LEFT
-		click.position = at
-		click.global_position = at
-		click.pressed = pressed
-		Input.parse_input_event(click)
-		Input.flush_buffered_events()
-		await process_frame
+	await InputKit.click(self, button)
 
 
 func _press_key(code: Key, pressed: bool) -> void:

@@ -81,6 +81,14 @@ func share(reward: int, fought: Array[Merc]) -> int:
 	return pot
 
 
+## A merc died: whatever he was owed is forfeit, the company no longer owes it (director
+## 2026-10-16). Returns the coin struck off the debt, 0 when he was owed nothing by name.
+func forfeit(id: String) -> int:
+	var coin := Merc.whole(dues.get(id, 0))
+	dues.erase(id)
+	return coin
+
+
 ## The whole debt was paid: nobody is owed anything.
 func clear() -> void:
 	dues.clear()
