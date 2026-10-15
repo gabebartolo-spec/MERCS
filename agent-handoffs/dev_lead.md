@@ -3,7 +3,7 @@ Start from this file, CLAUDE.md, `~/.claude/memory-shared/MEMORY.md`, the co-lea
 your brief (`agent-briefs/DEV_LEAD_OPUS.md`, Project Architect 3.0 since D-071) and
 `docs/08_ROADMAP.md` Phase 2 (lines 102-189). Run `git fetch`, `gh pr list`, `docs/STATUS.md`.
 
-## State: working (four coders: M2, M3, M4, M5; awaiting the director's M1 play)
+## State: working (four coders: M2, M3, M4, M5)
 
 ## Who does what
 This account has no Concept Lead: the session is lead AND Dev Lead under the original account's
@@ -35,7 +35,9 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
 - "4 coders" (raises D-071's two-coder cap to four; log it in the next board PR body).
 - Merged since: #78 tools/merge_eligibility.sh (use it before every merge), #79 magic numbers
   are lint errors from Phase 2 (caps phase 2).
-- Pending from him: milestone 1 verdict (play F2: road, rest, save, reopen). Also at milestone
+- Milestone 1 played: "milestone 1 is played. its good" (2026-10-15, 16:58) = carry on;
+  log in the next board PR (STATUS: M1 review done).
+- Pending from him: at milestone
   2's review: confirm or reorder milestones 3 and 4.
 
 ## Running (builder subagents of this session; they die with it)
