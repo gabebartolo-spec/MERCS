@@ -114,6 +114,13 @@ func place_job(contract: Dictionary) -> String:
 	return Jobs.place(self, contract, _job_knobs, _rng)
 
 
+## A broken deal's hunters (GrudgeParties.place, Phase 5 C4) on the map, away from the band,
+## on the Rng "grudge" stream; `strength` picks their line-up. Their id, "" when no tile was free.
+func send_hunters(deal_id: String, strength: int) -> String:
+	var knobs := _dict(_party_knobs, GrudgeParties.TYPE)
+	return GrudgeParties.place(self, {"deal": deal_id, "strength": strength}, knobs, _rng)
+
+
 ## The party by id, or null.
 func party(party_id: String) -> WorldParty:
 	for found: WorldParty in parties:
@@ -255,14 +262,17 @@ func _pass_time(units: int) -> void:
 			return
 
 
-## The party's encounter: its type, and a line-up rolled on the "encounter" stream. False
-## when the data holds no line-up for the type.
+## The party's encounter: its type, and a line-up rolled on the "encounter" stream (a hunter
+## party's strength picks it instead, no roll). False when the data holds no line-up for the type.
 func _raise_encounter(walker: WorldParty) -> bool:
 	var entry := _dict(_lineups, walker.type)
 	var lineups := _list(entry, "lineups")
 	if lineups.is_empty():
 		return false
-	var enemies: Array = _whole_deep(lineups[_rng.roll(ENCOUNTER_STREAM, 0, lineups.size() - 1)])
+	var pick := mini(walker.strength, lineups.size()) - 1
+	if walker.strength <= 0:
+		pick = _rng.roll(ENCOUNTER_STREAM, 0, lineups.size() - 1)
+	var enemies: Array = _whole_deep(lineups[pick])
 	encounter = {
 		"type": walker.type,
 		"party": walker.id,

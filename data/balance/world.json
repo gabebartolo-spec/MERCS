@@ -74,6 +74,15 @@
       "speed_pct": 100,
       "wander_tiles": 4,
       "return_days": 3
+    },
+    "hunters": {
+      "sight_tiles": 6,
+      "speed_pct": 100,
+      "wander_tiles": 6,
+      "return_days": 1,
+      "start_min_tiles": 8,
+      "start_max_tiles": 12,
+      "place_tries": 30
     }
   },
   "encounters": {

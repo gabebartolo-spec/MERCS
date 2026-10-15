@@ -12,6 +12,7 @@ extends "res://tests/lib/runner.gd"
 
 const Fixture := preload("res://tests/lib/world_fixture.gd")
 const JobChecks := preload("res://tests/world/job_checks.gd")
+const GrudgePartyChecks := preload("res://tests/world/grudge_party_checks.gd")
 const SEED := 424242
 const OTHER_SEED := 424243
 const STEPS := 12
@@ -37,6 +38,7 @@ func run_checks() -> void:
 	_check_starving()
 	_check_restore_continues()
 	JobChecks.new().run(check)
+	GrudgePartyChecks.new().run(check)
 	await process_frame
 
 

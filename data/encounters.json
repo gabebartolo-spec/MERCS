@@ -67,6 +67,31 @@
           { "fighter": "bandit", "cell": [4, 4] }
         ]
       ]
+    },
+    {
+      "id": "enc_hunters",
+      "type": "hunters",
+      "enemy_first": false,
+      "lineups": [
+        [
+          { "fighter": "bandit_chief", "cell": [9, 4] },
+          { "fighter": "bandit_spearman", "cell": [8, 2] },
+          { "fighter": "bandit", "cell": [8, 6] }
+        ],
+        [
+          { "fighter": "bandit_chief", "cell": [9, 4] },
+          { "fighter": "bandit_spearman", "cell": [8, 2] },
+          { "fighter": "bandit", "cell": [8, 6] },
+          { "fighter": "bandit", "cell": [8, 4] }
+        ],
+        [
+          { "fighter": "bandit_chief", "cell": [9, 4] },
+          { "fighter": "bandit_spearman", "cell": [8, 2] },
+          { "fighter": "bandit", "cell": [8, 6] },
+          { "fighter": "bandit", "cell": [8, 4] },
+          { "fighter": "bandit_spearman", "cell": [9, 6] }
+        ]
+      ]
     }
   ]
 }
