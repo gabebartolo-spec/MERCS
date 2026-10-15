@@ -23,8 +23,8 @@
     "radius_m": 0.3,
     "height_m": 0.02,
     "lift_m": 0.012,
-    "company_rgb": [0.86, 0.68, 0.24],
-    "enemy_rgb": [0.66, 0.16, 0.14],
-    "down_rgb": [0.18, 0.16, 0.16]
+    "company": "heraldry:2",
+    "enemy": "heraldry:1",
+    "down": "soot:2"
   }
 }

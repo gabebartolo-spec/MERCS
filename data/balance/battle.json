@@ -34,7 +34,7 @@
       "weapons": {
         "sword": {"cut": true},
         "axe": {"cut": true, "breaks_shields": true},
-        "spear": {"thrust": true, "reach": 2},
+        "spear": {"thrust": true},
         "mace": {"crush": true},
         "bow": {"thrust": true}
       },
@@ -44,6 +44,29 @@
         "plate": {"soak": 3, "gaps": {"crush": true}, "initiative": -1}
       },
       "shield": {"defense": 2}
+    },
+    "actions": {
+      "weapon": {
+        "sword": {
+          "reach": 1
+        },
+        "axe": {
+          "reach": 1
+        },
+        "spear": {
+          "reach": 2
+        },
+        "mace": {
+          "reach": 1
+        },
+        "bow": {
+          "ranged": true
+        }
+      },
+      "technique": {
+        "charge": true,
+        "blood_price": true
+      }
     }
   },
   "fighters": {

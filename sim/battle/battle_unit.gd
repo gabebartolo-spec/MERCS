@@ -55,14 +55,17 @@ var down := false
 var wounded := false
 ## The merc's resolve-flavoured social weight, read by visible checks (sim/story/checks.gd).
 var presence := 0
+## The class of the weapon in hand (stats "weapon_class": sword, axe, spear, mace, bow; director
+## Q-B, 2026-10-15, or battle.json "gear"; BattleGear.dress), "" for none; the action kit
+## gives its weapon action (BattleKit) and BattleGear reads its blow.
+var weapon_class := ""
 ## Learnt moves taken into this fight, by id, in loadout order (at most "loadout_max").
 var moves: Array[String] = []
 ## Added to this fighter's next attack only, then cleared (the Vampyr's blood price).
 var next_attack_bonus := 0
 var next_damage_bonus := 0
-## Equipment classes (BattleGear): one of BattleGear.WEAPONS and ARMOURS, or "" for none;
-## shield is true while the fighter carries a whole one (an axe can split it).
-var weapon_class := ""
+## The armour worn (BattleGear.ARMOURS: leather, mail, plate), "" for none; shield is true
+## while the fighter carries a whole one (an axe can split it). Both dressed by BattleGear.
 var armour_class := ""
 var shield := false
 

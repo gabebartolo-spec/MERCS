@@ -1,0 +1,23 @@
+{
+	"about": "Sim cost baseline for tests/run_perf_tests.gd: the highest of several local runs (Windows, headless). Gate: ms <= max(gate_factor * baseline, baseline + slack_ms). Work is the deterministic size of the job.",
+	"gate_factor": 3.0,
+	"scenarios": {
+		"battle": {
+			"ms": 420.0,
+			"work": 4595
+		},
+		"campaign": {
+			"ms": 480.0,
+			"work": 8112
+		},
+		"save_load": {
+			"ms": 2120.0,
+			"work": 54080
+		},
+		"world": {
+			"ms": 520.0,
+			"work": 150
+		}
+	},
+	"slack_ms": 250.0
+}

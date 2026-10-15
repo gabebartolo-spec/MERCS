@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Mercenaries",
-  "description": "data/mercs.json: the hand-made cast, by id. Stats are numbers; stats_from optionally names an entry of data/balance/battle.json fighters whose numbers the merc's own stats are laid over (one source of truth for the reference pair). moves_by_level maps a level (\"1\", \"2\", ...) to the move ids learnt there. gear_slots are the three generic-gear slots (weapon, armour, trinket); null is empty. look is a sheet id or \"placeholder\". placeholder marks an entry the director has yet to author. gear_line (optional) is the battle class of the merc's own weapon and armour and whether they carry a shield (data/balance/battle.json rules.gear); with none, the classes of stats_from's fighter \"gear\" apply.",
+  "description": "data/mercs.json: the hand-made cast, by id. Stats are numbers; stats_from optionally names an entry of data/balance/battle.json fighters whose numbers the merc's own stats are laid over (one source of truth for the reference pair). growth is the whole points a stat gains per level above the first. moves_by_level maps a level (\"1\", \"2\", ...) to the move ids learnt there. gear_slots are the three generic-gear slots (weapon, armour, trinket); null is empty. look is a sheet id or \"placeholder\". placeholder marks an entry the director has yet to author. gear_line (optional) is the battle class of the merc's own weapon and armour and whether they carry a shield (data/balance/battle.json rules.gear); with none, the classes of stats_from's fighter \"gear\" apply.",
   "type": "object",
   "required": ["mercs", "starting_captain"],
   "additionalProperties": false,
@@ -39,6 +39,19 @@
             "additionalProperties": false,
             "patternProperties": {
               "^[1-9][0-9]*$": {"type": "array", "items": {"type": "string", "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$"}}
+            }
+          },
+          "growth": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "hp": {"type": "integer", "minimum": 0},
+              "attack": {"type": "integer", "minimum": 0},
+              "defense": {"type": "integer", "minimum": 0},
+              "damage": {"type": "integer", "minimum": 0},
+              "initiative": {"type": "integer", "minimum": 0},
+              "presence": {"type": "integer", "minimum": 0},
+              "resolve": {"type": "integer", "minimum": 0}
             }
           },
           "stage_1_gear": {"type": "array", "items": {"type": "string", "minLength": 1}},

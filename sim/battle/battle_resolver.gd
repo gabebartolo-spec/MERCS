@@ -45,10 +45,11 @@ static func foe(actor: BattleUnit, target: BattleUnit) -> bool:
 	return target != null and not target.down and target.side != actor.side
 
 
-## The actor attacks an adjacent foe with move kind; false (no events, no roll) when the
-## target is not a foe beside him. Clears the actor's one-attack bonuses.
+## The actor attacks a foe within the reach of move kind (BattleRules.reach: 1, beside him, but
+## for a weapon action that reaches further, the spear's 2) with move kind; false (no events,
+## no roll) when the target is not a foe within reach. Clears the actor's one-attack bonuses.
 func attack(actor: BattleUnit, target: BattleUnit, kind: String, events: Array[Dictionary]) -> bool:
-	if not foe(actor, target) or not BattleGrid.adjacent(actor.cell, target.cell):
+	if not foe(actor, target) or BattleGrid.gap(actor.cell, target.cell) > _rules.reach(kind):
 		return false
 	actor.facing = BattleGrid.toward(actor.cell, target.cell, actor.facing)
 	var roll := _rng.roll(STREAM, 1, _rules.num("die_sides"))

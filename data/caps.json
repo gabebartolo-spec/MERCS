@@ -13,6 +13,7 @@
     "recruits": 6,
     "encounters": 2,
     "locations": 2,
+    "actions": 10,
     "weapon_classes": 5,
     "armour_classes": 3,
     "shields": 1,
