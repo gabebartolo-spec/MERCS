@@ -27,33 +27,29 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
   D-072 typo -> D-071. Local branch claude/board-after-75 remains (delete refused by settings).
 - Pruned two stale clean worktrees (dual-desktop, loving-elgamal).
 
-## Director today (2026-10-15)
-- "Start now" milestone 2 while he plays milestone 1.
-- "Keep Art paused".
-- "why do you only have 1 agent. get busy" -> run every slot (shared memory
+## Director today (2026-10-15) - record in a dated roadmap chapter via the next board PR
+- "Start now" M2; "Keep Art paused"; "4 coders" (D-071 cap 2 -> 4); "get busy" (memory-shared
   run-the-team-at-full-width.md).
-- "4 coders" (raises D-071's two-coder cap to four; log it in the next board PR body).
-- #80 milestone 2 MERGED (44cd728; sim review PASS posted on the PR; nine veto calls in its body).
-  Build: MERCS-builds/2026-10-15_m2_44cd728/MERCS.exe; awaiting his M2 play + 3/4 order call.
-- Merged since: #78 tools/merge_eligibility.sh (use it before every merge), #79 magic numbers
-  are lint errors from Phase 2 (caps phase 2).
-- Milestone 1 played: "milestone 1 is played. its good" (2026-10-15, 16:58) = carry on;
-  log in the next board PR (STATUS: M1 review done).
-- Pending from him: at milestone
-  2's review: confirm or reorder milestones 3 and 4.
+- M1 "is played. its good"; M2 "playtest is a success. clearly limited by the lack of combat
+  infrastructure but it works".
+- 4K TV bug: "the game needs to display on a 4k tv, i cant read any of the text its too small"
+  -> FIXED in #83 (fullscreen, canvas_items 2x, 24 px theme, smoke checks). Build not yet sent.
+- DESIGN GOAL: "moving around the world should be done manually, not in a menu, our band will
+  navigate an overworld just like pokemon, procedurally generated maps like battle brothers with
+  bespoke hand crafted locations and events and towns". His picks: smaller map scale with a cut
+  to street scale in towns/locations; encounters are visible parties (engage, avoid, run).
+- Pending from him: author merc_3..merc_6; confirm/reorder M3/M4; the veto lists in #80-#82.
 
 ## Running (builder subagents of this session; they die with it)
-- M3 company = PR #81 (save v2, F4 inspect). Conflicted with #80; its coder is merging origin/main
-  (Auto-fix is on for #81). Lead pre-reviewed the save (v1->v2 arm, v1 fixture, defaults): PASS;
-  post the verdict, set Review needed: done, merge_eligibility, merge. Then start M6.
-- M4 battle skeleton (Opus): `../MERCS-wt/slice-m1`, claude/p2-m4-battle. Keeps Battle's API.
-- M5 wounds/triage/death/chronicle/succession, sim only, keyed by merc id:
-  `../MERCS-wt/p2-m5`, claude/p2-m5-wounds.
+- M3 = PR #81 (sim review PASS posted): coder merging main (#83) again, then merge it.
+- M5 = PR #82 (sim review PASS posted, green): merge AFTER #81; ask its coder to merge main then.
+- M4 battle skeleton (Opus): `../MERCS-wt/slice-m1`, claude/p2-m4-battle.
+- Walkable overworld (Opus, rebuilds M1/M2 to his design goal): `../MERCS-wt/p2-walk`,
+  claude/p2-overworld-walk.
 Wiring after merges: company -> encounters, M4 hit hook -> M5 injuries, a triage screen.
-If this session died: respawn each from its worktree with the same brief shape.
 
 ## Next for the lead
-0. Fourth coder slot is free: start M6 (hub, economy, recruitment) the moment M3 merges.
+0. Next free slot: M6 (hub, economy, recruitment), after #81 merges; then the wiring task.
 1. Review M2 and M3 PRs (mercs-sim-review on the save keys, fixtures failing first, real taps),
    merge on green (merge_eligibility.sh once it lands), fetch the build, ask him to play.
 2. Record his milestone verdicts the same turn; ask him to author the four placeholder mercs
