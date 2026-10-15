@@ -1,122 +1,67 @@
-# Dev Lead handoff, 2026-10-15 (desktop, personal account, "Game Studio Lead mercs")
-Start from this file, CLAUDE.md, `~/.claude/memory-shared/MEMORY.md`, the co-lead playbook,
-your brief (`agent-briefs/DEV_LEAD_OPUS.md`, Project Architect 3.0 since D-071) and
-`docs/08_ROADMAP.md` Phase 2 (lines 102-189). Run `git fetch`, `gh pr list`, `docs/STATUS.md`.
+# Dev Lead handoff, 2026-10-15 18:24 (desktop, personal account, "Game Studio Lead mercs")
+Start: this file, CLAUDE.md, ~/.claude/memory-shared/MEMORY.md + co-lead-playbook.md, your brief
+(agent-briefs/DEV_LEAD_OPUS.md, Project Architect 3.0, cap FOUR coders), docs/08_ROADMAP.md
+Phase 2 (lines 102-189), docs/STATUS.md, docs/brainstorms/2026-10-15-director-comments.md.
+Then `git fetch`, `gh pr list`, `gh run list`.
 
-## State: working (four coders: M2, M3, M4, M5)
+## State: working (look-target fixes, gate pack, campaign end running)
 
 ## Who does what
-This account has no Concept Lead: the session is lead AND Dev Lead under the original account's
-rules. No peer sessions were alive on 2026-10-15; the team is run as builder subagents
-(`subagent_type: builder`, Sonnet) spawned from this session, one task per life. Merge & CI work
-(board PRs) goes to a builder brief too. Art Factory: PAUSED (director 2026-10-15: "Keep Art
-paused", focus on the playable baseline). Its handoff: `../MERCS-wt/art-publish/agent-handoffs/art.md`.
+No Concept Lead in this account: the session is lead AND Dev Lead. The team is builder
+subagents of this session (Sonnet; Opus for judgement work), one task per life; they die with the
+session. Agents talk tersely (memory-shared terse-agent-messages.md). Art = a builder on Opus.
 
-## THE GOAL (director, 2026-10-14, D-063..D-071, brainstorm docs/brainstorms/2026-10-14-...)
-Medium term: the horizontal slice, a playable baseline of every pillar, thin and structurally
-sound (Phase 2, seven milestones in dependency order). Short term (parked): the vertical slice
-look gate (orc + Vampyr). Each milestone ships in the F-key build; the director plays it and
-says carry on or wrong. Entry condition of every milestone: its player-effect fixture passes.
+## Phase 2 (horizontal slice): ALL MILESTONES MERGED 2026-10-15
+#80 encounters, #81 company (save v2, C), #82 wounds, #85 battle skeleton, #87 hub/economy (B),
+#89 storylet+memory, #93 walkable overworld (M; tile region, locations.json, visible parties),
+#90 wiring (company up to 6 fights parties, triage, dead stay dead). Also #83 4K display, #84
+gdlint required, #86 letter keys (no F-keys), #88 board, #91 validate_pixels (D-035 no mixels).
+Director played M1, M2 and the walk/full-loop build: "playtest was good carry on".
+Full-loop build: Documents/GitHub/MERCS-builds/2026-10-15_loop_674c749/MERCS.exe.
 
-## Done this session (2026-10-15)
-- Merged #74 (roadmap rewrite, D-063..D-071) and #75 (milestone 1: F2 overworld, WorldSim,
-  save v1) at matched heads after checking every suite ran (13 suites at floor). Main 38b2659
-  green; Windows build at `Documents/GitHub/MERCS-builds/2026-10-15_m1_38b2659/MERCS.exe`
-  (headless boot clean).
-- Board PR #76 merged (8df923a): D-063..D-071 logged, Phase 2 items 1-2, Art paused, roadmap
-  D-072 typo -> D-071. Local branch claude/board-after-75 remains (delete refused by settings).
-- Pruned two stale clean worktrees (dual-desktop, loving-elgamal).
-
-## Director today (2026-10-15) - record in a dated roadmap chapter via the next board PR
-- "Start now" M2; "Keep Art paused"; "4 coders" (D-071 cap 2 -> 4); "get busy" (memory-shared
-  run-the-team-at-full-width.md).
-- M1 "is played. its good"; M2 "playtest is a success. clearly limited by the lack of combat
-  infrastructure but it works".
-- 4K TV bug: "the game needs to display on a 4k tv, i cant read any of the text its too small"
-  -> FIXED in #83 (fullscreen, canvas_items 2x, 24 px theme, smoke checks). Build not yet sent.
-- DESIGN GOAL: "moving around the world should be done manually, not in a menu, our band will
-  navigate an overworld just like pokemon, procedurally generated maps like battle brothers with
-  bespoke hand crafted locations and events and towns". His picks: smaller map scale with a cut
-  to street scale in towns/locations; encounters are visible parties (engage, avoid, run).
-- Pending from him: author merc_3..merc_6; confirm/reorder M3/M4; the veto lists in #80-#82.
-
-## Running (builder subagents of this session; they die with it)
-- Merged today: #80 M2, #81 M3, #82 M5, #83 4K, #84 gdlint gate, #85 M4 battle, #86 letter keys
-  (no F-keys: M map, C company, L loop, H help, G frame time; smoke fails on KEY_F).
-- #93 walkable overworld MERGED (tile region, locations.json, visible parties, M opens the map;
-  lead 4K capture OK; blocked step gives no feedback - small follow-up). Build downloading for his play.
-- #91 validate_pixels MERGED (PIX-* rules in project-lints).
-- #87 M6 hub/economy MERGED (hub on B; economy inside the company save block; review PASS).
-- #88 board MERGED (D-072..D-081, docs/brainstorms/2026-10-15-director-comments.md). Name board
-  branches claude/board-after-<n> or merge_eligibility refuses them.
-- Rejected tools today: Rucol GAN (no licence), gmattie Data-Pixels (hand-typed pixels, no use).
-- #89 M7 storylet+memory MERGED (optional story save block; placeholder words for him).
-- #90 wiring MERGED (674c749): company (up to 6) fights parties, triage, dead stay dead.
-  ALL Phase 2 milestones built. Full-loop build: MERCS-builds/2026-10-15_loop_674c749 (his play).
-- Director 2026-10-15: company wipe -> "Campaign ends" (final chronicle screen). Coder: worktree
-  campaign-end, claude/campaign-end. LOG as a D-entry in the next board PR.
-- Director 2026-10-15 on the walk/full-loop build: "playtest was good carry on" (log in board PR).
-- Look target A/B/C built (claude/art-look-target 1ee6d22; boards docs/audits/look_target/
-  option_{A,B,C}.png; frames D:/MERCS-vault/renders/look_2026-10-15). Lead QC sent back: puddles
-  read as casterless shadows, straw as tools, orc pauldrons balloon/head big; + blockout caption.
-  realism-critic needs a REAL reference photo path to run (none in repo) - get freely licensed
-  refs (ask before downloading) or proceed on lead QC.
-- Gate pack coder: slice-m1, claude/p2-gate-pack: blocked-step feedback fix + docs/audits/
+## Running (builders)
+- Gate pack: `../MERCS-wt/slice-m1`, claude/p2-gate-pack: blocked-step feedback + docs/audits/
   phase2_gate/ (what to play, veto table, placeholders, 4K captures, structural self-check).
-  Then: Concept Lead's structural audit (other account) + his one playthrough = the gate.
-- ART resumed (director "look target first"): Opus, art-look, claude/art-look-target (main + art
-  branch merged). Deliverable: 2-3 labelled options (palette+light+post), each = street day, street
-  night/rain at 4K in-engine, overworld strip at map scale; draft palettes in assets/palette/options/.
-  Lead QCs (art-qa-critic) before the director sees boards; his pick becomes golden + master palette.
-- QUEUED after his palette pick: Texel Studio trial (director yes 2026-10-15) for map-scale
-  terrain tiles only: local Ollama, no concept-art (diffusion) step, palette-locked, licensing
-  register row CLEARED first (its licence: outputs ours, internal use ok, no resale as a service).
-  One strip from Texel vs the Blender rig, side by side, he picks. Rucol GAN repo rejected (no licence).
-- Retro Diffusion (director 2026-10-15): licence checked (ToS 2026-09-28: outputs ours,
-  commercial ok; free-credit outputs go PUBLIC; they may train on outputs; we may not train on
-  theirs). Director: "Small paid plan, private", SPEND YES US$10 prepaid balance (he tops it up
-  himself) - LOG IN NEXT BOARD PR as a D-entry. DONE by him 2026-10-15: balance $10.00 (paid $11
-  incl. tax, account gabebartolo). Account page has NO output-privacy switch (cookies only): first
-  trial generation, check its gallery/public flag before any more.
-  He logged RD into the BUILT-IN browser pane too (2026-10-15): the lead drives the trial there
-  (builders have no browser tools); never sign out or change account settings.
-  Joins the tile trial (Texel Studio vs RD vs Blender rig) after his look-target pick.
-- Mixels (D-035; director 2026-10-15 "eager to avoid mixels or fake pixels"): validator coder
-  running (`../MERCS-wt/mixels`, claude/no-mixels: PIX-UPSCALED/ALPHA/PALETTE/AA over assets/ in
-  project-lints). Overworld coder told: one texel grid, no scaled nodes. Flag: UI font is smooth,
-  not pixel - bring a labelled font sheet with the look target (06 §7 [D]).
-Traps: never `export APPDATA` (breaks gh, git creds, Python user site for gdtoolkit); set it on
-the Godot command line only. gdlint/gdformat: `python -m gdtoolkit.linter|formatter`.
-Director 2026-10-15: agents talk tersely (memory-shared terse-agent-messages.md).
+  Then the gate = Concept Lead's structural audit (other account) + his one playthrough.
+- Campaign end: `../MERCS-wt/campaign-end`, claude/campaign-end. Director: a wiped company ends
+  the campaign (final chronicle screen, ended save never loads into play). Log as a D-entry.
+- Art look target: `../MERCS-wt/art-look`, claude/art-look-target. A "Ash and Hearth", B "Peat and
+  Ochre", C "Clear Day" (boards docs/audits/look_target/option_{A,B,C}.png; 4K frames
+  D:/MERCS-vault/renders/look_2026-10-15). Re-rendering with lead QC fixes (puddles read as
+  casterless shadows, straw as tools, orc pauldrons balloon + head big; "blockout" caption) and
+  his note: "the colour looks good though. the lighting could stand to be 5% brighter" (+5% light,
+  all options). He leans B ("most atmosphere") but picks from the FIXED A/B/C. His pick = master
+  palette + goldens. He also said "the end fidelity would have to be much higher" (final art).
+  realism-critic refuses without a real reference photo path (none in repo; ask before download).
 
-## Next for the lead
-0. Next free slot: the wiring task (company fights encounters, hits -> injuries, triage screen)
-   once M4 and the walkable overworld merge; then the Phase 2 evidence pack.
-1. Review M2 and M3 PRs (mercs-sim-review on the save keys, fixtures failing first, real taps),
-   merge on green (merge_eligibility.sh once it lands), fetch the build, ask him to play.
-2. Record his milestone verdicts the same turn; ask him to author the four placeholder mercs
-   and to confirm or reorder milestones 3/4.
-3. After M2+M3 merge: flip STRICT_FROM_PHASE/caps phase to 2 and fix the listed literals.
-4. Then milestone 4 (battle skeleton) and 5 (wounds) as the next two coder slots.
-5. Handoff lives on remote branch claude/lead-handoff-1015 (updated via gh api while all
-   worktrees are busy); open a docs-only PR for it at session end.
+## Queued after his look pick
+Tile trial on the chosen palette: Retro Diffusion (US$10 prepaid, his written yes; logged into the
+built-in browser pane; lead drives it; skill ~/.claude/skills/retro-diffusion; download at
+ORIGINAL size; check the first output's public flag) vs Texel Studio (local Ollama, no diffusion
+step, licensing row first) vs the Blender rig; RD Low-Poly 3D worth a props trial. Bring a pixel
+UI font sheet (06 §7 [D]).
 
-## Suites (floors on main)
-data 96, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 13, slice 15, battle 14,
-loop 4, sim_world 9, save 7, effect 4, overworld 8.
+## Waiting on the director
+Author merc_3..6, recruits, both factions, the storylet's words (placeholders in data); veto
+tables #80-#93 (gate pack collects them); confirm/reorder M3/M4 (both built).
 
-## Worktrees (5 / 4, director allows forced removal of finished ones)
-slice-m1 (wiring #90), art-look (2/4). Remove each when its PR merges.
+## Next board PR must log (branch claude/board-after-<n>)
+Retro Diffusion US$10 spend yes; campaign ends on wipe; full-loop playtest pass; lighting +5%;
+fidelity note; the look pick.
+
+## Worktrees (3/4)
+slice-m1 (gate pack), campaign-end, art-look. Remove each when its work merges.
 
 ## Co-lead playbook
-playbook: nothing new (2026-10-15; no worker findings yet).
+playbook: updated 2026-10-15 (merge-check gap, APPDATA trap). Curate Art's "Findings for the
+lead" (4K window 3836x2158; Blender glTF double-sided faces) on Art's refresh.
 
 ## Rules learnt the hard way (keep under 10 lines)
-- REWRITE this file each time; never insert sections (doc-caps fails past 120 lines).
-- tests.yml skips draft PRs: mark ready, THEN push.
-- Before merging, read the shard log: every suite listed with its count, not just "green".
-- Headless test windows are 64x64: size root to 1920x1080 before clicking GUI in a suite.
-- `git show <ref>:file > file` writes LFS pointers for LFS paths; use `git lfs smudge`.
-- A suite extending a script that fails to parse HANGS: `SUITE_TIMEOUT=120`; kill by PID.
-- Typed GDScript: assign a Variant to a typed local before arithmetic, casts or `.get()`.
-- `git fetch` and read `git log origin/main` before choosing or briefing any work.
+- Never `export APPDATA`: set it on the Godot command only (breaks gh, git creds, Python user site).
+- gdlint/gdformat: `python -m gdtoolkit.linter|formatter`; CI requires both (merge_eligibility).
+- Handoff on a branch is deleted on merge: each update = new branch from main + PR; keep <=120 lines.
+- Every merge: `bash tools/merge_eligibility.sh <pr>` then `gh pr merge --match-head-commit`.
+- Before merging a sim PR: post the mercs-sim-review verdict, set Review needed: done.
+- A milestone's Director gate line: "none blocking; play review after merge (D-064)".
+- tests.yml skips drafts: mark ready, then push. Headless windows are 64x64: size root first.
+- Captures at 3840x2160 offscreen (--windowed --position 8000,8000) before he looks.
