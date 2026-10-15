@@ -7,7 +7,10 @@ extends RefCounted
 ## without one reads as the starting six with the orc captain. No disk access: writing and
 ## reading files is presentation's.
 
-const VERSION := 2
+## The save formats, oldest first; each one past UNVERSIONED has a migration arm below.
+enum Format { UNVERSIONED, FIRST, COMPANY }
+
+const VERSION: int = Format.COMPANY
 ## The error codes from_dict() can leave in `error` (empty when ok).
 const ERROR_TOO_NEW := "save_version_too_new"
 
