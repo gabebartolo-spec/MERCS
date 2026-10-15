@@ -15,6 +15,8 @@ const V0_FIXTURE := "res://tests/fixtures/save/v0.json"
 const WORLD_BALANCE := "res://data/balance/world.json"
 const SEED := 424242
 const CAP_FOR_TEST := 4
+## The company cap (data/balance/company.json; director 2026-10-16, "Company cap 8", Phase 5 C7).
+const ROSTER_CAP := 8
 const STARTING_IDS: Array[String] = ["orc", "vampyr", "merc_3", "merc_4", "merc_5", "merc_6"]
 
 
@@ -136,13 +138,13 @@ func _check_starting_company() -> void:
 			_ids(company) == STARTING_IDS
 			and company.captain_id == "orc"
 			and company.captain().display_name == "The Orc"
-			and company.cap() == 12
+			and company.cap() == ROSTER_CAP
 			and company.roster.all(
 				func(merc: Merc) -> bool: return merc.level() == 1 and merc.xp == 0
 			)
 		),
 		(
-			"a new company is the starting six, the orc captain, cap 12, all at level 1 with "
+			"a new company is the starting six, the orc captain, cap 8, all at level 1 with "
 			+ "no experience"
 		)
 	)

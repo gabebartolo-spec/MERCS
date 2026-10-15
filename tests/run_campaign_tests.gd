@@ -5,9 +5,12 @@ extends "res://tests/lib/runner.gd"
 ## a rest at the hub and the storylet) played twice from one seed ends in the same save, byte
 ## for byte, and from another seed does not; every stage of it really happened; the final save
 ## reads back and writes the same; the version 2 fixture (fixtures/save/v2.json) loads with its
-## company, wounds and story; a memory sentence names a comrade who died by name, never by id.
-## Seeded by design: campaign seeds 424230 and 424311 (424230 has a death and a surrender in
-## its fight; it was 424310 until equipment physics, Phase 4 P1b, moved that fight); the
+## company, wounds and story; a memory sentence names a comrade who died by name, never by id;
+## the lethality ledger (tests/lib/lethality_kit.gd, Phase 5 C7) gives the same report twice
+## on the same seeds.
+## Seeded by design: campaign seeds 424202 and 424311 (424202 has a death and a surrender in
+## its fight; it was 424310 until equipment physics, Phase 4 P1b, then 424230 until the road's
+## bigger line-ups, Phase 5 C7, moved that fight); the
 ## extra routes on 424308 and 424316.
 ##   godot --headless --path . --script tests/run_campaign_tests.gd
 
@@ -15,7 +18,12 @@ const Campaign := preload("res://tests/lib/campaign_kit.gd")
 const Routes := preload("res://tests/lib/route_kit.gd")
 const Fixture := preload("res://tests/lib/company_fixture.gd")
 const World := preload("res://tests/lib/world_fixture.gd")
-const SEED := 424230
+const Lethality := preload("res://tests/lib/lethality_kit.gd")
+## The ledger's replay check: a few short campaigns, enough to fight and to finish fast.
+const LEDGER_SEED := 424200
+const LEDGER_CAMPAIGNS := 2
+const LEDGER_FIGHTS := 4
+const SEED := 424202
 const OTHER_SEED := 424311
 ## The extra routes' seeds (route_kit.gd; tools/audit/route_replay.sh plays 424308 too): the
 ## routes were built on these, and P5's AI wins the loss route's fight on SEED.
@@ -53,7 +61,22 @@ func run_checks() -> void:
 	for route: String in Routes.ROUTES:
 		_check_route(route)
 	_check_wipe_reads_ended()
+	_check_ledger_replays()
 	await process_frame
+
+
+## The lethality ledger reports the same on the same seeds, and its campaigns really fought.
+func _check_ledger_replays() -> void:
+	var first := Lethality.ledger(LEDGER_SEED, LEDGER_CAMPAIGNS, LEDGER_FIGHTS)
+	var again := Lethality.ledger(LEDGER_SEED, LEDGER_CAMPAIGNS, LEDGER_FIGHTS)
+	var total: Dictionary = first["total"]
+	check(
+		var_to_str(first) == var_to_str(again) and Merc.whole(total["fights"]) > 0,
+		(
+			"the lethality ledger gives the same report twice on seeds %d+%d (%d fights, %d deaths)"
+			% [LEDGER_SEED, LEDGER_CAMPAIGNS, total["fights"], total["deaths"]]
+		)
+	)
 
 
 ## A lost fight, a toll paid, a second fight and the campaign's end: each on one seed twice

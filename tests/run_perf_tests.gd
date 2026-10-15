@@ -7,12 +7,13 @@ extends "res://tests/lib/runner.gd"
 ## battle ends, the world reaches day 30, every campaign stage happens, the save reloads to
 ## the same save. Phase 5 C7 adds a fifth: the company's six against the road's sixteen
 ## rabble (data/encounters.json, the largest line-up the caps allow), FIGHTS seeds, held to
-## the 6v6 battle's own budget (no budget of its own: the bigger fight must fit the old one). The one clock check is a ceiling per workload: the larger of gate_factor
+## the 6v6 battle's own budget (no budget of its own: the bigger fight must fit the old one).
+## The one clock check is a ceiling per workload: the larger of gate_factor
 ## times the baseline and baseline plus slack_ms, read from tests/perf_baseline.json, so a
 ## slower machine does not fail it and only a large slowdown does. The clock never decides
 ## whether the sim is correct. PERF_WRITE=1 rewrites the baseline from this run (run it three
 ## times on a quiet machine and keep the highest numbers).
-## Seeded by design: battle seeds 424242 + n, world seed 424242, campaign seed 424230.
+## Seeded by design: battle seeds 424242 + n, world seed 424242, campaign seed 424202.
 ##   godot --headless --path . --script tests/run_perf_tests.gd
 
 const Campaign := preload("res://tests/lib/campaign_kit.gd")
@@ -24,7 +25,7 @@ const ABOUT := (
 )
 const BASELINE := "res://tests/perf_baseline.json"
 const SEED := 424242
-const CAMPAIGN_SEED := 424230
+const CAMPAIGN_SEED := 424202
 const SIDE := 6
 const GRID := Vector2i(10, 8)
 const FIGHTS := 25
@@ -111,7 +112,9 @@ func _battle_rabble() -> void:
 	for n: int in FIGHTS:
 		var rng := Rng.from_seed(SEED + n)
 		var wounds := Wiring.wounds(rng)
-		var units := wounds.units(EncounterBattle.company_cells(Wiring.scenario()), BattleUnit.COMPANY)
+		var units := wounds.units(
+			EncounterBattle.company_cells(Wiring.scenario()), BattleUnit.COMPANY
+		)
 		fielded = units.size()
 		var pending := {"enemies": enemies, "enemy_first": true}
 		var battle := EncounterBattle.build(pending, Wiring.scenario(), data, rng, units)
@@ -120,8 +123,10 @@ func _battle_rabble() -> void:
 	_record(RABBLE_NAME, started, events)
 	check(
 		fielded == SIDE and enemies.size() == RABBLE_SIZE,
-		"the rabble fight is %d v %d (the road's largest), got %d v %d"
-		% [SIDE, RABBLE_SIZE, fielded, enemies.size()]
+		(
+			"the rabble fight is %d v %d (the road's largest), got %d v %d"
+			% [SIDE, RABBLE_SIZE, fielded, enemies.size()]
+		)
 	)
 	check(
 		ended == FIGHTS,

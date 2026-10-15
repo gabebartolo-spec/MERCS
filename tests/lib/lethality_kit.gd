@@ -53,9 +53,20 @@ static func run(seed_value: int, fights_max: int = 0) -> Dictionary:
 	var played := Played.new(seed_value)
 	var rabble := _rabble_kinds()
 	var report := {
-		"seed": seed_value, "fights": 0, "won": 0, "enemies": 0, "rabble_fights": 0,
-		"deaths": 0, "downs": 0, "fielded": 0, "reserve": 0, "days": 0, "wiped": false,
-		"dead": {}, "down_by": {}, "fought_by": {}
+		"seed": seed_value,
+		"fights": 0,
+		"won": 0,
+		"enemies": 0,
+		"rabble_fights": 0,
+		"deaths": 0,
+		"downs": 0,
+		"fielded": 0,
+		"reserve": 0,
+		"days": 0,
+		"wiped": false,
+		"dead": {},
+		"down_by": {},
+		"fought_by": {}
 	}
 	var wanted := fights_max if fights_max > 0 else FIGHTS_MAX
 	var tries := 0

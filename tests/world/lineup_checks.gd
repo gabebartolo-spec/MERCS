@@ -108,12 +108,18 @@ func _check_sizes(caps: Dictionary) -> void:
 		)
 	)
 	_check.call(
-		Merc.whole(biggest["soldiers"]) == soldiers_cap and Merc.whole(biggest["rabble"]) == rabble_cap,
+		(
+			Merc.whole(biggest["soldiers"]) == soldiers_cap
+			and Merc.whole(biggest["rabble"]) == rabble_cap
+		),
 		"the road holds a line-up at each cap (largest %s)" % [biggest]
 	)
 
 
-## Each fighter is known to battle.json, on its own cell of the street, off the company's.
+## Each fighter is known to battle.json, on its own cell of the street, off the company's; and
+## every deployment starts in sight: each enemy within sight_cells of the nearest company cell,
+## each company cell within sight_cells of the nearest enemy, so no side waits on a foe it
+## cannot see (the stall the lead flagged: a fight where nobody moves).
 func _check_cells() -> void:
 	var scenarios: Array = World.json(SCENARIOS).get("scenarios", [])
 	var scenario: Dictionary = scenarios[0]
@@ -122,28 +128,34 @@ func _check_cells() -> void:
 	var company := {}
 	for cell: Variant in setup.get("road_cells", []):
 		company[_cell(cell)] = true
-	var road: Array = setup.get("road_cells", [])
-	var first := _cell(road.front())
 	var sight := Merc.whole(_rules().get("sight_cells", 0))
 	var wrong: Array[String] = []
 	for entry: Variant in types():
 		var record: Dictionary = entry
 		for lineup: Variant in lineups_of(str(record.get("type"))):
 			var seen := {}
+			var enemy_cells: Array[Vector2i] = []
 			for one: Variant in LineupPick.fighters_of(lineup):
 				var row: Dictionary = one
 				var at := _cell(row.get("cell", []))
 				var inside := Rect2i(Vector2i.ZERO, grid).has_point(at)
 				var known := _fighters.has(str(row.get("fighter", "")))
-				var near := BattleGrid.gap(at, first) <= sight
+				var near := _nearest(at, company.keys()) <= sight
+				enemy_cells.append(at)
 				if not known or not inside or not near or seen.has(at) or company.has(at):
 					wrong.append("%s %s %s" % [record.get("type"), row.get("fighter"), at])
 				seen[at] = true
+			for cell: Vector2i in company:
+				if _nearest(cell, enemy_cells) > sight:
+					wrong.append("%s company %s unseen" % [record.get("type"), cell])
 	_check.call(
 		wrong.is_empty(),
 		(
 			"every line-up's fighters are known, inside the street, one to a cell, off the "
-			+ "company's cells and within sight_cells of its first cell (wrong: %s)" % [wrong]
+			+ (
+				"company's cells, and both sides start within sight_cells of each other (wrong: %s)"
+				% [wrong]
+			)
 		)
 	)
 
@@ -174,11 +186,14 @@ func _check_place_and_day() -> void:
 	)
 	var early := LineupPick.allowed(ambush, ROAD, 0)
 	var late := LineupPick.allowed(ambush, ROAD, LATE_DAY)
-	_check.call(
-		late.size() > early.size() and _largest(late) > _largest(early),
-		(
-			"later days open bigger line-ups (road day 0: %d line-ups, up to %d; later: %d, up to %d)"
-			% [early.size(), _largest(early), late.size(), _largest(late)]
+	(
+		_check
+		. call(
+			late.size() > early.size() and _largest(late) > _largest(early),
+			(
+				"later days open bigger line-ups (road day 0: %d line-ups, up to %d; later: %d, up to %d)"
+				% [early.size(), _largest(early), late.size(), _largest(late)]
+			)
 		)
 	)
 
@@ -225,6 +240,15 @@ static func _same(listed: Array, met: Array) -> bool:
 		if _cell(a.get("cell")) != _cell(b.get("cell")):
 			return false
 	return true
+
+
+## The gap from `at` to the nearest of `cells` (a huge gap when there are none).
+static func _nearest(at: Vector2i, cells: Array) -> int:
+	var best := 1 << 30
+	for cell: Variant in cells:
+		var other: Vector2i = cell
+		best = mini(best, BattleGrid.gap(at, other))
+	return best
 
 
 static func _largest(lists: Array) -> int:

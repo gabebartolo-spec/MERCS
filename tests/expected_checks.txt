@@ -11,7 +11,7 @@ slice 16
 battle 64
 loop 8
 sim_world 28
-sim_encounters 11
+sim_encounters 19
 save 12
 effect 40
 overworld 14
@@ -27,12 +27,12 @@ wiring 19
 hub_fight 2
 story 60
 story_gui 17
-campaign 12
+campaign 13
 panels 15
 campaign_end 11
 ironman 14
 ironman_resume 24
 look 17
-perf 14
+perf 18
 battle_view 45
 impact 26
