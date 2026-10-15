@@ -19,7 +19,7 @@ const ENEMY_PAUSE_S := 0.45
 const HUD_MARGIN_PX := 12.0
 ## The gap in logical pixels between a fighter's head and the intent marker (a figure is
 ## the stage's sprite_height_px tall on screen wherever it stands), and the outline.
-const INTENT_GAP_PX := 8
+const INTENT_GAP_PX := 18
 const OUTLINE_PX := 6
 const NOWHERE := Vector2i(-1, -1)
 var battle: Battle = null
