@@ -210,7 +210,7 @@ func _check_contract_board() -> void:
 	economy.refresh_board(0, SITES, rng)
 	check(
 		_streams(rng) == ["contracts"],
-		"the board rolls only its own stream, \"contracts\", got %s" % [_streams(rng)]
+		'the board rolls only its own stream, "contracts", got %s' % [_streams(rng)]
 	)
 	economy.refresh_board(0, [], Rng.from_seed(SEED))
 	check(economy.board.is_empty(), "with no site to name there is no contract")
@@ -224,8 +224,7 @@ func _check_contracts_by_pressure() -> void:
 			_w(loud_a["fac_placeholder_a"]) > _w(loud_a["fac_placeholder_b"]) * 3
 			and _w(loud_b["fac_placeholder_b"]) > _w(loud_b["fac_placeholder_a"]) * 3
 		),
-		"the faction under more pressure posts most of the contracts: %s then %s"
-		% [loud_a, loud_b]
+		"the faction under more pressure posts most of the contracts: %s then %s" % [loud_a, loud_b]
 	)
 
 
@@ -308,7 +307,10 @@ func _check_loot() -> void:
 		seeds[entry] = true
 	check(seeds.size() > 1, "different seeds loot different things")
 	var none := _company().economy.take_loot("not_a_fight", Rng.from_seed(SEED))
-	check(_w(none["coin"]) == 0 and str(none["item"]) == "", "a fight the data does not list leaves nothing")
+	check(
+		_w(none["coin"]) == 0 and str(none["item"]) == "",
+		"a fight the data does not list leaves nothing"
+	)
 	var rng := Rng.from_seed(SEED)
 	_company().economy.take_loot("ambush", rng)
-	check(_streams(rng) == ["loot"], "loot rolls only its own stream, \"loot\"")
+	check(_streams(rng) == ["loot"], 'loot rolls only its own stream, "loot"')

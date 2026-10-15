@@ -247,20 +247,16 @@ func _check_older_save() -> void:
 	)
 	var odd_economy := {"purse": "lots", "inventory": ["wpn_nope", ITEM], "morale": 900}
 	var odd := Company.restore({"roster": [], "economy": odd_economy}, Fixture.defs())
-	var held := Company.restore(
-		{"roster": [{"id": "orc"}], "economy": odd_economy}, Fixture.defs()
-	)
+	var held := Company.restore({"roster": [{"id": "orc"}], "economy": odd_economy}, Fixture.defs())
 	check(
 		(
 			_is(held.economy.inventory, [ITEM])
 			and held.economy.morale == Merc.whole(Fixture.json(Fixture.ECONOMY)["morale"]["max"])
 			and held.economy.purse == fresh.purse
 		),
-		"odd economy values fall back: unknown gear dropped, morale held at the ceiling, purse as a new game"
+		"odd economy values fall back: unknown gear dropped, morale at the ceiling, new purse"
 	)
-	check(
-		odd.economy.purse == fresh.purse, "an economy beside an empty roster starts the new game"
-	)
+	check(odd.economy.purse == fresh.purse, "an economy beside an empty roster starts the new game")
 
 
 func _check_world_hooks() -> void:

@@ -7,7 +7,8 @@ extends RefCounted
 ## Nothing here rolls (no stream), so a company has no seed. No Node, no file access.
 ##
 ## defs, the data a company is made from: {"mercs": data/mercs.json, "fighters":
-## data/balance/battle.json "fighters", "company": data/balance/company.json}.
+## data/balance/battle.json "fighters", "company": data/balance/company.json}, and for the
+## economy (see Economy) "economy", "factions", "equipment" and "recruits" (all optional).
 
 var roster: Array[Merc] = []
 var captain_id := ""

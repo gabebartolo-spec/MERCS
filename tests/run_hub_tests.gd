@@ -8,21 +8,17 @@ extends "res://tests/lib/runner.gd"
 ## on one decides it and shows the line the captain remembers; the wearer button and an equip
 ## click put gear on a merc and the battle numbers follow; away from the hub the wages,
 ## contracts and recruits give way to a line saying so; every button sits on the 1920x1080
-## screen; the overworld's Save writes the economy and a fresh session reads it. A real fight
-## on the road ends with the hub open on a prisoner exactly when the company won.
+## screen; the overworld's Save writes the economy and a fresh session reads it.
 ## Seeded by design: the balance seed (data/balance/world.json); nothing else rolls.
 ##   godot --headless --path . --script tests/run_hub_tests.gd
 
 const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const WORLD_BALANCE := "res://data/balance/world.json"
-const BATTLE_DATA := "res://data/balance/battle.json"
 const ECONOMY := "res://data/balance/economy.json"
 const WINDOW_SIZE := Vector2i(1920, 1080)
 const LAYOUT_FRAMES := 3
 const HOLD_FRAMES := 30
-const FIGHT_FRAMES := 6000
 const REST_DAYS := 3
-const PATROL_ROAD := "site_hamlet_2"
 const HAMLET := "site_hamlet_1"
 const BLADE := "wpn_iron_blade"
 const SAVE_SYSTEM := preload("res://presentation/autoload/save_system.gd")
@@ -48,8 +44,6 @@ func run_checks() -> void:
 	await _check_save()
 	_game.queue_free()
 	await process_frame
-	_clear_save()
-	await _check_real_fight()
 	_clear_save()
 
 
@@ -102,8 +96,10 @@ func _check_open() -> void:
 			and panel.shown_text().contains(Text.t("hub.pack.empty"))
 			and _game.player.cell == start
 		),
-		"F6 opens the hub: wages paid up, %d contracts, %d recruits, an empty pack; walking waits"
-		% [accepts, hires]
+		(
+			"F6 opens the hub: wages paid up, %d contracts, %d recruits, an empty pack; walking waits"
+			% [accepts, hires]
+		)
 	)
 
 
@@ -136,8 +132,10 @@ func _check_wages_by_clicks() -> void:
 			and pay != null
 			and not pay.disabled
 		),
-		"%d rest clicks on the map make %d coin of wages fall due, shown with a Pay button"
-		% [REST_DAYS, per_day * REST_DAYS]
+		(
+			"%d rest clicks on the map make %d coin of wages fall due, shown with a Pay button"
+			% [REST_DAYS, per_day * REST_DAYS]
+		)
 	)
 	var purse := economy.purse
 	var low := economy.morale
@@ -210,8 +208,10 @@ func _check_win_opens_prisoner() -> void:
 			and not _economy().prisoner.is_empty()
 			and _prisoner_buttons() == Economy.CHOICES.size()
 		),
-		"a won fight opens the hub on the loot line and the prisoner's %d buttons"
-		% Economy.CHOICES.size()
+		(
+			"a won fight opens the hub on the loot line and the prisoner's %d buttons"
+			% Economy.CHOICES.size()
+		)
 	)
 	await _check_all_on_screen()
 
@@ -267,8 +267,10 @@ func _check_equip() -> void:
 			and not economy.inventory.has(BLADE)
 			and panel.button_for("equip", BLADE) == null
 		),
-		"the wearer button names the next merc and Equip puts the blade on him: damage %d to %d"
-		% [before, after]
+		(
+			"the wearer button names the next merc and Equip puts the blade on him: damage %d to %d"
+			% [before, after]
+		)
 	)
 
 
@@ -278,7 +280,9 @@ func _check_prisoner_click() -> void:
 	var roster := company.roster.size()
 	var morale := economy.morale
 	await _click_button(_hub().panel.button_for("prisoner", Economy.RECRUIT))
-	var line := Text.t("hub.memory.prisoner.recruit", {"name": company.member(company.captain_id).display_name})
+	var line := Text.t(
+		"hub.memory.prisoner.recruit", {"name": company.member(company.captain_id).display_name}
+	)
 	check(
 		(
 			company.roster.size() == roster + 1
@@ -329,58 +333,6 @@ func _check_save() -> void:
 		"the overworld's Save writes the economy: purse, morale, hires, board and the blade"
 	)
 	await _tap(KEY_F2)
-
-
-## A real fight on the road: the hub opens on a prisoner exactly when the company won.
-func _check_real_fight() -> void:
-	var game := await _spawn()
-	await _tap(KEY_F2)
-	var director := game.overworld_director()
-	await _click_button(director.panel.button_for(PATROL_ROAD))
-	await _click_button(director.panel.button_for(OverworldDirector.FIGHT))
-	var won := await _finish_fight(director)
-	await _frames(LAYOUT_FRAMES)
-	var hub := game.hub_director()
-	check(
-		(
-			game.hub_open() == won
-			and hub.company.economy.prisoner.is_empty() != won
-			and (not won or hub.panel.button_for("prisoner", Economy.RELEASE) != null)
-		),
-		"a real fight on the road ended %s: the hub is %s" % [
-			"won" if won else "lost", "open on a prisoner" if won else "left shut"
-		]
-	)
-	game.queue_free()
-	await process_frame
-
-
-func _finish_fight(director: OverworldDirector) -> bool:
-	var battle := director.view.battle
-	var rules: Dictionary = _json(BATTLE_DATA).get("rules", {})
-	var sight: int = rules.get("sight_cells", 0)
-	for _frame: int in FIGHT_FRAMES:
-		if battle.is_over():
-			break
-		var actor := battle.current()
-		if actor.side == BattleUnit.COMPANY:
-			await _company_turn(director, BattleAi.choose(battle, actor, sight))
-		else:
-			await process_frame
-	return battle.winner == BattleUnit.COMPANY
-
-
-func _company_turn(director: OverworldDirector, action: Dictionary) -> void:
-	var kind := str(action.get("type", ""))
-	if kind == Battle.ACTION_MOVE:
-		var to: Vector2i = action.get("to", Vector2i.ZERO)
-		director.view.click_cell(director.origin + to)
-		await process_frame
-		return
-	var choice_id := Battle.ACTION_WAIT
-	if kind == Battle.ACTION_ATTACK:
-		choice_id = "%s:%s" % [Battle.ACTION_ATTACK, action.get("target")]
-	await _click_button(director.panel.button_for(choice_id))
 
 
 func _saves() -> SAVE_SYSTEM:

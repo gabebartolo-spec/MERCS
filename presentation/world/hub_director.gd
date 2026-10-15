@@ -20,12 +20,13 @@ var _wearer := ""
 var _reaction := ""
 
 
-## Builds the hub for the shared company and world, hooked to the world's days and fights, hidden.
-## `game` is any node that will own it. An empty board is posted at once.
-static func attach(game: Node, shared: Company, sim: WorldSim, stream: Rng) -> HubDirector:
+## Builds the hub for the game's company and world (its overworld must exist), hooked to the
+## world's days and fights, hidden, owned by `game`. An empty board is posted at once.
+static func attach(game: SliceGame) -> HubDirector:
 	var hub := HubDirector.new()
 	game.add_child(hub)
-	hub.begin(shared, sim, stream)
+	var map := game.overworld_director()
+	hub.begin(game.company_director().company, map.world, map.rng)
 	return hub
 
 

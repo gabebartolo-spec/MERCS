@@ -211,7 +211,7 @@ func toggle_overworld() -> void:
 		_overworld.origin = Vector2i(int(origin[0]), int(origin[1]))
 		add_child(_overworld)
 		_overworld.begin()
-		_hub = HubDirector.attach(self, company_director().company, _overworld.world, _overworld.rng)
+		_hub = HubDirector.attach(self)
 		return
 	_overworld.set_open(not _overworld.is_open())
 

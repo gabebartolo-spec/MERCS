@@ -21,14 +21,18 @@ static func post(
 	var count := rng.roll(STREAM, _knob(rules, "board_min"), _knob(rules, "board_max"))
 	for i: int in count:
 		var wait := rng.roll(STREAM, _knob(rules, "deadline_min"), _knob(rules, "deadline_max"))
-		board.append(
-			{
-				"faction": _pick_faction(factions, rng),
-				"site": site_ids[rng.roll(STREAM, 0, site_ids.size() - 1)],
-				"reward": rng.roll(STREAM, _knob(rules, "reward_min"), _knob(rules, "reward_max")),
-				"deadline": day + wait,
-				"accepted": false,
-			}
+		(
+			board
+			. append(
+				{
+					"faction": _pick_faction(factions, rng),
+					"site": site_ids[rng.roll(STREAM, 0, site_ids.size() - 1)],
+					"reward":
+					rng.roll(STREAM, _knob(rules, "reward_min"), _knob(rules, "reward_max")),
+					"deadline": day + wait,
+					"accepted": false,
+				}
+			)
 		)
 	return board
 
