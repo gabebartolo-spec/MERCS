@@ -60,11 +60,13 @@ func at_the_hub() -> void:
 	await watch.settle("B: the hub", VIEW)
 	var hub := game.hub_director()
 	for choice: String in Economy.CHOICES:
+		if hub.panel.button_for("prisoner", choice) == null:
+			continue  # the recruit fate is not offered (Q-12, C8)
 		await _press(hub.panel.button_for("prisoner", choice))
 		await watch.settle("prisoner " + choice, DECISION)
 	await _press(hub.panel.button_for("pay", "wages"))
 	await watch.settle("pay wages", DECISION)
-	for prefix: String in ["hire_", "equip_", "accept_"]:
+	for prefix: String in ["hire_", "equip_", "talk_", "offer_", "back_"]:
 		await _press(_first(hub.panel, prefix))
 		await watch.settle(prefix, DECISION)
 	await _press(hub.panel.button_for("close", "hub"))
