@@ -182,9 +182,7 @@ func _check_conditions(game: SliceGame) -> void:
 	var help := _first_label(game)
 	var shown := help != null and help.visible
 	await _tap(KEY_H)
-	check(
-		shown and help != null and not help.visible, "the key help shows at start and H hides it"
-	)
+	check(shown and help != null and not help.visible, "the key help shows at start and H hides it")
 
 
 func _check_crowd_repeats(first: SliceGame) -> void:
