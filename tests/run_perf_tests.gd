@@ -5,12 +5,15 @@ extends "res://tests/lib/runner.gd"
 ## save and load of a mid-campaign state through JSON. Each prints "PERF <name>: <ms> ms
 ## (baseline <ms>, ceiling <ms>)". The checks that decide pass or fail are deterministic: the
 ## battle ends, the world reaches day 30, every campaign stage happens, the save reloads to
-## the same save. The one clock check is a ceiling per workload: the larger of gate_factor
+## the same save. Phase 5 C7 adds a fifth: the company's six against the road's sixteen
+## rabble (data/encounters.json, the largest line-up the caps allow), FIGHTS seeds, held to
+## the 6v6 battle's own budget (no budget of its own: the bigger fight must fit the old one).
+## The one clock check is a ceiling per workload: the larger of gate_factor
 ## times the baseline and baseline plus slack_ms, read from tests/perf_baseline.json, so a
 ## slower machine does not fail it and only a large slowdown does. The clock never decides
 ## whether the sim is correct. PERF_WRITE=1 rewrites the baseline from this run (run it three
 ## times on a quiet machine and keep the highest numbers).
-## Seeded by design: battle seeds 424242 + n, world seed 424242, campaign seed 424230.
+## Seeded by design: battle seeds 424242 + n, world seed 424242, campaign seed 424202.
 ##   godot --headless --path . --script tests/run_perf_tests.gd
 
 const Campaign := preload("res://tests/lib/campaign_kit.gd")
@@ -22,7 +25,7 @@ const ABOUT := (
 )
 const BASELINE := "res://tests/perf_baseline.json"
 const SEED := 424242
-const CAMPAIGN_SEED := 424230
+const CAMPAIGN_SEED := 424202
 const SIDE := 6
 const GRID := Vector2i(10, 8)
 const FIGHTS := 25
@@ -32,6 +35,13 @@ const MOVES_PER_DAY := 6
 const WORLD_RUNS := 5
 const CAMPAIGNS := 3
 const SAVE_ROUNDS := 20
+const Wiring := preload("res://tests/lib/wiring_kit.gd")
+const Lineups := preload("res://tests/world/lineup_checks.gd")
+const RABBLE_TYPE := "ambush"
+const RABBLE_NAME := "battle_6v16"
+const RABBLE_SIZE := 16
+## The budget a workload is held to, when not its own (C7: the 6v16 fight fits the 6v6's).
+const BUDGET_OF := {RABBLE_NAME: "battle"}
 const USEC_PER_MS := 1000.0
 
 var _baseline: Dictionary = {}
@@ -45,6 +55,7 @@ func suite_name() -> String:
 func run_checks() -> void:
 	_baseline = _load_baseline()
 	_battle()
+	_battle_rabble()
 	_world()
 	var saved := _campaign()
 	_save_load(saved)
@@ -81,6 +92,46 @@ func _battle() -> void:
 		"every 6v6 battle ends within %d actions (%d of %d)" % [MAX_ACTIONS, ended, FIGHTS]
 	)
 	check(events > 0, "the 6v6 battles logged events (%d)" % events)
+
+
+## The starting six, fielded as the road fields them, against the ambush's sixteen rabble
+## (the largest line-up in data/encounters.json), FIGHTS seeds, MercPlay on both sides.
+func _battle_rabble() -> void:
+	var rules := Fixture.rules()
+	var data := Wiring.json(Fixture.BATTLE)
+	var fighters: Dictionary = data.get("fighters", {})
+	var enemies: Array = []
+	for lineup: Variant in Lineups.lineups_of(RABBLE_TYPE):
+		var listed := LineupPick.fighters_of(lineup)
+		if Lineups.all_rabble(fighters, listed) and listed.size() > enemies.size():
+			enemies = listed
+	var ended := 0
+	var events := 0
+	var fielded := 0
+	var started := Time.get_ticks_usec()
+	for n: int in FIGHTS:
+		var rng := Rng.from_seed(SEED + n)
+		var wounds := Wiring.wounds(rng)
+		var units := wounds.units(
+			EncounterBattle.company_cells(Wiring.scenario()), BattleUnit.COMPANY
+		)
+		fielded = units.size()
+		var pending := {"enemies": enemies, "enemy_first": true}
+		var battle := EncounterBattle.build(pending, Wiring.scenario(), data, rng, units)
+		events += MercPlay.play_out(battle, rules, MAX_ACTIONS).size()
+		ended += 1 if battle.is_over() else 0
+	_record(RABBLE_NAME, started, events)
+	check(
+		fielded == SIDE and enemies.size() == RABBLE_SIZE,
+		(
+			"the rabble fight is %d v %d (the road's largest), got %d v %d"
+			% [SIDE, RABBLE_SIZE, fielded, enemies.size()]
+		)
+	)
+	check(
+		ended == FIGHTS,
+		"every 6v16 battle ends within %d actions (%d of %d)" % [MAX_ACTIONS, ended, FIGHTS]
+	)
 
 
 func _six_v_six(rules: Dictionary, seed_value: int) -> Battle:
@@ -158,7 +209,7 @@ func _gate(name: String) -> void:
 	var now: Dictionary = _measured[name]
 	var ms: float = now["ms"]
 	var scenarios: Dictionary = _baseline.get("scenarios", {})
-	var entry: Dictionary = scenarios.get(name, {})
+	var entry: Dictionary = scenarios.get(str(BUDGET_OF.get(name, name)), {})
 	var base: float = entry.get("ms", 0.0)
 	var factor: float = _baseline.get("gate_factor", 3.0)
 	var slack: float = _baseline.get("slack_ms", 250.0)
@@ -182,6 +233,8 @@ func _gate(name: String) -> void:
 func _write_baseline() -> void:
 	var scenarios := {}
 	for name: String in _measured:
+		if BUDGET_OF.has(name):
+			continue
 		var now: Dictionary = _measured[name]
 		var ms: float = now["ms"]
 		scenarios[name] = {"ms": snappedf(ms, 0.1), "work": now["work"]}
