@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Jobs",
+  "description": "data/jobs.json: the four kinds of job a contract can be (Phase 5 C1). type: the rule sim/world/jobs.gd judges it by (clear_bandits, escort, hold, hunt); words: its name, a key in data/text/en.json; party: the WorldParty type it puts on the map (data/balance/world.json 'parties', data/encounters.json 'type').",
+  "type": "object",
+  "required": ["jobs"],
+  "additionalProperties": false,
+  "properties": {
+    "jobs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "words", "party"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^job_[a-z0-9]+(_[a-z0-9]+)*$"},
+          "type": {"type": "string", "pattern": "^(clear_bandits|escort|hold|hunt)$"},
+          "words": {"type": "string", "pattern": "^hub[.]job[.][a-z_]+$"},
+          "party": {"type": "string", "pattern": "^[a-z]+(_[a-z]+)*$"}
+        }
+      }
+    }
+  }
+}

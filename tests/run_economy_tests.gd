@@ -14,11 +14,14 @@ const GoldenChecks := preload("res://tests/economy/golden_checks.gd")
 const TermsChecks := preload("res://tests/economy/terms_checks.gd")
 const TermsDealChecks := preload("res://tests/economy/terms_deal_checks.gd")
 const PayrollChecks := preload("res://tests/economy/payroll_checks.gd")
+const ArmouryChecks := preload("res://tests/economy/armoury_checks.gd")
 const SEED := 424242
 const OTHER_SEED := 7
 const WEEK := 7
 const BOARDS := 40
 const SITES: Array[String] = ["site_1", "site_2", "site_3"]
+## A won fight's result: two fallen watchmen and a bandit, the classes they carried (Phase 5 C6).
+const FALLEN := {"won": true, "fallen_gear": ["spear", "mail", "spear", "mail", "sword", "leather"]}
 
 
 func suite_name() -> String:
@@ -38,6 +41,7 @@ func run_checks() -> void:
 	TermsChecks.new().run(check)
 	TermsDealChecks.new().run(check)
 	PayrollChecks.new().run(check)
+	ArmouryChecks.new().run(check)
 	await process_frame
 
 
@@ -121,8 +125,14 @@ func _check_wages_fall_due() -> void:
 	_day(company, 2)
 	_day(company, 3)
 	check(
-		company.economy.owed == per_day * 3 and company.economy.unpaid_days == 3,
-		"three days unpaid owe three days of wages, owed %d" % company.economy.owed
+		(
+			company.economy.owed == (per_day + company.economy.armoury.upkeep(company.roster)) * 3
+			and company.economy.unpaid_days == 3
+		),
+		(
+			"three days unpaid owe three days of wages and armour upkeep, owed %d"
+			% company.economy.owed
+		)
 	)
 	company.add("recruit_1")
 	check(
@@ -220,8 +230,11 @@ func _check_contract_board() -> void:
 	var rng := Rng.from_seed(SEED)
 	economy.refresh_board(0, SITES, rng)
 	check(
-		_streams(rng) == ["contracts"],
-		'the board rolls only its own stream, "contracts", got %s' % [_streams(rng)]
+		_streams(rng) == ["contracts", "jobs"],
+		(
+			'the board rolls only its own streams, "contracts" and the job types on "jobs" (C1), got %s'
+			% [_streams(rng)]
+		)
 	)
 	economy.refresh_board(0, [], Rng.from_seed(SEED))
 	check(economy.board.is_empty(), "with no site to name there is no contract")
@@ -292,17 +305,14 @@ func _check_contract_lifecycle() -> void:
 
 func _check_loot() -> void:
 	var rules: Dictionary = Fixture.json(Fixture.ECONOMY)["loot"]["patrol"]
-	var items: Array[String] = []
-	for entry: Variant in Fixture.json(Fixture.EQUIPMENT)["equipment"]:
-		var def: Dictionary = entry
-		items.append(str(def["id"]))
+	var items := _worn_ids()
 	var seen: Array[String] = []
 	var bounded := true
 	var gear := 0
 	for seed_value: int in range(1, BOARDS):
 		var economy := _company().economy
 		var purse := economy.purse
-		var loot := economy.take_loot("patrol", Rng.from_seed(seed_value))
+		var loot := economy.take_loot("patrol", Rng.from_seed(seed_value), FALLEN)
 		seen.append(JSON.stringify(loot))
 		bounded = (
 			bounded
@@ -313,26 +323,36 @@ func _check_loot() -> void:
 			and economy.inventory.size() == (0 if loot["item"] == "" else 1)
 		)
 		gear += 0 if loot["item"] == "" else 1
-	check(bounded, "loot coin stays in the data's range and gear goes to the pack")
+	check(bounded, "loot coin stays in the data's range and worn gear goes to the pack")
 	check(gear > 0 and gear < BOARDS - 1, "some fights leave gear and some do not: %d" % gear)
 	_check_loot_determinism(seen)
 
 
+## The worn forms' ids in data/equipment.json: what loot can leave (Phase 5 C6).
+func _worn_ids() -> Array[String]:
+	var items: Array[String] = []
+	for entry: Variant in Fixture.json(Fixture.EQUIPMENT)["equipment"]:
+		var def: Dictionary = entry
+		if def.has("worn"):
+			items.append(str(def["worn"]["id"]))
+	return items
+
+
 func _check_loot_determinism(seen: Array[String]) -> void:
-	var again := _company().economy.take_loot("patrol", Rng.from_seed(SEED))
+	var again := _company().economy.take_loot("patrol", Rng.from_seed(SEED), {})
 	check(
-		_is(again, _company().economy.take_loot("patrol", Rng.from_seed(SEED))),
+		_is(again, _company().economy.take_loot("patrol", Rng.from_seed(SEED), {})),
 		"the same seed loots the same things"
 	)
 	var seeds := {}
 	for entry: String in seen:
 		seeds[entry] = true
 	check(seeds.size() > 1, "different seeds loot different things")
-	var none := _company().economy.take_loot("not_a_fight", Rng.from_seed(SEED))
+	var none := _company().economy.take_loot("not_a_fight", Rng.from_seed(SEED), {})
 	check(
 		_w(none["coin"]) == 0 and str(none["item"]) == "",
 		"a fight the data does not list leaves nothing"
 	)
 	var rng := Rng.from_seed(SEED)
-	_company().economy.take_loot("ambush", rng)
+	_company().economy.take_loot("ambush", rng, {})
 	check(_streams(rng) == ["loot"], 'loot rolls only its own stream, "loot"')

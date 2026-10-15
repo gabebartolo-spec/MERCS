@@ -50,6 +50,7 @@ var _rng: Rng = null
 var _encounters: Dictionary = {}
 var _party_knobs: Dictionary = {}
 var _lineups: Dictionary = {}
+var _job_knobs: Dictionary = {}
 
 
 ## world_data: data/balance/world.json, with "locations" set to data/locations.json's array
@@ -104,6 +105,13 @@ func rest() -> void:
 	log.append({"step": "rest", "day": day + 1})
 	_tick()
 	_pass_time(_units_per_day)
+
+
+## Puts a contract's job party on the map (Jobs.place, Phase 5 C1: near its site, or beside
+## the band for an escort's charge) on the Rng "jobs" stream. contract: the board record plus
+## "party" (its WorldParty type). The party's id, "" when no tile was free.
+func place_job(contract: Dictionary) -> String:
+	return Jobs.place(self, contract, _job_knobs, _rng)
 
 
 ## The party by id, or null.
@@ -298,6 +306,7 @@ func _lay_out(world_data: Dictionary, rng: Rng) -> void:
 	_units_per_day = maxi(1, _num(_dict(world_data, "march"), "units_per_day"))
 	_encounters = _dict(world_data, "encounters")
 	_party_knobs = _dict(world_data, "parties")
+	_job_knobs = _dict(world_data, "jobs")
 	sites = RegionGen.generate(_dict(world_data, "region"), rng)
 	_by_id.clear()
 	for entry: WorldSite in sites:

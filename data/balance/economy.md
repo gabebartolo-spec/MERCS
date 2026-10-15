@@ -24,15 +24,21 @@ One line per knob (docs/05_STYLE_CODE.md "Data"). Read by `sim/economy/` (Phase 
 
 ## loot (by the encounter's type, as in world.json "encounters")
 - `coin_min`, `coin_max`: coin looted from a won fight.
-- `item_chance`: percent chance of one generic item from `data/equipment.json`.
+- `item_chance`: percent chance of one piece of the gear the fallen enemies carried, in its worn form (`data/equipment.json` "worn"; Phase 5 C6, director Q-11). A fight whose fallen carried nothing with a worn form leaves coin only.
+
+## armoury (Phase 5 C6: armour is strong but costly, towns buy and sell; director Q-10; placeholder numbers)
+- `sell_pct`: percent of a piece's price (`data/equipment.json` "price", or its worn form's) a town pays for it.
+- `upkeep`: coin a day for each mercenary on the roster fighting in this armour class (`leather`, `mail`, `plate`: his gear line's armour, else the armour he wears), added to the day's bill with the wages.
 
 ## recruits
 - `offers`: how many unhired recruits the hub shows.
 - `cost`: coin to hire one.
 
 ## prisoner (the company's reaction to each choice)
-- `ransom_coin`: coin a ransom brings.
-- `release_morale`, `ransom_morale`, `execute_morale`, `recruit_morale`: morale change for each choice.
+- `ransom_coin`: coin a ransom brings for a prisoner whose fighter type `ransom_by_fighter` does not price (and for a Phase 2 prisoner with no type).
+- `release_morale`, `ransom_morale`, `execute_morale`: morale change for each choice. Three fates (director Q-12, "Not until you design it": no recruit fate in this pass; an old save's recruit line still loads).
+- `ransom_by_fighter`: coin a ransom brings, by the prisoner's fighter type (data/balance/battle.json `fighters`; Phase 5 C5). Placeholder numbers.
+- `reactions` (PLACEHOLDER, `reactions_placeholder`: the director designs the mercs, like the bargaining traits of Q-8): per fate, a strength per merc id (data/mercs.json). The living merc, not the captain, with the largest strength of either sign remembers the fate beside the captain; a tie goes to the lower id; with nobody listed only the captain remembers. The sign (approves +, objects -) is not yet worded.
 
 ## standing (Phase 5 C4: the name with each faction and the grudges; director Q-7, Q-13, Q-15, Q-16)
 - `start`: the company's name with a faction it has not yet dealt with.

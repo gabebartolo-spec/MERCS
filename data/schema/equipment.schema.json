@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Equipment",
-  "description": "Generic gear (D-066): weapons (wpn_), armour (arm_) and trinkets (trk_), for stats only. data/equipment.json. slot is the generic-gear slot it fills; bonus maps a merc stat to the number it adds. class (optional) is the battle class of a weapon (sword, axe, spear, mace, bow) or armour (leather, mail, plate), data/balance/battle.json rules.gear; it counts only when the merc's gear line names no class for that slot.",
+  "description": "Generic gear (D-066): weapons (wpn_), armour (arm_) and trinkets (trk_), for stats only. data/equipment.json. slot is the generic-gear slot it fills; bonus maps a merc stat to the number it adds. class (optional) is the battle class of a weapon (sword, axe, spear, mace, bow) or armour (leather, mail, plate), data/balance/battle.json rules.gear; it counts only when the merc's gear line names no class for that slot. price (optional, Phase 5 C6) is the coin a town asks for it new; worn (optional) is its battered form, looted from the fallen: its own id (ending _worn), name, bonus and price.",
   "type": "object",
   "required": ["equipment"],
   "additionalProperties": false,
@@ -28,8 +28,34 @@
               "initiative": {"type": "integer"},
               "presence": {"type": "integer"}
             }
+          },
+          "price": {"type": "integer", "minimum": 0},
+          "worn": {
+            "type": "object",
+            "required": ["id", "name", "bonus", "price"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {"type": "string", "pattern": "^(wpn|arm)_[a-z0-9]+(_[a-z0-9]+)*_worn$"},
+              "name": {"type": "string", "minLength": 1},
+              "bonus": {"$ref": "#/$defs/bonus"},
+              "price": {"type": "integer", "minimum": 0}
+            }
           }
         }
+      }
+    }
+  },
+  "$defs": {
+    "bonus": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hp": {"type": "integer"},
+        "attack": {"type": "integer"},
+        "defense": {"type": "integer"},
+        "damage": {"type": "integer"},
+        "initiative": {"type": "integer"},
+        "presence": {"type": "integer"}
       }
     }
   }

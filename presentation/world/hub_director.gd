@@ -2,7 +2,7 @@ class_name HubDirector
 extends Node
 ## The hub on screen (Phase 2 milestone 6): wages due and paid, the contract board, the
 ## placeholder recruits to inspect and hire, the pack of generic gear to put on a merc, and
-## after a won fight on the road the loot line and the prisoner's four choices. The Economy
+## after a won fight on the road the loot line and each prisoner's three fates. The Economy
 ## (held by the Company) and the WorldSim are the sim's and shared with the rest of the game;
 ## this registers two small hooks on the world (a day passes; a fight's result is applied),
 ## words what the sim decides (Text.t, data/text/en.json) and shows it in HubPanel. Wages,
@@ -16,6 +16,9 @@ var company: Company = null
 var world: WorldSim = null
 var rng: Rng = null
 var panel: HubPanel = null
+## The contracts' jobs on the map (Phase 5 C1): placed when a contract is taken, judged after
+## every day and every fight.
+var jobs: Jobs = null
 ## The overworld's autosave (OverworldDirector.autosave: writes only under Ironman), called after
 ## each committed action so a quit cannot give the decision back (D-087).
 var autosave := Callable()
@@ -44,6 +47,9 @@ func begin(shared: Company, sim: WorldSim, stream: Rng) -> void:
 	_wearer = company.captain_id
 	world.day_hook = _on_day
 	world.result_hook = _on_result
+	var found: Variant = OverworldDirector.world_data().get("jobs", {})
+	var knobs: Dictionary = found if found is Dictionary else {}
+	jobs = Jobs.make(world, company, knobs)
 	if company.economy.board.is_empty():
 		company.economy.refresh_board(world.day, _site_ids(), rng)
 	_layer = CanvasLayer.new()
@@ -73,20 +79,23 @@ func economy() -> Economy:
 
 
 func _on_day(day: int) -> void:
+	_judge().on_day(day)
 	company.economy.on_day(company.roster, day, _site_ids(), rng)
 	if is_open():
 		_show()
 
 
-## A fight's result was applied: a win leaves loot, and one prisoner when the enemy
-## surrendered men (EncounterBattle.result "prisoners"; a wipe or a rout leaves none: Phase 4
-## ruling Q-C), and opens the hub.
+## A fight's result was applied: a win leaves loot, and the men the enemy surrendered as
+## prisoners (EncounterBattle.result "prisoners"; a wipe or a rout leaves none: Phase 4 ruling
+## Q-C; Phase 5 C5), and opens the hub.
 func _on_result(kind: String, result: Dictionary) -> void:
+	_judge().on_result(result)
 	if result.get("won", false) != true:
 		return
-	company.economy.take_loot(kind, rng)
-	if not EncounterBattle.taken(result).is_empty():
-		company.economy.captives.take(world.day)
+	company.economy.take_loot(kind, rng, result)
+	var taken := EncounterBattle.taken(result)
+	if not taken.is_empty():
+		company.economy.captives.take(world.day, taken)
 	_reaction = ""
 	set_open(true)
 
@@ -97,7 +106,7 @@ func _on_action(action: String, id: String) -> void:
 		"pay":
 			economy.pay_wages()
 		"accept":
-			if economy.accept(id):
+			if jobs.take(id):
 				_remember_contract()
 		"inspect":
 			_inspected = id
@@ -128,12 +137,21 @@ func _remember_contract() -> void:
 	shared.on_choice(ids, Memory.KEY_CONTRACT, world.day)
 
 
+## The jobs, about to judge: a judged job leaves its sentence in the shared memory store.
+func _judge() -> Jobs:
+	jobs.memory = StoryDirector.memory_of(self)
+	return jobs
+
+
 func _decide(choice: String) -> void:
 	var economy := company.economy
+	var before := economy.chronicle.size()
 	if economy.decide_prisoner(company, choice, world.day):
-		var last := economy.chronicle[economy.chronicle.size() - 1]
-		var name := company.member(str(last.get("merc", ""))).display_name
-		_reaction = Text.t("hub.memory." + str(last.get("key", "")), {"name": name})
+		var lines: Array[String] = []
+		for line: Dictionary in economy.chronicle.slice(before):
+			var name := company.member(str(line.get("merc", ""))).display_name
+			lines.append(Text.t("hub.memory." + str(line.get("key", "")), {"name": name}))
+		_reaction = "\n".join(lines)
 
 
 func _next_wearer() -> void:
@@ -180,6 +198,7 @@ func _wages_rows() -> Array[Dictionary]:
 		"days": economy.unpaid_days,
 		"per_day": economy.wage_per_day(company.roster),
 		"count": company.roster.size(),
+		"upkeep": economy.armoury.upkeep(company.roster),
 	}
 	var rows: Array[Dictionary] = [_label(Text.t("hub.title", params))]
 	rows.append(_label(Text.t("hub.status", params)))
@@ -187,6 +206,8 @@ func _wages_rows() -> Array[Dictionary]:
 		rows.append(_label(Text.t("hub.wages.clear", params)))
 		return rows
 	rows.append(_label(Text.t("hub.wages.owed", params)))
+	if Merc.whole(params["upkeep"]) > 0:
+		rows.append(_label(Text.t("hub.armoury.upkeep", params)))
 	var can_pay := _at_hub() and economy.purse >= economy.owed
 	rows.append(_button("pay", "wages", Text.t("hub.pay", params), can_pay))
 	return rows
@@ -246,10 +267,7 @@ func _prisoner_rows() -> Array[Dictionary]:
 	rows.append(_label(Text.t("hub.prisoner.body")))
 	for choice: String in Economy.CHOICES:
 		var params := {"coin": economy.captives.ransom_coin()}
-		var open := (
-			choice != Economy.RECRUIT or economy.captives.can_recruit(company, economy.hired)
-		)
-		rows.append(_button("prisoner", choice, Text.t("hub.prisoner." + choice, params), open))
+		rows.append(_button("prisoner", choice, Text.t("hub.prisoner." + choice, params), true))
 	return rows
 
 

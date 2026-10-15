@@ -1,9 +1,10 @@
 extends RefCounted
 ## The economy suite's golden campaigns, run by tests/run_economy_tests.gd (Phase 5 C0): the
-## five whole-campaign routes (campaign_kit.gd's winning route, route_kit.gd's loss, toll,
-## second fight and wipe), each on two seeds, every roll on the one Rng of its seed. Each final
-## save, as JSON text, hashes to a pinned SHA-256: a change meant to keep behaviour (the split
-## of economy.gd into a facade and modules) must leave every hash as it is. A package that
+## six whole-campaign routes (campaign_kit.gd's winning route, route_kit.gd's loss, toll,
+## second fight, wipe and, since C1, job), each on two seeds, every roll on the one Rng of its
+## seed. Each final save, as JSON text, hashes to a pinned SHA-256: a change meant to keep
+## behaviour (the split of economy.gd into a facade and modules) must leave every hash
+## as it is. A package that
 ## changes the routes on purpose re-pins the hashes it moves in the same PR, with a one-line
 ## reason (docs/plans/phase5_contracts.md "Shared files"); one meant to be neutral for the old
 ## routes adds a route and leaves these alone.
@@ -19,23 +20,39 @@ const SEEDS := {
 	"toll": [424308, 424316],
 	"second_fight": [424308, 424316],
 	"wipe": [424308, 424316],
+	"job": [424308, 424316],
 }
 ## Pinned before the economy.gd split (claude/c0-economy-split); "route/seed" -> SHA-256 of the
 ## final save text.
 ## Re-pinned by Phase 4 P1b (equipment physics): gear moves the fights in win/424310,
 ## win/424311, loss/424316 and both second_fight routes; toll, wipe and loss/424308 hold.
 ## The win route keeps 424310/424311 (the campaign suite now plays 424230 for its stages).
+## Re-pinned by Phase 5 C1 (claude/c1-jobs): every posted contract now carries its job type
+## ("job", drawn on the new "jobs" stream after the board's own draws), so all ten saves gain
+## that key and a "jobs" stream position; with both stripped each hashes as P1b left it.
+## C1 also added the "job" route (route_kit.gd).
+## Re-pinned by Phase 5 C5 (claude/c5-prisoners): win/424310 only. Its fight leaves one
+## surrendered man, released at the hub; the release is now remembered by the merc who reacts
+## most strongly (merc_3, economy.json "prisoner" "reactions") beside the captain, so the save
+## gains that one chronicle line and memory. 6e3ccee3... -> a9086cba...; the rest hold.
+## Re-pinned by Phase 5 C6 (claude/c6-armoury): armour upkeep goes on the day's bill, so every
+## route where the plated orc or Vampyr is on the roster when a day ticks owes more (win, toll,
+## second_fight, job/424316); loot is drawn from the fallen's gear, so second_fight/424316's
+## first win (only the chief's mace fell: no piece) skips the pick and its second fight's loot
+## rolls move. loss and wipe (the orc and Vampyr are dead) and job/424308 (no day ticks) hold.
 const GOLDEN := {
-	"win/424310": "5c1f1811707028b16af9296272187b96927e53234d03250e091415676b457ad2",
-	"win/424311": "4e1668a71db586f77bb60b7b1ae16002ace987e3f4228cc07c6497f89ab0c5de",
-	"loss/424308": "bf24e8ad4f759ec41f11f782bb6fab625ffa194275174d76859d3e5c8d67687c",
-	"loss/424316": "cb5ab3c18517fa9cd91c9170ecab471529814502b0d13f6fe5fec926038d49a7",
-	"toll/424308": "07b3f8c3aee0d23d81887b9f460df4c10f060d63b96bb96472a0b1d9b24592ad",
-	"toll/424316": "6ebb4b56cf86829e401bae68b0fbdf364f02aa31168e3eaf25fe096f3fb0e9ad",
-	"second_fight/424308": "30aad0112527a441979eec18605dfd858d0565751148ee10ba152066f7d718ed",
-	"second_fight/424316": "db6c417a6547ab5c92f6c8021880277ccb91f08b860564957b467841bf9b277f",
-	"wipe/424308": "d8cca9bde2564397726057206f8f69099013637e2a0fe261c9d4550f44ed8bde",
-	"wipe/424316": "902fba124f6b0e7486a73fc9c7df605cf7253634e194be2a0b440aef16690f9a",
+	"win/424310": "764f232048becec9da60b5a7fae1853b3945d6306dbeb9aebd5cc96e55640f07",
+	"win/424311": "17afc3759f22468bd32a194872b128bee1b5d5754d23c2dc18f0fdb3761a867e",
+	"loss/424308": "78527d9fb2aeea09260487d334b9cf12c1a433219f7ff89de46564a9ed4daf1c",
+	"loss/424316": "ae1491173ccf7b35563033ab048932fe88b7f9e34b0a41d32b40520df5a03e9b",
+	"toll/424308": "6f97c63c31c7cdfb03baaa5448afd92670b8eff5ca12eddeff3aa2bdcb7a237a",
+	"toll/424316": "84a0597763a649f8d644d6499dfe34a8e5e5819a63ced8ff4db6ff5af0f5c32a",
+	"second_fight/424308": "103cd6e36d52f8077fc5dd802e9374d0130abef94290398d4d69467346cb1de7",
+	"second_fight/424316": "594df2ada0769fa67cf4f0e2bb5d46be6af7827b7812fd90a5f7b5c88b262d4e",
+	"wipe/424308": "c2a1651d45788bdf39496e475bd3408d4f021f5fd1c1167f75c7d4be8b8b3bcb",
+	"wipe/424316": "052a22183247a44ae3feb842e7d98f0dbb0d355a1dd08c7e4e99145b4e4bde9c",
+	"job/424308": "17748c59ae8ea3b7a71d4af78836d37084877417e699dfa05fcef4486130f2c1",
+	"job/424316": "5173a1b21a140efe63db148bc7f21ddb990b170587ea6f374c471a22d8dda873",
 }
 
 
@@ -57,7 +74,10 @@ func run(check: Callable) -> void:
 	)
 	check.call(
 		digests.size() == GOLDEN.size(),
-		"the ten golden saves are ten different campaigns, got %d" % digests.size()
+		(
+			"the %d golden saves are as many different campaigns, got %d"
+			% [GOLDEN.size(), digests.size()]
+		)
 	)
 
 

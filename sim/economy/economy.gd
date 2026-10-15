@@ -2,7 +2,7 @@ class_name Economy
 extends RefCounted
 ## The company's money and mood (Phase 2 milestone 6): a purse of coin, the wages that fall
 ## due every day and the morale that falls when they are not paid, the contract board, the
-## loot and the generic gear in the pack, the hub's placeholder recruits and the prisoner a
+## loot and the generic gear in the pack, the hub's placeholder recruits and the prisoners a
 ## won fight leaves. Held by the Company, so it rides in the company's save; nothing here
 ## reads a node, the clock or a file. What it rolls (contracts, loot) comes from the Rng it is
 ## handed, on named streams. Numbers are in data/balance/economy.json.
@@ -10,22 +10,23 @@ extends RefCounted
 ## This file is the facade every caller uses (Phase 5 C0, docs/plans/phase5_contracts.md); the
 ## parts each package grows live in modules:
 ## - ContractBook (contract_book.gd, `book`): the board, accept, complete, expire;
-## - Prisoners (prisoners.gd, `captives`): the waiting prisoner and the four choices;
+## - Prisoners (prisoners.gd, `captives`): the surrendered men waiting and the three fates (C5);
 ## - Terms (terms.gd, `terms`): the ask, the employer's reply, the step-in (C2).
 ## - Payroll (payroll.gd, `payroll`): each merc's daily wage by level, his share of a
 ##   contract's pay, and who is owed what (Phase 5 C3).
 ## - Standing (standing.gd, `standing`): the name with each faction and the grudges (C4).
+## - Armoury (armoury.gd, `armoury`): worn forms, prices, buying and selling, armour upkeep (C6).
 ## The facade keeps at most 14 public methods; a package prefers a module or a field read
 ## through state() over a new one.
 ##
 ## defs: {"economy": data/balance/economy.json, "factions": data/factions.json, "equipment":
-## data/equipment.json, "recruits": data/recruits.json, "traits": data/traits.json}. Missing
-## data reads as nothing: no coin, no wages, no board, no recruits, no gear, no bargaining.
+## data/equipment.json, "recruits": data/recruits.json, "traits": data/traits.json, "jobs":
+## data/jobs.json}. Missing data reads as nothing: no coin, no wages, no board, no recruits,
+## no gear, no bargaining, no jobs.
 
 const RELEASE := Prisoners.RELEASE
 const RANSOM := Prisoners.RANSOM
 const EXECUTE := Prisoners.EXECUTE
-const RECRUIT := Prisoners.RECRUIT
 const CHOICES: Array[String] = Prisoners.CHOICES
 
 var purse := 0
@@ -35,7 +36,7 @@ var unpaid_days := 0
 var morale := 0
 ## The contract board (contract(id), expire(day), faction_name(id) are read there).
 var book := ContractBook.new()
-## The prisoner a won fight leaves (take(day), ransom_coin(), can_recruit() are read there).
+## The prisoners a won fight leaves (take(day, ids), ransom_coin(), held are read there).
 var captives := Prisoners.new()
 ## Negotiation (negotiate(); reputation(id), odds(merc_id), judge() are read there).
 var terms := Terms.new()
@@ -43,13 +44,15 @@ var terms := Terms.new()
 var payroll := Payroll.new()
 ## The company's name with each faction and its grudges (reputation(faction) is read there).
 var standing := Standing.new()
+## Gear as coin (sell(), sale_price(), upkeep(roster), stock() are read there).
+var armoury := Armoury.new()
 ## The posted contracts: Contracts records plus "id" ("ctr_<n>"). Held by the book.
 var board: Array[Dictionary]:
 	get:
 		return book.board
 	set(value):
 		book.board = value
-## Generic gear ids in the pack, unequipped (one entry per piece).
+## Generic gear ids in the pack, unequipped (one entry per piece; a worn piece by its own id).
 var inventory: Array[String] = []
 ## Recruit ids ever hired, so a recruit who is later lost is never offered again.
 var hired: Array[String] = []
@@ -95,7 +98,10 @@ static func restore(saved: Dictionary, defs: Dictionary) -> Economy:
 		if economy._items.has(id):
 			economy.inventory.append(id)
 	economy.hired.append_array(_ids(saved, "hired"))
-	economy.prisoner = _whole_row(_dict(saved, "prisoner"))
+	var behind: Array[Dictionary] = []
+	for row: Dictionary in _rows(saved, "prisoners_behind"):
+		behind.append(_whole_row(row))
+	economy.captives.load_state(_whole_row(_dict(saved, "prisoner")), behind)
 	economy.last_loot = _whole_row(_dict(saved, "last_loot"))
 	for row: Dictionary in _rows(saved, "chronicle"):
 		economy.chronicle.append(_whole_row(row))
@@ -106,7 +112,8 @@ static func restore(saved: Dictionary, defs: Dictionary) -> Economy:
 ## The save. "dues" (who is owed what, Phase 5 C3) is written only while someone is owed, so
 ## a save with nobody owed reads as it did before C3.
 ## The economy as a save holds it; "standing" is left out until it has moved (an optional key,
-## so a game that never touched a name saves as before C4).
+## so a game that never touched a name saves as before C4). "prisoners_behind" (the men held
+## behind the waiting one, C5) is written only while there are any.
 func state() -> Dictionary:
 	var saved := {
 		"purse": purse,
@@ -126,6 +133,8 @@ func state() -> Dictionary:
 		saved["dues"] = payroll.dues.duplicate()
 	if not standing.is_new():
 		saved["standing"] = standing.state()
+	if captives.held.size() > 1:
+		saved["prisoners_behind"] = captives.behind().duplicate(true)
 	return saved
 
 
@@ -139,12 +148,13 @@ func wage_per_day(roster: Array[Merc]) -> int:
 	return payroll.wage_per_day(roster)
 
 
-## A day has passed. Each merc's wage falls due; wages (and any share) unpaid past the grace
+## A day has passed. Each merc's wage falls due, and the upkeep of the armour the roster fights
+## in (Armoury, owed with the wages); wages (and any share) unpaid past the grace
 ## cost morale; old contracts lapse; and a fresh board is posted when none stands or the last
 ## has aged out. site_ids: the places a contract may name; rng: the world's Rng ("contracts"
 ## stream).
 func on_day(roster: Array[Merc], day: int, site_ids: Array[String], rng: Rng) -> void:
-	owed += payroll.fall_due(roster)
+	owed += payroll.fall_due(roster) + armoury.upkeep(roster)
 	unpaid_days += 1
 	if unpaid_days > _rule("wages", "grace_days"):
 		morale = maxi(0, morale - _rule("wages", "morale_loss_per_day"))
@@ -217,18 +227,23 @@ func negotiate(company: Company, id: String, ask: Dictionary, rng: Rng) -> Dicti
 	return terms.negotiate(self, company, id, talk)
 
 
-## Loot from a won fight of this encounter type: coin to the purse, a piece of gear to the
-## pack. Rolled on the Rng "loot" stream. Returns {"coin", "item"}.
-func take_loot(kind: String, rng: Rng) -> Dictionary:
-	var ids: Array[String] = []
-	for id: Variant in _items:
-		ids.append(str(id))
-	last_loot = Loot.roll(_dict(_rules, "loot"), kind, ids, rng)
+## Loot from a won fight of this encounter type: coin to the purse, and maybe a worn piece of
+## the gear the fallen carried (result: EncounterBattle.result, its "fallen_gear") to the pack.
+## Rolled on the Rng "loot" stream. Returns {"coin", "item"}.
+func take_loot(kind: String, rng: Rng, result: Dictionary) -> Dictionary:
+	var pool := armoury.spoils(Loot.fallen_gear(result))
+	last_loot = Loot.roll(_dict(_rules, "loot"), kind, pool, rng)
 	purse += _num(last_loot, "coin", 0)
 	var item := str(last_loot.get("item", ""))
 	if item != "":
 		inventory.append(item)
 	return last_loot.duplicate()
+
+
+## Buys a piece the town sells into the pack, for its price (Armoury.buy; selling is
+## armoury.sell). False (and no change) when it is not sold or the purse falls short.
+func buy(item_id: String) -> bool:
+	return armoury.buy(self, item_id)
 
 
 ## The recruits on offer: unhired entries of data/recruits.json, in order, up to the offer count.
@@ -274,9 +289,9 @@ func equip(company: Company, merc_id: String, item_id: String) -> bool:
 	return true
 
 
-## Decides the waiting prisoner: release, ransom, execute or recruit (Prisoners.decide). False
-## (and the prisoner still waits) when none waits, the choice is unknown, or a recruit cannot
-## join.
+## Decides the waiting prisoner: release, ransom or execute (Prisoners.decide; the captain and
+## the merc who reacts most strongly remember it). False (and the prisoner still waits) when
+## none waits or the choice is not one of the three.
 func decide_prisoner(company: Company, choice: String, day: int) -> bool:
 	return captives.decide(self, company, choice, day)
 
@@ -295,8 +310,9 @@ func _read(defs: Dictionary) -> void:
 	_recruits = _rows(_dict(defs, "recruits"), "recruits")
 	for def: Dictionary in _rows(_dict(defs, "equipment"), "equipment"):
 		_items[str(def.get("id", ""))] = def
-	book.setup(_dict(_rules, "contracts"), factions)
-	captives.setup(_dict(_rules, "prisoner"), _recruits, _max_morale())
+	armoury.setup(_dict(_rules, "armoury"), _items)
+	book.setup(_dict(_rules, "contracts"), factions, _rows(_dict(defs, "jobs"), "jobs"))
+	captives.setup(_dict(_rules, "prisoner"), _max_morale())
 	payroll.setup(_dict(_rules, "wages"))
 	standing.setup(_dict(_rules, "standing"))
 	terms.setup(_dict(_rules, "terms"), factions, _rows(_dict(defs, "traits"), "traits"), standing)

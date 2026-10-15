@@ -1,0 +1,9 @@
+{
+  "_comment": "Phase 5 C1: the four kinds of job a contract can be (docs/plans/phase5_contracts.md C1, director Q-9). The board draws one per posted contract on the Rng 'jobs' stream (sim/economy/contract_book.gd); sim/world/jobs.gd places the party and judges done or failed. 'party' is the WorldParty type the job puts on the map (its walking numbers are in data/balance/world.json 'parties', its line-ups in data/encounters.json); 'words' is the job's name in data/text/en.json. Schema: data/schema/jobs.schema.json.",
+  "jobs": [
+    {"id": "job_clear_bandits", "type": "clear_bandits", "words": "hub.job.clear_bandits", "party": "camp"},
+    {"id": "job_escort", "type": "escort", "words": "hub.job.escort", "party": "charge"},
+    {"id": "job_hold", "type": "hold", "words": "hub.job.hold", "party": "raiders"},
+    {"id": "job_hunt", "type": "hunt", "words": "hub.job.hunt", "party": "quarry"}
+  ]
+}

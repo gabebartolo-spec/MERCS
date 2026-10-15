@@ -1,34 +1,34 @@
 # Checks each suite must run (tools/run_tests.sh). A suite reporting fewer fails the
 # run: checks went missing. Raise a floor in the PR that adds checks; floors only go
 # up (04_GUARDRAILS.md B6). A suite with no line here fails until one is added.
-data 139
+data 147
 smoke 30
 stage 43
 stage_scale 11
 stage_light 8
 assets 13
 slice 16
-battle 56
+battle 64
 loop 8
-sim_world 11
+sim_world 28
 sim_encounters 11
 save 12
-effect 38
+effect 40
 overworld 14
 road 8
 company 21
 inspect 10
 company_battle 5
-economy 78
-economy_company 62
+economy 92
+economy_company 70
 hub 12
 injury 29
 wiring 19
 hub_fight 2
 story 60
-story_gui 17
-campaign 11
-panels 13
+story_gui 18
+campaign 12
+panels 15
 campaign_end 11
 ironman 14
 ironman_resume 24

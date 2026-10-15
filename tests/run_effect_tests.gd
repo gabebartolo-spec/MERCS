@@ -42,10 +42,13 @@ const EXPECTED_IDS: Array[String] = [
 	"battle_kit",
 	"levels",
 	"battle_gear",
+	"battle_ranged",
 	"xp_from_fights",
 	"wages_share",
 	"contract_grudge",
 	"contract_terms",
+	"contract_jobs",
+	"armour_upkeep",
 ]
 
 
