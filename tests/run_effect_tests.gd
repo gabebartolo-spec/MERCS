@@ -27,6 +27,14 @@ const EXPECTED_IDS: Array[String] = [
 	"hub_prisoner",
 	"storylet_memory",
 	"campaign_end",
+	"captain_office",
+	"turn_order",
+	"battle_sight",
+	"intent_marker",
+	"temporary_injury",
+	"contracts_pressure",
+	"loot_gear",
+	"hiring",
 ]
 
 

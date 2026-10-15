@@ -205,3 +205,45 @@ Full run, checks per suite (floor in `tests/expected_checks.txt`; every suite at
 - A save edited by hand, half-written or corrupt beyond the two tampered controls above, other
   than what the save suite's defaults and refusal checks cover.
 - Linux or CI runners for the harness (run on the studio PC only; the suites run in CI).
+
+## 8. Gaps closed (PR `claude/p2-effect-fixtures`, tests and harness only)
+
+Gap 4, eight systems without an on/off fixture. Seven now have one in `tests/effect/`
+(`Effect tests: 27 checks, 0 failures`, floor 19 to 27); each prints `EFFECT <id>: <on> vs <off>`
+on a pinned seed. Each case was run and read before it was kept; `turn_order` first failed (the
+orc already opened, so on equalled off) and was fixed by setting the initiative on both sides.
+
+| System | Fixture | On | Off |
+|---|---|---|---|
+| Captain's office (M3) | `captain_office.gd` | orc leads: round 5, 0 of the band down | Vampyr leads: round 3, 1 of the band down |
+| Turn order (M4) | `turn_order.gd` | orc's initiative above the chief's: order orc,chief; orc strikes first; 19 turns | below: order chief,orc; chief first; 22 turns |
+| Intent (M4) | `intent_marker.gd` | company in sight: 4 plans, each `advance:merc_6` | sight cut to 1: 4 plans, all `hold` |
+| Battle AI sight, not psychic (M4) | `battle_sight.gd` | data sight: 28 actions, 5 enemy advances | blind past 1 cell: 74 actions, 0 enemy advances |
+| Temporary injury (M5) | `temporary_injury.gd` | next fight with 2 wounds on: band attack 9, enemy wins in round 6 | healed: attack 13, round 8 |
+| Contracts by pressure (M6) | `contracts_pressure.gd` | 30 boards, A 50, B 17 | pressures swapped: A 22, B 45 |
+| Loot and gear (M6) | `loot_gear.gd` | 10 won patrols, gear worn: merc_3 wins with 3 hp | gear left in the pack: merc_3 loses |
+| Hiring (M6) | `hiring.gd` | roster 7, purse 55, next offer recruit_2, recruit alone loses | roster 6, purse 80, next offer recruit_1 |
+
+**Experience bar and moves by level: NO visible effect (finding, no fixture faked).** Run on the
+real data: the orc, the Vampyr and merc_3 each at 0 xp and at 500 xp (level 5), same seed 424242,
+alone against the scenario's band: the identical fight, event for event (orc won with 13 hp in
+84 events, Vampyr lost in 44, merc_3 lost in 69). `Merc.stat` has no level term and every merc's
+`moves_by_level` in `data/mercs.json` puts all moves at level 1, so a level changes the F4 bar and
+nothing in a fight. The bar and the learn-by-level rule work (`run_company_tests.gd:207`), but the
+player gains no power or move from experience yet. This needs a design call (what a level gives);
+not made here.
+
+Gap 3, one scripted route. `tests/lib/route_kit.gd` adds four routes beside the campaign suite's
+winning one; the campaign suite (6 to 11 checks) plays each twice in process (same save, another
+seed differs, the stage really happened) and `tools/audit/route_replay.sh <out_dir>` plays each
+in two Godot processes, md5 compared. Run 2026-10-15, seed 424308 (other seed 424316):
+
+| Route | What happened | Process A md5 | Process B md5 | Seed 424316 |
+|---|---|---|---|---|
+| `loss` | two weakest mercs, ambush fought and lost, fell back, two rests, wages paid | `349a4805c4f68fb3ef98a82855a12b27` | same | `c66eace4...` (differs) |
+| `toll` | a patrol met, its toll paid in supplies, home | `1dba0ec982dafab5db58bee164260c69` | same | `d52477e5...` (differs) |
+| `second_fight` | an ambush won (loot, prisoner), a second ambush met and fought, home | `e35fd789c5ebf73d7ae88259dfe22930` | same | `19628cf2...` (differs) |
+| `wipe` | the last merc fights, is cut down, the campaign ends (`ended: true` in the save) | `deb6400adf94966184b9ab929bba687c` | same | `8d69d8c0...` (differs) |
+
+Still not covered by any whole-campaign replay: a hamlet or wild site visit, a level-up (no
+effect yet, see above), a contract completed or expired.
