@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Encounters",
+  "description": "data/encounters.json: the encounters the road can raise, one entry per type (Phase 2 M2). Each holds the possible enemy line-ups; fighter ids name entries in data/balance/battle.json \"fighters\". The numbers (chance, weights, toll, loot) are in data/balance/world.json \"encounters\".",
+  "type": "object",
+  "required": [
+    "encounters"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "encounters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "enemy_first",
+          "lineups"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^enc_[a-z0-9]+(_[a-z0-9]+)*$"
+          },
+          "type": {
+            "type": "string",
+            "pattern": "^[a-z]+(_[a-z]+)*$"
+          },
+          "enemy_first": {
+            "type": "boolean"
+          },
+          "lineups": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "fighter",
+                  "cell"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "fighter": {
+                    "type": "string",
+                    "pattern": "^[a-z]+(_[a-z]+)*$"
+                  },
+                  "cell": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

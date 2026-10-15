@@ -5,6 +5,8 @@ extends RefCounted
 ## version step by step, filling defaults for anything missing and refusing a version newer
 ## than this build knows. No disk access: writing and reading files is presentation's.
 
+## Version 1 grew the world's optional "encounter" key (Phase 2 M2: an encounter standing on
+## the road) without a bump: a save without it reads as no encounter, so nothing moves.
 const VERSION := 1
 ## The error codes from_dict() can leave in `error` (empty when ok).
 const ERROR_TOO_NEW := "save_version_too_new"

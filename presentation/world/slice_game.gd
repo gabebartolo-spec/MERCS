@@ -113,16 +113,25 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	var click := event as InputEventMouseButton
 	if click != null and click.pressed and click.button_index == MOUSE_BUTTON_LEFT:
-		if _overworld_open():
-			return
-		var cell := ground_cell_at(click.position)
-		if not cell.has(&"cell"):
-			return
-		var target: Vector2i = cell[&"cell"]
-		if _loop == null:
-			player.walk_to(target)
-		elif _loop.in_battle():
-			_loop.view.click_cell(target)
+		_on_ground_click(click.position)
+
+
+## A left click on the street: walk there, or a move in the battle on screen. Nothing while
+## the map is open, except in a fight on the road.
+func _on_ground_click(window_position: Vector2) -> void:
+	var fighting := _overworld != null and _overworld.in_fight()
+	if _overworld_open() and not fighting:
+		return
+	var cell := ground_cell_at(window_position)
+	if not cell.has(&"cell"):
+		return
+	var target: Vector2i = cell[&"cell"]
+	if fighting:
+		_overworld.view.click_cell(target)
+	elif _loop == null:
+		player.walk_to(target)
+	elif _loop.in_battle():
+		_loop.view.click_cell(target)
 
 
 ## The street cell under a window position, as {&"cell": Vector2i}, or {} off the ground.
@@ -195,6 +204,9 @@ func end_loop() -> void:
 func toggle_overworld() -> void:
 	if _overworld == null:
 		_overworld = OverworldDirector.new()
+		_overworld.street_stage = _stage
+		var origin := _data.floats("loop", "battle_origin_xz")
+		_overworld.origin = Vector2i(int(origin[0]), int(origin[1]))
 		add_child(_overworld)
 		_overworld.begin()
 		return
@@ -319,8 +331,9 @@ func _build_hud() -> void:
 ## Places every merc and the camera, and shows each merc's current facing.
 func _sync() -> void:
 	# From the fight on, the camera stays on the field and the street's walkers step aside.
-	var fighting := _loop != null and _loop.view != null
-	_stage.focus_on(_loop.view.centre() if fighting else _ground(player))
+	var arena := _arena()
+	var fighting := arena != null
+	_stage.focus_on(arena.centre() if fighting else _ground(player))
 	_stage.stand_at(_ground(player))
 	_stage.merc().visible = not fighting
 	_face(_stage.merc(), player, _clock)
@@ -329,6 +342,13 @@ func _sync() -> void:
 		_stage.move_extra(i, _ground(crowd[i]))
 		extras[i].visible = not fighting
 		_face(extras[i], crowd[i], _clock - CROWD_PHASE_S * (i + 1))
+
+
+## The battle on screen, from the loop example or from an encounter on the road, or null.
+func _arena() -> BattleView:
+	if _loop != null and _loop.view != null:
+		return _loop.view
+	return _overworld.view if _overworld != null else null
 
 
 ## Shows the frame a merc should have now: its facing, from walk while it moves and idle
