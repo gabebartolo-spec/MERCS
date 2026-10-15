@@ -5,8 +5,8 @@
                   are rejected; a binary minus as in x - 100 is not a sign); sim/core/rng.gd,
                   whose generator constants are the algorithm, is exempt. int, float, 0x hex, 0b binary, 1_000 and exponent forms; digits inside
                   identifiers such as Vector2i are not literals). An error once data/caps.json
-                  says "phase" >= STRICT_FROM_PHASE; a warning in Phases 0-2 and whenever
-                  caps.json is missing or unreadable (B9: warning in Phase 1-2, error from 3).
+                  says "phase" >= STRICT_FROM_PHASE; a warning in Phases 0-1 and whenever
+                  caps.json is missing or unreadable (B9: warning in Phase 1, error from 2).
   COLOUR-LITERAL  always an error, in ui/**/*.gd, ui/**/*.tscn and ui/**/*.tres except the
                   colour owner: Color( or Color8( or any Color.<member> (Color.RED,
                   Color.html(, Color.from_hsv(, ...) in code, and .gd string literals that are
@@ -31,7 +31,7 @@ from pathlib import Path
 from lintlib import (GdSource, Report, ends_operand, files_under, parse_args, prev_index, read_text, rel,
                      scan_gd)
 
-STRICT_FROM_PHASE = 3  # B9: MAGIC-NUMBER is a warning in Phase 1-2 and an error from Phase 3
+STRICT_FROM_PHASE = 2  # B9, amended for the breadth phase (D-064): an error from Phase 2
 ALLOWED_VALUES = frozenset({0.0, 1.0, -1.0, 100.0})  # B9: 0, 1, -1 and 100, sign included
 RNG_FILE = "sim/core/rng.gd"  # generator constants are the algorithm, not balance
 COLOUR_OWNER = "ui/uikit.gd"  # compared with the lowercased path minus underscores
