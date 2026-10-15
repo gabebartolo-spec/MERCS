@@ -13,6 +13,7 @@ const Fixture := preload("res://tests/lib/company_fixture.gd")
 const GoldenChecks := preload("res://tests/economy/golden_checks.gd")
 const TermsChecks := preload("res://tests/economy/terms_checks.gd")
 const TermsDealChecks := preload("res://tests/economy/terms_deal_checks.gd")
+const WalkoutChecks := preload("res://tests/economy/walkout_checks.gd")
 const PayrollChecks := preload("res://tests/economy/payroll_checks.gd")
 const ArmouryChecks := preload("res://tests/economy/armoury_checks.gd")
 const SEED := 424242
@@ -40,6 +41,7 @@ func run_checks() -> void:
 	GoldenChecks.new().run(check)
 	TermsChecks.new().run(check)
 	TermsDealChecks.new().run(check)
+	WalkoutChecks.new().run(check)
 	PayrollChecks.new().run(check)
 	ArmouryChecks.new().run(check)
 	await process_frame

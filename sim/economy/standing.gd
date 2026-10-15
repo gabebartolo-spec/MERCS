@@ -19,6 +19,9 @@ var names: Dictionary = {}
 ## last deal; broken: who broke each deal and where the job was (optional: a row saved before
 ## it reads its deals as broken by "captain", at no known site).
 var grudges: Dictionary = {}
+## Factions whose paymasters pay nothing up front: the company walked out on a job of theirs
+## and has not finished one for them since (director 2026-10-16, "Walk out, no more advances").
+var no_advance: Array[String] = []
 
 var _rules := {}
 
@@ -32,6 +35,13 @@ func setup(rules: Dictionary) -> void:
 func load_state(saved: Dictionary) -> void:
 	names = {}
 	grudges = {}
+	no_advance = []
+	var closed: Variant = saved.get("no_advance", [])
+	if closed is Array:
+		for faction: Variant in closed:
+			if str(faction) != "" and str(faction) not in no_advance:
+				no_advance.append(str(faction))
+		no_advance.sort()
 	var named: Variant = saved.get("names", {})
 	if named is Dictionary:
 		var rows_named: Dictionary = named
@@ -46,12 +56,15 @@ func load_state(saved: Dictionary) -> void:
 
 
 func state() -> Dictionary:
-	return {"names": names.duplicate(), "grudges": grudges.duplicate(true)}
+	var saved := {"names": names.duplicate(), "grudges": grudges.duplicate(true)}
+	if not no_advance.is_empty():
+		saved["no_advance"] = no_advance.duplicate()
+	return saved
 
 
 ## Whether nothing has moved since a new game (the save then leaves the key out).
 func is_new() -> bool:
-	return names.is_empty() and grudges.is_empty()
+	return names.is_empty() and grudges.is_empty() and no_advance.is_empty()
 
 
 ## The company's name with a faction (C2's employer reads it).
@@ -68,6 +81,7 @@ func grudge(faction_id: String) -> Dictionary:
 
 ## A contract for this faction was completed: the name mends.
 func completed(faction_id: String) -> void:
+	no_advance.erase(faction_id)
 	_move(faction_id, _rule("complete_mend"))
 
 
@@ -80,6 +94,12 @@ func failed(faction_id: String) -> void:
 ## The faction's employer walked from an ask pushed too far: the name dents (C2's terms).
 func walked(faction_id: String) -> void:
 	_move(faction_id, -_rule("walk_dent"))
+
+
+## Whether this faction's paymasters still pay up front (not while the company's last word
+## with them was walking out on a job).
+func pays_advance(faction_id: String) -> bool:
+	return faction_id not in no_advance
 
 
 ## Whether the advance taken on this contract row is sizeable: standing.sizeable_advance
@@ -96,6 +116,9 @@ func sizeable(row: Dictionary) -> bool:
 func abandoned(row: Dictionary, captain_id: String, day: int) -> bool:
 	var faction := str(row.get("faction", ""))
 	_move(faction, -_rule("abandon_dent"))
+	if faction != "" and faction not in no_advance:
+		no_advance.append(faction)
+		no_advance.sort()
 	if not sizeable(row):
 		return false
 	var grudge_row := _grudge_row(grudges.get(faction, {}))
