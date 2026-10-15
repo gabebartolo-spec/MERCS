@@ -62,7 +62,9 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
 - Retro Diffusion (director 2026-10-15): licence checked (ToS 2026-09-28: outputs ours,
   commercial ok; free-credit outputs go PUBLIC; they may train on outputs; we may not train on
   theirs). Director: "Small paid plan, private", SPEND YES US$10 prepaid balance (he tops it up
-  himself) - LOG IN NEXT BOARD PR as a D-entry. Confirm privacy switch before any generation.
+  himself) - LOG IN NEXT BOARD PR as a D-entry. DONE by him 2026-10-15: balance $10.00 (paid $11
+  incl. tax, account gabebartolo). Account page has NO output-privacy switch (cookies only): first
+  trial generation, check its gallery/public flag before any more.
   Joins the tile trial (Texel Studio vs RD vs Blender rig) after his look-target pick.
 - Mixels (D-035; director 2026-10-15 "eager to avoid mixels or fake pixels"): validator coder
   running (`../MERCS-wt/mixels`, claude/no-mixels: PIX-UPSCALED/ALPHA/PALETTE/AA over assets/ in
