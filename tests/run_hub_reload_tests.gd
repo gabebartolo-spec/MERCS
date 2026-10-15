@@ -41,7 +41,9 @@ func _driver() -> void:
 	var wrote := _child("write")
 	var wrote_out: String = wrote["out"]
 	var wrote_code: int = wrote["code"]
-	check(wrote_code == 0 and wrote_out.contains(EMPTY_MARK), "process 1 emptied the board and saved")
+	check(
+		wrote_code == 0 and wrote_out.contains(EMPTY_MARK), "process 1 emptied the board and saved"
+	)
 	check(_saves_exist(), "process 1 left a save on disk")
 	var read := _child("read")
 	var read_code: int = read["code"]
