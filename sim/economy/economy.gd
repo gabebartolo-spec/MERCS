@@ -220,7 +220,8 @@ func negotiate(company: Company, id: String, ask: Dictionary, rng: Rng) -> Dicti
 
 ## Loot from a won fight of this encounter type: coin to the purse, a piece of gear to the
 ## pack. Rolled on the Rng "loot" stream. Returns {"coin", "item"}.
-func take_loot(kind: String, rng: Rng) -> Dictionary:
+func take_loot(kind: String, rng: Rng, result: Dictionary = {}) -> Dictionary:
+	var _fallen := result
 	var ids: Array[String] = []
 	for id: Variant in _items:
 		ids.append(str(id))
