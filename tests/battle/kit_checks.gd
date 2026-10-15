@@ -4,7 +4,8 @@ extends RefCounted
 ## (battle.json "rules" "actions") stays within the actions cap in data/caps.json and names the
 ## five weapon classes; a fighter's kit is his weapon action then at most four catalogued
 ## techniques; only the kit (and move, attack, wait) is legal; the spear's action reaches two
-## cells, the others one, the bow's shot waits for P1c; a fight with the spear's action replays
+## cells, the others one, the bow shoots (its range and line: ranged_checks.gd, P1c); a fight
+## with the spear's action replays
 ## through FightRecord. Seeded by design: every roll comes from Rng.from_seed(SEED).
 
 const BATTLE_DATA := "res://data/balance/battle.json"
@@ -28,7 +29,7 @@ func run(check: Callable) -> void:
 	_check_kit_shape()
 	_check_kit_legality()
 	_check_reach()
-	_check_bow_waits()
+	_check_bow_shoots()
 	_check_enemy_bow_ends()
 	_check_weapon_replaces_attack()
 	_check_base_ids_do_not_crowd()
@@ -166,25 +167,24 @@ func _check_reach() -> void:
 	)
 
 
-func _check_bow_waits() -> void:
+func _check_bow_shoots() -> void:
 	var c := _unit("c", BattleUnit.COMPANY, Vector2i(1, 1), {"initiative": 3})
 	c.weapon_class = "bow"
 	var b := _unit("b", BattleUnit.ENEMY, Vector2i(2, 1), {"hp": SURE_HIT})
 	var battle := _battle([c, b])
-	var refused := battle.apply({"type": "bow", "target": "b"}).is_empty()
-	var log_before := battle.log.size()
 	var plain := battle.apply({"type": Battle.ACTION_ATTACK, "target": "b"}).is_empty()
+	var shot := not battle.apply({"type": "bow", "target": "b"}).is_empty()
 	_check.call(
-		battle.kit("c") == ["bow"] and refused and plain and battle.log.size() == log_before,
+		battle.kit("c") == ["bow"] and shot and plain,
 		(
-			"a bow's shot is in the kit but refused until its line of fire exists (P1c); "
+			"a bow's shot is in the kit and lands (P1c); "
 			+ "the plain blow is not open beside it (the weapon action replaces it)"
 		)
 	)
 
 
-## An enemy archer beside a merc: his shot is refused until P1c, so BattleAi.act waits in its
-## place (the battle view plays enemy turns through it) and the fight still runs to its end.
+## An enemy archer beside a merc: BattleAi.act plays his turns (a shot, or a wait in place of a
+## refused action; the battle view plays enemy turns through it) and the fight runs to its end.
 func _check_enemy_bow_ends() -> void:
 	var c := _unit("c", BattleUnit.COMPANY, Vector2i(1, 1), {"attack": SURE_HIT})
 	var b := _unit("b", BattleUnit.ENEMY, Vector2i(2, 1), {"initiative": 9})
@@ -202,7 +202,7 @@ func _check_enemy_bow_ends() -> void:
 			battle.apply({"type": battle.kit("c")[0], "target": "b"})
 	_check.call(
 		battle.is_over() and enemy_turns > 0 and not stuck,
-		"an enemy archer beside a merc waits in place of his refused shot; the fight still ends"
+		"an enemy archer beside a merc acts every turn; the fight still ends"
 	)
 
 

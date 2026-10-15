@@ -25,14 +25,19 @@ const ILLEGAL_EVERY := 7
 ## follow-ups: every line-up wears gear (armour soaks, shields, plate is slow, axes split
 ## shields; the chief now carries a mace) and the weapon action replaces the plain attack, so
 ## every fight moves on purpose. GEARLESS below proves gear moves numbers, never rolls.
+## Re-pinned by Phase 4 P1c (reach: the enemy strikes whatever its weapon reaches): seeds 1, 7,
+## 1337 and 31, the watch's fights, move because the watchmen's spears now strike from two
+## cells over a friend's shoulder; 424242, 90210 and 2026 (bandits, no spears) are unchanged.
+## Seed 9 added by P1c: the watch fight in which the orc's axe still splits a shield.
 const GOLDEN := {
-	1: "27b1856d92bcf510c9944a68fea785ae59693e8c6742395d3b9f90e19597ed24",
-	7: "0105597e7e6401adf60e7c300551a30b0ddfeb8495e72e44cc119180d712c56f",
-	1337: "b3c52e1c0ef44ef3c93cdefa8f7d25487f0820bc0a5da8077963acf607ba3671",
+	1: "0520476fe9c6c6672b753a5fbd891f27b0d71b3a9d6f5c6bc8c1d9568991a6fe",
+	7: "9210a2da2567c762a778735a4708c1e68fc6c4d9da8cbdc78012b11cbe1b4820",
+	1337: "152b652cd5dbbd6af5318ae5e7561ebf674f45cc7ef597a3f15289172c08e27d",
 	424242: "bf3230ebe0f05c1c125434487cc22361175371a00855f470d2d66a0fe74de4d7",
 	90210: "f27a6f66edc03844567d284ffc0f6913bc2766dc4a6d1f2ec15c8495d674168e",
 	2026: "f2cb429cb889c0d7abe14b9615f77a8df23049e6bfb4f68f6de85e3eee60f35e",
-	31: "5ad182d7120fcb7398d00848f21169381697c88b7bd587e06ca761e831cf7ad0",
+	31: "ae3c9cb57c2012d6d0e46fae3305a48ab114387d3421d8107d9c9d458e258cb7",
+	9: "0c4a82ab40ce7940f22631dc8ac99c7565e44803a84232e987efb000a0d58303",
 }
 ## The same seven fights with every fighter's "gear" taken away hash to main's pins from before
 ## equipment physics (Phase 4 P1b): gear changes numbers, never the rolls or their order.
@@ -80,14 +85,15 @@ func run(check: Callable) -> void:
 		"ambush",
 		"surrender",
 		"captain_fall",
-		BattleGear.EVENT_SHIELD_BROKEN
+		BattleGear.EVENT_SHIELD_BROKEN,
+		"spear"
 	]
 	var all_seen := covered.all(func(key: String) -> bool: return seen.has(key))
 	_check.call(
 		all_seen,
 		(
 			"the golden fights cover rout, wipe, both moves, hook, shaken, ambush, surrender, "
-			+ "captain's fall, a split shield"
+			+ "captain's fall, a split shield, a spear's blow"
 		)
 	)
 
