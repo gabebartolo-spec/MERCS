@@ -3,7 +3,7 @@ Start from this file, CLAUDE.md, your brief, and the Lead ("main") messages. Loa
 
 ## State: cast fix round 4 pushed on PR #118 (claude/art-cast-fix), awaiting a fresh critic. No jobs running.
 Round 4 (2026-10-16, critic `scratchpad/crit118_r3/CRITIC.md`, `tools/look/cast_r4/` + README): orc repainted inside
-the round-2 alpha (bulk back), skin_orc green-grey #2e3428 #485240 #6b7a68 #8d9b80 #b2bc9c (critic ramp, steps 2-3
+the round-2 alpha (bulk back), skin_orc green-grey #2e3428 #485240 #6e806f #8d9b80 #b2bc9c (critic ramp, steps 2-3
 lifted for the lead rule CIEDE2000 >= 12 and dE76 >= 15 vs every grass incl. verdure_mid_0; sheet uses steps 2-4),
 tusks bone 3; Vampyr own armour (slim spaulders, no fauld box), fanned cape, no eye rings; tokens = SE at half scale;
 average_m arm gaps SE/SW, E thigh planes; overworld golden lit grass flat verdure_2 (director to approve; re-render

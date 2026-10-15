@@ -2,12 +2,12 @@
   "_doc": "Core palette (06 section 2): ramps every biome shares.",
   "asset": "palette",
   "files": {
-    "core.gpl": "3d911fb5cc2b475abb8e505c243d2ea4ca62a0e9d9d38f60a9fe0b57f6eaaf2a",
-    "core.json": "107f21574c068646d11ac3587107aef9b2394ad049706fcfe196d48811043087",
-    "core_swatch.png": "30e904911c7f83d4536cfe43ac8be136e61440559abd4fa4202595cac4f0388b"
+    "core.gpl": "81aed32d3b9e9455681d1e935945d709cfafa8227196da8a73e384e8861906c6",
+    "core.json": "087863a03d5599f67128441420b730d49e7b4d352d88e6f11d6c9533abbe8053",
+    "core_swatch.png": "c2b73e7ebb442e9fca7fa7f6a9fce2b663ec3e74dd9f5bed1756e7ab988c7e7f"
   },
   "produced_by": {
-    "tools/look/make_palettes.py": "8f83894366cc624e"
+    "tools/look/make_palettes.py": "4b0d08d1d19d5816"
   },
   "models": [],
   "licence_rows": [

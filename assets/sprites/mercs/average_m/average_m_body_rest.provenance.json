@@ -2,7 +2,7 @@
   "_doc": "Provenance manifest (docs/10_LICENSING_REGISTER.md 'Provenance manifest'): covers the three files of this sheet. Rendered by the sprite pipeline from the CC0 MPFB base body; no generative model touched it.",
   "asset": "sprites/mercs/average_m/average_m_body_rest.json",
   "files": {
-    "average_m_body_rest.json": "ad7605136b6ab0e81f264caafa8fd00210d85bb927788dc0e18ae7faca7054d3",
+    "average_m_body_rest.json": "3d9c26cee3127cb97b0c15797780667b51a0336dabff0e62267b1d8dcafa8107",
     "average_m_body_rest.png": "118f2e297044ad9922e3ede058e872092ef7db3801a689443112c66964858c3b",
     "average_m_body_rest_normal.png": "afbafb558545076ed1eede46d888c527520ae644936a80f674007a6ea99e10af"
   },

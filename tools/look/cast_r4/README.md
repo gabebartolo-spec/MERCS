@@ -9,8 +9,8 @@ overwrite them. Reruns are byte-identical.
   pauldrons and boots are drawn on top and clipped to it. The head is kept from the render and laid back on
   top; its lit top takes skin step 4; tusks in bone 3, 2 px wide and 3 px tall. Plates take a 1-px iron 4
   edge where the key hits them. skin_orc is the critic's green-grey ramp with steps 2-3 lifted toward grey-blue
-  (lead rule: CIEDE2000 >= 12 and dE76 >= 15 against every grass colour, including verdure_mid_0); the sheet
-  uses steps 2-4 only (`de_table.py` prints the table).
+  (lead rule: CIEDE2000 >= 12 and dE76 >= 15 against every grass colour, including verdure_mid_0; the most-used
+  step 2 at CIEDE2000 >= 18 against the grass mass, verdure_mid_0 and verdure_2); the sheet uses steps 2-4 only (`de_table.py` prints the table).
 - Vampyr (`vamp_paint.py`): slim sloped spaulders, a narrow waist over two small tassets, collar closed in
   iron 0 by the face, a cape whose folds fan from the blades over an uneven hem; S/SE/NE/N and mirrors are
   clipped to the round-2 alpha grown by 1 px.
