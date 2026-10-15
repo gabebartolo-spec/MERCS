@@ -18,6 +18,8 @@
     "armour_classes": 3,
     "shields": 1,
     "bows": 1,
-    "jobs": 4
+    "jobs": 4,
+    "enemies_soldiers": 8,
+    "enemies_rabble": 16
   }
 }

@@ -45,7 +45,9 @@ static func start(defs: Dictionary) -> Company:
 
 ## The company a save held. A save with no company (older, or empty) starts the starting six
 ## with the orc as captain; ids the data no longer has are dropped; a captain who is not on
-## the roster is replaced by the starting captain, else the first merc.
+## the roster is replaced by the starting captain, else the first merc. Every living merc the
+## save holds is kept, even past the cap (a save from when the cap was twelve, Phase 5 C7):
+## the cap only gates new hires.
 static func restore(saved: Dictionary, defs: Dictionary) -> Company:
 	var held: Variant = saved.get("roster", [])
 	var rows: Array = held if held is Array else []
@@ -62,7 +64,7 @@ static func restore(saved: Dictionary, defs: Dictionary) -> Company:
 		if not row is Dictionary:
 			continue
 		var saved_merc: Dictionary = row
-		var merc := company._add(str(saved_merc.get("id", "")))
+		var merc := company._add(str(saved_merc.get("id", "")), false)
 		if merc != null:
 			merc.apply_state(saved_merc)
 	if company.roster.is_empty() and company.fallen.is_empty():
@@ -216,8 +218,9 @@ func _restore_office(saved: Dictionary, defs: Dictionary) -> void:
 	captain_out = saved.get("captain_out", false) == true and FieldCommand.can_sit_out(self)
 
 
-func _add(id: String) -> Merc:
-	if member(id) != null or id in fallen or roster.size() >= _cap:
+## capped: false only when a save is read back (restore), which keeps a roster past the cap.
+func _add(id: String, capped: bool = true) -> Merc:
+	if member(id) != null or id in fallen or (capped and roster.size() >= _cap):
 		return null
 	var merc := _make(id, _entries())
 	if merc == null:
