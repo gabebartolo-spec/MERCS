@@ -56,10 +56,27 @@ static func company_cells(scenario: Dictionary) -> Array[Vector2i]:
 	return cells
 
 
-## What WorldSim.resolve_encounter() takes: {"won": bool, "surrendered": bool}.
+## What WorldSim.resolve_encounter() takes: {"won": bool, "surrendered": bool, "prisoners":
+## [enemy ids taken by the company], "fled": [enemy ids who ran], "captured": [company ids taken
+## by the enemy]}. A surrender ends the fight with the enemy's men alive: they are the
+## prisoners the hub's decision is about (Phase 4, director ruling Q-C).
 static func result(battle: Battle) -> Dictionary:
 	var won := battle.is_over() and battle.winner == BattleUnit.COMPANY
-	return {"won": won, "surrendered": battle.surrendered == BattleUnit.ENEMY}
+	var by_company := battle.routed == BattleUnit.ENEMY
+	var taken := battle.surrendered == BattleUnit.COMPANY
+	return {
+		"won": won,
+		"surrendered": battle.surrendered == BattleUnit.ENEMY,
+		"prisoners": battle.prisoners.duplicate() if by_company else [],
+		"fled": battle.fled.duplicate() if by_company else [],
+		"captured": battle.prisoners.duplicate() if taken else []
+	}
+
+
+## The enemy's men the company took prisoner in a result() ([] when none or when absent).
+static func taken(result: Dictionary) -> Array:
+	var found: Variant = result.get("prisoners", [])
+	return found if found is Array else []
 
 
 static func _cell(value: Variant) -> Vector2i:

@@ -3,7 +3,7 @@ extends "res://tests/lib/effect_case.gd"
 ## company (orc, Vampyr, recruit) against the bandit chief and three bandits, both sides
 ## played by BattleAi, seed 424242: with the balance's rout lines the fight ends when one
 ## side's morale breaks, its fighters still standing; with the rout lines at 0 it runs until
-## one side has no one left up.
+## one side has no one left up (and no one breaks at his captain's fall: hold_resolve 0).
 
 const BATTLE_DATA := "res://data/balance/battle.json"
 const SEED := 424242
@@ -29,6 +29,7 @@ func run() -> Dictionary:
 	for side: Variant in sides:
 		var block: Dictionary = sides[side]
 		block["rout_below"] = 0
+	unbreakable["morale_captain_fall"] = {"hold_resolve": 0}
 	return {"on": _fight(data, rules), "off": _fight(data, unbreakable)}
 
 

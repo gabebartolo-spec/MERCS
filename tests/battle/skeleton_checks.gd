@@ -101,8 +101,9 @@ func _order_ids(battle: Battle) -> String:
 	return ",".join(ids)
 
 
-## e1 stands beside a sturdy and a hurt company fighter; e2 sees them from afar; e3 sees no
-## one. Company fighters act first; e1 acts, its plan is spent; the next round re-plans.
+## e1 stands beside a sturdy and a hurt company fighter (he saw cb wounded; rule 6: he goes by
+## the wound he saw, not the health number); e2 sees them from afar; e3 sees no one. Company
+## fighters act first; e1 acts, its plan is spent; the next round re-plans.
 func _check_intent() -> void:
 	var fast := {"initiative": 5, "hp": 10}
 	var fighters: Array[BattleUnit] = [
@@ -112,6 +113,7 @@ func _check_intent() -> void:
 		_unit("e2", BattleUnit.ENEMY, Vector2i(8, 6), {"initiative": 1}),
 		_unit("e3", BattleUnit.ENEMY, FAR_CELL, {"initiative": 1}),
 	]
+	fighters[1].wounded = true
 	var battle := _battle(fighters, WIDE)
 	var plans := "%s %s %s" % [_plan(battle, "e1"), _plan(battle, "e2"), _plan(battle, "e3")]
 	var planned := plans == "attack:cb advance:cb hold:" and battle.round_number == 1

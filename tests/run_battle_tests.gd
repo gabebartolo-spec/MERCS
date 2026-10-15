@@ -7,7 +7,10 @@ extends "res://tests/lib/runner.gd"
 ## leader); low morale routs a side with fighters still standing; the enemy waits when it
 ## sees no one. Phase 2 milestone 4's checks (facings, turn order, intent, loadout, the hit
 ## hook, blocking, shaken, the event log) live in tests/battle/skeleton_checks.gd; the
-## golden logs (several seeded fights hashed and pinned) in tests/battle/golden_checks.gd.
+## golden logs (several seeded fights hashed and pinned) in tests/battle/golden_checks.gd;
+## Phase 4's morale, captain's fall, rout and surrender in tests/battle/morale_checks.gd; the
+## enemy that is not psychic (rule 6) in tests/battle/ai_checks.gd; the
+## action kit (Phase 4 P1a: weapon action + learnt moves, reach, the cap) in kit_checks.gd.
 ## Seeded by design: every roll comes from Rng.from_seed with a fixed seed.
 ##   godot --headless --path . --script tests/run_battle_tests.gd
 
@@ -21,6 +24,9 @@ const SURE_HIT := 100
 const FAR := Vector2i(9, 7)
 const SkeletonChecks := preload("res://tests/battle/skeleton_checks.gd")
 const GoldenChecks := preload("res://tests/battle/golden_checks.gd")
+const MoraleChecks := preload("res://tests/battle/morale_checks.gd")
+const AiChecks := preload("res://tests/battle/ai_checks.gd")
+const KitChecks := preload("res://tests/battle/kit_checks.gd")
 
 
 func suite_name() -> String:
@@ -39,6 +45,9 @@ func run_checks() -> void:
 	_check_checks()
 	SkeletonChecks.new().run(check)
 	GoldenChecks.new().run(check)
+	MoraleChecks.new().run(check)
+	AiChecks.new().run(check)
+	KitChecks.new().run(check)
 	await process_frame
 
 
@@ -173,7 +182,7 @@ func _check_morale_and_surrender() -> void:
 
 
 ## A shaken band starts just above its rout line, so losing its leader breaks it while one
-## bandit still stands.
+## bandit still stands; with its leader down he surrenders (Phase 4 ruling Q-C).
 func _check_rout(rules: Dictionary, leader_loss: int) -> void:
 	var shaken := rules.duplicate(true)
 	var sides: Dictionary = rules.get("morale_sides", {})
@@ -194,16 +203,19 @@ func _check_rout(rules: Dictionary, leader_loss: int) -> void:
 	pair[1].is_leader = true
 	surrender.setup(shaken, {"size": GRID, "blocked": {}}, pair, Rng.from_seed(SEED))
 	var events := surrender.apply({"type": Battle.ACTION_ATTACK, "target": "b1"})
-	var routed := events.any(func(e: Dictionary) -> bool: return e.get("type") == Battle.EVENT_ROUT)
+	var gave_up := events.any(
+		func(e: Dictionary) -> bool: return e.get("type") == Battle.EVENT_SURRENDER
+	)
 	check(
 		(
-			routed
+			gave_up
 			and surrender.is_over()
 			and surrender.routed == BattleUnit.ENEMY
 			and surrender.surrendered == BattleUnit.ENEMY
+			and surrender.prisoners == ["b2"]
 			and not surrender.unit("b2").down
 		),
-		"a side whose morale falls below its rout_below routs with a fighter still standing"
+		"a side whose morale falls below its rout_below gives way with a fighter still standing"
 	)
 
 
