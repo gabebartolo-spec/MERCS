@@ -1,14 +1,14 @@
 extends "res://tests/lib/runner.gd"
 ## Overworld suite (Phase 2, the walkable overworld: OverworldDirector, OverworldMap, the
 ## SaveSystem autoload). Real input events reach the game through Input.parse_input_event,
-## never a handler call, with the root at 1920 x 1080. A real F2 leaves the street for the map:
+## never a handler call, with the root at 1920 x 1080. A real M leaves the street for the map:
 ## a marker per site, the band's token at the view's centre on the hub's gate, Rest and Save
 ## and no travel buttons; a held key does not walk the street's merc while it is open; a tap
 ## of S walks the band one tile and the map scrolls under it; a held S repeats, a tile at a
-## time; a click on Rest passes a day in place; F2 away from the gate keeps the map and says
+## time; a click on Rest passes a day in place; M away from the gate keeps the map and says
 ## where the street is; walking back into the hub's gate cuts to the street, where D walks the
-## merc again; F2 from the street shows the same run; a click on Save writes the save, which
-## reads back equal; a fresh session's first F2 continues it and Escape on the gate goes back
+## merc again; M from the street shows the same run; a click on Save writes the save, which
+## reads back equal; a fresh session's first M continues it and Escape on the gate goes back
 ## to the street. Seeded by design: the balance seed only (data/balance/world.json).
 ##   godot --headless --path . --script tests/run_overworld_tests.gd
 
@@ -61,10 +61,10 @@ func _spawn() -> SliceGame:
 
 
 func _check_open(game: SliceGame) -> void:
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	var director := game.overworld_director()
 	if director == null:
-		check(false, "F2 opens the overworld map (no director)")
+		check(false, "M opens the overworld map (no director)")
 		return
 	await _frames(LAYOUT_FRAMES)
 	var world := director.world
@@ -85,7 +85,7 @@ func _check_open(game: SliceGame) -> void:
 		),
 		(
 			(
-				"F2 opens the map on day 0, the band's token centred on the hub's gate, %d markers,"
+				"M opens the map on day 0, the band's token centred on the hub's gate, %d markers,"
 				+ " Rest and Save and no travel buttons"
 			)
 			% markers
@@ -163,11 +163,11 @@ func _check_rest(game: SliceGame) -> void:
 
 func _check_not_at_gate(game: SliceGame) -> void:
 	var director := game.overworld_director()
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	await _tap(KEY_ESCAPE)
 	check(
 		director.is_open() and director.panel.shown_body() == Text.t("world.panel.not_at_gate"),
-		"F2 and Escape away from the hub's gate keep the map and say the street is through the gate"
+		"M and Escape away from the hub's gate keep the map and say the street is through the gate"
 	)
 
 
@@ -198,11 +198,11 @@ func _check_gate_cuts_to_street(game: SliceGame) -> void:
 	)
 
 
-## F2 on the street shows the same run, the band on the gate, the day as it was.
+## M on the street shows the same run, the band on the gate, the day as it was.
 func _check_hidden_keeps_run(game: SliceGame) -> void:
 	var director := game.overworld_director()
 	var day := director.world.day
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	await _frames(LAYOUT_FRAMES)
 	check(
 		(
@@ -212,7 +212,7 @@ func _check_hidden_keeps_run(game: SliceGame) -> void:
 			and director.world.band == director.world.region.entrance(RegionGen.HUB_ID)
 			and _token_centred(director)
 		),
-		"F2 from the street shows the same run again: day %d, the band on the hub's gate" % day
+		"M from the street shows the same run again: day %d, the band on the hub's gate" % day
 	)
 
 
@@ -244,7 +244,7 @@ func _check_save_and_load(game: SliceGame) -> void:
 
 func _check_continue_from_save(game: SliceGame) -> void:
 	var model := _saves().load_game(OverworldDirector.world_data())
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	var director := game.overworld_director()
 	var continued := (
 		director != null
@@ -258,7 +258,7 @@ func _check_continue_from_save(game: SliceGame) -> void:
 		continued and hidden,
 		(
 			(
-				"a fresh session's first F2 continues the save (day %d) and Escape on the gate"
+				"a fresh session's first M continues the save (day %d) and Escape on the gate"
 				+ " goes back to the street"
 			)
 			% model.world.day

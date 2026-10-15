@@ -6,7 +6,7 @@ extends Node
 ## keeps Rest and Save. Opens on the save on disk when there is one (SaveSystem), so a closed
 ## game continues where it was; otherwise on a fresh region from the balance seed. One
 ## director lives for the session: walking into the hub's gate hides the map and the street
-## takes over; F2 on the street (toggle()) shows it again with the band where it was. A
+## takes over; M on the street (toggle()) shows it again with the band where it was. A
 ## party within a step of the band raises its encounter and the panel offers Fight (and,
 ## for a patrol, the toll): Fight hides the map and runs the existing street battle
 ## (BattleView) on the stage, then the result goes back through WorldSim.resolve_encounter()

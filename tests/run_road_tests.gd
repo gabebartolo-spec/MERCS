@@ -1,10 +1,10 @@
 extends "res://tests/lib/runner.gd"
 ## Road suite (Phase 2, encounters on the walkable overworld, on screen). Real input events
-## reach the game through Input.parse_input_event: F2 and Escape taps, walking-key taps, real
+## reach the game through Input.parse_input_event: M and Escape taps, walking-key taps, real
 ## mouse clicks on the panel's buttons, with the root at 1920 x 1080. Each case saves a world
 ## on the balance seed with the band three tiles out of the hub's gate and one party placed
-## near it, and the game's own first F2 loads it. Walking into a patrol raises it: the panel
-## words it with Fight and the toll, the band is stopped (keys, F2 and Escape change
+## near it, and the game's own first M loads it. Walking into a patrol raises it: the panel
+## words it with Fight and the toll, the band is stopped (keys, M and Escape change
 ## nothing); Fight hides the map and starts the street battle (the company acts first), and
 ## when it ends the fighters leave the street, the result is applied and the map returns with
 ## the outcome in words. Paying the toll skips the fight and the patrol leaves the map. An
@@ -70,7 +70,7 @@ func _saves() -> SAVE_SYSTEM:
 
 
 ## Saves a world on the balance seed, the band OUT tiles south of the hub's gate and one party
-## of `kind` `gap` tiles from it, then opens the game and its map (the first F2 loads it).
+## of `kind` `gap` tiles from it, then opens the game and its map (the first M loads it).
 func _game_with(kind: String, gap: int) -> SliceGame:
 	var data := World.data()
 	var world_block: Dictionary = data.get("world", {})
@@ -86,7 +86,7 @@ func _game_with(kind: String, gap: int) -> SliceGame:
 	var game: SliceGame = packed.instantiate() as SliceGame
 	root.add_child(game)
 	await process_frame
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	await _frames(LAYOUT_FRAMES)
 	return game
 
@@ -139,7 +139,7 @@ func _check_patrol_met(director: OverworldDirector) -> void:
 
 func _check_encounter_holds(director: OverworldDirector) -> void:
 	var band := director.world.band
-	for code: Key in [KEY_S, KEY_A, KEY_F2, KEY_ESCAPE]:
+	for code: Key in [KEY_S, KEY_A, KEY_M, KEY_ESCAPE]:
 		await _tap(code)
 	check(
 		(
@@ -148,12 +148,12 @@ func _check_encounter_holds(director: OverworldDirector) -> void:
 			and str(director.world.encounter.get("type")) == "patrol"
 			and director.panel.shown_body() == _expected_body(director)
 		),
-		"while the patrol stands, walking keys, F2 and Escape change nothing"
+		"while the patrol stands, walking keys, M and Escape change nothing"
 	)
 
 
 ## Fight hides the map on the street battle: the company's turn first, every fighter on the
-## street, and F2 cannot close the map under the fight.
+## street, and M cannot close the map under the fight.
 func _check_fight_starts(game: SliceGame, director: OverworldDirector) -> void:
 	var mercs_before := game.stage().extra_mercs.size()
 	var enemies: Array = director.world.encounter.get("enemies", [])
@@ -163,7 +163,7 @@ func _check_fight_starts(game: SliceGame, director: OverworldDirector) -> void:
 		check(false, "Fight starts the street battle (it did not start)")
 		return
 	var battle := director.view.battle
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	var on_street := game.stage().extra_mercs.size() - mercs_before
 	check(
 		(
@@ -174,7 +174,7 @@ func _check_fight_starts(game: SliceGame, director: OverworldDirector) -> void:
 			and director.is_open()
 		),
 		(
-			"Fight hides the map on the street battle: %d fighters, the company first, F2 cannot close it"
+			"Fight hides the map on the street battle: %d fighters, the company first, M cannot close it"
 			% battle.units.size()
 		)
 	)
@@ -305,7 +305,7 @@ func _check_avoid(director: OverworldDirector) -> void:
 	)
 
 
-## A save written with an encounter standing: the next session's first F2 reopens on it.
+## A save written with an encounter standing: the next session's first M reopens on it.
 func _check_saved_encounter() -> void:
 	var met := await _game_with("ambush", NEAR)
 	var director := met.overworld_director()
@@ -318,7 +318,7 @@ func _check_saved_encounter() -> void:
 	var fresh: SliceGame = packed.instantiate() as SliceGame
 	root.add_child(fresh)
 	await process_frame
-	await _tap(KEY_F2)
+	await _tap(KEY_M)
 	var reopened := fresh.overworld_director()
 	await _frames(LAYOUT_FRAMES)
 	check(
