@@ -91,6 +91,7 @@ static func make(game: SliceGame) -> OverworldDirector:
 func adopt(screen: CompanyDirector) -> void:
 	company = screen.company
 	wounds = screen.wounds
+	screen.autosave = autosave
 
 
 ## data/balance/world.json with the hand-made stamps: what WorldSim and SaveModel read.
@@ -209,6 +210,7 @@ func _step(direction: Vector2i) -> void:
 	if not world.encounter.is_empty():
 		_walking = false
 		_show("")
+		autosave()
 	elif world.at == RegionGen.HUB_ID:
 		set_open(false)
 	elif panel.shown_body() != _place_line():
