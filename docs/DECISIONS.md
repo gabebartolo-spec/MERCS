@@ -4,6 +4,56 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
+## 2026-10-15 · D-081 · Director · Agents talk tersely to one another
+Words: "you guys should use concise language when you speak to one another so that we use less context and tokens on messages"
+Why: Fewer tokens per message.
+Changes: Agent briefs and messages: short, one line where possible.
+
+## 2026-10-15 · D-080 · Director · Texel Studio trial for terrain tiles after the look-target pick: local Ollama, no diffusion step, licensing row first
+Words: Answer to the director's question on how to establish one consistent aesthetic ("how are we going to establish an aesthetic and stick to it with consistent style?"); trial follows his look-target pick.
+Why: Consistency from one target; no diffusion keeps D-002 and rule 1 intact.
+Changes: `docs/10_LICENSING_REGISTER.md` row CLEARED before any file enters `assets/` or `tools/`.
+
+## 2026-10-15 · D-079 · Director · Worktree forced removal is allowed for finished worktrees
+Words: Standing permission for Merge & CI and builders to `git worktree remove --force` a worktree whose PR merged.
+Why: Stops the permission refusals that left stale worktrees.
+Changes: Never for unmerged work.
+
+## 2026-10-15 · D-078 · Director · Overworld is walked manually at map scale; towns cut to street scale; parties are visible; regions are procedural with hand-made locations, events and towns
+Words: "i want to clarify a design goal, moving around the world should be done manually, not in a menu, our band will navigate an overworld just like pokemon, procedurally generated maps like battle brothers with bespoke hand crafted locations and events and towns". His answers: smaller map scale with a cut to street scale; visible parties.
+Why: The menu map (#75) proved structure; the vision is a walked world.
+Changes: Branch claude/p2-overworld-walk; `docs/08_ROADMAP.md` Phase 2 to be revisited by the Concept Lead.
+
+## 2026-10-15 · D-077 · Director · Letter keys replace every function key (M map, C company, L loop, H help)
+Words: "remove the F2 stuff, function buttons dont work on my keyboard / replace with alternatives"
+Why: His keyboard has no working function keys.
+Changes: #86; open branches bind through SliceKeys.
+
+## 2026-10-15 · D-076 · Director · 4K display rule: the game must fill a 4K TV and its text must be readable
+Words: "the game needs to display on a 4k tv, i cant read any of the text its too small"
+Why: Text was unreadable on his TV.
+Changes: #83: fullscreen, 2x stretch, 24 px base.
+
+## 2026-10-15 · D-075 · Director · Milestone 2 playtest passed
+Words: "milestone 2 playtest is a success. clearly limited by the lack of combat infrastructure but it works"
+Why: Combat depth comes from milestone 4 (#85).
+Changes: STATUS.md Phase 2 item 2 DONE (#80).
+
+## 2026-10-15 · D-074 · Director · Art resumes on the look target first
+Words: Director: "Keep Art paused", then "Yes, look target first" (answer to how to keep one aesthetic).
+Why: Style before cast art.
+Changes: Art row in STATUS.md; branch claude/art-look-target. Amends D-051/D-065 pause.
+
+## 2026-10-15 · D-073 · Director · Milestone 1 passed
+Words: "milestone 1 is played. its good"
+Why: Carry on to milestone 2.
+Changes: STATUS.md Phase 2 item 1 DONE (#75).
+
+## 2026-10-15 · D-072 · Director · Coder subagent cap raised from 2 to 4
+Words: "4 coders"
+Why: More parallel builders in Phase 2.
+Changes: Amends D-071 (Project Architect 3.0).
+
 ## 2026-10-14 · D-071 · Director · Project Architect 3.0 adopted as the team structure for Phase 2
 Why: coder subagents own edit/build/test loops, retriever subagents handle reads over 300 lines, a fixed short return contract, a scripted merge-eligibility check, restart from handoff at about 150k. Rejected: keep-warm, critic agent, per-tool hooks, memory-file sprawl, Haiku.
 Changes: `agent-briefs/DEV_LEAD_OPUS.md`, `agent-briefs/MERGE_CI_AGENT.md`.
