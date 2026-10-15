@@ -63,6 +63,8 @@ const TILE_NAMES := {
 	"S": "tile_shore",
 	"T": "tile_plain",
 }
+## The band's standard is planted beside its token, clear of the figure, slightly toward the camera.
+const BANNER_OFFSET_M := Vector3(1.7, 0.0, 0.3)
 const TURNABLE := "PFHW"
 const TOWN_TILE := Vector2i(8, 4)
 const TOWN_SCALE := 1.5
@@ -247,7 +249,7 @@ func _tile_centre(i: int, j: int, cols: int, rows: int) -> Vector3:
 
 func _banner(kit: Node3D, key: String, at: Vector3, holder: Node3D) -> void:
 	var pole := (kit.find_child(key, true, false) as Node3D).duplicate() as Node3D
-	pole.position = at + Vector3(0.75, 0.0, -0.2)
+	pole.position = at + BANNER_OFFSET_M
 	holder.add_child(pole)
 
 
@@ -286,7 +288,7 @@ func _token(path: String, at: Vector3, holder: Node3D) -> void:
 	mesh.material = m
 	blob.mesh = mesh
 	blob.scale = Vector3(1.0, 1.0, 0.6)
-	blob.position = at + Vector3(0.0, 0.04, 0.0)
+	blob.position = at + Vector3(0.0, 0.07, 0.0)
 	holder.add_child(blob)
 
 
