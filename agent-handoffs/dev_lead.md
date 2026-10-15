@@ -3,7 +3,7 @@ Start from this file, CLAUDE.md, `~/.claude/memory-shared/MEMORY.md`, the co-lea
 your brief (`agent-briefs/DEV_LEAD_OPUS.md`, Project Architect 3.0 since D-071) and
 `docs/08_ROADMAP.md` Phase 2 (lines 102-189). Run `git fetch`, `gh pr list`, `docs/STATUS.md`.
 
-## State: working (milestone 2 builder running; awaiting the director's milestone 1 play)
+## State: working (team at full width: M2 + M3 coders, Merge & CI tooling; awaiting the director's M1 play)
 
 ## Who does what
 This account has no Concept Lead: the session is lead AND Dev Lead under the original account's
@@ -30,33 +30,40 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
 ## Director today (2026-10-15)
 - "Start now" milestone 2 while he plays milestone 1.
 - "Keep Art paused".
+- "why do you only have 1 agent. get busy" -> run every slot (shared memory
+  run-the-team-at-full-width.md). D-071 cap: two coders live plus Merge & CI.
 - Pending from him: milestone 1 verdict (play F2: road, rest, save, reopen). Also at milestone
   2's review: confirm or reorder milestones 3 and 4.
 
-## Running
-- Builder on milestone 2 (encounters: ambush with enemy first, patrol with fight-or-toll; new Rng
-  stream "encounter"; pending encounter in the save with a default; fixtures: different road ->
-  different encounter, chance 0 vs on). Worktree `../MERCS-wt/p2-m2`, branch
-  claude/p2-m2-encounters. Its PR needs my mercs-sim-review (save shape) before merge, then a
-  build for the director.
+## Running (builder subagents of this session; they die with it)
+- M2 coder: encounters (ambush enemy-first, patrol fight-or-toll, Rng stream "encounter",
+  pending encounter saved with a default). `../MERCS-wt/p2-m2`, claude/p2-m2-encounters.
+- M3 coder: mercs.json (orc, Vampyr + four PLACEHOLDERS merc_3..6 for him to author), sim/merc
+  Company (roster, captain, xp), battle-unit helper, inspect screen on a new F-key, fixture orc
+  vs Vampyr. `../MERCS-wt/p2-m3`, claude/p2-m3-company. Overlap with M2: shared lists only.
+- Merge & CI: tools/merge_eligibility.sh + fixture self-test (D-071); also reports which
+  literals turn into errors at magic-number phase 2. `../MERCS-wt/slice-m1`,
+  claude/merge-eligibility.
+If this session died: none of them survive; respawn from the worktree state (each branch has
+its WIP only if it committed) with the same brief shape.
 
 ## Next for the lead
-1. (done: #76 merged.) 2. Review the milestone 2 PR (sim review on the save,
-   fixtures failing first, real taps), merge on green, fetch the build, ask him to play it.
-3. Record his milestone verdicts the same turn (board PR body + this file).
-4. Brief milestone 3 (six mercs in data, roster, captain, inspect screen) after his M2 verdict
-   and his 3/4 order call.
-5. Set `STRICT_FROM_PHASE = 2` in tools/lint/magic_numbers.py and caps phase 2 in a milestone
-   PR (Concept Lead recommendation in #74/#75).
+1. Review M2 and M3 PRs (mercs-sim-review on the save keys, fixtures failing first, real taps),
+   merge on green (merge_eligibility.sh once it lands), fetch the build, ask him to play.
+2. Record his milestone verdicts the same turn; ask him to author the four placeholder mercs
+   and to confirm or reorder milestones 3/4.
+3. After M2+M3 merge: flip STRICT_FROM_PHASE/caps phase to 2 and fix the listed literals.
+4. Then milestone 4 (battle skeleton) and 5 (wounds) as the next two coder slots.
+5. Handoff lives on remote branch claude/lead-handoff-1015 (updated via gh api while all
+   worktrees are busy); open a docs-only PR for it at session end.
 
 ## Suites (floors on main)
 data 96, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 13, slice 15, battle 14,
 loop 4, sim_world 9, save 7, effect 4, overworld 8.
 
-## Worktrees (3 / 4)
-`../MERCS-wt/slice-m1` (mine, branch claude/lead-handoff-1015, pushed, no PR yet: open a
-docs-only PR at session end), `../MERCS-wt/p2-m2` (milestone 2), `../MERCS-wt/art-publish`
-(Art, paused). Remove p2-m2 when its PR merges.
+## Worktrees (4 / 4)
+`../MERCS-wt/p2-m2` (M2), `../MERCS-wt/p2-m3` (M3), `../MERCS-wt/slice-m1` (Merge & CI,
+claude/merge-eligibility), `../MERCS-wt/art-publish` (Art, paused). Remove each when its PR merges.
 
 ## Co-lead playbook
 playbook: nothing new (2026-10-15; no worker findings yet).
