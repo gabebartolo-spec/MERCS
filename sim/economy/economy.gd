@@ -180,6 +180,14 @@ func pay_wages() -> bool:
 	return true
 
 
+## A dead merc's unpaid wages and share are forfeit: struck off the debt (director 2026-10-16).
+## With nothing left owed the run of unpaid days ends too.
+func forfeit_dues(merc_id: String) -> void:
+	owed = maxi(0, owed - payroll.forfeit(merc_id))
+	if owed <= 0:
+		unpaid_days = 0
+
+
 ## Posts a new board on `day`: the contracts already accepted stay, the rest are replaced.
 func refresh_board(day: int, site_ids: Array[String], rng: Rng) -> void:
 	book.refresh_board(day, site_ids, rng)

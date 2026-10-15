@@ -13,13 +13,13 @@ loop 8
 sim_world 43
 sim_encounters 19
 save 12
-effect 42
+effect 43
 overworld 16
 road 8
 company 23
 inspect 10
 company_battle 5
-economy 92
+economy 96
 economy_company 70
 hub 12
 injury 29
