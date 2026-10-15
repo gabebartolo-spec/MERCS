@@ -39,9 +39,17 @@ The parties walking the map (`sim/world/party_moves.gd`, on the Rng stream `part
 - `<type>.speed_pct`: its walking units per 100 of the band's (100: as fast as the band on the same ground).
 - `<type>.wander_tiles`: how far from its home tile it wanders while it does not see the band.
 - `<type>.return_days`: days a party is off the map after the band fought it or paid it; then it is back at its home tile.
+- Job parties (Phase 5 C1, `data/jobs.json` "party"): `camp` (clear bandits), `charge` (escort: the man the company walks with), `raiders` (hold: the fight that comes), `quarry` (hunt). They have no `count`: none walks the map until a contract's job puts it there (`sim/world/jobs.gd`), so the spawn draws nothing for them. Placeholder numbers.
 
 ## encounters
 Read by `sim/world/world_sim.gd`. A party within a step of the band raises its type's encounter; its line-up is rolled on the Rng stream `encounter`, never on `world`, so the map layout never shifts. The enemy line-ups per type are authored in `data/encounters.json`.
 - `ambush.win_supplies`, `patrol.win_supplies`: supplies looted when the company wins the fight.
 - `ambush.loss_supplies`, `patrol.loss_supplies`: supplies lost when the company loses or routs (floored at 0); it then falls back to the last site it stood at.
 - `patrol.toll_supplies`: supplies that buy a pass without a fight (offered only while the company has that many).
+
+## jobs
+Phase 5 C1, read by `sim/world/jobs.gd` (placement on the Rng stream `jobs`). Placeholder numbers until the director plays it.
+- `near_min_tiles`, `near_max_tiles`: a camp or a quarry is put this many steps (at least, at most) from its contract's site entrance.
+- `place_tries`: random tiles tried before a job's party is left off the map.
+- `hold_days`: days in a row the company must stand at the site of a hold before the fight comes.
+- `raid_min_tiles`, `raid_max_tiles`: how many steps from the site the raiders of a hold appear.

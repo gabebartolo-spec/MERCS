@@ -19,8 +19,9 @@ extends RefCounted
 ## through state() over a new one.
 ##
 ## defs: {"economy": data/balance/economy.json, "factions": data/factions.json, "equipment":
-## data/equipment.json, "recruits": data/recruits.json, "traits": data/traits.json}. Missing
-## data reads as nothing: no coin, no wages, no board, no recruits, no gear, no bargaining.
+## data/equipment.json, "recruits": data/recruits.json, "traits": data/traits.json, "jobs":
+## data/jobs.json}. Missing data reads as nothing: no coin, no wages, no board, no recruits,
+## no gear, no bargaining, no jobs.
 
 const RELEASE := Prisoners.RELEASE
 const RANSOM := Prisoners.RANSOM
@@ -295,7 +296,7 @@ func _read(defs: Dictionary) -> void:
 	_recruits = _rows(_dict(defs, "recruits"), "recruits")
 	for def: Dictionary in _rows(_dict(defs, "equipment"), "equipment"):
 		_items[str(def.get("id", ""))] = def
-	book.setup(_dict(_rules, "contracts"), factions)
+	book.setup(_dict(_rules, "contracts"), factions, _rows(_dict(defs, "jobs"), "jobs"))
 	captives.setup(_dict(_rules, "prisoner"), _recruits, _max_morale())
 	payroll.setup(_dict(_rules, "wages"))
 	standing.setup(_dict(_rules, "standing"))

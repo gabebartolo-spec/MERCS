@@ -25,6 +25,7 @@ Colours of the look-B palette.
 - `void`: what shows past the region's edge (a dark soot frame, not a terrain).
 - `band`: the band's token (the company's colour on the street's battle rings).
 - `ambush`, `patrol`: bandits' and a patrol's tokens, by encounter type.
+- `camp`, `raiders`, `quarry`, `charge`: a job's party (Phase 5 C1): the first three are bandits (the ambush's colour), an escort's charge walks with the band (the band's colour). Placeholders until the hub's look pass (C8).
 - `site`: a site's marker.
 - `ring`: the outline round the band.
 - `chase`: the chase ring round a party that has seen the band (heraldry white, a colour no token, marker or outline shares).

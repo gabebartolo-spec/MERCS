@@ -32,6 +32,41 @@
           { "fighter": "watchman", "cell": [9, 5] }
         ]
       ]
+    },
+    {
+      "id": "enc_camp",
+      "type": "camp",
+      "enemy_first": false,
+      "lineups": [
+        [
+          { "fighter": "bandit_chief", "cell": [5, 4] },
+          { "fighter": "bandit", "cell": [4, 2] },
+          { "fighter": "bandit", "cell": [4, 6] }
+        ]
+      ]
+    },
+    {
+      "id": "enc_raiders",
+      "type": "raiders",
+      "enemy_first": true,
+      "lineups": [
+        [
+          { "fighter": "bandit", "cell": [4, 2] },
+          { "fighter": "bandit", "cell": [4, 4] },
+          { "fighter": "bandit", "cell": [4, 6] }
+        ]
+      ]
+    },
+    {
+      "id": "enc_quarry",
+      "type": "quarry",
+      "enemy_first": false,
+      "lineups": [
+        [
+          { "fighter": "bandit_chief", "cell": [5, 4] },
+          { "fighter": "bandit", "cell": [4, 4] }
+        ]
+      ]
     }
   ]
 }

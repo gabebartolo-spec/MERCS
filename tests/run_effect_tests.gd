@@ -46,6 +46,7 @@ const EXPECTED_IDS: Array[String] = [
 	"wages_share",
 	"contract_grudge",
 	"contract_terms",
+	"contract_jobs",
 ]
 
 

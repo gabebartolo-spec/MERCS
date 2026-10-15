@@ -29,6 +29,7 @@ const ROUTE_STAGES := {
 	"toll": {"toll_paid": true, "ended": false},
 	"second_fight": {"second_fought": true, "ended": false},
 	"wipe": {"fought": true, "won": false, "ended": true},
+	"job": {"judged": true},
 }
 ## Any internal id (a lower-case word with an underscore) in a sentence a player reads.
 const ID_PATTERN := "\b[a-z]+_[a-z0-9_]+\b"
