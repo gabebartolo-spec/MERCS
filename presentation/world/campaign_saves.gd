@@ -5,7 +5,7 @@ extends RefCounted
 ## writes it by itself right after every decision the player commits: a fight's start and each
 ## action in it, the fight's end (its result, loot and prisoners applied), the toll, a rest day,
 ## a walked day and the hub's actions. During a fight the save is the fight's starting save with
-## the actions taken since (FightRecord), so a reload rebuilds the battle and replays it to the turn.
+## the actions since (FightRecord), so a reload rebuilds the battle and replays it to the turn.
 ## Writing only reads the run; nothing here draws from the Rng or decides anything.
 ##
 ## Save order (Ironman: a quit resumes the exact state): an autosave is the LAST thing a
