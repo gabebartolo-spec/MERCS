@@ -42,7 +42,8 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
 
 ## Running (builder subagents of this session; they die with it)
 - #81 M3 company MERGED (save v2, F4). #83 4K MERGED. #84 MERGED (gdlint is a required merge check).
-- M5 = PR #82 (sim review PASS): coder told to merge main after #84, then merge #82.
+- #82 M5 wounds MERGED (9ac9961; wounds block optional in save v2).
+- M7 storylet + memory (Sonnet): `../MERCS-wt/p2-m7`, claude/p2-m7-storylet (placeholder words).
 - M4 battle skeleton (Opus): `../MERCS-wt/slice-m1`, claude/p2-m4-battle.
 - Walkable overworld (Opus): `../MERCS-wt/p2-walk`, claude/p2-overworld-walk (told: slice_game.gd
   is at 400 lines, split before adding).
@@ -52,8 +53,8 @@ gdlint/gdformat locally: `python -m gdtoolkit.linter|formatter` (not on PATH).
 Wiring after merges: company -> encounters, M4 hit hook -> M5 injuries, a triage screen.
 
 ## Next for the lead
-0. Next free slot: the wiring task (company fights encounters, hits -> injuries, triage screen),
-   then M7 storylet + memory.
+0. Next free slot: the wiring task (company fights encounters, hits -> injuries, triage screen)
+   once M4 and the walkable overworld merge; then the Phase 2 evidence pack.
 1. Review M2 and M3 PRs (mercs-sim-review on the save keys, fixtures failing first, real taps),
    merge on green (merge_eligibility.sh once it lands), fetch the build, ask him to play.
 2. Record his milestone verdicts the same turn; ask him to author the four placeholder mercs
@@ -68,7 +69,7 @@ data 96, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 13, slice 15,
 loop 4, sim_world 9, save 7, effect 4, overworld 8.
 
 ## Worktrees (4 / 4)
-p2-m5 (#82), p2-m6 (M6), p2-walk (overworld), slice-m1 (M4). Director allowed forced removals of
+p2-m7 (M7), p2-m6 (M6), p2-walk (overworld), slice-m1 (M4). Director allowed forced removals of
 finished worktrees (2026-10-15). Art's worktree was removed while paused (branch
 claude/art-slice-cast pushed at 99b3fdf): on resume `git worktree add ../MERCS-wt/art-publish
 claude/art-slice-cast` and fix the path in art.md if needed.
