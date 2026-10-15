@@ -20,6 +20,7 @@ The loop sketch's fighters, by id. The orc and the Vampyr are the director's ref
 - `presence`: weight in social checks (talking the lookout down).
 - `ability_charge`: walks and attacks in one turn (the orc: pure aggression). `ability_blood_price`: may pay hp to power an attack (the Vampyr: health as energy).
 - `leader`: losing this fighter costs `morale_loss_leader_down`.
+- `watchman`, `watch_sergeant`: the road patrol's fighters (Phase 2 M2, data/encounters.json); the sergeant leads.
 - `recruit_placeholder`: the loop's recruit until the director designs the cast member offered there.
 
 ## gate
