@@ -25,6 +25,8 @@ var hunters: GrudgeParties = null
 ## The overworld's autosave (OverworldDirector.autosave: writes only under Ironman), called after
 ## each committed action so a quit cannot give the decision back (D-087).
 var autosave := Callable()
+## True while the overworld's triage stands: the hub stays shut until Continue (show_result).
+var waiting := Callable()
 
 var _layer: CanvasLayer = null
 var _inspected := ""
@@ -40,6 +42,8 @@ static func attach(game: SliceGame) -> HubDirector:
 	var map := game.overworld_director()
 	hub.begin(game.company_director().company, map.world, map.rng)
 	hub.autosave = map.autosave
+	map.after_fight = hub.show_result
+	hub.waiting = func() -> bool: return map.triage != ""
 	return hub
 
 
@@ -69,9 +73,9 @@ func is_open() -> bool:
 	return _layer != null and _layer.visible
 
 
-## Shows the hub (redrawn) or hides it; nothing is lost either way.
+## Shows the hub (redrawn) or hides it; nothing is lost either way. Not over a triage.
 func set_open(open: bool) -> void:
-	if _layer == null:
+	if _layer == null or (open and waiting.is_valid() and waiting.call()):
 		return
 	_layer.visible = open
 	if open:
@@ -92,7 +96,8 @@ func _on_day(day: int) -> void:
 
 ## A fight's result was applied: a win leaves loot, and the men the enemy surrendered as
 ## prisoners (EncounterBattle.result "prisoners"; a wipe or a rout leaves none: Phase 4 ruling
-## Q-C; Phase 5 C5), and opens the hub.
+## Q-C; Phase 5 C5). All of it now, before the fight's autosave; the hub opens on it once the
+## triage is read (show_result).
 func _on_result(kind: String, result: Dictionary) -> void:
 	_judge().on_result(result)
 	_hunt().on_result(result)
@@ -102,6 +107,10 @@ func _on_result(kind: String, result: Dictionary) -> void:
 	var taken := EncounterBattle.taken(result)
 	if not taken.is_empty():
 		company.economy.captives.take(world.day, taken)
+
+
+## Opens the hub on a won fight's loot and prisoners (the overworld's Continue after the triage).
+func show_result() -> void:
 	_reaction = ""
 	set_open(true)
 

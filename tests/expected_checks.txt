@@ -31,7 +31,7 @@ campaign 13
 panels 15
 campaign_end 11
 ironman 14
-ironman_resume 24
+ironman_resume 39
 look 17
 perf 18
 battle_view 45

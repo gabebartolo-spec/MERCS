@@ -1,0 +1,7 @@
+# RULE path:line for each planted error; pay_then_save, on_choice and _observed (a registered observer) pass.
+SAVE-LATE presentation/world/orders.gd:16
+SAVE-LATE presentation/world/orders.gd:49
+SAVE-LATE presentation/world/orders.gd:57
+SAVE-PARKED presentation/world/orders.gd:62
+SAVE-PARKED presentation/world/orders.gd:64
+SAVE-POLL presentation/world/orders.gd:69

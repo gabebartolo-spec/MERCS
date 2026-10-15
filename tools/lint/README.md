@@ -1,6 +1,6 @@
 # tools/lint: project lints
 
-Six lints that enforce guardrails a formatter cannot. Python 3.11+ standard library only,
+Eight lints that enforce guardrails a formatter cannot. Python 3.11+ standard library only,
 plus one bash script. Run them all with `bash tools/lint/run_all.sh` (pass/fail table, exit 1
 on any failure). Each Python lint takes `--root DIR` (default: this repo).
 
@@ -19,6 +19,7 @@ rules about strings.
 | `no_weights.py` | gate gap #14, docs/10 | `WEIGHT-FILE` `WEIGHT-PATH` `WEIGHT-GIT` |
 | `worktrees.sh` | C1 | `WT-OVER` (error), `WT-UNCOUNTED` `WT-PRUNABLE` (warnings) |
 | `function_limits.py` | 05 Typing and structure | `FUNC-LINES` (over 40 lines) `FUNC-COMPLEXITY` (over 12) |
+| `save_order.py` | D-087 Ironman (CampaignSaves "Save order") | `SAVE-LATE` `SAVE-PARKED` `SAVE-POLL` |
 
 Each lint's docstring (`worktrees.sh` header) is the full rule list. Decisions worth knowing:
 

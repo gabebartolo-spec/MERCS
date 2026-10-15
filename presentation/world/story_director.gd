@@ -138,6 +138,7 @@ func _link(overworld: OverworldDirector) -> void:
 	book.rng = overworld.rng
 	book.load_defs(_json(STORYLETS_DATA))
 	overworld.panel.chosen.connect(_on_overworld_choice)
+	overworld.before_save(_remember_decisions)
 	if not _resumed.is_empty() and not _open:
 		if _resumable(_resumed):
 			_show_offer(_resumed)
@@ -157,7 +158,8 @@ func _resumable(held: Dictionary) -> bool:
 
 
 ## The hub's decisions (the economy's chronicle lines, {"day", "merc", "key"}) become a memory
-## sentence on the merc who remembers them, once each.
+## sentence on the merc who remembers them, once each: every frame, and before every save
+## (OverworldDirector.before_save), so a save never holds a decision without them.
 func _remember_decisions() -> void:
 	if book == null or book.company == null:
 		return

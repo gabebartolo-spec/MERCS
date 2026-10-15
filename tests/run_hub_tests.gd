@@ -1,14 +1,13 @@
 extends "res://tests/lib/runner.gd"
-## Hub suite (Phase 2 milestone 6: HubDirector, HubPanel, B). Real input reaches the game
-## through Input.parse_input_event at 1920x1080: a real B opens the hub with wages, a contract
-## board, three recruits and the pack, and walking pauses; real rest clicks on the map make
-## wages fall due and a real click pays them; real clicks accept a contract, inspect and hire
-## a placeholder recruit (the F4 company shows the hire); a won fight (the world's result
-## applied) opens the hub on the loot line and three fates (Q-12); a real click on one decides
-## it and shows the captain's and the most moved merc's lines; the wearer button and an equip
-## click put gear on a merc and the battle numbers follow; away from the hub the wages,
-## contracts and recruits give way to a line saying so; every button sits on the 1920x1080
-## screen; the overworld's Save writes the economy and a fresh session reads it. Seeded: world.json.
+## Hub suite (Phase 2 M6: HubDirector, HubPanel, B). Real input (Input.parse_input_event): a real B
+## opens the hub with wages, a contract board, three recruits and the pack, and walking pauses; real
+## rest clicks on the map make wages fall due and a real click pays them; real clicks accept a
+## contract, inspect and hire a placeholder recruit (the F4 company shows the hire); a won fight
+## (result applied, hub shown) opens on the loot line and three fates (Q-12); a real click on one
+## decides it and shows the captain's and the most moved merc's lines; the wearer button and an
+## equip click put gear on a merc and the battle numbers follow; away from the hub the wages,
+## contracts and recruits give way to a line saying so; every button sits on the 1920x1080 screen;
+## the overworld's Save writes the economy and a fresh session reads it. Seeded: world.json.
 ##   godot --headless --path . --script tests/run_hub_tests.gd
 
 const InputKit := preload("res://tests/lib/input_kit.gd")
@@ -196,13 +195,14 @@ func _check_contract_and_hire() -> void:
 	_game.company_director().set_open(false)
 
 
-## The world applies a won fight with a surrender, as the overworld does: loot and a prisoner.
+## A won fight with a surrender applied as the overworld does; the hub shown as Continue shows it.
 func _check_win_opens_prisoner() -> void:
 	await _tap(KEY_ESCAPE)
 	var world := _hub().world
 	world.encounter = {"type": "patrol", "from": world.at, "to": world.at, "days_left": 0}
 	var purse := _economy().purse
 	world.resolve_encounter({"won": true, "surrendered": true, "prisoners": ["watchman_0"]})
+	_hub().show_result()
 	await _frames(LAYOUT_FRAMES)
 	var panel := _hub().panel
 	var loot := _economy().last_loot
