@@ -43,7 +43,9 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
 ## Running (builder subagents of this session; they die with it)
 - Merged today: #80 M2, #81 M3, #82 M5, #83 4K, #84 gdlint gate, #85 M4 battle, #86 letter keys
   (no F-keys: M map, C company, L loop, H help, G frame time; smoke fails on KEY_F).
-- Walkable overworld (Opus): p2-walk, claude/p2-overworld-walk. Told: SliceKeys, slice_game <=400.
+- #93 walkable overworld MERGED (tile region, locations.json, visible parties, M opens the map;
+  lead 4K capture OK; blocked step gives no feedback - small follow-up). Build downloading for his play.
+- #91 validate_pixels MERGED (PIX-* rules in project-lints).
 - #87 M6 hub/economy MERGED (hub on B; economy inside the company save block; review PASS).
 - #88 board MERGED (D-072..D-081, docs/brainstorms/2026-10-15-director-comments.md). Name board
   branches claude/board-after-<n> or merge_eligibility refuses them.
@@ -93,7 +95,7 @@ data 96, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 13, slice 15,
 loop 4, sim_world 9, save 7, effect 4, overworld 8.
 
 ## Worktrees (5 / 4, director allows forced removal of finished ones)
-p2-walk, slice-m1 (wiring #90), art-look, mixels (4/4). Remove each when its PR merges.
+slice-m1 (wiring #90), art-look (2/4). Remove each when its PR merges.
 
 ## Co-lead playbook
 playbook: nothing new (2026-10-15; no worker findings yet).
