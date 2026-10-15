@@ -120,6 +120,7 @@ func begin() -> void:
 	panel = LoopPanel.new()
 	_layer.add_child(panel)
 	panel.chosen.connect(_on_choice)
+	add_child(MapCover.make(panel, map))
 	_show(_place_line())
 
 
@@ -237,8 +238,25 @@ func _on_choice(choice_id: String) -> void:
 			world.rest()
 			_show(_place_line())
 		SAVE:
-			var saved := _saves().save_game(world, rng, company, wounds.state())
-			_show(Text.t("world.panel.saved" if saved else "world.panel.save_failed"))
+			save_run()
+
+
+## Writes the run to the save on disk and says so. Refused, with nothing written, while a
+## fight is on or its triage stands: a fight lives only on screen (a save then would hold the
+## world after the blow-by-blow it cannot replay), so the save waits for Continue. The fight's
+## own panel is not touched (its buttons are the player's turn); the triage panel keeps its
+## Continue and gains the line that says why. True when written.
+func save_run() -> bool:
+	if in_fight():
+		return false
+	if _triage != "":
+		var choices: Array[Dictionary] = [{"id": CONTINUE, "label": Text.t("wiring.continue")}]
+		var body := Text.t("world.panel.save_busy") + "\n" + _triage
+		panel.present(Text.t("wiring.panel.title"), body, choices)
+		return false
+	var saved := _saves().save_game(world, rng, company, wounds.state())
+	_show(Text.t("world.panel.saved" if saved else "world.panel.save_failed"))
+	return saved
 
 
 ## Hides the map over the street and starts the battle the standing encounter leads into.

@@ -162,13 +162,25 @@ func _on_screen_key(code: Key) -> void:
 	elif action == &"map":
 		toggle_overworld()
 	elif action == &"company":
-		company_director().set_open(not company_open())
+		_toggle_company()
 	elif action == &"hub":
-		hub_director().set_open(not hub_open())
+		_toggle_hub()
 	elif action == SliceKeys.CLOSE and (company_open() or hub_open()):
 		(_company_director if company_open() else _hub).set_open(false)
 	elif action == SliceKeys.CLOSE and _overworld_open():
 		toggle_overworld()
+
+
+func _toggle_company() -> void:
+	if _hub != null and not company_open():
+		_hub.set_open(false)
+	company_director().set_open(not company_open())
+
+
+func _toggle_hub() -> void:
+	if _company_director != null and not hub_open():
+		_company_director.set_open(false)
+	hub_director().set_open(not hub_open())
 
 
 func start_loop() -> void:

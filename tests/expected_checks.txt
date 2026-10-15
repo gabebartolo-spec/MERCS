@@ -27,4 +27,6 @@ wiring 15
 hub_fight 1
 story 60
 story_gui 17
+campaign 6
+panels 8
 campaign_end 11

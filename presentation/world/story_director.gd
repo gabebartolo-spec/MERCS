@@ -240,8 +240,7 @@ func _names(cast: Dictionary) -> Dictionary:
 
 
 func _name(merc_id: String) -> String:
-	var merc := book.company.member(merc_id)
-	return merc.display_name if merc != null else merc_id
+	return book.company.name_of(merc_id)
 
 
 static func _json(path: String) -> Dictionary:

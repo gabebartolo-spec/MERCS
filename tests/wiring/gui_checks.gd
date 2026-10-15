@@ -75,6 +75,10 @@ func _continue_and_save(game: SliceGame, director: OverworldDirector) -> void:
 		),
 		"Continue returns to the map with its choices"
 	)
+	# A won fight opens the hub over the map; its panel covers Save, so the hub is shut first.
+	if game.hub_open():
+		await _tap(KEY_B)
+		await _frames(LAYOUT_FRAMES)
 	await _click_button(director.panel.button_for(OverworldDirector.SAVE))
 	await _check_company_screen(game)
 	game.queue_free()

@@ -10,7 +10,8 @@ extends Node
 ## fighter's sprite goes and a dark ring marks where they fell. A strip along the bottom
 ## left (clear of the help line at the top) shows the turn order from now
 ## (Battle.turn_order) and whether a side wavers; a word marker over each enemy's head shows
-## its intent for the round until it acts (Battle.intent). Placeholder look.
+## its intent for the round until it acts (Battle.intent), kept off the panel's text.
+## Placeholder look.
 
 signal finished
 
@@ -21,6 +22,8 @@ const HUD_MARGIN_PX := 12.0
 ## the stage's sprite_height_px tall on screen wherever it stands), and the outline.
 const INTENT_GAP_PX := 18
 const OUTLINE_PX := 6
+## The gap an intent marker keeps from the panel's edge when it is moved clear of it.
+const PANEL_GAP_PX := 6.0
 const NOWHERE := Vector2i(-1, -1)
 var battle: Battle = null
 ## Set before begin(): the street to draw on and the panel to speak through.
@@ -282,7 +285,17 @@ func _place_intents() -> void:
 		head.y -= street_stage.sprite_height_px + INTENT_GAP_PX
 		var at := head * scale
 		var size := label.get_minimum_size()
-		label.position = at - Vector2(size.x / 2.0, size.y)
+		label.position = _clear_of_panel(Rect2(at - Vector2(size.x / 2.0, size.y), size)).position
+
+
+## The marker's rectangle, moved left of the panel when it would sit on the panel's text.
+func _clear_of_panel(rect: Rect2) -> Rect2:
+	if panel == null or not panel.visible:
+		return rect
+	var blocked := panel.get_global_rect()
+	if rect.intersects(blocked):
+		rect.position.x = maxf(0.0, blocked.position.x - rect.size.x - PANEL_GAP_PX)
+	return rect
 
 
 func _field_far() -> Vector2i:
