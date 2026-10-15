@@ -1,59 +1,65 @@
-# Dev Lead handoff, 2026-10-16 08:15 (desktop, personal account, "Game Studio Lead mercs")
+# Dev Lead handoff, 2026-10-16 10:52 (desktop, personal account, "Game Studio Lead mercs")
 Start: this file, CLAUDE.md, ~/.claude/memory-shared/MEMORY.md + co-lead-playbook.md, your brief
-(agent-briefs/DEV_LEAD_OPUS.md), docs/plans/phase4_combat.md, docs/plans/phase5_contracts.md ("Decided"),
-docs/DECISIONS.md D-091..D-112, ~/.claude/skills/ai-slop-art/SKILL.md. Then `git fetch`, `gh pr list`.
+(agent-briefs/DEV_LEAD_OPUS.md), docs/plans/phase5_contracts.md ("Decided"), docs/DECISIONS.md D-091..D-112,
+~/.claude/skills/ai-slop-art/SKILL.md. Then `git fetch`, `gh pr list`, `git worktree list`.
 
-## State: working. Usage limit killed all agents 04:50-07:20 (resumed from worktrees). Director asleep since ~03:20 ("dont ask me more questions im going to bed").
+## State: working. Director was back 09:43-10:26, answered the queue, then "afk, no more questions for now".
 Ask NOTHING until he writes again. Team calls are yours; taste calls go in the queue below.
 
 ## Who does what
 Session = lead AND Dev Lead. Team = builder subagents (die with the session: check ListAgents).
-Parallel Godot OK (D-090): GODOT=/c/Users/DANTE/Desktop/Godot_v4.7.2-stable_win64.exe/Godot_v4.7.2-stable_win64_console.exe,
-own APPDATA on the command only, offscreen, kill by PID. Builder rules: session scratchpad p4_common.md;
-all rulings: scratchpad p4_rulings.md (copy into briefs if the scratchpad is gone; the board has them too).
+Godot: /c/Users/DANTE/Desktop/Godot_v4.7.2-stable_win64.exe/Godot_v4.7.2-stable_win64_console.exe, own APPDATA on
+the command only, kill by PID. Rules for builders: session scratchpad p4_common.md; all rulings: scratchpad
+p4_rulings.md (copy into briefs if the scratchpad is gone).
 
-## Decisions: logged in DECISIONS.md D-091..D-112 by board PR #137. Not yet logged (next board PR):
-- Mercs 3-6 "I draft, you pick"; rabble kinds (peasant mobs, deserters, cultists, starving brigands);
-  hit-stop "Subtle, a few frames"; orc "Bulk and green-grey skin"; grass "Darken to match golden";
-  passed art "Yes, wire it in"; Q-16 sizeable advance = half the pay. D-094/D-095 verbatim words:
-  "Small growth + new moves", "Fights: survive + kills" (his option picks).
-- Lead calls: P1c lines (walls block, fighters don't, range 6); gear placeholders (armour 1/2/3, chief mace no
-  armour, bandit_spearman; slice 117/200); share on the full agreed price; a deadline passed with an advance =
-  abandon (C1 owns); job type drawn at posting; orc skin may use grass-failing steps inside the face only;
-  orc skin bar CIEDE2000 >= 18 vs grass mass; rough terrain lighter than grass.
+## Director rulings today 09:43-10:26 (NOT yet in DECISIONS.md: next board PR logs them verbatim)
+- Mercs 3-6: Wren (slot 3), Gauda Kettle (4), Ser Ambrose Vell (5), Yaro Sedlak (6), as drafted in
+  MERCS-builds/merc_candidates_2026-10-16.md. Bargaining traits: theirs as drafted; Orc "Hard bargain" and
+  Vampyr "Silver tongue" placeholders kept.
+- Grass: "B: new grass" (shipped #151). Ref photos: yes to ~12 free-licence downloads (done, D:/MERCS-vault/refs/).
+- Cast r7 REJECTED: "both look awful. both of their heads are featureless stumps and their postures are bizarre
+  and unnatural". #118 is draft, on hold, not synced.
+- Contract screens: "Merge as working panels" (styled look later, own look gate) (shipped #145).
+- Lethality: "Downed die 1 in 3" (shipped #154; 0.30 -> 0.88 named deaths per 4 fights).
+- Dead merc's unpaid wages: "Forfeit". Kept advance on abandon: "No share" (shipped #153).
+- Advance farm: "Walk out, no more advances" (shipped #155).
+- Faction/place names: "You draft, I pick" (drafts ready: MERCS-builds/faction_place_candidates_2026-10-16.md).
+- Death-roll edit: permission system refused the builder; director said yes to the lead making it (done in #154).
 
-## Merged tonight (all with review + CI green)
-#116 Ledger, #122-#127 combat depth, #129 blood/bodies, #130 plan, #132 C0, #133 spray+hit-stop, #134 C4 rep,
-#135 C3 wages, #136 C2 terms, #137 board, #138 C1 jobs, #139 P1c ranged, #142 C5 prisoners, #144 C6 loot/armoury,
-#146 C7 road/rabble/ledger, #143 C4 hunters (+ handoffs #131 #140 #141).
+## Merged today
+#150 GUI clicks, #151 grass B, #152 baseline tune (economy 119% of bill, sergeant+4 patrol from day 8),
+#153 wages forfeit, #145 C8 contract screens, #154 death roll 1 in 3, #155 walk-out closes advances + old-save forfeit.
 
-## Open PRs and running agents (08:15)
-- #147 stall fix (b934e60): review APPROVE on 920d0b5; a delta review (review147b) checks the later perf shortcut
-  (walk skips route search on wall-free fields). Merge refused for the builder as unreviewed: merge only after the
-  delta review PASSES, through mq.sh with the review recorded. Worktree p4-ai-path kept.
-- #148 Ironman save order: review148 running; then re-sync (conflicts with #143 story_director memory_key).
-- #145 C8 hub screens: lead QC PASS; DIRECTOR LOOK GATE pending (captures D:/MERCS-vault/renders/c8_hub_2026-10-16/).
-  Do NOT merge before his yes (I wrongly marked it done once; the permission system stopped it). Worktree c8 kept.
-- #118 cast: round 7 small fixes running (orc ear crease, 5 vampyr holes, E/W eye, golden 40,48,22 -> verdure_0).
-  Then lead QC (crops cast_r7_2026-10-16) and merge; golden change needs director's look at the 1x pair first.
-- Tiles B9 painter (tiles-b9b) running -> then fresh critic.
-- Follow-ups queued: GUI click helpers press only "attack"; paired win-rate audit (after #147); armoury buy/sell
-  screen (new UI, look gate); C2/C4 memory_key list is hand-written.
+## Running (10:52)
+- Orc hand-painted figure study (opus builder): method change after two failed render-based rounds (r7, and
+  cast_study_2026-10-16 which failed lead QC). Paints at r7 height ~122 px, head ~15-16 px. Output
+  D:/MERCS-vault/renders/cast_paint_2026-10-16/. Next: fresh realism-critic with D:/MERCS-vault/refs/photos_2026-10-16/,
+  then lead QC at 1x/2x judging the READ (face? natural stance?) before any metric; then the director.
+- Heather B11 painter: critic B10c said FIX (bramble/grape read, 64-px lattice, too blue, 1-px bridged crowns, hard
+  edges). Lead allowed full variants v4/v5. Next: fresh critic WITH the moorland photos, then the director's board.
+- no-advance-line builder: terms screen shows hub.terms.no_advance and disables the advance buttons when
+  Terms.advance_open is false. Review needed: none; merge via mq after CI.
 
 ## Queued for the director (when HE writes; one at a time, with images)
-1. Pick mercs 3-6: MERCS-builds/merc_candidates_2026-10-16.md (12 drafts, 3 per slot).
-2. Overworld golden before/after (grass recolour, #118) - a golden changes only by his yes.
-3. Cast look (after critic SHIP), tile board (after critic SHIP), contract screens (after lead QC).
-4. Name each merc's bargaining trait (placeholders now: Vampyr silver tongue, Orc hard bargain).
-5. Dead merc's unpaid wages: paid with the debt (now) or forfeit? Share of a kept advance on abandon?
-6. Balance read after his playtest: Vampyr in plate never falls (424200-426400); death target 1 per 4.
-7. Next playtest only after combat + art land (his ruling); fresh gate build then.
+1. Faction/place names (2 factions, hub, 3 hamlets, 3 wild sites). Flag: caps allow 2 factions, palette has 3
+   heraldry pairs; patrols already draw in blue.
+2. Orc painted figure (after critic + lead QC). 3. Heather board (after critic SHIP).
+4. Balance, after his playtest: reopen loop still farms 56-110% of the bill (upper bound); patrols #1/#2 lost
+   83-85% with ~1 death per fight (hardness unchanged since spear reach).
+5. Next playtest only after combat + art land; fresh gate build then.
+
+## Housekeeping
+- Worktrees: 12 live (limit 4). My `git worktree remove` was refused by the permission system; do not retry
+  blindly. Merged and removable: grass-b, baseline, c8, death-roll, wages-forfeit, walkout-advance, handoff5 (after
+  merge). Keep art-cast (#118 record), tiles-b6, art-desloppify (check), no-advance-line (open).
+- Follow-ups: armoury buy/sell screen (new UI, look gate); C2/C4 memory_key list is hand-written; hub_pack.gd.uid
+  not committed; no test for speaker_hope.m/f lines; next board PR (rulings above + D-094/D-095 words).
 
 ## Rules learnt the hard way (keep under 10 lines)
 - Never `export APPDATA`. Board PRs: branch `docs/board-after-<n>`. merge_eligibility needs PYTHONUTF8=1.
-- PR body: ## Evidence, ## Not exercised, ## Board and log, [MERGE NOTE] bullets "- Review needed: none|done (...)"
-  and "- Director gate: none|done (...)" (scratch note.py). Only a branch's owner pushes to it.
-- Merge chains: re-run the FULL suite after every sync (playbook 2026-10-16). Hash-neutral PRs merge first.
-- Sim PRs: fresh mercs-sim-review that plays the exploit in separate processes; cross-PR checks catch API drift.
-- Art: maker never passes own work; fresh critic; lead QC at 2x; CIEDE2000 for figure-vs-ground.
+- PR body: ## Evidence, ## Not exercised, ## Board and log, [MERGE NOTE] "- Review needed: ..." and
+  "- Director gate: ..." (scratch note.py). Merge chain: scratch chain.sh (sync, full suite, push, mq).
+- Re-run the FULL suite after every sync in a merge chain. Builder numbers can be stale after a sync: reviewers re-measure.
+- Art: judge the READ first (is that a face, does it stand like a person, beside a real photo); metrics never pass art.
+- A subagent's refused action is never redone by the lead without the director's explicit yes.
 - gdlint caps: 400 lines/file, 4 args/function, complexity 12. gdformat writes CRLF here: strip to LF.
