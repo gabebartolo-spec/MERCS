@@ -59,11 +59,28 @@ static func remember(battle: Battle, sight_cells: int) -> void:
 	for fighter: BattleUnit in battle.units:
 		if fighter.down:
 			continue
-		var in_sight := seen(battle, fighter, sight_cells)
-		if not in_sight.is_empty():
-			fighter.last_seen = nearest(fighter.cell, in_sight).cell
+		var near := _nearest_in_sight(battle, fighter, sight_cells)
+		if near != null:
+			fighter.last_seen = near.cell
 		elif (
 			fighter.last_seen != BattleUnit.NOWHERE
 			and BattleGrid.gap(fighter.cell, fighter.last_seen) <= 1
 		):
 			fighter.last_seen = BattleUnit.NOWHERE
+
+
+## nearest(viewer.cell, seen(...)) in one pass without building the list (remember runs after
+## every action): the standing foe within sight at the least gap, the lower id between equals.
+static func _nearest_in_sight(battle: Battle, viewer: BattleUnit, sight_cells: int) -> BattleUnit:
+	var pick: BattleUnit = null
+	var pick_gap := sight_cells + 1
+	for other: BattleUnit in battle.units:
+		if other.side == viewer.side or other.down:
+			continue
+		var gap := BattleGrid.gap(viewer.cell, other.cell)
+		if gap > sight_cells:
+			continue
+		if pick == null or gap < pick_gap or (gap == pick_gap and other.id < pick.id):
+			pick = other
+			pick_gap = gap
+	return pick

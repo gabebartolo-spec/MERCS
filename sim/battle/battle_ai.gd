@@ -56,17 +56,19 @@ static func choose(battle: Battle, fighter: BattleUnit, sight_cells: int) -> Dic
 ## (BattleGrid.distances), the nearer in a straight line between equals, the first cell in
 ## order after that; a wait when no cell is closer than where he stands. In the open this is
 ## the straight walk; behind a wall it goes round instead of stalling.
+## On an open field the steps are the straight-line gap, so the route is not searched.
 static func _walk(battle: Battle, fighter: BattleUnit, goal: Vector2i) -> Dictionary:
-	var route := battle.grid.distances(goal)
+	var walled := not battle.grid.blocked.is_empty()
+	var route := battle.grid.distances(goal) if walled else {}
 	var far := battle.grid.size.x * battle.grid.size.y
 	var best := fighter.cell
-	var best_steps: int = route.get(best, far)
 	var best_gap := BattleGrid.gap(best, goal)
+	var best_steps: int = route.get(best, far) if walled else best_gap
 	var cells: Array = battle.reachable(fighter).keys()
 	cells.sort()
 	for cell: Vector2i in cells:
-		var steps: int = route.get(cell, far)
 		var gap := BattleGrid.gap(cell, goal)
+		var steps: int = route.get(cell, far) if walled else gap
 		if steps < best_steps or (steps == best_steps and gap < best_gap):
 			best = cell
 			best_steps = steps
