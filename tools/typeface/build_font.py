@@ -170,7 +170,7 @@ def write_provenance(folder: Path) -> None:
         "status": "PROPOSED: director gate (look approval) pending",
         "created": "2026-10-15",
     }
-    (folder / "provenance.json").write_text(json.dumps(doc, indent=1) + "\n", encoding="utf-8")
+    (folder / "provenance.json").write_text(json.dumps(doc, indent=1) + "\n", encoding="utf-8", newline="\n")
 
 
 def glyph_name(cp: int) -> str:

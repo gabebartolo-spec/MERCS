@@ -7,7 +7,7 @@
   "MERCSLedger-Regular.ttf": "2b4b2a2749596b24d57fd7d8b24f6772994fd747d8244f284f79892cd2ef9d6e"
  },
  "produced_by": {
-  "tools/typeface/build_font.py": "3a6f2f8dcc1e0283",
+  "tools/typeface/build_font.py": "38cdf072d64221d3",
   "tools/typeface/ledger/display.kern.txt": "73eda2c8a48b2d44",
   "tools/typeface/ledger/display.txt": "347f9de38e540376",
   "tools/typeface/ledger/regular.kern.txt": "73eda2c8a48b2d44",
