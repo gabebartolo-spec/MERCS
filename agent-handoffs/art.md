@@ -1,61 +1,68 @@
-# Art Factory handoff, 2026-10-10 AEDT
-Start from this file, CLAUDE.md, your brief, and the Lead ("MERCS BOSS") messages. Load art-qa-critic before any visual review.
+# Art handoff, 2026-10-15 AEDT
+Start from this file, CLAUDE.md, your brief, and the Lead ("main") messages. Load art-qa-critic before any visual review.
 
-## State: RESET requested by the director mid step 2 (2026-10-10). No jobs running. WIP committed and pushed.
-Standing order (Lead, latest): FINISH step 2, send the clips to the Lead (never the director), then commit, rewrite this
-file, push and PAUSE. Do not start step 3.
-## Task
-P1-ART-SLICE-CAST step 2: a 3 s gait loop at game speed, 1x and 2x, S/SE/E/NE, no foot slide. Orc: heavy, grounded.
-Vampyr: controlled, predatory, upright. The Vampyr renders BARE (Lead decision); the sword returns in step 3 behind check A.
-The orc keeps the axe only if it passes check A; otherwise render him bare and tell the Lead.
-Carry into step 3: orc tusks as tapered cones; the Vampyr cape hugs the back (curved section, no proud edge at 45 deg).
-## Lead-approved QA plan (2026-10-10, trimmed)
-A in render_character.py (DONE, needs one fix, below): kit-vs-body clearance 1 cm on every dense frame, except a piece's
-  "contact" bones (the axe lists RightHand, so the fingers may grip); direction "checks" in the kit json (claim, then
-  measured min_dot). Results go to render_meta clip.kit_checks; a fail exits 1 and renders nothing (kit_checks.json written).
-B: --pass layers (body clay, each kit group a flat label colour, DONE); 2x nearest crops of contact points at the key
-  frames (clip.key_frames: foot forward L/R, right hand forward/back) for each facing. Crop script NOT written yet;
-  outputs[].marks give the 1x pixel position of hands, hips and feet per frame.
-C: one line per prop in the QC note (claim -> result). D dropped (A measures it); kit docs must match the maths.
-E: findings go to the LEAD, never to a skill's learnings log (Lead, 2026-10-10: the Lead decides what goes to memory).
-  The step 2 report and this handoff both carry a "Findings for the lead" section (below), each item with evidence, or "none".
-## Check A evidence so far (logs D:\MERCS-vault\logs\2026-10-10_gait_*_A_*.log)
-- Old axe (d2d8f93 kit): edge leads dot -0.345 FAIL, head forward -0.644 FAIL: the director's "held backwards" caught.
-- Vampyr sword: scabbard -6.0 cm into LeftLeg FAIL, tip-trails axis dot 0.696 (< 0.9) FAIL, hilt and crossguard 1.3-1.7 cm
-  into the torso FAIL: the director's "tendrils" caught.
-- New axe (this branch): edge +0.796 PASS, head forward +0.559 PASS, head above grip 0.693 (needs 0.7) FAIL by a hair,
-  haft clearance -0.120 m "near RightForeArm" FAIL. OPEN: a stance probe (ray parity) shows the haft BUTT (fraction 0.0,
-  z 0.47 m) inside the body, i.e. probably the right THIGH, plus haft inside the fist (fractions 0.33-0.38, expected, the
-  grip). The nearest-bone label comes from the BVH polygon and may be wrong. Next: confirm with a layers-pass 2x crop at
-  dense frame 29 / 03; fix by shortening the haft below the fist or moving the grip down the haft; tilt the head up
-  slightly (or set the need to 0.65 with a claim) so "head above the grip" passes honestly.
-## Next, exactly
-1. Fix the axe (above) until check A passes; if it can't, render the orc bare and tell the Lead.
-2. Render colour and layers passes, S/SE/E/NE (facings 0-3), orc with axe_ kept, Vampyr with no kit.
-   Runner: scratchpad run_gait.sh (pass --python-exit-code 1 to Blender or a traceback exits 0; use `read -r`).
-3. pixelate.py to 1x, GIFs at 1x and 2x (3 s, the clip's fps; E row travels at ground_speed_mps over 0.25 m ticks), the
-   2x crops at the key frames, a QC note with one line per prop. Send to the Lead. Commit, rewrite this file, push, pause.
-## Findings for the lead (keep current; send with the step 2 report)
-- Caught a defect: check A's direction claims flagged the old axe as held backwards (edge dot -0.345, head-forward -0.644)
-  and the Vampyr scabbard tip leaning forward (axis dot 0.696 < 0.9). Evidence: logs 2026-10-10_gait_orc_color_A_orc_oldaxe,
-  _vampyr_color_A_vampyr_sword. Both were missed by eye by the art agent and the Lead in step 1.
-- Caught a defect: check A's clearance flagged the scabbard 6.0 cm inside the left leg (same vampyr log).
-- Earned its keep: two-bone leg IK onto the clip's ankles kept foot slide at 0.8 cm (orc) / 0.6 cm (Vampyr) while the hips
-  sway and drop; without it, hip changes drag planted feet (render_meta clip.foot_slide_m).
-- Tooling trap: Blender exits 0 on a Python traceback unless --python-exit-code 1; a failed check could pass a batch.
-- Tooling trap: Blender's 4D Vector.normalized() uses the xyz length only; it scaled bones up to 30x (probe3, this session).
-- Check A limit: a signed distance to the nearest surface misreads points beside an excluded contact part (the fist); it is
-  capped at 12 cm, and an open case (the axe haft) still needs a layers crop to confirm.
-## Done (committed)
-render_character.py: --clip/--frames/--loop-window/--kit-keep/--pass layers; Mixamo retarget plus posture lean; gait layer
-from bodies.json "gait" (swing_scale, hip sway/bounce/drop, cadence, hold_stance grip); two-bone leg IK on the clip's
-ankles; KitChecks; marks; key_frames. Measured slide: orc 0.8 cm, Vampyr 0.6 cm. Pipeline self-test 15/15.
-Orc kit: axe head forward (+20 X), blade on local -Y, spike +Y, contact + 3 checks. Vampyr kit: scabbard axis check only.
+## State: LOOK TARGET options A/B/C built, self-QC'd, reported to the Lead. Awaiting the Lead's review. No jobs running.
+Branch `claude/art-look-target` (worktree `MERCS-wt/art-look`), pushed. No PR yet (brief: not needed yet).
+
+## Task (director 2026-10-15: "establish an aesthetic and stick to it")
+Golden references + one master palette + one render rig, validated. 2-3 labelled options, each a coherent palette +
+lighting + post set, shown as: street day, street night + rain (4K, real Godot build), overworld strip at map scale.
+
+## What exists
+- Boards (one per option, 3 frames side by side at exactly 2x logical): `docs/audits/look_target/option_{A,B,C}.png`.
+  Raw 3840x2160 frames: `D:/MERCS-vault/renders/look_2026-10-15/frames_4k/{A,B,C}_{day,night,map}.png`.
+- Palettes: `assets/palette/options/<X>/palette.json|.gpl|swatch.png` (64 colours, 14 named ramps, OKLab-spaced
+  between hand-set anchors), `look.json` (day/night light, torch, rain, dither), `pixelate.json` (pipeline config with
+  the option's palette). A "Ash and Hearth" (muted, cool), B "Peat and Ochre" (warm, earthy, ordered dither),
+  C "Clear Day" (wider values, hue-shifted ramps, violet shadows).
+- One rig, `tools/look/`: make_palettes.py; build_sprites.py (pixelate.py to skin_neutral, then a new
+  render_character.py `--pass matid` gives each pixel's material and the shading step moves to that material's ramp:
+  orc skin_orc, Vampyr skin_pale, plate iron or a blackened composite, cape a wine composite; map tokens are the same
+  render reduced by 8); build_look_kit.py (Blender, primitives only: timber and stone houses, well, cart, barrels,
+  fence, lantern post, cobbles, mud; map tiles plain/road/forest/hill/water/shore, town marker, banner poles; faces
+  named `pal:<ramp>:<step>`); look_target.gd (the real StreetStage in a 3840x2160 SubViewport, grey boxes swapped for
+  the kit, light from look.json, every pixel snapped to the palette by palette_post.gdshader in OKLab, with a distance
+  penalty on heraldry/blood/fire so lit wood never turns crimson); make_boards.py; write_provenance.py.
+- `tools/pipeline/validate_palette.py`: palette 48-64 colours, and every opaque pixel on it. All 9 frames and all
+  sprites: 0 off-palette pixels. Negative check: A_day against palette B fails (8.3 M pixels).
+- Capture is deterministic: A_day re-captured after gdformat was byte-identical.
+- Kits edited for the look target: orc breastplate/cuisses/greaves/vambraces enlarged (body poked through); Vampyr
+  breastplate enlarged, tassets raised, two cape cones replaced by one `cape`, collar now plate; a `material` field on
+  pieces (cloth/timber; default iron). Weapons left off (the axe's check A is still open).
+- Licensing register: three rows added (palettes, kit, sprites), all CLEARED inputs; provenance.json in each folder.
+
+## How to rerun
+- Characters: Blender `-b --factory-startup --python-exit-code 1 -P tools/pipeline/render_character.py -- --body
+  orc|vampyr --out D:/MERCS-vault/renders/look_2026-10-15/<body>_4x_<pass> --kit <kit> --kit-keep <pieces, no weapons>
+  --pass color|normal|matid|parts`; then `python tools/look/build_sprites.py --renders D:/MERCS-vault/renders/look_2026-10-15`.
+- Kit: Blender ... `-P tools/look/build_look_kit.py -- --out assets/look_target/kit`, then Godot `--import` (headless).
+- Frame: `APPDATA=<scratch> godot_quiet.sh --render --path . --windowed --resolution 3840x2160 --position 8000,8000
+  --script tools/look/look_target.gd -- --option=A --scene=day|night|map --out=<png>` (APPDATA on the command only).
+- Then validate_palette.py, make_boards.py, write_provenance.py.
+
+## Known limits (said in the report)
+- Figures are stage-1 blockouts (primitive plate, bare feet, no weapons); the orc's stoop is his bodies.json posture.
+- Map water reads as flat grey slate in every option (no water ramp); banner poles lean with the perspective camera.
+- Map tokens are unlit (no normal maps); street sprites are lit.
+- A fresh realism critic (art-qa-critic section 0) has NOT been run: I cannot spawn agents. The Lead should.
+
+## Findings for the lead (evidence attached; the Lead decides what is recorded)
+- Caught a defect: a flat material-ID (matid) pass showed the orc's chest and thighs and the Vampyr's chest poking
+  through blockout plate, invisible in the clay colour pass (`D:/MERCS-vault/renders/look_2026-10-15/iter/`); fixed.
+- Caught a defect: per-face colour hashed on tile-local coordinates repeated the same light/dark triangles on every
+  map tile (a carpet pattern); fixed with one colour per tile plus turned tiles.
+- Caught a defect: whole-frame nearest-palette snapping turned torch-lit barrels heraldry crimson (06: heraldry only
+  on faction cloth); fixed with a per-ramp distance penalty in the post shader.
+- Tooling: a 3840x2160 window on this desktop comes out 3836x2158 even borderless; render into a 3840x2160
+  SubViewport and save its texture (0 non-uniform 4x4 blocks measured).
+- Tooling: Blender's glTF export makes default materials double-sided, so a face wound downward still draws, dark;
+  wind every generated face upward.
+
 ## Rules learnt the hard way (keep under 10 lines)
 - MPFB targets are shape keys: measure evaluated_get(depsgraph). The MPFB rig is offset (location z 0.75).
 - Blender 4D Vector.normalized() scales by its xyz length only: normalize a Quaternion as a Quaternion.
 - Moving or rotating the hips drags planted feet: re-solve the legs (IK) onto the clip's ankles.
-- Kit rot_deg: +X rotation leans a piece's +Z toward -Y (the body's front). Prove a direction by check A, never by the doc.
-- Gear in body clay reads as anatomy: review kit in the layers pass, at 2x, at the contact frames.
+- Gear in body clay reads as anatomy: review kit in the layers or matid pass, at 2x.
 - Blender returns exit 0 on a Python traceback unless --python-exit-code 1 is passed.
+- Typed GDScript here treats Variant-to-typed as an error: read JSON values into typed locals.
 - Only Merge & CI edits STATUS.md and DECISIONS.md. Director: no mixels; send 1x and 2x as separate files.
