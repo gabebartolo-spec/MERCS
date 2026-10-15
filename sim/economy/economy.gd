@@ -148,7 +148,6 @@ func on_day(roster: Array[Merc], day: int, site_ids: Array[String], rng: Rng) ->
 	unpaid_days += 1
 	if unpaid_days > _rule("wages", "grace_days"):
 		morale = maxi(0, morale - _rule("wages", "morale_loss_per_day"))
-	_lapse_advances(day)
 	book.expire(day)
 	if board.is_empty() or day - book.board_day >= _rule("contracts", "refresh_days"):
 		refresh_board(day, site_ids, rng)
@@ -200,7 +199,10 @@ func abandon(id: String, company: Company, day: int) -> bool:
 	var row := book.contract(id)
 	if row.is_empty() or row.get("accepted") != true:
 		return false
-	_walk_away(row, company.captain_id, day)
+	board.erase(row)
+	var grew := standing.abandoned(row, company.captain_id, day)
+	var key := "standing.grudge" if grew else "standing.abandon"
+	chronicle.append({"day": day, "merc": company.captain_id, "key": key})
 	return true
 
 
@@ -277,26 +279,6 @@ func equip(company: Company, merc_id: String, item_id: String) -> bool:
 ## join.
 func decide_prisoner(company: Company, choice: String, day: int) -> bool:
 	return captives.decide(self, company, choice, day)
-
-
-## The company walks away from an accepted row (abandon, or a lapse after an advance).
-func _walk_away(row: Dictionary, captain_id: String, day: int) -> void:
-	board.erase(row)
-	var grew := standing.abandoned(row, captain_id, day)
-	var key := "standing.grudge" if grew else "standing.abandon"
-	chronicle.append({"day": day, "merc": captain_id, "key": key})
-
-
-## An accepted contract with an advance taken that reaches its deadline undone is walked away
-## from as abandon() is (review of #136): the advance is kept, the name dents, a sizeable one
-## grows a grudge; the captain who agreed the terms remembers it. Without an advance a lapse
-## stays silent, as before C2.
-func _lapse_advances(day: int) -> void:
-	for row: Dictionary in board.duplicate():
-		if row.get("accepted") != true or _num(row, "advance", 0) <= 0:
-			continue
-		if _num(row, "deadline", 0) < day:
-			_walk_away(row, str(row.get("captain", "")), day)
 
 
 func _max_morale() -> int:
