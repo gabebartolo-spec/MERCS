@@ -13,12 +13,20 @@ var ok := false
 var error := ""
 var world: WorldSim = null
 var rng: Rng = null
+## The wounds block (Aftermath.state(): chronicle, memories, captain, injuries); {} in a
+## save made before it existed. Aftermath.restore() reads it.
+var wounds := {}
 
 
 ## The Rng's seed and stream positions are written as strings: they are 64-bit ints, and
 ## JSON holds a number as a double, exact only up to 2^53.
-static func to_dict(world_sim: WorldSim, source: Rng) -> Dictionary:
-	return {"version": VERSION, "rng": _rng_as_text(source.state()), "world": world_sim.state()}
+static func to_dict(world_sim: WorldSim, source: Rng, wounds_block: Dictionary = {}) -> Dictionary:
+	return {
+		"version": VERSION,
+		"rng": _rng_as_text(source.state()),
+		"world": world_sim.state(),
+		"wounds": wounds_block
+	}
 
 
 ## balance: data/balance/world.json (the defaults for what the save does not hold). A save
@@ -34,6 +42,7 @@ static func from_dict(saved: Dictionary, balance: Dictionary) -> SaveModel:
 	else:
 		model.rng = Rng.from_seed(_num(_dict(balance, "world"), "seed"))
 	model.world = WorldSim.restore(_dict(current, "world"), balance, model.rng)
+	model.wounds = _dict(current, "wounds")
 	model.ok = true
 	return model
 

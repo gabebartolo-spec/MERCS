@@ -58,5 +58,15 @@
   "world.choice.travel": "To {site}, {days} days on the road",
   "world.choice.travel_one": "To {site}, a day on the road",
   "world.choice.rest": "Rest a day",
-  "world.choice.save": "Save"
+  "world.choice.save": "Save",
+  "injury.gash.name": "a gash",
+  "injury.broken_arm.name": "a broken arm",
+  "injury.lost_eye.name": "a lost eye",
+  "injury.lost_eye.role": "Fights half-blind: no longer trusted on the front line, he is better kept at the back.",
+  "chronicle.death": "{name} died on day {day}, struck down by {cause}.",
+  "memory.comrade_died": "I stood beside {name} when he fell on day {day}.",
+  "memory.captain_died": "The captain {name} died on day {day}, and the company had to choose.",
+  "memory.dissent": "I did not want {name} to lead us.",
+  "succession.new_captain": "{name} leads the company now.",
+  "succession.dissent": "{name} did not approve."
 }

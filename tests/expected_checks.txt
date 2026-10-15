@@ -12,5 +12,6 @@ battle 14
 loop 4
 sim_world 9
 save 7
-effect 4
+effect 6
 overworld 8
+injury 29
