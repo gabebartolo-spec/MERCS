@@ -13,6 +13,10 @@ extends Node
 ## and the map returns with the outcome. The sim decides every step, cost and roll; this
 ## only words and draws them. Words: data/text/en.json.
 
+## Raised on Continue after the fight that killed the last merc of the company: the campaign
+## is over and the game shows its last screen (CampaignEnd).
+signal wiped(company: Company, chronicle: Chronicle, memory: Memory)
+
 const WORLD_DATA := "res://data/balance/world.json"
 const LOCATIONS := "res://data/locations.json"
 const MAP_DATA := "res://data/balance/overworld.json"
@@ -54,6 +58,8 @@ var _triage := ""
 ## What waits for Continue: the hub's loot and prisoner (the world's result hook), so the
 ## triage comes first.
 var _after_triage := Callable()
+## Set when the triage left nobody alive: the saved campaign is over and Continue ends it.
+var _ended := false
 
 
 ## A director for the slice's street, added under `game` and begun (the map shown).
@@ -133,7 +139,7 @@ func in_fight() -> bool:
 func toggle() -> void:
 	if not is_open():
 		set_open(true)
-	elif in_fight() or _triage != "":
+	elif in_fight() or _triage != "" or _ended:
 		return
 	elif world.at == RegionGen.HUB_ID and world.encounter.is_empty():
 		set_open(false)
@@ -156,7 +162,7 @@ func set_open(open: bool) -> void:
 ## steps at once, a held key repeats (data/balance/overworld.json "walk"). Nothing while the
 ## map is hidden, a fight is on or an encounter stands.
 func walk(direction: Vector2i, delta: float) -> void:
-	var held := not world.encounter.is_empty() or _triage != ""
+	var held := not world.encounter.is_empty() or _triage != "" or _ended
 	if not is_open() or in_fight() or held or direction == Vector2i.ZERO:
 		_walking = false
 		return
@@ -203,6 +209,10 @@ func _on_choice(choice_id: String) -> void:
 			_start_fight()
 		CONTINUE:
 			_triage = ""
+			if _ended:
+				panel.visible = false
+				wiped.emit(company, wounds.chronicle(), wounds.memory())
+				return
 			_show(_outcome_line())
 			if _after_triage.is_valid():
 				_after_triage.call()
@@ -251,9 +261,20 @@ func _on_fight_over() -> void:
 	world.result_hook = hook
 	_after_triage = hook.bind(kind, result) if hook.is_valid() else Callable()
 	map.visible = true
+	if wounds.ended():
+		_end_campaign()
 	_triage = RoadFight.triage_body(_outcome_line(), events, wounds)
 	_show(_outcome_line())
 	_show_triage()
+
+
+## The company is dead to the last merc: the save is marked ended at once (so closing the game
+## here cannot resume it), the hub's loot and prisoner fall away, and Continue leads to the
+## last screen.
+func _end_campaign() -> void:
+	_ended = true
+	_after_triage = Callable()
+	_saves().save_game(world, rng, company, wounds.state())
 
 
 ## The triage panel after a road fight: what happened to whom, and Continue to the map.

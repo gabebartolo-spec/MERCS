@@ -7,3 +7,6 @@ One line per knob (docs/05_STYLE_CODE.md "Data"). Read by `sim/merc/company.gd` 
 
 ## xp
 - `level_xp`: the experience a merc needs to reach each level, cumulative and rising: the first entry is level 1 (0), the second level 2, and so on. The last entry's level is the highest. One bar, filled by fighting and by story (vision, "Growth"); nothing awards experience yet, so first-pass numbers only.
+
+## campaign_end
+- `memories_shown`: how many of a fallen merc's own memories the last screen of a campaign lists under their chronicle line (the screen opens when the whole company is dead).

@@ -15,6 +15,9 @@ enum Format { UNVERSIONED, FIRST, COMPANY }
 const VERSION: int = Format.COMPANY
 ## The error codes from_dict() can leave in `error` (empty when ok).
 const ERROR_TOO_NEW := "save_version_too_new"
+## Left by from_dict() on a save whose campaign is over (every merc dead): the model still
+## holds what the chronicle screen shows, but `ok` is false, so nothing plays on from it.
+const ERROR_ENDED := "campaign_ended"
 
 var ok := false
 var error := ""
@@ -28,13 +31,20 @@ var wounds := {}
 ## The story block (StoryletState.state(): storylets fired and when); {} in a save made before
 ## it existed, which reads as nothing fired. Optional like "wounds", so no version of its own.
 var story := {}
+## Whether the save's campaign is over. Optional key "ended" (absent reads as not ended; no
+## version of its own), or a company with every merc dead. An ended save is never ok.
+var ended := false
 
 
 ## The Rng's seed and stream positions are written as strings: they are 64-bit ints, and
 ## JSON holds a number as a double, exact only up to 2^53. The company and the wounds block
-## are written when given.
+## are written when given; "ended" only when the campaign is over.
 static func to_dict(
-	world_sim: WorldSim, source: Rng, held: Company = null, wounds_block: Dictionary = {}
+	world_sim: WorldSim,
+	source: Rng,
+	held: Company = null,
+	wounds_block: Dictionary = {},
+	is_ended: bool = false
 ) -> Dictionary:
 	var saved := {
 		"version": VERSION, "rng": _rng_as_text(source.state()), "world": world_sim.state()
@@ -43,6 +53,8 @@ static func to_dict(
 		saved["company"] = held.state()
 	if not wounds_block.is_empty():
 		saved["wounds"] = wounds_block
+	if is_ended:
+		saved["ended"] = true
 	return saved
 
 
@@ -67,7 +79,12 @@ static func from_dict(
 	model.story = _dict(current, "story")
 	if not company_defs.is_empty():
 		model.company = Company.restore(_dict(current, "company"), company_defs)
-	model.ok = true
+	model.ended = (
+		current.get("ended", false) == true or (model.company != null and model.company.is_wiped())
+	)
+	model.ok = not model.ended
+	if model.ended:
+		model.error = ERROR_ENDED
 	return model
 
 

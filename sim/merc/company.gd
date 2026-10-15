@@ -82,6 +82,12 @@ func cap() -> int:
 	return _cap
 
 
+## Whether the whole company is dead: nobody left on the roster and at least one buried. A
+## company that has never had a merc is not wiped, it is new.
+func is_wiped() -> bool:
+	return roster.is_empty() and not fallen.is_empty()
+
+
 ## Hires a merc from the data onto the roster. False (and no change) when the id is not in
 ## the data, the merc is already on the roster or the roster is full.
 func add(id: String) -> bool:
