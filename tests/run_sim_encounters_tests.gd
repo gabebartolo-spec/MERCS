@@ -7,11 +7,13 @@ extends "res://tests/lib/runner.gd"
 ## the party leaves the map for its return days, then comes back home; a loss costs supplies
 ## and the band falls back to the last site; a patrol's toll buys the way past (an ambush has
 ## none); an ambush gives the enemy the first turn, a patrol the company; the same seed and
-## walk raise the same encounters; without the party the same walk meets nothing.
+## walk raise the same encounters; without the party the same walk meets nothing. Phase 5 C7:
+## the line-ups stay inside the enemy caps and come by place and day (tests/world/lineup_checks.gd).
 ## Seeded by design: Rng.from_seed(424242) and 424243.
 ##   godot --headless --path . --script tests/run_sim_encounters_tests.gd
 
 const Fixture := preload("res://tests/lib/world_fixture.gd")
+const LineupChecks := preload("res://tests/world/lineup_checks.gd")
 const SEED := 424242
 const OTHER_SEED := 424243
 const SCENARIOS := "res://data/scenarios.json"
@@ -41,6 +43,7 @@ func run_checks() -> void:
 	_check_sight()
 	_check_lost_sight()
 	_check_return()
+	LineupChecks.new().run(check)
 	await process_frame
 
 

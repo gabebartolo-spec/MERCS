@@ -19,6 +19,9 @@ var panel: HubPanel = null
 ## The contracts' jobs on the map (Phase 5 C1): placed when a contract is taken, judged after
 ## every day and every fight.
 var jobs: Jobs = null
+## The hunters a grudge sends (Phase 5 C4): sent after the jobs are judged each day, settled
+## after each fight.
+var hunters: GrudgeParties = null
 ## The overworld's autosave (OverworldDirector.autosave: writes only under Ironman), called after
 ## each committed action so a quit cannot give the decision back (D-087).
 var autosave := Callable()
@@ -51,6 +54,7 @@ func begin(shared: Company, sim: WorldSim, stream: Rng) -> void:
 	var found: Variant = OverworldDirector.world_data().get("jobs", {})
 	var knobs: Dictionary = found if found is Dictionary else {}
 	jobs = Jobs.make(world, company, knobs)
+	hunters = GrudgeParties.make(world, company)
 	if company.economy.board.is_empty():
 		company.economy.refresh_board(world.day, _site_ids(), rng)
 	_layer = CanvasLayer.new()
@@ -81,6 +85,7 @@ func economy() -> Economy:
 
 func _on_day(day: int) -> void:
 	_judge().on_day(day)
+	_hunt().on_day(day)
 	company.economy.on_day(company.roster, day, _site_ids(), rng)
 	if is_open():
 		_show()
@@ -92,6 +97,7 @@ func _on_day(day: int) -> void:
 ## triage is read (show_result).
 func _on_result(kind: String, result: Dictionary) -> void:
 	_judge().on_result(result)
+	_hunt().on_result(result)
 	if result.get("won", false) != true:
 		return
 	company.economy.take_loot(kind, rng, result)
@@ -147,6 +153,12 @@ func _remember_contract() -> void:
 func _judge() -> Jobs:
 	jobs.memory = StoryDirector.memory_of(self)
 	return jobs
+
+
+## The hunters, about to act: a settled hunter fight leaves its sentence in the shared store.
+func _hunt() -> GrudgeParties:
+	hunters.memory = StoryDirector.memory_of(self)
+	return hunters
 
 
 func _decide(choice: String) -> void:

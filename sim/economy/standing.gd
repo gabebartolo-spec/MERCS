@@ -6,15 +6,18 @@ extends RefCounted
 ## from an ask dents it (C2); abandoning a contract dents it more, and abandoning after taking
 ## a sizeable advance (standing.sizeable_advance percent of the pay or more, Q-13, Q-16) also
 ## grows that faction's grudge. The grudge's growth is the number the hunters it sends grow
-## with (Q-15; the hunter party is C4's second half, sim/world/grudge_parties.gd). Nothing here
-## rolls. Rules: data/balance/economy.json "standing".
+## with (Q-15): each broken deal sends one hunter party, as strong as the grudge has grown
+## (sim/world/grudge_parties.gd). Nothing here rolls. Rules: data/balance/economy.json "standing".
 
 const PERCENT := 100
 
 ## faction id -> the company's name with it; a faction not here stands at standing.start.
 var names: Dictionary = {}
 ## faction id -> its grudge: {"growth": n, "sent": n, "deals": [contract ids], "day": d,
-## "captain": merc id}. growth: how far it has grown; sent: how many hunter parties went.
+## "captain": merc id, "broken": {contract id: {"captain": merc id, "site": site id}}}.
+## growth: how far it has grown; sent: how many hunter parties went; captain: who broke the
+## last deal; broken: who broke each deal and where the job was (optional: a row saved before
+## it reads its deals as broken by "captain", at no known site).
 var grudges: Dictionary = {}
 
 var _rules := {}
@@ -101,20 +104,68 @@ func abandoned(row: Dictionary, captain_id: String, day: int) -> bool:
 	deals.append(str(row.get("id", "")))
 	grudge_row["day"] = day
 	grudge_row["captain"] = captain_id
+	var broken: Dictionary = grudge_row.get("broken", {})
+	broken[str(row.get("id", ""))] = {"captain": captain_id, "site": str(row.get("site", ""))}
+	grudge_row["broken"] = broken
 	grudges[faction] = grudge_row
 	return true
 
 
-## Hook for the hunter half (C4, after C1): the factions whose grudge has grown past the hunter
-## parties already sent, in id order. Nothing sends hunters yet.
+## The factions owed a hunter party, in id order: one party per broken deal ("sent" counts
+## parties), so a grudge whose deals outnumber the parties sent calls the next (GrudgeParties).
 func hunter_calls() -> Array[String]:
 	var due: Array[String] = []
 	for faction: Variant in grudges:
 		var row: Dictionary = grudges[faction]
-		if _whole(row.get("growth", 0)) > _whole(row.get("sent", 0)):
+		var deals: Array = row.get("deals", [])
+		if deals.size() > _whole(row.get("sent", 0)):
 			due.append(str(faction))
 	due.sort()
 	return due
+
+
+## The next broken deal of a faction's grudge still owed its hunters, "" when none.
+func next_hunt(faction_id: String) -> String:
+	var row := grudge(faction_id)
+	var deals: Array = row.get("deals", [])
+	var sent := _whole(row.get("sent", 0))
+	return str(deals[sent]) if sent < deals.size() else ""
+
+
+## One more hunter party went for a faction's grudge (GrudgeParties). False when it holds none.
+func hunters_sent(faction_id: String) -> bool:
+	if not grudges.has(faction_id):
+		return false
+	var row: Dictionary = grudges[faction_id]
+	row["sent"] = _whole(row.get("sent", 0)) + 1
+	return true
+
+
+## Who broke this deal and where its job was: {"faction", "captain", "site"}; {} when no grudge
+## holds it. A row saved before "broken" names its last captain and no site.
+func broken_deal(deal_id: String) -> Dictionary:
+	var faction := grudge_of(deal_id)
+	if faction == "":
+		return {}
+	var row: Dictionary = grudges[faction]
+	var held: Dictionary = row.get("broken", {})
+	var deal: Variant = held.get(deal_id, {})
+	var known: Dictionary = deal if deal is Dictionary else {}
+	return {
+		"faction": faction,
+		"captain": str(known.get("captain", row.get("captain", ""))),
+		"site": str(known.get("site", "")),
+	}
+
+
+## The faction whose grudge holds this broken deal, "" when none does.
+func grudge_of(deal_id: String) -> String:
+	for faction: Variant in grudges:
+		var row: Dictionary = grudges[faction]
+		var deals: Array = row.get("deals", [])
+		if deals.has(deal_id):
+			return str(faction)
+	return ""
 
 
 func _move(faction_id: String, by: int) -> void:
@@ -138,13 +189,30 @@ static func _grudge_row(saved: Variant) -> Dictionary:
 	if held is Array:
 		for id: Variant in held:
 			deals.append(str(id))
-	return {
+	var clean := {
 		"growth": maxi(0, _whole(row.get("growth", 0))),
 		"sent": maxi(0, _whole(row.get("sent", 0))),
 		"deals": deals,
 		"day": _whole(row.get("day", 0)),
 		"captain": str(row.get("captain", "")),
 	}
+	var broken := _broken_rows(row.get("broken", {}))
+	if not broken.is_empty():
+		clean["broken"] = broken
+	return clean
+
+
+## The saved "broken" record, each deal's {"captain", "site"} as text; {} when none.
+static func _broken_rows(saved: Variant) -> Dictionary:
+	var rows: Dictionary = saved if saved is Dictionary else {}
+	var clean := {}
+	for deal: Variant in rows:
+		var held: Variant = rows[deal]
+		var one: Dictionary = held if held is Dictionary else {}
+		clean[str(deal)] = {
+			"captain": str(one.get("captain", "")), "site": str(one.get("site", ""))
+		}
+	return clean
 
 
 static func _whole(value: Variant) -> int:

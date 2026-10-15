@@ -30,6 +30,7 @@ func suite_name() -> String:
 func run_checks() -> void:
 	# The headless window is tiny; give it the game's size so the panel lies on screen.
 	root.size = WINDOW_SIZE
+	preload("res://tests/world/map_words_checks.gd").new().run(check)
 	_clear_save()
 	var game := await _spawn()
 	await _check_open(game)
