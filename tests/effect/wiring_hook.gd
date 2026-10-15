@@ -1,11 +1,11 @@
 extends "res://tests/lib/effect_case.gd"
-## wiring_hook: the same road fight on the same seed (424211, MercPlay on both sides, the
+## wiring_hook: the same road fight on the same seed (424358, MercPlay on both sides, the
 ## slice band), the company's hit hook set or not. The fight itself is identical; what the
 ## company is afterwards differs: with the hook the captain falls in the triage, the office
 ## passes on and the chronicle has him, without it everyone is as before.
 
 const Kit := preload("res://tests/lib/wiring_kit.gd")
-const SEED := 424211
+const SEED := 424358
 
 
 func id() -> String:
@@ -18,7 +18,7 @@ func run() -> Dictionary:
 
 func _after(hooked: bool) -> String:
 	var rng := Rng.from_seed(SEED)
-	var made := Kit.wounds(rng, "", {}, Kit.led_by("vampyr"))
+	var made := Kit.wounds(rng, "", {}, Kit.led_by("merc_3"))
 	var result := Kit.fight(made, rng, hooked)
 	var battle: Battle = result["battle"]
 	return (

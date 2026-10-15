@@ -112,8 +112,17 @@
       "resolve": 4,
       "initiative": 3
     },
+    "bandit_spearman": {
+      "gear": {"spear": true, "mail": true},
+      "hp": 8,
+      "attack": 1,
+      "defense": 1,
+      "damage": 4,
+      "resolve": 4,
+      "initiative": 3
+    },
     "bandit_chief": {
-      "gear": {"axe": true, "mail": true},
+      "gear": {"mace": true},
       "hp": 10,
       "attack": 2,
       "defense": 2,

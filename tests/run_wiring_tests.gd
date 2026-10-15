@@ -10,16 +10,21 @@ extends "res://tests/lib/runner.gd"
 ## GUI (tests/wiring/gui_checks.gd): real clicks and letter keys at 1920x1080: Fight on the
 ## road, the triage panel, Continue, the C screen marking the fallen as gone, Save, a fresh
 ## session that never fields the dead.
-## Seeded by design: sim fights use MercPlay on seeds 424251 (a permanent injury) and 424211
-## (the captain's death); the GUI fight is an ambush met by walking, world seed 424270.
+## Seeded by design: sim fights use MercPlay on seeds 425343 (a permanent injury) and 424358
+## (the captain's death; both re-picked when equipment physics, Phase 4 P1b, moved the fights:
+## plate keeps the Vampyr alive, so merc_3 holds the office there); the GUI fight is an ambush
+## met by walking, world seed 424270.
 ##   godot --headless --path . --script tests/run_wiring_tests.gd
 
 const Kit := preload("res://tests/lib/wiring_kit.gd")
 const Fixture := preload("res://tests/lib/company_fixture.gd")
 const GuiChecks := preload("res://tests/wiring/gui_checks.gd")
 const WINDOW_SIZE := Vector2i(1920, 1080)
-const DEATH_SEED := 424211
-const SCAR_SEED := 424251
+const DEATH_SEED := 424358
+## Who leads and falls on DEATH_SEED (Phase 4 P1b: in plate the Vampyr no longer falls on any
+## nearby seed, so the captain's death is shown with a placeholder merc in the office).
+const DEATH_CAPTAIN := "merc_3"
+const SCAR_SEED := 425343
 const SCAR_ATTACK := -3
 const TEMPORARY_DAYS := 5
 ## The merc who goes down on SCAR_SEED (in plate, the Vampyr no longer does).
@@ -117,7 +122,7 @@ func _check_hook_leaves_battle_stream() -> void:
 	var streams: Array[Dictionary] = []
 	for hooked: bool in [true, false]:
 		var rng := Rng.from_seed(DEATH_SEED)
-		var made := Kit.wounds(rng, "", {}, Kit.led_by("vampyr"))
+		var made := Kit.wounds(rng, "", {}, Kit.led_by(DEATH_CAPTAIN))
 		Kit.fight(made, rng, hooked)
 		var held: Dictionary = rng.state()["streams"]
 		streams.append(held)
@@ -133,7 +138,7 @@ func _check_hook_leaves_battle_stream() -> void:
 
 func _check_aftermath_applied() -> void:
 	var rng := Rng.from_seed(DEATH_SEED)
-	var made := Kit.wounds(rng, "", {}, Kit.led_by("vampyr"))
+	var made := Kit.wounds(rng, "", {}, Kit.led_by(DEATH_CAPTAIN))
 	var result := Kit.fight(made, rng, true)
 	var events: Array[Dictionary] = result["events"]
 	var succession := _first(events, "succession")
@@ -150,13 +155,13 @@ func _check_aftermath_applied() -> void:
 	)
 	check(
 		(
-			dead_id == "vampyr"
-			and made.company.member("vampyr") == null
-			and made.company.fallen == ["vampyr"]
+			dead_id == DEATH_CAPTAIN
+			and made.company.member(DEATH_CAPTAIN) == null
+			and made.company.fallen == [DEATH_CAPTAIN]
 			and entries.size() == 1
 			and str(entries[0].get("cause", "")) != ""
 			and mourned
-			and heir != "vampyr"
+			and heir != DEATH_CAPTAIN
 			and heir == str(succession.get("captain", ""))
 			and made.company.member(heir) != null
 			and dissent != ""
@@ -173,12 +178,12 @@ func _check_aftermath_applied() -> void:
 
 func _check_hook_off_changes_nothing() -> void:
 	var plain_rng := Rng.from_seed(DEATH_SEED)
-	var plain := Kit.wounds(plain_rng, "", {}, Kit.led_by("vampyr"))
+	var plain := Kit.wounds(plain_rng, "", {}, Kit.led_by(DEATH_CAPTAIN))
 	Kit.fight(plain, plain_rng, false)
 	check(
 		(
 			plain.company.roster.size() == _cast()
-			and plain.company.captain_id == "vampyr"
+			and plain.company.captain_id == DEATH_CAPTAIN
 			and plain.chronicle().entries.is_empty()
 		),
 		"the same fight without the hook leaves the company as it was"
@@ -238,7 +243,7 @@ func _attack_of(made: CompanyWounds, merc_id: String) -> int:
 
 func _check_save_round_trip() -> void:
 	var rng := Rng.from_seed(DEATH_SEED)
-	var made := Kit.wounds(rng, "", {}, Kit.led_by("vampyr"))
+	var made := Kit.wounds(rng, "", {}, Kit.led_by(DEATH_CAPTAIN))
 	Kit.fight(made, rng, true)
 	var model := Kit.reloaded(made, rng)
 	var back := Kit.wounds(model.rng, "", model.wounds, model.company)
@@ -246,16 +251,16 @@ func _check_save_round_trip() -> void:
 	check(
 		(
 			model.ok
-			and model.company.member("vampyr") == null
+			and model.company.member(DEATH_CAPTAIN) == null
 			and model.company.roster.size() == made.company.roster.size()
 			and model.company.captain_id == made.company.captain_id
-			and back.chronicle().is_dead("vampyr")
+			and back.chronicle().is_dead(DEATH_CAPTAIN)
 			and back.chronicle().entries == made.chronicle().entries
 			and (
 				back.memories_of(made.company.captain_id)
 				== made.memories_of(made.company.captain_id)
 			)
-			and not _ids(units).has("vampyr")
+			and not _ids(units).has(DEATH_CAPTAIN)
 			and units[0].id == made.company.captain_id
 		),
 		"save, reload, continue: the dead stay dead, the heir leads, chronicle and memories back"
@@ -267,7 +272,7 @@ func _check_save_round_trip() -> void:
 ## a merc not fielded gets none, the battle stream is not touched, and it survives a save.
 func _check_xp() -> void:
 	var rng := Rng.from_seed(DEATH_SEED)
-	var held := Kit.led_by("vampyr")
+	var held := Kit.led_by(DEATH_CAPTAIN)
 	var made := Kit.wounds(rng, "", {}, held)
 	var cells := _cells()
 	var spare_id: String = held.fighting_order().back()
@@ -316,21 +321,21 @@ func _paid(events: Array[Dictionary], held: Company, made: CompanyWounds) -> boo
 
 func _check_no_save_revives() -> void:
 	var rng := Rng.from_seed(DEATH_SEED)
-	var made := Kit.wounds(rng, "", {}, Kit.led_by("vampyr"))
+	var made := Kit.wounds(rng, "", {}, Kit.led_by(DEATH_CAPTAIN))
 	Kit.fight(made, rng, true)
 	var block := made.state()
 	var old_company := Company.start(Fixture.defs())
 	var old := Kit.wounds(Rng.from_seed(1), "", block, old_company)
 	var everyone_gone := Company.restore(
-		{"roster": [], "fallen": ["orc", "vampyr"]}, Fixture.defs()
+		{"roster": [], "fallen": ["orc", DEATH_CAPTAIN]}, Fixture.defs()
 	)
 	check(
 		(
-			old.company.member("vampyr") == null
-			and old.company.fallen.has("vampyr")
-			and not old.company.add("vampyr")
-			and everyone_gone.member("vampyr") == null
-			and everyone_gone.member("vampyr") == null
+			old.company.member(DEATH_CAPTAIN) == null
+			and old.company.fallen.has(DEATH_CAPTAIN)
+			and not old.company.add(DEATH_CAPTAIN)
+			and everyone_gone.member(DEATH_CAPTAIN) == null
+			and everyone_gone.member(DEATH_CAPTAIN) == null
 		),
 		"an older company block listing the dead is buried by the chronicle; none restarts empty"
 	)
