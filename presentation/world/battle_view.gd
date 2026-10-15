@@ -45,6 +45,8 @@ var _wait_s := 0.0
 var _hud: CanvasLayer = null
 var _order_label: Label = null
 var _intent_labels := {}
+var _marks := BattleMarks.new()
+var _fx := BattleFx.new()
 
 
 ## Places one sprite per fighter and shows the first turn.
@@ -56,6 +58,7 @@ func begin(fight: Battle, origin: Vector2i, sight: int) -> void:
 	for fighter: BattleUnit in battle.units:
 		_sprites[fighter.id] = street_stage.add_merc(world_point(fighter.cell))
 		_rings[fighter.id] = _ring()
+	_marks.begin(street_stage, _origin)
 	_make_hud()
 	if not panel.chosen.is_connected(_on_choice):
 		panel.chosen.connect(_on_choice)
@@ -65,6 +68,8 @@ func begin(fight: Battle, origin: Vector2i, sight: int) -> void:
 
 ## Takes the fighters off the street.
 func clear() -> void:
+	_fx.clear(_sprites, battle)
+	_marks.clear()
 	for unit_id: Variant in _sprites:
 		var sprite: Sprite3D = _sprites[unit_id]
 		street_stage.remove_merc(sprite)
@@ -76,6 +81,24 @@ func clear() -> void:
 		_hud.queue_free()
 		_hud = null
 	_intent_labels.clear()
+
+
+## What the fight has left on the field: blood at every hit, bodies where they fell (P6b).
+func marks() -> BattleMarks:
+	return _marks
+
+
+## The hit and death flashes (P6b).
+func fx() -> BattleFx:
+	return _fx
+
+
+## The sprite standing for a fighter (tests and the fx read it), or null.
+func sprite_of(unit_id: String) -> Sprite3D:
+	if not _sprites.has(unit_id):
+		return null
+	var found: Sprite3D = _sprites[unit_id]
+	return found
 
 
 ## The turn order strip's words (tests read it).
@@ -113,6 +136,7 @@ func click_cell(street_cell: Vector2i) -> void:
 func _process(delta: float) -> void:
 	if battle == null:
 		return
+	_fx.tick(delta, _sprites, battle)
 	_place_intents()
 	if battle.is_over():
 		return
@@ -136,10 +160,13 @@ func _on_choice(choice_id: String) -> void:
 
 
 func _play(action: Dictionary) -> void:
-	if battle.apply(action).is_empty():
+	var events := battle.apply(action)
+	if events.is_empty():
 		return
 	acted.emit(action)
 	_refresh()
+	_marks.record(events, battle, _sprites, _fx)
+	_fx.play(events, _sprites)
 	if battle.is_over():
 		finished.emit()
 	else:

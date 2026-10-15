@@ -1,0 +1,28 @@
+{
+  "_comment": "Phase 4 P6b: what a hit leaves on the field and how it flashes (presentation/battle/). Read by battle_marks.gd and battle_fx.gd; battle_view.md explains each knob. Colours are palette references in the code, never here.",
+  "splat": {
+    "half_px": 26,
+    "base_area_px": 170,
+    "area_per_damage_px": 55,
+    "max_area_px": 800,
+    "satellite_from_damage": 4,
+    "satellite_area_px": 16,
+    "satellite_min_px": 8,
+    "satellite_ring_px": 21,
+    "jitter_px": 18,
+    "jitter_front_px": 26,
+    "seed_mul": 7919
+  },
+  "age": {
+    "wet_after_actions": 6,
+    "dry_after_actions": 16
+  },
+  "flash": {
+    "hit_s": 0.09,
+    "death_s": 0.18
+  },
+  "lift": {
+    "splat_m": 0.06,
+    "body_m": 0.05
+  }
+}
