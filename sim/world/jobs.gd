@@ -175,9 +175,15 @@ func _settle(row: Dictionary, verdict: String) -> Dictionary:
 	return {"id": id, "job": job, "verdict": verdict, "day": world.day}
 
 
-## Done: the contract pays (Economy.complete).
+## Done: the contract pays (Economy.complete), its share to the mercs who fought it (C3):
+## the company's fighting order.
 func _pay(id: String) -> void:
-	company.economy.complete(id)
+	var fought: Array[Merc] = []
+	for merc_id: String in company.fighting_order():
+		var merc := company.member(merc_id)
+		if merc != null:
+			fought.append(merc)
+	company.economy.complete(id, fought)
 
 
 ## A job failed honestly (deadline or a lost fight): the employer's name for the company is

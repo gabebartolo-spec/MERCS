@@ -100,7 +100,7 @@ class Played:
 		jobs.memory = memory
 		world.day_hook = func(day: int) -> void:
 			verdicts.append_array(jobs.on_day(day))
-			company.economy.on_day(company.roster.size(), day, site_ids, rng)
+			company.economy.on_day(company.roster, day, site_ids, rng)
 
 	## One move: a standing fight settled, else a step toward the job, else a rest.
 	func move(won: bool) -> void:

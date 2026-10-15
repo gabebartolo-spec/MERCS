@@ -80,7 +80,7 @@ func economy() -> Economy:
 
 func _on_day(day: int) -> void:
 	_judge().on_day(day)
-	company.economy.on_day(company.roster.size(), day, _site_ids(), rng)
+	company.economy.on_day(company.roster, day, _site_ids(), rng)
 	if is_open():
 		_show()
 
@@ -192,7 +192,7 @@ func _wages_rows() -> Array[Dictionary]:
 		"morale": economy.morale,
 		"owed": economy.owed,
 		"days": economy.unpaid_days,
-		"per_day": economy.wage_per_day(company.roster.size()),
+		"per_day": economy.wage_per_day(company.roster),
 		"count": company.roster.size(),
 	}
 	var rows: Array[Dictionary] = [_label(Text.t("hub.title", params))]

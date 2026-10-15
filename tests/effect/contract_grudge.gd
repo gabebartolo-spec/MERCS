@@ -24,7 +24,7 @@ func run() -> Dictionary:
 func _deal(abandons: bool) -> String:
 	var company := Company.start(Fixture.defs())
 	var economy := company.economy
-	economy.on_day(company.roster.size(), DAY, SITES, Rng.from_seed(SEED))
+	economy.on_day(company.roster, DAY, SITES, Rng.from_seed(SEED))
 	var row: Dictionary = economy.board[0]
 	var id_taken := str(row.get("id", ""))
 	var faction := str(row.get("faction", ""))
