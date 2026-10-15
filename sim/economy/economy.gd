@@ -28,6 +28,10 @@ const RANSOM := Prisoners.RANSOM
 const EXECUTE := Prisoners.EXECUTE
 const RECRUIT := Prisoners.RECRUIT
 const CHOICES: Array[String] = Prisoners.CHOICES
+## The captain's chronicle line when the company walks from a contract (abandon): with a grudge
+## grown (a sizeable advance kept) or without.
+const KEY_ABANDON := "standing.abandon"
+const KEY_GRUDGE := "standing.grudge"
 
 var purse := 0
 ## Wages fallen due and not yet paid, and the days since the debt was last cleared.
@@ -202,7 +206,7 @@ func abandon(id: String, company: Company, day: int) -> bool:
 		return false
 	board.erase(row)
 	var grew := standing.abandoned(row, company.captain_id, day)
-	var key := "standing.grudge" if grew else "standing.abandon"
+	var key := KEY_GRUDGE if grew else KEY_ABANDON
 	chronicle.append({"day": day, "merc": company.captain_id, "key": key})
 	return true
 

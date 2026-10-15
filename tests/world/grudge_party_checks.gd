@@ -18,6 +18,8 @@ const SIZES: Array[int] = [3, 4, 5, 5]
 const BLIND_DAYS := 3
 const AFTER_DAYS := 10
 const SPLIT := 6
+const BATTLE := "res://data/balance/battle.json"
+const SCENARIOS := "res://data/scenarios.json"
 
 var _check: Callable
 
@@ -30,6 +32,7 @@ func run(check: Callable) -> void:
 	_check_not_sent(HALF, true)
 	_check_one_per_deal()
 	_check_lineups()
+	_check_in_sight()
 	_check_not_psychic()
 	_check_fights_once(true)
 	_check_fights_once(false)
@@ -138,6 +141,33 @@ func _check_lineups() -> void:
 		unrolled = unrolled and played.rng.state() == before
 	_check.call(sizes == SIZES, "the hunters grow with the grudge: %s, got %s" % [SIZES, sizes])
 	_check.call(unrolled, "a hunter line-up is picked by strength, nothing rolled")
+
+
+## Every hunter in every enc_hunters line-up starts within the battle's sight_cells of the
+## company's nearest road cell, so the fight opens with each side in the other's sight.
+func _check_in_sight() -> void:
+	var rules: Dictionary = World.json(BATTLE).get("rules", {})
+	var sight := Merc.whole(rules.get("sight_cells"))
+	var scenarios: Array = World.json(SCENARIOS).get("scenarios", [])
+	var slice: Dictionary = scenarios[0]
+	var road := EncounterBattle.company_cells(slice)
+	var worst := -1
+	for encounter: Dictionary in World.json(World.ENCOUNTERS).get("encounters", []):
+		if encounter.get("type") != GrudgeParties.TYPE:
+			continue
+		for lineup: Array in encounter.get("lineups", []):
+			for enemy: Dictionary in lineup:
+				var raw: Array = enemy.get("cell", [])
+				var cell := Vector2i(Merc.whole(raw[0]), Merc.whole(raw[1]))
+				var nearest := -1
+				for mine: Vector2i in road:
+					var gap := BattleGrid.gap(cell, mine)
+					nearest = gap if nearest < 0 else mini(nearest, gap)
+				worst = maxi(worst, nearest)
+	_check.call(
+		sight > 0 and not road.is_empty() and worst >= 0 and worst <= sight,
+		"every hunter deploys within sight_cells (%d) of the company: farthest %d" % [sight, worst]
+	)
 
 
 ## The hunters walk the same whether the band stands near them or far, while they cannot see it.
