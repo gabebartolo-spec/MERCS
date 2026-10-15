@@ -18,13 +18,16 @@ const ILLEGAL_EVERY := 7
 ## Re-pinned, all seven, by Phase 4 P5 (claude/p4-p5-ai): the enemy no longer picks the foe
 ## beside it with the least exact health (rule 6) but the one it saw wounded, ties by id
 ## (BattleKnowledge), so plans, blows and the fights after them move.
+## Re-pinned by Phase 4 P2 (morale, surrender, the captain's fall) on top of P5: seeds 1, 7,
+## 1337, 424242, 90210 and 2026 now end with the broken band's men running or surrendering
+## (and the chief's fall breaking his shaky bandits first); seed 31 is unchanged.
 const GOLDEN := {
-	1: "96ac7f0cdcc02663af1d3e3bd702f5dd6c324c11abc82e9d232a2a1482f49c37",
-	7: "31bc8b7f0deeb01cc01da293a0e43fe14e2b241c19e47c8d072f48df258c437e",
-	1337: "b5091dc1e2240133614b61bbaaf29f08701c2ab77d13077e4c248667659e31b0",
-	424242: "a89399317d62cb8bdc90f1d4c6568398aa79a4b7a352ea46e8bb78b05c2657f0",
-	90210: "fac4d9f90e51a8a3cacee2187171a235170bff0dd0d568decd74096bbb02b7a1",
-	2026: "232f42b609260a525fa9b89de8bbb47b44e6cc2befde5979beefa43d316036cd",
+	1: "3299931e9bdb761e4059482a56a893ea1cc7edd80068325ddfa4b3cd166c509c",
+	7: "7568529f025b8ea2c47b985b30b29e5e221424b06cd42bfa23c4783ec7ef2150",
+	1337: "036b27068c601f3442f239d5e186a8064d14023fd0d74b38c96996d091f1b538",
+	424242: "a1b6cca7a1fba6c46516214e263cf2c1ccd37ecdd2b1ed581c583549305f43b3",
+	90210: "99c70224e351a57618f1687ead0e8d972c3cfa1901fbebb269198a1ab91b87a9",
+	2026: "5cd2331f919abb9568429914bd493e439fdb776daa16bdcbfc3d3e372cbc4c63",
 	31: "ac55cc7c4e59ae637676de3c515542566de606443c76050c5fed73a1103cb975",
 }
 const MARK := "golden_mark"
@@ -51,9 +54,25 @@ func run(check: Callable) -> void:
 		_note_coverage(battle, seen)
 	_check.call(hashes_ok, "every golden fight's event log and end state hash as pinned")
 	_check.call(replay_ok, "each golden fight's actions replayed into a fresh battle match it")
-	var covered := ["rout", "wipe", "charge", "blood_price", MARK, "shaken", "ambush"]
+	var covered := [
+		"rout",
+		"wipe",
+		"charge",
+		"blood_price",
+		MARK,
+		"shaken",
+		"ambush",
+		"surrender",
+		"captain_fall"
+	]
 	var all_seen := covered.all(func(key: String) -> bool: return seen.has(key))
-	_check.call(all_seen, "the golden fights cover rout, wipe, both moves, hook, shaken, ambush")
+	(
+		_check
+		. call(
+			all_seen,
+			"the golden fights cover rout, wipe, both moves, hook, shaken, ambush, surrender, captain's fall"
+		)
+	)
 
 
 func _rules() -> Dictionary:
@@ -186,7 +205,7 @@ func _note_coverage(battle: Battle, seen: Dictionary) -> void:
 		var kind := str(event.get("type", ""))
 		if kind == Battle.ACTION_ATTACK:
 			seen[str(event.get("move", ""))] = true
-		elif kind in [MARK, "shaken"]:
+		elif kind in [MARK, "shaken", Battle.EVENT_SURRENDER, Battle.EVENT_CAPTAIN_FALL]:
 			seen[kind] = true
 	var first := _first_act(battle)
 	var actor := battle.unit(str(first.get("unit", "")))

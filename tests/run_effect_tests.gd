@@ -21,6 +21,8 @@ const EXPECTED_IDS: Array[String] = [
 	"death_memory",
 	"battle_blocking",
 	"battle_rout",
+	"battle_captain",
+	"battle_surrender",
 	"battle_ai_knowledge",
 	"wiring_hook",
 	"wiring_death_reload",
