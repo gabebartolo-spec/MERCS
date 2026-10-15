@@ -3,7 +3,7 @@ extends "res://tests/lib/runner.gd"
 ## the logged cell of every wound, in the order they happened, and a body at the cell of every
 ## fighter who fell, and both stay until the fight is cleared; a splat's picture is the same for
 ## the same hit and differs between hits, uses the core blood ramp only, has no stray pixel and
-## no gradient, and dries (fresh, dark, brown) without vanishing; a wounded fighter shows a
+## no gradient, and darkens (fresh, dark red; no brown) without vanishing; a wounded fighter shows a
 ## bone-white flash frame and gets its own frame back. The scene checks play the slice's fight
 ## on the street at 1920x1080 with the player's turns as real clicks.
 ## Seeded by design: Rng.from_seed with fixed seeds; both sides by BattleAi; no clock.
@@ -17,7 +17,8 @@ const MAX_ACTIONS := 300
 const MIN_HITS := 3
 const FIGHT_FRAMES := 6000
 const SETTLE := 40
-const BLOOD_REFS: Array[String] = ["blood:0", "blood:1", "blood:2", "soot:2"]
+const BLOOD_REFS: Array[String] = ["blood:0", "blood:1"]
+const PIXEL_TOLERANCE := 0.08
 const SAMPLE_HITS := 24
 const MAX_DAMAGE := 7
 const NOWHERE := Vector2i(-1, -1)
@@ -103,6 +104,7 @@ func _check_model(seed_value: int) -> void:
 		_bodies_on_last_blow(marks, played),
 		"%s: each body lies where its fighter took the last blow" % tag
 	)
+	_check_fall(marks, played, tag)
 	_check_persistence(marks, played, tag)
 	_check_replay(marks, played, tag)
 	marks.clear()
@@ -123,6 +125,21 @@ func _bodies_on_last_blow(marks: BattleMarks, played: Played) -> bool:
 	return true
 
 
+## Each body falls away from the fighter who struck the last blow, the same way every replay.
+func _check_fall(marks: BattleMarks, played: Played, tag: String) -> void:
+	var away := not marks.bodies.is_empty()
+	for body: Dictionary in marks.bodies:
+		var killer := played.battle.unit(str(body["by"]))
+		var dir: Vector2i = body["dir"]
+		var cell: Vector2i = body["cell"]
+		var from: Vector2i = body["from"]
+		away = away and killer != null
+		if cell != from:
+			away = away and dir == marks.fall_dir(cell, from, 0)
+			away = away and Vector2(cell - from).dot(Vector2(dir)) > 0
+	check(away, "%s: each body lies head away from the fighter who struck it down" % tag)
+
+
 func _check_persistence(marks: BattleMarks, played: Played, tag: String) -> void:
 	var before := marks.splats.size()
 	var kept := marks.body_units()
@@ -136,7 +153,7 @@ func _check_persistence(marks: BattleMarks, played: Played, tag: String) -> void
 	var dry := true
 	for splat: Dictionary in marks.splats:
 		dry = dry and marks.age_of(splat) == BattleMarks.DRY
-	check(dry, "%s: old blood has dried to brown" % tag)
+	check(dry, "%s: old blood has darkened and stayed" % tag)
 
 
 func _check_replay(marks: BattleMarks, played: Played, tag: String) -> void:
@@ -173,7 +190,7 @@ func _check_pictures() -> void:
 				if level == BattleMarks.FRESH:
 					varied[image.get_data().hex_encode()] = true
 	check(ok.square, "a splat's picture is a small odd square of whole pixels")
-	check(ok.ramp, "every splat pixel is a blood-ramp (or dried-edge soot) colour, fully opaque")
+	check(ok.ramp, "every splat pixel is one of the blood ramp's two reds (no brown), fully opaque")
 	check(ok.tones, "a splat is a fill and a shadow edge only: no gradient")
 	check(ok.specks, "no splat has a clump smaller than the data's minimum: no speckle")
 	check(
@@ -182,10 +199,20 @@ func _check_pictures() -> void:
 
 
 func _check_pixels() -> void:
+	var fall := BattleMarks.new()
+	var here := Vector2i(3, 3)
+	var turned := (
+		fall.fall_dir(here, here + Vector2i.LEFT, 0) == Vector2i.RIGHT
+		and fall.fall_dir(here, here + Vector2i.RIGHT, 0) == Vector2i.LEFT
+		and fall.fall_dir(here, here + Vector2i.UP, 0) == Vector2i.DOWN
+		and fall.fall_dir(here, here + Vector2i.DOWN, 0) == Vector2i.UP
+	)
+	check(turned, "a body falls east, west, south or north: away from where the blow came from")
 	var marks := BattleMarks.new()
 	var fresh := marks.splat_image(3, 4, BattleMarks.FRESH)
 	var dry := marks.splat_image(3, 4, BattleMarks.DRY)
-	check(fresh.get_data() != dry.get_data(), "dried blood is a different colour from fresh")
+	check(fresh.get_data() != dry.get_data(), "old blood is a darker colour than fresh")
+	check(_lum(dry) < _lum(fresh), "darker means older: the old splat is darker than the fresh one")
 	var big := marks.splat_image(3, MAX_DAMAGE, BattleMarks.FRESH)
 	var small := marks.splat_image(3, 1, BattleMarks.FRESH)
 	check(_solid(big) > _solid(small), "a harder blow leaves a bigger splat")
@@ -203,6 +230,18 @@ func _tones(image: Image, allowed: Array[Color]) -> int:
 				return -1
 			tones[c.to_html()] = true
 	return tones.size()
+
+
+func _lum(image: Image) -> float:
+	var total := 0.0
+	var n := 0
+	for y: int in image.get_height():
+		for x: int in image.get_width():
+			var c := image.get_pixel(x, y)
+			if c.a > 0.0:
+				total += c.get_luminance()
+				n += 1
+	return total / maxf(1.0, float(n))
 
 
 func _solid(image: Image) -> int:
@@ -351,6 +390,56 @@ func _check_bodies(mounted: Kit.Mounted) -> void:
 		gone = gone and not sprite.visible
 	check(on_field, "each fallen fighter's body is on the field at the end of the fight")
 	check(gone, "a fallen fighter's standing sprite has gone, the body stays")
+	var inside := true
+	var clear := true
+	for body: Dictionary in marks.bodies:
+		var rect := marks.body_rect(body)
+		var body_cell: Vector2i = body["cell"]
+		var area := marks.footprint(body_cell)
+		inside = inside and rect.size != Vector2.ZERO and area.encloses(rect)
+		for fighter: BattleUnit in view.battle.units:
+			if not fighter.down:
+				clear = clear and not rect.intersects(marks.feet_rect(fighter.cell))
+	check(inside, "every body lies inside its own cell's footprint")
+	check(clear, "no body is drawn over a standing fighter's feet")
+	var rings := 0
+	for node: Node in mounted.stage.world().get_children():
+		var ring := node as MeshInstance3D
+		if ring != null and ring.mesh is CylinderMesh and ring.visible:
+			rings += 1
+	var living := 0
+	for fighter: BattleUnit in view.battle.units:
+		living += 0 if fighter.down else 1
+	check(rings == living, "a base ring under every living fighter and none under the dead")
+	check(_one_pixel_scale(mounted), "ground marks and figures show the same pixel size on screen")
+
+
+## A ground texel (along the width and along the depth) and a figure's texel cover the same
+## screen distance, so there is one pixel scale on screen.
+func _one_pixel_scale(mounted: Kit.Mounted) -> bool:
+	var marks := mounted.view.marks
+	var camera := mounted.stage.camera()
+	for splat: Dictionary in marks.splats:
+		if not _same_pixels(camera, marks.node_of(splat)):
+			return false
+	return true
+
+
+func _same_pixels(camera: Camera3D, node: Sprite3D) -> bool:
+	var at := node.global_position
+	var origin := camera.unproject_position(at)
+	var texel := node.pixel_size
+	var wide := absf(camera.unproject_position(at + Vector3(texel, 0.0, 0.0)).x - origin.x)
+	var deep := absf(
+		camera.unproject_position(at + Vector3(0.0, 0.0, texel * node.scale.z)).y - origin.y
+	)
+	var basis := camera.global_transform.basis
+	var tall := absf(camera.unproject_position(at + basis.y * texel).y - origin.y)
+	var wide_figure := absf(camera.unproject_position(at + basis.x * texel).x - origin.x)
+	return (
+		absf(wide - wide_figure) <= PIXEL_TOLERANCE * wide_figure
+		and absf(deep - tall) <= PIXEL_TOLERANCE * tall
+	)
 
 
 func _last_hit_cell(battle: Battle, unit_id: String) -> Vector2i:

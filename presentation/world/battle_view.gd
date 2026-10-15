@@ -7,7 +7,7 @@ extends Node
 ## on a reachable cell moves; enemy turns play themselves after a short pause (BattleAi, which
 ## only acts on what it sees). A flat ring under each fighter says whose side they are on
 ## (placeholder until the hand-made cast's art carries it; slice.json "markers"); a downed
-## fighter's sprite goes and a dark ring marks where they fell. A strip along the bottom
+## fighter's sprite and ring go and the body stays (BattleMarks). A strip along the bottom
 ## left (clear of the help line at the top) shows the turn order from now
 ## (Battle.turn_order) and whether a side wavers; a word marker over each enemy's head shows
 ## its intent for the round until it acts (Battle.intent). The intents are one backed line
@@ -259,11 +259,8 @@ func _refresh() -> void:
 		sprite.visible = not fighter.down
 		var ring: MeshInstance3D = _rings[fighter.id]
 		ring.position = world_point(fighter.cell) + Vector3.UP * _markers.num("markers", "lift_m")
-		var key := (
-			"down"
-			if fighter.down
-			else ("company" if fighter.side == BattleUnit.COMPANY else "enemy")
-		)
+		ring.visible = not fighter.down
+		var key := "company" if fighter.side == BattleUnit.COMPANY else "enemy"
 		var material := ring.material_override as StandardMaterial3D
 		material.albedo_color = _markers.colour("markers", key)
 

@@ -13,12 +13,18 @@ One line per knob (docs/05_STYLE_CODE.md "Data"). Read by `presentation/battle/b
 - `seed_mul`: the splat's shape seed = hit number x this + damage; no clock, no roll on the sim's streams.
 
 ## age
-Counted in applied actions since the hit. Blood goes fresh red, then dark red, then dried brown. Splats never vanish before the fight ends.
-- `wet_after_actions`, `dry_after_actions`: where it turns dark and where it turns brown.
+Counted in applied actions since the hit. Blood goes fresh red, then dark red (the blood ramp's two reds; its brown is not used). Splats never vanish before the fight ends.
+- `wet_after_actions`, `dry_after_actions`: where it turns dark red and where it settles (same colours; the oldest tone).
 
 ## flash
 - `hit_s`: seconds a wounded fighter shows its bone-white flash frame (placeholder until the Art agent's hit frames).
 - `death_s`: the same for the fighter who falls; then the sprite goes and the body stays.
+
+## body
+- `cell_width_m`: the width of a cell's footprint; a lying body is shrunk to fit inside it (and inside its row's depth).
+- `margin_m`: gap kept to the footprint's edge and to the feet.
+- `feet_half_m`: half the ground a standing fighter's feet cover; a body never lies over it.
+- `probe_m`: the step used to measure how the camera foreshortens the ground at a mark, so its pixels match the figures'.
 
 ## lift
 - `splat_m`, `body_m`: metres above the ground the splats and bodies lie, both above the side ring's top (0.022 m) so the ring does not hide them; the body is lower so blood lies over it.

@@ -34,4 +34,4 @@ ironman 12
 ironman_resume 22
 look 17
 perf 14
-battle_view 35
+battle_view 43
