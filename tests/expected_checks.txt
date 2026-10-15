@@ -8,7 +8,7 @@ stage_scale 11
 stage_light 8
 assets 13
 slice 16
-battle 32
+battle 33
 loop 8
 sim_world 11
 sim_encounters 11
@@ -24,7 +24,7 @@ economy_company 44
 hub 12
 injury 29
 wiring 15
-hub_fight 1
+hub_fight 2
 story 60
 story_gui 17
 campaign 6

@@ -23,6 +23,7 @@ var _check: Callable
 func run(check: Callable) -> void:
 	_check = check
 	_check_captain_fall()
+	_check_broken_no_plan()
 	_check_all_broken()
 	_check_rout_way_out()
 	_check_pinned_and_free()
@@ -107,6 +108,31 @@ func _check_captain_fall() -> void:
 			and battle.standing(BattleUnit.ENEMY).get("broken") == ["raw"]
 		),
 		"the captain's fall: the steady veteran holds, the shaky one breaks and stops acting"
+	)
+
+
+## A man who broke at his captain's fall shows no plan, at once and in the next round, while
+## the veteran who held plans again (D-066: the intent shown is what will happen).
+func _check_broken_no_plan() -> void:
+	var others: Array[BattleUnit] = [
+		_enemy("lead", Vector2i(1, 0), STEADY, true),
+		_enemy("vet", Vector2i(6, 5), STEADY),
+		_enemy("raw", Vector2i(7, 5), SHAKY),
+	]
+	var battle := _fight(_rules(), others)
+	battle.apply({"type": Battle.ACTION_ATTACK, "target": "lead"})
+	var at_once := battle.intent("raw").is_empty()
+	battle.apply({"type": Battle.ACTION_WAIT})
+	var planned := battle.intents().map(func(plan: Dictionary) -> String: return plan["unit"])
+	_check.call(
+		(
+			at_once
+			and battle.intent("raw").is_empty()
+			and not "raw" in planned
+			and "vet" in planned
+			and not battle.is_over()
+		),
+		"a man broken at his captain's fall shows no plan; the veteran who held plans on"
 	)
 
 

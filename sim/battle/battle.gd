@@ -137,9 +137,10 @@ func turn_order() -> Array[BattleUnit]:
 
 
 ## What a standing enemy plans for this round, until it acts: {"unit", "kind": "attack" |
-## "advance" | "hold", "target"} (BattleAi.intent); {} when it has no plan.
+## "advance" | "hold", "target"} (BattleAi.intent); {} when it has no plan or broke at his
+## captain's fall (a broken man never acts, so he shows no plan).
 func intent(unit_id: String) -> Dictionary:
-	return _intents.plan(unit_id)
+	return {} if _morale.is_broken(unit_id) else _intents.plan(unit_id)
 
 
 ## Every plan still to be carried out this round, in turn order.
@@ -185,7 +186,7 @@ func standing(side: int) -> Dictionary:
 	return _morale.view(units, side)
 
 
-## A new round: each standing enemy plans what it will do from what it can see.
+## A new round: each standing enemy who has not broken plans what it will do from what it can see.
 func _begin_round(events: Array[Dictionary]) -> void:
 	events.append(_turns.next_round())
-	events.append_array(_intents.plan_round(self, _turns.order(), _rules.num("sight_cells")))
+	events.append_array(_intents.plan_round(self, _turns.turn_order(), _rules.num("sight_cells")))
