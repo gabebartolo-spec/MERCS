@@ -186,6 +186,8 @@
   "battle.order.separator": " > ",
   "battle.shaken.company": "The company wavers.",
   "battle.shaken.enemy": "The enemy wavers.",
+  "battle.intent.line": "{who}: {plan}",
+  "battle.name.numbered": "{name} {n}",
   "battle.intent.attack": "Attacks {target}",
   "battle.intent.advance": "Advances on {target}",
   "battle.intent.hold": "Holds",

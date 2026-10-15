@@ -89,7 +89,8 @@
   "pixel": {
     "logical_width_px": 960,
     "logical_height_px": 540,
-    "integer_scale": 2
+    "integer_scale": 2,
+    "fight_zoom": 2
   },
   "capture": {
     "settle_frames": 4,
