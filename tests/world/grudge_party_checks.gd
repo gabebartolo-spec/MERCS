@@ -14,7 +14,7 @@ const SEED := 424242
 const HALF := 50
 const THIRD := 33
 ## The enemy count of enc_hunters' line-ups, by strength 1, 2, 3, and past the last.
-const SIZES: Array[int] = [3, 4, 5, 5]
+const SIZES: Array[int] = [4, 5, 6, 6]
 const BLIND_DAYS := 3
 const AFTER_DAYS := 10
 const SPLIT := 6

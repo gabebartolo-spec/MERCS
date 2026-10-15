@@ -181,11 +181,6 @@
         [
           { "fighter": "bandit_chief", "cell": [9, 4] },
           { "fighter": "bandit_spearman", "cell": [8, 2] },
-          { "fighter": "bandit", "cell": [8, 6] }
-        ],
-        [
-          { "fighter": "bandit_chief", "cell": [9, 4] },
-          { "fighter": "bandit_spearman", "cell": [8, 2] },
           { "fighter": "bandit", "cell": [8, 6] },
           { "fighter": "bandit", "cell": [8, 4] }
         ],
@@ -195,6 +190,14 @@
           { "fighter": "bandit", "cell": [8, 6] },
           { "fighter": "bandit", "cell": [8, 4] },
           { "fighter": "bandit_spearman", "cell": [9, 6] }
+        ],
+        [
+          { "fighter": "bandit_chief", "cell": [9, 4] },
+          { "fighter": "bandit_spearman", "cell": [8, 2] },
+          { "fighter": "bandit", "cell": [8, 6] },
+          { "fighter": "bandit", "cell": [8, 4] },
+          { "fighter": "bandit_spearman", "cell": [9, 6] },
+          { "fighter": "bandit", "cell": [9, 2] }
         ]
       ]
     }
