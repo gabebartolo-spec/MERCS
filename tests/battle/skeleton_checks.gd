@@ -164,14 +164,20 @@ func _check_loadout() -> void:
 	var orc := _unit("o", BattleUnit.COMPANY, Vector2i(1, 1), {"moves": many, "initiative": 2})
 	var bandit := _unit("b", BattleUnit.ENEMY, Vector2i(2, 1), {"hp": SURE_HIT})
 	var battle := _battle([orc, bandit], GRID)
-	var kept := orc.moves.size() == cap and orc.knows("charge") and not orc.knows("m5")
+	var kept := orc.moves.size() == 2 and orc.knows("charge") and not orc.knows("m3")
 	orc.teach("blood_price", false)
 	var unlearnt := battle.apply({"type": "blood_price", "target": "b"}).is_empty()
 	var undefined := battle.apply({"type": "m3", "target": "b"}).is_empty()
 	var used := not battle.apply({"type": "charge", "target": "b"}).is_empty()
-	_check.call(
-		cap == 4 and kept and unlearnt and undefined and used,
-		"a fighter takes at most %d learnt moves; only a learnt move in data can be used" % cap
+	(
+		_check
+		. call(
+			cap == 4 and kept and unlearnt and undefined and used,
+			(
+				"a fighter takes at most %d catalogued learnt moves; only a learnt move in data can be used"
+				% cap
+			)
+		)
 	)
 
 

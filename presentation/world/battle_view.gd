@@ -205,7 +205,7 @@ func _actions(actor: BattleUnit) -> Array[Dictionary]:
 		if _adjacent(actor.cell, enemy.cell):
 			out.append(
 				{
-					"id": Battle.ACTION_ATTACK + ":" + enemy.id,
+					"id": battle.kit(actor.id)[0] + ":" + enemy.id,
 					"label": Text.t("slice.battle.attack", params)
 				}
 			)

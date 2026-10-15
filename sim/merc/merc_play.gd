@@ -26,7 +26,7 @@ static func play_out(battle: Battle, rules: Dictionary, max_turns: int) -> Array
 static func choose(battle: Battle, fighter: BattleUnit, rules: Dictionary) -> Dictionary:
 	var sight := Merc.whole(rules.get("sight_cells", 0))
 	var plain := BattleAi.choose(battle, fighter, sight)
-	if fighter.can_blood_price and plain.get("type") == Battle.ACTION_ATTACK:
+	if fighter.can_blood_price and plain.get("type") == battle.kit(fighter.id)[0]:
 		var target := battle.unit(str(plain["target"]))
 		if _worth_the_price(fighter, target, battle.move_def(BattleUnit.MOVE_BLOOD_PRICE)):
 			return {"type": Battle.ACTION_BLOOD_PRICE, "target": target.id}

@@ -29,6 +29,8 @@ func run(check: Callable) -> void:
 	_check_kit_legality()
 	_check_reach()
 	_check_bow_waits()
+	_check_weapon_replaces_attack()
+	_check_base_ids_do_not_crowd()
 	_check_replay()
 
 
@@ -169,12 +171,53 @@ func _check_bow_waits() -> void:
 	var battle := _battle([c, b])
 	var refused := battle.apply({"type": "bow", "target": "b"}).is_empty()
 	var log_before := battle.log.size()
-	var plain := not battle.apply({"type": Battle.ACTION_ATTACK, "target": "b"}).is_empty()
+	var plain := battle.apply({"type": Battle.ACTION_ATTACK, "target": "b"}).is_empty()
 	_check.call(
-		battle.kit("c") == ["bow"] and refused and plain and battle.log.size() > log_before,
+		battle.kit("c") == ["bow"] and refused and plain and battle.log.size() == log_before,
 		(
 			"a bow's shot is in the kit but refused until its line of fire exists (P1c); "
-			+ "the archer still strikes beside him"
+			+ "the plain blow is not open beside it (the weapon action replaces it)"
+		)
+	)
+
+
+## Director Q-A "1 weapon + 4 moves": a fighter with a weapon class has no plain attack beside
+## his weapon action; one without a class keeps it; move and wait stay open for both.
+func _check_weapon_replaces_attack() -> void:
+	var classed := _unit("c", BattleUnit.COMPANY, Vector2i(1, 1), {"initiative": 9})
+	classed.weapon_class = "sword"
+	var bare := _unit("u", BattleUnit.COMPANY, Vector2i(1, 3), {"initiative": 8})
+	var foe := _unit("b", BattleUnit.ENEMY, Vector2i(2, 2), {"hp": SURE_HIT, "initiative": 1})
+	var battle := _battle([classed, bare, foe])
+	var blow := {"type": Battle.ACTION_ATTACK, "target": "b"}
+	var classed_plain := battle.apply(blow).is_empty()
+	var classed_sword := not battle.apply({"type": "sword", "target": "b"}).is_empty()
+	var bare_plain := not battle.apply(blow).is_empty()
+	var move_open := not battle.apply({"type": Battle.ACTION_WAIT}).is_empty()
+	_check.call(
+		classed_plain and classed_sword and bare_plain and move_open,
+		(
+			"a classed fighter's plain attack is refused and his weapon action strikes; "
+			+ "a classless one keeps the plain attack"
+		)
+	)
+
+
+## A listed base id (move, attack, wait) must not push a learnt technique out of the kit: the
+## catalogued techniques are filtered first, then capped at four.
+func _check_base_ids_do_not_crowd() -> void:
+	var listed: Array = ["move", "attack", "wait", "charge", "blood_price"]
+	var learner := _unit("l", BattleUnit.COMPANY, Vector2i(1, 1), {"moves": listed})
+	var foe := _unit("b", BattleUnit.ENEMY, Vector2i(8, 1), {})
+	var battle := _battle([learner, foe])
+	_check.call(
+		(
+			battle.kit("l") == ["attack", "charge", "blood_price"]
+			and str(battle.unit("l").moves) == str(["charge", "blood_price"])
+		),
+		(
+			"base ids listed among the moves do not crowd a learnt technique out: %s"
+			% [battle.kit("l")]
 		)
 	)
 
