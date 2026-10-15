@@ -9,19 +9,16 @@ extends "res://tests/lib/runner.gd"
 ## when it ends the fighters leave the street, the result is applied and the map returns with
 ## the outcome in words. Paying the toll skips the fight and the patrol leaves the map. An
 ## ambush offers only Fight and the enemy strikes first. A party out of sight does not come
-## for a band walking away. A save taken with an encounter standing reopens on its panel. The
-## company's moves in the fight use the sim's BattleAi for the choice; attacks and waits are
-## real clicks, a move calls click_cell().
+## for a band walking away. A save taken with an encounter standing reopens on its panel. In
+## the fight BattleAi picks the company's moves; attacks and waits are real clicks.
 ## Seeded by design: the balance seed (data/balance/world.json).
 ##   godot --headless --path . --script tests/run_road_tests.gd
 
 const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const World := preload("res://tests/lib/world_fixture.gd")
 const InputKit := preload("res://tests/lib/input_kit.gd")
-const BATTLE_DATA := "res://data/balance/battle.json"
 const WINDOW_SIZE := Vector2i(1920, 1080)
 const LAYOUT_FRAMES := 3
-const FIGHT_FRAMES := 6000
 const OUT := 3
 const NEAR := 3
 ## Beyond every party type's sight (data/balance/world.json "parties").
@@ -182,21 +179,13 @@ func _check_fight_starts(game: SliceGame, director: OverworldDirector) -> void:
 
 ## The fight to its end: fighters off the street, the result applied, the map back in words.
 func _check_fight_returns(game: SliceGame, director: OverworldDirector, before: Dictionary) -> void:
-	var won := await _finish_fight(director)
+	var won := await InputKit.finish_fight(self, director)
 	await _frames(LAYOUT_FRAMES)
 	var world := director.world
-	var supplies: int = before.get("supplies", 0)
-	var loot: int = _knobs("patrol").get("win_supplies", 0)
-	var lost: int = _knobs("patrol").get("loss_supplies", 0)
-	var expected := supplies + loot if won else maxi(0, supplies - lost)
-	var band: Vector2i = before.get("band", Vector2i.ZERO)
+	var expected := _after_fight(world, won, before)
 	var mercs: int = before.get("mercs", -1)
-	var place := band if won else world.region.entrance(RegionGen.HUB_ID)
-	var site := OverworldMap.site_name(world.site(world.haven))
-	var line := Text.t(
-		"world.encounter.outcome.%s" % ("won" if won else "lost"),
-		{"supplies": loot if won else mini(supplies, lost), "site": site}
-	)
+	var place: Vector2i = expected.get("band")
+	var supplies: int = expected.get("supplies")
 	check(
 		(
 			not director.in_fight()
@@ -204,8 +193,8 @@ func _check_fight_returns(game: SliceGame, director: OverworldDirector, before: 
 			and game.stage().extra_mercs.size() == mercs
 			and world.encounter.is_empty()
 			and world.band == place
-			and world.supplies == expected
-			and director.panel.shown_body() == line
+			and world.supplies == supplies
+			and director.panel.shown_body() == str(expected.get("line"))
 			and director.panel.button_for(OverworldDirector.SAVE) != null
 		),
 		(
@@ -213,6 +202,24 @@ func _check_fight_returns(game: SliceGame, director: OverworldDirector, before: 
 			% ["won" if won else "lost", world.supplies, place]
 		)
 	)
+
+
+## What a patrol fight that started from `before` should leave: {"supplies", "band", "line"}.
+func _after_fight(world: WorldSim, won: bool, before: Dictionary) -> Dictionary:
+	var supplies: int = before.get("supplies", 0)
+	var loot: int = _knobs("patrol").get("win_supplies", 0)
+	var lost: int = _knobs("patrol").get("loss_supplies", 0)
+	var band: Vector2i = before.get("band", Vector2i.ZERO)
+	var site := OverworldMap.site_name(world.site(world.haven))
+	return {
+		"supplies": supplies + loot if won else maxi(0, supplies - lost),
+		"band": band if won else world.region.entrance(RegionGen.HUB_ID),
+		"line":
+		Text.t(
+			"world.encounter.outcome.%s" % ("won" if won else "lost"),
+			{"supplies": loot if won else mini(supplies, lost), "site": site}
+		),
+	}
 
 
 func _check_toll(director: OverworldDirector) -> void:
@@ -259,7 +266,7 @@ func _check_ambush(director: OverworldDirector) -> void:
 		director.in_fight() and director.view.battle.current().side == BattleUnit.ENEMY
 	)
 	if director.in_fight():
-		await _finish_fight(director)
+		await InputKit.finish_fight(self, director)
 	await _frames(LAYOUT_FRAMES)
 	var entry: Dictionary = director.world.log.back()
 	check(
@@ -290,7 +297,7 @@ func _check_avoid(director: OverworldDirector) -> void:
 		var band := world.band
 		await _tap(_key_for(step))
 		walked += 1 if world.band != band else 0
-	var sight: int = _party_knobs("ambush").get("sight_tiles", 0)
+	var sight: int = _knobs("ambush", "parties").get("sight_tiles", 0)
 	check(
 		(
 			walked == NEAR
@@ -334,44 +341,9 @@ func _check_saved_encounter() -> void:
 	await process_frame
 
 
-## Plays the company's turns through the panel and waits out the enemy's until the battle is
-## over. True when the company won.
-func _finish_fight(director: OverworldDirector) -> bool:
-	var battle := director.view.battle
-	var rules: Dictionary = World.json(BATTLE_DATA).get("rules", {})
-	var sight: int = rules.get("sight_cells", 0)
-	for _frame: int in FIGHT_FRAMES:
-		if battle.is_over():
-			break
-		var actor := battle.current()
-		if actor.side == BattleUnit.COMPANY:
-			await _company_turn(director, BattleAi.choose(battle, actor, sight))
-		else:
-			await process_frame
-	return battle.winner == BattleUnit.COMPANY
-
-
-func _company_turn(director: OverworldDirector, action: Dictionary) -> void:
-	var kind := str(action.get("type", ""))
-	if kind == Battle.ACTION_MOVE:
-		var to: Vector2i = action.get("to", Vector2i.ZERO)
-		director.view.click_cell(director.origin + to)
-		await process_frame
-		return
-	var choice_id := Battle.ACTION_WAIT
-	if kind == Battle.ACTION_ATTACK:
-		choice_id = "%s:%s" % [Battle.ACTION_ATTACK, action.get("target")]
-	await _click_button(director.panel.button_for(choice_id))
-
-
-func _knobs(kind: String) -> Dictionary:
-	var block: Dictionary = World.data().get("encounters", {})
-	var found: Variant = block.get(kind, {})
-	return found if found is Dictionary else {}
-
-
-func _party_knobs(kind: String) -> Dictionary:
-	var block: Dictionary = World.data().get("parties", {})
+## One type's block of a data/balance/world.json section ("encounters" or "parties").
+func _knobs(kind: String, section: String = "encounters") -> Dictionary:
+	var block: Dictionary = World.data().get(section, {})
 	var found: Variant = block.get(kind, {})
 	return found if found is Dictionary else {}
 
