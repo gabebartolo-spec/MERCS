@@ -57,6 +57,8 @@ var ironman: bool:
 		_store.ironman = value
 ## The street battle on screen, else null.
 var view: BattleView = null
+## What opens after a won fight's triage is read (HubDirector.show_result); it only shows.
+var after_fight := Callable()
 
 var _layer: CanvasLayer = null
 var _store := CampaignSaves.new()
@@ -67,8 +69,7 @@ var _walking := false
 var _wait_s := 0.0
 ## The triage after a road fight, shown until Continue; empty when none stands.
 var _triage := ""
-## What waits for Continue: the hub's loot and prisoner (the world's result hook), so the
-## triage comes first.
+## What waits for Continue: only the hub shown on a won fight's result (applied at its end).
 var _after_triage := Callable()
 ## Set when the triage left nobody alive: the saved campaign is over and Continue ends it.
 var _ended := false
@@ -249,7 +250,6 @@ func _on_choice(choice_id: String) -> void:
 			if _after_triage.is_valid():
 				_after_triage.call()
 			_after_triage = Callable()
-			autosave()
 		TOLL:
 			world.pay_toll()
 			autosave()
@@ -306,7 +306,8 @@ func _start_fight(taken: Array[Dictionary] = []) -> void:
 		_on_fight_over()
 
 
-## The battle ended: the fighters leave the street, the sim applies the result, the map returns.
+## The battle ended: the fighters leave the street, the sim applies the result (the hub's loot,
+## prisoners and jobs with it, unless nobody is left), the map returns, and the run is saved last.
 func _on_fight_over() -> void:
 	_store.end_fight()
 	var result := EncounterBattle.result(view.battle)
@@ -315,12 +316,12 @@ func _on_fight_over() -> void:
 	view = null
 	var events := wounds.resolve()
 	FieldCommand.finish(company)
-	var kind := str(world.encounter.get("type", ""))
 	var hook := world.result_hook
-	world.result_hook = Callable()
+	if wounds.ended():
+		world.result_hook = Callable()
 	world.resolve_encounter(result)
 	world.result_hook = hook
-	_after_triage = hook.bind(kind, result) if hook.is_valid() else Callable()
+	_after_triage = after_fight if result.get("won", false) == true else Callable()
 	map.visible = true
 	if wounds.ended():
 		_end_campaign()
@@ -335,6 +336,11 @@ func _on_fight_over() -> void:
 ## too); saving only reads the Rng. Off: nothing.
 func autosave() -> void:
 	_store.autosave()
+
+
+## An observer that catches up on its own, run before every write (CampaignSaves "Save order").
+func before_save(observer: Callable) -> void:
+	_store.before_save(observer)
 
 
 ## The company is dead to the last merc: the save is marked ended at once (so closing the game

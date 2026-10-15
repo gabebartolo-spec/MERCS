@@ -37,6 +37,7 @@ static func attach(game: SliceGame) -> HubDirector:
 	var map := game.overworld_director()
 	hub.begin(game.company_director().company, map.world, map.rng)
 	hub.autosave = map.autosave
+	map.after_fight = hub.show_result
 	return hub
 
 
@@ -87,7 +88,8 @@ func _on_day(day: int) -> void:
 
 ## A fight's result was applied: a win leaves loot, and the men the enemy surrendered as
 ## prisoners (EncounterBattle.result "prisoners"; a wipe or a rout leaves none: Phase 4 ruling
-## Q-C; Phase 5 C5), and opens the hub.
+## Q-C; Phase 5 C5). All of it now, before the fight's autosave; the hub opens on it once the
+## triage is read (show_result).
 func _on_result(kind: String, result: Dictionary) -> void:
 	_judge().on_result(result)
 	if result.get("won", false) != true:
@@ -96,6 +98,10 @@ func _on_result(kind: String, result: Dictionary) -> void:
 	var taken := EncounterBattle.taken(result)
 	if not taken.is_empty():
 		company.economy.captives.take(world.day, taken)
+
+
+## Opens the hub on a won fight's loot and prisoners (the overworld's Continue after the triage).
+func show_result() -> void:
 	_reaction = ""
 	set_open(true)
 

@@ -98,7 +98,8 @@ func _check_real_fight() -> void:
 	await process_frame
 
 
-## The world applies a won fight nobody surrendered in: the loot, but no prisoner (Q-C).
+## The world applies a won fight nobody surrendered in: the loot, but no prisoner (Q-C); the hub
+## opens on it as the overworld's Continue after the triage opens it (show_result).
 func _check_win_without_surrender() -> void:
 	var packed: PackedScene = load(SLICE_SCENE) as PackedScene
 	var game: SliceGame = packed.instantiate() as SliceGame
@@ -108,6 +109,7 @@ func _check_win_without_surrender() -> void:
 	var world := hub.world
 	world.encounter = {"type": "patrol", "from": world.at, "to": world.at, "days_left": 0}
 	world.resolve_encounter({"won": true, "surrendered": false, "prisoners": []})
+	hub.show_result()
 	await InputKit.frames(self, InputKit.LAYOUT_FRAMES)
 	check(
 		(
