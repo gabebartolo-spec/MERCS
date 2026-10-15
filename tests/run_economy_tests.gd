@@ -215,8 +215,11 @@ func _check_contract_board() -> void:
 	var rng := Rng.from_seed(SEED)
 	economy.refresh_board(0, SITES, rng)
 	check(
-		_streams(rng) == ["contracts"],
-		'the board rolls only its own stream, "contracts", got %s' % [_streams(rng)]
+		_streams(rng) == ["contracts", "jobs"],
+		(
+			'the board rolls only its own streams, "contracts" and the job types on "jobs" (C1), got %s'
+			% [_streams(rng)]
+		)
 	)
 	economy.refresh_board(0, [], Rng.from_seed(SEED))
 	check(economy.board.is_empty(), "with no site to name there is no contract")

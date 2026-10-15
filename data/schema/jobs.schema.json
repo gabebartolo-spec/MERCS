@@ -15,7 +15,7 @@
         "properties": {
           "id": {"type": "string", "pattern": "^job_[a-z0-9]+(_[a-z0-9]+)*$"},
           "type": {"type": "string", "pattern": "^(clear_bandits|escort|hold|hunt)$"},
-          "words": {"type": "string", "pattern": "^hub\.job\.[a-z_]+$"},
+          "words": {"type": "string", "pattern": "^hub[.]job[.][a-z_]+$"},
           "party": {"type": "string", "pattern": "^[a-z]+(_[a-z]+)*$"}
         }
       }

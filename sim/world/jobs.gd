@@ -170,26 +170,15 @@ func _settle(row: Dictionary, verdict: String) -> Dictionary:
 	return {"id": id, "job": job, "verdict": verdict, "day": world.day}
 
 
-## Done: the contract pays, and the mercs who fought it are named for their share (Phase 5
-## C3, #135: Economy.complete(id, fought)). Guarded until C3 merges; whichever of the two
-## merges second makes it a plain call.
+## Done: the contract pays (Economy.complete).
 func _pay(id: String) -> void:
-	var economy := company.economy
-	if economy.get_method_argument_count("complete") > 1:
-		economy.callv("complete", [id, company.fighting_order()])
-	else:
-		economy.complete(id)
+	company.economy.complete(id)
 
 
 ## A job failed honestly (deadline or a lost fight): the employer's name for the company is
-## dented (Phase 5 C4, Economy.standing.failed). Guarded until C4 (#134) merges; whichever
-## of the two merges second makes it a plain call.
+## dented (Phase 5 C4, Standing.failed).
 func _dent(faction_id: String) -> void:
-	var found: Variant = company.economy.get("standing")
-	if found is Object:
-		var standing: Object = found
-		if standing.has_method("failed"):
-			standing.call("failed", faction_id)
+	company.economy.standing.failed(faction_id)
 
 
 ## The accepted contracts that are jobs, in board order (a copy: settling one changes the board).

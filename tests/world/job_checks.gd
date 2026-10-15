@@ -16,6 +16,8 @@ const TYPES: Array[String] = ["clear_bandits", "escort", "hold", "hunt"]
 const SPLIT := 4
 const SHORT_DEADLINE := 2
 const WAIT_DAYS := 4
+## Moves enough for a company that loses every fight to reach the wide deadline.
+const LONG_PLAY := 2000
 
 var _check: Callable
 
@@ -108,7 +110,7 @@ func _check_lost_fights() -> void:
 		var wanted := job_type == "hold"
 		var standing := played.fights.size() == 1 and judged == wanted
 		if job_type != "hold":
-			JobKit.play(played, false)
+			JobKit.play(played, false, LONG_PLAY)
 			standing = standing and _verdict(played) == Jobs.FAILED
 			standing = standing and played.world.day > JobKit.WIDE
 		_check.call(standing, "a lost fight: %s (%s)" % [job_type, outcomes.back()])
@@ -120,7 +122,7 @@ func _check_escort_lost_on_the_way() -> void:
 	var charge := played.world.parties.duplicate()
 	World.lone_party(played.world, "ambush", 3)
 	played.world.parties.append_array(charge)
-	JobKit.play(played, false)
+	JobKit.play(played, false, LONG_PLAY)
 	_check.call(
 		played.fights == ["ambush"] and _verdict(played) == Jobs.FAILED,
 		"an escort that loses a fight on the way fails (%s, %s)" % [played.fights, _verdict(played)]
@@ -133,19 +135,25 @@ func _check_deadline() -> void:
 	var row := played.company.economy.book.contract(str(played.contract.get("id")))
 	row["deadline"] = SHORT_DEADLINE
 	var purse := played.company.economy.purse
+	var faction := str(played.contract.get("faction", ""))
+	var name_before := played.company.economy.standing.reputation(faction)
 	var had_party := _job_party_on_map(played)
 	for _day: int in WAIT_DAYS:
 		played.world.rest()
-	_check.call(
-		(
-			had_party
-			and _verdict(played) == Jobs.FAILED
-			and not _job_party_on_map(played)
-			and played.company.economy.purse == purse
-		),
-		(
-			"a hunt still running past its deadline (day %d) fails: quarry gone, unpaid"
-			% SHORT_DEADLINE
+	(
+		_check
+		. call(
+			(
+				had_party
+				and _verdict(played) == Jobs.FAILED
+				and not _job_party_on_map(played)
+				and played.company.economy.purse == purse
+				and played.company.economy.standing.reputation(faction) < name_before
+			),
+			(
+				"a hunt still running past its deadline (day %d) fails: quarry gone, unpaid, name dented"
+				% SHORT_DEADLINE
+			)
 		)
 	)
 
@@ -168,7 +176,7 @@ func _check_reload_continues() -> void:
 	JobKit.play(whole, true)
 	var paused := JobKit.begin(SEED, "hold", true)
 	JobKit.play(paused, true, SPLIT)
-	var resumed := JobKit.reload(paused)
+	var resumed := JobKit.load_back(paused)
 	JobKit.play(resumed, true)
 	_check.call(
 		(

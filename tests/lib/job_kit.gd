@@ -37,7 +37,7 @@ static func save_text(played: Played) -> String:
 
 ## A play loaded back from its save text (the world, the Rng and the company; the jobs and
 ## the hooks set again, as the hub does after a load), to continue where it was saved.
-static func reload(played: Played) -> Played:
+static func load_back(played: Played) -> Played:
 	var parsed: Variant = JSON.parse_string(save_text(played))
 	var saved: Dictionary = parsed if parsed is Dictionary else {}
 	var model := SaveModel.from_dict(saved, World.data(), Fixture.defs())

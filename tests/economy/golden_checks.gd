@@ -1,9 +1,10 @@
 extends RefCounted
 ## The economy suite's golden campaigns, run by tests/run_economy_tests.gd (Phase 5 C0): the
-## five whole-campaign routes (campaign_kit.gd's winning route, route_kit.gd's loss, toll,
-## second fight and wipe), each on two seeds, every roll on the one Rng of its seed. Each final
-## save, as JSON text, hashes to a pinned SHA-256: a change meant to keep behaviour (the split
-## of economy.gd into a facade and modules) must leave every hash as it is. A package that
+## six whole-campaign routes (campaign_kit.gd's winning route, route_kit.gd's loss, toll,
+## second fight, wipe and, since C1, job), each on two seeds, every roll on the one Rng of its
+## seed. Each final save, as JSON text, hashes to a pinned SHA-256: a change meant to keep
+## behaviour (the split of economy.gd into a facade and modules) must leave every hash
+## as it is. A package that
 ## changes the routes on purpose re-pins the hashes it moves in the same PR, with a one-line
 ## reason (docs/plans/phase5_contracts.md "Shared files"); one meant to be neutral for the old
 ## routes adds a route and leaves these alone.
@@ -19,20 +20,26 @@ const SEEDS := {
 	"toll": [424308, 424316],
 	"second_fight": [424308, 424316],
 	"wipe": [424308, 424316],
+	"job": [424308, 424316],
 }
-## Pinned before the economy.gd split (claude/c0-economy-split); "route/seed" -> SHA-256 of the
-## final save text.
+## "route/seed" -> SHA-256 of the final save text. First pinned before the economy.gd split
+## (claude/c0-economy-split). Re-pinned by Phase 5 C1 (claude/c1-jobs): every posted contract
+## now carries its job type ("job", drawn on the new "jobs" stream after the board's own
+## draws), so each save gains that key and a "jobs" stream position; with both stripped the
+## ten saves hash exactly as C0 pinned them. C1 also added the "job" route (route_kit.gd).
 const GOLDEN := {
-	"win/424310": "b0e5255a80c3dd821a9a53aa2c4220c5b4ff5aa97a241124f2105331406e72da",
-	"win/424311": "16f42f04427d73411dd49471adc36623c9abf784f6f0f2d75174eb8de3fa3f04",
-	"loss/424308": "bf24e8ad4f759ec41f11f782bb6fab625ffa194275174d76859d3e5c8d67687c",
-	"loss/424316": "03e981bba5f58a61e5b2609da8b7683f0edcd2751808c7bcd140c47ccd00bcd3",
-	"toll/424308": "07b3f8c3aee0d23d81887b9f460df4c10f060d63b96bb96472a0b1d9b24592ad",
-	"toll/424316": "6ebb4b56cf86829e401bae68b0fbdf364f02aa31168e3eaf25fe096f3fb0e9ad",
-	"second_fight/424308": "cd473eb2ad14db1d9a0be0f3d8f1dd8ae8507a2db88559a062c215da01f83b85",
-	"second_fight/424316": "3cb79ddecfaa680c9260df267aedfa4637ea345dd717aed97e109927d68690a4",
-	"wipe/424308": "d8cca9bde2564397726057206f8f69099013637e2a0fe261c9d4550f44ed8bde",
-	"wipe/424316": "902fba124f6b0e7486a73fc9c7df605cf7253634e194be2a0b440aef16690f9a",
+	"win/424310": "0cc77e30757eccc8eef88da1dd93d83e01d953b5e99ad966f1f99f074a107fee",
+	"win/424311": "5ab0ae4e6d572fb522927c718497d968d0aee6bd5b777b3fa7c553d48da27bbb",
+	"loss/424308": "78527d9fb2aeea09260487d334b9cf12c1a433219f7ff89de46564a9ed4daf1c",
+	"loss/424316": "af1863700312175c63a4eb197d4dab5555932e4e3c07518d3c8ee11bc30efac2",
+	"toll/424308": "f7854fd802c0402b11b5db2308d06987f6c919bfc4131c39b4677ca6bbdfe58f",
+	"toll/424316": "17feb8d953f76ef6c83866a38e3495b25339802f083bb4d238335984d1128f81",
+	"second_fight/424308": "c57ddff4aa89ec36c1b5388939a071aa4a4278521b47286edbcefebc49cbc4e9",
+	"second_fight/424316": "6c88fcadc3dca0e30d7f551e1060ad4b5121b17803d8485c35e499f3352c08d9",
+	"wipe/424308": "c2a1651d45788bdf39496e475bd3408d4f021f5fd1c1167f75c7d4be8b8b3bcb",
+	"wipe/424316": "052a22183247a44ae3feb842e7d98f0dbb0d355a1dd08c7e4e99145b4e4bde9c",
+	"job/424308": "99f26c9416bf5a63df3e9643b9a12d5fc9fa3c8e67c579e51b976d6b4474c6b7",
+	"job/424316": "6626317582575f2a0114faa022c3bf60aefabcd3020646ed2e853f93e4f0e84e",
 }
 
 
@@ -54,7 +61,10 @@ func run(check: Callable) -> void:
 	)
 	check.call(
 		digests.size() == GOLDEN.size(),
-		"the ten golden saves are ten different campaigns, got %d" % digests.size()
+		(
+			"the %d golden saves are as many different campaigns, got %d"
+			% [GOLDEN.size(), digests.size()]
+		)
 	)
 
 
