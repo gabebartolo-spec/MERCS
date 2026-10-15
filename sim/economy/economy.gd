@@ -13,6 +13,7 @@ extends RefCounted
 ## - Prisoners (prisoners.gd, `captives`): the waiting prisoner and the four choices;
 ## - Payroll (payroll.gd, `payroll`): each merc's daily wage by level, his share of a
 ##   contract's pay, and who is owed what (Phase 5 C3).
+## - Standing (standing.gd, `standing`): the name with each faction and the grudges (C4).
 ## The facade keeps at most 14 public methods; a package prefers a module or a field read
 ## through state() over a new one.
 ##
@@ -37,6 +38,8 @@ var book := ContractBook.new()
 var captives := Prisoners.new()
 ## The wages and the share by merc (day_wage(merc), dues are read there).
 var payroll := Payroll.new()
+## The company's name with each faction and its grudges (reputation(faction) is read there).
+var standing := Standing.new()
 ## The posted contracts: Contracts records plus "id" ("ctr_<n>"). Held by the book.
 var board: Array[Dictionary]:
 	get:
@@ -93,11 +96,14 @@ static func restore(saved: Dictionary, defs: Dictionary) -> Economy:
 	economy.last_loot = _whole_row(_dict(saved, "last_loot"))
 	for row: Dictionary in _rows(saved, "chronicle"):
 		economy.chronicle.append(_whole_row(row))
+	economy.standing.load_state(_dict(saved, "standing"))
 	return economy
 
 
 ## The save. "dues" (who is owed what, Phase 5 C3) is written only while someone is owed, so
 ## a save with nobody owed reads as it did before C3.
+## The economy as a save holds it; "standing" is left out until it has moved (an optional key,
+## so a game that never touched a name saves as before C4).
 func state() -> Dictionary:
 	var saved := {
 		"purse": purse,
@@ -115,6 +121,8 @@ func state() -> Dictionary:
 	}
 	if not payroll.dues.is_empty():
 		saved["dues"] = payroll.dues.duplicate()
+	if not standing.is_new():
+		saved["standing"] = standing.state()
 	return saved
 
 
@@ -175,6 +183,22 @@ func complete(id: String, fought: Array[Merc] = []) -> bool:
 	var reward := _num(row, "reward", 0)
 	purse += reward
 	owed += payroll.share(reward, fought)
+	standing.completed(str(row.get("faction", "")))
+	return true
+
+
+## Walks away from an accepted contract on `day`: it leaves the board, the name with its
+## faction dents, and after a sizeable advance the faction's grudge grows (Standing.abandoned).
+## The captain remembers it (a chronicle line). False (and no change) when the contract is not
+## on the board or not accepted.
+func abandon(id: String, company: Company, day: int) -> bool:
+	var row := book.contract(id)
+	if row.is_empty() or row.get("accepted") != true:
+		return false
+	board.erase(row)
+	var grew := standing.abandoned(row, company.captain_id, day)
+	var key := "standing.grudge" if grew else "standing.abandon"
+	chronicle.append({"day": day, "merc": company.captain_id, "key": key})
 	return true
 
 
@@ -259,6 +283,7 @@ func _read(defs: Dictionary) -> void:
 	book.setup(_dict(_rules, "contracts"), factions)
 	captives.setup(_dict(_rules, "prisoner"), _recruits, _max_morale())
 	payroll.setup(_dict(_rules, "wages"))
+	standing.setup(_dict(_rules, "standing"))
 
 
 static func _num(block: Dictionary, key: String, fallback: int) -> int:

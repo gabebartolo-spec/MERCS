@@ -29,5 +29,16 @@
     "ransom_morale": -2,
     "execute_morale": -6,
     "recruit_morale": 3
+  },
+  "standing": {
+    "start": 50,
+    "min": 0,
+    "max": 100,
+    "complete_mend": 5,
+    "fail_dent": 5,
+    "walk_dent": 5,
+    "abandon_dent": 10,
+    "sizeable_advance": 50,
+    "grudge_growth": 1
   }
 }
