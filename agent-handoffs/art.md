@@ -15,6 +15,17 @@ and golden references". Lock-B layout (supersedes the option paths below):
 - check_assets_pixels.py checks assets/look_target/heartland and assets/golden against heartland; self-test 24/24.
 - Pipeline default pixelate.json still points at master_draft (average_m sheet + fixtures): switching is a separate step.
 
+## Desloppify (director 2026-10-15 "NO SLOP"), branch claude/art-desloppify, no PR yet; awaiting lead
+- Board + evidence: D:/MERCS-vault/renders/desloppify_2026-10-15/ (board_{day,night,map}.png, x1/, frames_4k/,
+  scan_summary.json, qc/ crops, render.sh, flip.py). A = re-render, byte-identical to the 3 goldens.
+- B = dither 0 (gate variants Bg/Bg2 tried: dither only on gradients came out as streaks, worse). Isolated px
+  31.2/30.1/22.0% -> 0.9/2.8/0.9% (map/day/night). Map mean OKLab L -2% (grass snaps to verdure 2).
+- C = B + 6 colours separated at same L (min shift, every pair > 8) + water ramp (68 colours, cap now 72)
+  + map kit: shallows/lip/deep/glints, tuft fans, chunk stones. Near-dups 0. Lit faces flip to other
+  colours: dE>0.04 on 0.9/2.4% (day/night) of pixels; night dirt reads slightly yellower.
+- Goldens unchanged: check_assets_pixels and pipeline self-test fail on them vs the new palette until
+  the director picks new goldens (then copy x1/C_*.png and write_provenance).
+
 ## Water fix (lead QC 2026-10-15: map water read as an asphalt road with a lane marking)
 - Cause: water was slate 1 lit by the warm sun (snapped to brown-greys), straight tile edges with a soil kerb,
   and a hairline crack between tiles showing the sky (bone 3) as one long pale line.
