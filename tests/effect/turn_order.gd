@@ -20,11 +20,27 @@ func run() -> Dictionary:
 	var fighters: Dictionary = slow["fighters"]
 	var orc: Dictionary = fighters["orc"]
 	var chief: Dictionary = fighters["bandit_chief"]
-	orc["initiative"] = Merc.whole(chief["initiative"]) - 1
+	# Armour may slow the orc (plate, BattleGear): set his initiative so that, worn, it is
+	# one below or one above the chief's.
+	var worn := _armour_initiative(slow, orc)
+	orc["initiative"] = Merc.whole(chief["initiative"]) - 1 - worn
 	var quick_fighters: Dictionary = fast["fighters"]
 	var quick_orc: Dictionary = quick_fighters["orc"]
-	quick_orc["initiative"] = Merc.whole(chief["initiative"]) + 1
+	quick_orc["initiative"] = Merc.whole(chief["initiative"]) + 1 - worn
 	return {"on": _fight(fast), "off": _fight(slow)}
+
+
+## What the fighter's armour adds to his initiative under the data's gear rules.
+func _armour_initiative(data: Dictionary, stats: Dictionary) -> int:
+	var unit := BattleUnit.make("probe", BattleUnit.COMPANY, Vector2i.ZERO, stats)
+	var knobs: Dictionary = data["rules"]
+	var rules := BattleRules.new()
+	rules.setup(knobs)
+	var gear := BattleGear.new()
+	gear.setup(rules)
+	var probe: Array[BattleUnit] = [unit]
+	gear.fit(probe)
+	return unit.gear_initiative
 
 
 func _fight(data: Dictionary) -> String:

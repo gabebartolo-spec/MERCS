@@ -142,11 +142,12 @@ func _check_blood_price_kept_in_hand() -> void:
 	var price := Fixture.sect(Fixture.sect(rules, "moves"), BattleUnit.MOVE_BLOOD_PRICE)
 	vampyr.hp = Merc.whole(price.get("hp_cost", 0)) * 2
 	var weak := MercPlay.choose(duel, vampyr, rules)
+	var blow := duel.kit(vampyr.id)[0]
 	check(
 		(
 			_is(healthy.get("type"), Battle.ACTION_BLOOD_PRICE)
-			and _is(weak.get("type"), Battle.ACTION_ATTACK)
-			and _is(unhurt.get("type"), Battle.ACTION_ATTACK)
+			and _is(weak.get("type"), blow)
+			and _is(unhurt.get("type"), blow)
 		),
 		(
 			"the Vampyr pays his blood price only on a foe he saw wounded (rule 6) and only "

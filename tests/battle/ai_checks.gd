@@ -88,9 +88,11 @@ func _decide(battle: Battle) -> String:
 
 
 func _check_strikes_the_seen_wound() -> void:
-	var decided := _decide(_between())
+	var battle := _between()
+	var decided := _decide(battle)
+	# The strike is the watchman's weapon action (his kit's first, P1a).
 	_check.call(
-		decided == "attack bloodied / attack bloodied",
+		decided == "attack bloodied / %s bloodied" % battle.kit("watchman")[0],
 		"the enemy plans and strikes the foe it saw wounded, not the one with less hidden health"
 	)
 
@@ -153,7 +155,7 @@ func _check_merc_reads_the_same() -> void:
 	foe.wounded = true
 	var bleeding := str(MercPlay.choose(battle, vampyr, rules).get("type"))
 	_check.call(
-		unhurt == Battle.ACTION_ATTACK and bleeding == Battle.ACTION_BLOOD_PRICE,
+		unhurt == battle.kit("vampyr")[0] and bleeding == Battle.ACTION_BLOOD_PRICE,
 		"the Vampyr spends his blood on a foe he saw wounded, not on hidden low health"
 	)
 

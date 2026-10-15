@@ -10,7 +10,7 @@ extends "res://tests/lib/runner.gd"
 ## slower machine does not fail it and only a large slowdown does. The clock never decides
 ## whether the sim is correct. PERF_WRITE=1 rewrites the baseline from this run (run it three
 ## times on a quiet machine and keep the highest numbers).
-## Seeded by design: battle seeds 424242 + n, world seed 424242, campaign seed 424310.
+## Seeded by design: battle seeds 424242 + n, world seed 424242, campaign seed 424230.
 ##   godot --headless --path . --script tests/run_perf_tests.gd
 
 const Campaign := preload("res://tests/lib/campaign_kit.gd")
@@ -22,7 +22,7 @@ const ABOUT := (
 )
 const BASELINE := "res://tests/perf_baseline.json"
 const SEED := 424242
-const CAMPAIGN_SEED := 424310
+const CAMPAIGN_SEED := 424230
 const SIDE := 6
 const GRID := Vector2i(10, 8)
 const FIGHTS := 25

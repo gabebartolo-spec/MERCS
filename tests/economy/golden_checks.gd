@@ -13,7 +13,7 @@ extends RefCounted
 const Campaign := preload("res://tests/lib/campaign_kit.gd")
 const Routes := preload("res://tests/lib/route_kit.gd")
 const WIN := "win"
-## Each route and the two seeds it is played on (the campaign suite's, run_campaign_tests.gd).
+## Each route and the two seeds it is played on (the campaign suite's until P1b).
 const SEEDS := {
 	"win": [424310, 424311],
 	"loss": [424308, 424316],
@@ -22,20 +22,24 @@ const SEEDS := {
 	"wipe": [424308, 424316],
 	"job": [424308, 424316],
 }
-## "route/seed" -> SHA-256 of the final save text. First pinned before the economy.gd split
-## (claude/c0-economy-split). Re-pinned by Phase 5 C1 (claude/c1-jobs): every posted contract
-## now carries its job type ("job", drawn on the new "jobs" stream after the board's own
-## draws), so each save gains that key and a "jobs" stream position; with both stripped the
-## ten saves hash exactly as C0 pinned them. C1 also added the "job" route (route_kit.gd).
+## Pinned before the economy.gd split (claude/c0-economy-split); "route/seed" -> SHA-256 of the
+## final save text.
+## Re-pinned by Phase 4 P1b (equipment physics): gear moves the fights in win/424310,
+## win/424311, loss/424316 and both second_fight routes; toll, wipe and loss/424308 hold.
+## The win route keeps 424310/424311 (the campaign suite now plays 424230 for its stages).
+## Re-pinned by Phase 5 C1 (claude/c1-jobs): every posted contract now carries its job type
+## ("job", drawn on the new "jobs" stream after the board's own draws), so all ten saves gain
+## that key and a "jobs" stream position; with both stripped each hashes as P1b left it.
+## C1 also added the "job" route (route_kit.gd).
 const GOLDEN := {
-	"win/424310": "0cc77e30757eccc8eef88da1dd93d83e01d953b5e99ad966f1f99f074a107fee",
-	"win/424311": "5ab0ae4e6d572fb522927c718497d968d0aee6bd5b777b3fa7c553d48da27bbb",
+	"win/424310": "6e3ccee3237ce098c920f80dc6908cc41f64ba2403d1880cdd395e98614aa81d",
+	"win/424311": "e98f9d247a6b8190b4674119a691bf6c7149bcfb2d28af524a71be0940c490d5",
 	"loss/424308": "78527d9fb2aeea09260487d334b9cf12c1a433219f7ff89de46564a9ed4daf1c",
-	"loss/424316": "af1863700312175c63a4eb197d4dab5555932e4e3c07518d3c8ee11bc30efac2",
+	"loss/424316": "ae1491173ccf7b35563033ab048932fe88b7f9e34b0a41d32b40520df5a03e9b",
 	"toll/424308": "f7854fd802c0402b11b5db2308d06987f6c919bfc4131c39b4677ca6bbdfe58f",
 	"toll/424316": "17feb8d953f76ef6c83866a38e3495b25339802f083bb4d238335984d1128f81",
-	"second_fight/424308": "c57ddff4aa89ec36c1b5388939a071aa4a4278521b47286edbcefebc49cbc4e9",
-	"second_fight/424316": "6c88fcadc3dca0e30d7f551e1060ad4b5121b17803d8485c35e499f3352c08d9",
+	"second_fight/424308": "0762f7879397ed9955107c5af9aeb6e31b29d48d556f295cd8483dd1f6a0b66f",
+	"second_fight/424316": "e6816ca2d36d71209df1ff9d97879127e51d177f0e81a6bd5f0148db231423c3",
 	"wipe/424308": "c2a1651d45788bdf39496e475bd3408d4f021f5fd1c1167f75c7d4be8b8b3bcb",
 	"wipe/424316": "052a22183247a44ae3feb842e7d98f0dbb0d355a1dd08c7e4e99145b4e4bde9c",
 	"job/424308": "99f26c9416bf5a63df3e9643b9a12d5fc9fa3c8e67c579e51b976d6b4474c6b7",

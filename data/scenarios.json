@@ -33,7 +33,7 @@
             "cell": [8, 2]
           },
           {
-            "fighter": "bandit",
+            "fighter": "bandit_spearman",
             "cell": [8, 6]
           }
         ],
