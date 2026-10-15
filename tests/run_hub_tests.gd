@@ -8,10 +8,10 @@ extends "res://tests/lib/runner.gd"
 ## on one decides it and shows the line the captain remembers; the wearer button and an equip
 ## click put gear on a merc and the battle numbers follow; away from the hub the wages,
 ## contracts and recruits give way to a line saying so; every button sits on the 1920x1080
-## screen; the overworld's Save writes the economy and a fresh session reads it.
-## Seeded by design: the balance seed (data/balance/world.json); nothing else rolls.
+## screen; the overworld's Save writes the economy and a fresh session reads it. Seeded: world.json.
 ##   godot --headless --path . --script tests/run_hub_tests.gd
 
+const InputKit := preload("res://tests/lib/input_kit.gd")
 const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const WORLD_BALANCE := "res://data/balance/world.json"
 const ECONOMY := "res://data/balance/economy.json"
@@ -115,6 +115,7 @@ func _rest_on_the_map() -> void:
 	await _tap(KEY_ESCAPE)
 	await _tap(KEY_M)
 	var map_panel := _game.overworld_director().panel
+	await InputKit.pick_mode(self, _game.overworld_director())
 	for _day: int in REST_DAYS:
 		await _click_button(map_panel.button_for(OverworldDirector.REST))
 	await _tap(KEY_M)

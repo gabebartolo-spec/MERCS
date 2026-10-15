@@ -11,6 +11,8 @@ const ERROR_NO_FILE := "save_file_missing"
 ## Set by whoever holds the optional blocks of the save (the story director: memories and
 ## the storylets fired). Called at save time; returns {"wounds": {...}, "story": {...}}.
 var extras: Callable = Callable()
+## The campaign's mode (SaveModel "ironman"), set by whoever plays the campaign before it saves.
+var ironman := false
 
 
 func has_save() -> bool:
@@ -19,7 +21,8 @@ func has_save() -> bool:
 
 ## Writes the run as it stands, with the company and its wounds block (CompanyWounds.state())
 ## when there are some. A company with every merc dead marks the save ended (SaveModel), after
-## which it only ever shows the chronicle. False when the file could not be written.
+## which it only ever shows the chronicle. Written with `ironman` as the caller set it. False
+## when the file could not be written.
 func save_game(world: WorldSim, rng: Rng, company: Company = null, wounds: Dictionary = {}) -> bool:
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file == null:
@@ -28,7 +31,7 @@ func save_game(world: WorldSim, rng: Rng, company: Company = null, wounds: Dicti
 		)
 		return false
 	var saved := SaveModel.to_dict(
-		world, rng, company, wounds, company != null and company.is_wiped()
+		world, rng, company, wounds, company != null and company.is_wiped(), ironman
 	)
 	if extras.is_valid():
 		var more: Dictionary = extras.call()

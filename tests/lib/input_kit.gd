@@ -30,6 +30,13 @@ static func click(tree: SceneTree, button: Button) -> void:
 		await tree.process_frame
 
 
+## A fresh campaign asks Ironman or saving by hand before anything moves: a real click on the
+## answer when it stands (Off by default, so a suite that is not about Ironman plays as it did).
+static func pick_mode(tree: SceneTree, director: OverworldDirector, ironman: bool = false) -> void:
+	var id := OverworldDirector.IRONMAN_ON if ironman else OverworldDirector.IRONMAN_OFF
+	await click(tree, director.panel.button_for(id))
+
+
 static func key(tree: SceneTree, code: Key, pressed: bool) -> void:
 	var event := InputEventKey.new()
 	event.keycode = code

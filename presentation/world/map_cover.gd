@@ -26,6 +26,11 @@ func _process(_delta: float) -> void:
 
 func _cover(covered: bool) -> void:
 	if covered == _covered:
+		# A panel the director raises under a screen (an encounter standing, the map reopened)
+		# steps aside at once and comes back with the others when the screen closes.
+		if covered and _panel.visible:
+			_panel_was_up = true
+			_panel.visible = false
 		return
 	_covered = covered
 	if covered:

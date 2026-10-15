@@ -34,6 +34,8 @@ func run_checks() -> void:
 	_clear_save()
 	root.size = WINDOW_SIZE
 	await _check_fight_and_screens()
+	await _check_encounter_under_screen(KEY_B)
+	await _check_encounter_under_screen(KEY_C)
 	_check_chase_ring()
 	_clear_save()
 
@@ -104,6 +106,11 @@ func _check_fight_and_screens() -> void:
 		not _saved() and director.in_fight(),
 		"Save asked for in the middle of a fight writes nothing and the fight goes on"
 	)
+	var direct := director.save_run()
+	check(
+		not direct and not _saved() and director.in_fight(),
+		"save_run() called directly in the middle of a fight returns false and writes nothing"
+	)
 	_clear_all = true
 	_turns_seen = 0
 	var won := await InputKit.finish_fight(self, director, _on_turn.bind(director))
@@ -121,6 +128,41 @@ func _check_fight_and_screens() -> void:
 	await _check_screens(game, won)
 	game.queue_free()
 	await process_frame
+
+
+## An encounter that stands while the hub (B) or the company screen (C) is up: walking waits,
+## and when the map is redrawn the panel with Fight stays out from under the screen, then comes
+## back when the screen closes.
+func _check_encounter_under_screen(code: Key) -> void:
+	var game := await _start_game()
+	var director := game.overworld_director()
+	await InputKit.tap(self, code)
+	var band := director.world.band
+	await _walk_into(director)
+	var held := director.world.band == band and director.world.encounter.is_empty()
+	World.walk_toward(director.world, director.world.parties[0].tile, TAP_LIMIT)
+	director.set_open(true)
+	await InputKit.frames(self, SETTLE)
+	var raised := not director.world.encounter.is_empty()
+	var hidden := not director.panel.visible
+	await InputKit.tap(self, code)
+	await InputKit.frames(self, SETTLE)
+	var back := (
+		director.panel.visible and director.panel.button_for(OverworldDirector.FIGHT) != null
+	)
+	check(
+		held and raised and hidden and back,
+		(
+			(
+				"with screen %s up the keys do not walk, an encounter raised under it keeps the "
+				+ "map's panel hidden and Fight returns when it closes (held %s, raised %s, hidden %s, back %s)"
+			)
+			% [OS.get_keycode_string(code), held, raised, hidden, back]
+		)
+	)
+	game.queue_free()
+	await process_frame
+	_clear_save()
 
 
 func _check_triage_save(director: OverworldDirector) -> void:

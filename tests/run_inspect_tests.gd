@@ -10,6 +10,7 @@ extends "res://tests/lib/runner.gd"
 ## Seeded by design: nothing here rolls; the world uses the balance seed.
 ##   godot --headless --path . --script tests/run_inspect_tests.gd
 
+const InputKit := preload("res://tests/lib/input_kit.gd")
 const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const WORLD_BALANCE := "res://data/balance/world.json"
 const WINDOW_SIZE := Vector2i(1920, 1080)
@@ -201,6 +202,7 @@ func _check_saved_captain(game: SliceGame) -> void:
 	await _tap(KEY_C)
 	await _tap(KEY_M)
 	var overworld := game.overworld_director()
+	await InputKit.pick_mode(self, overworld)
 	await _click_button(overworld.panel.button_for(OverworldDirector.SAVE))
 	var model := _saves().load_game(_json(WORLD_BALANCE), CompanyDirector.defs())
 	check(
