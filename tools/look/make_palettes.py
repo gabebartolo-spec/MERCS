@@ -67,7 +67,7 @@ OPTIONS = {
         "ramps": {
             "soot": ("#17120f", "#45392f"), "slate": ("#34393d", "#aba693"), "iron": ("#2b2b2a", "#b6b1a3"),
             "soil": ("#2b1c11", "#a27a4e"), "timber": ("#321f0f", "#b68b51"), "bone": ("#8e7d5d", "#efe1bd"),
-            "skin_neutral": ("#4c2d1f", "#e0b48f"), "skin_orc": ["#2e3428", "#485240", "#7e8a73", "#97a58b", "#b9c9ab"],
+            "skin_neutral": ("#4c2d1f", "#e0b48f"), "skin_orc": ["#2e3428", "#637251", "#94a179", "#afb88b", "#c1cb9c"],
             "skin_pale": ("#4b3d39", "#e1d3c2"), "verdure": ("#1e2a12", "#808c46"),
             "heather": ("#3d2a41", "#94758a"),
             "verdure_mid": ["#40501d"],  # luma 69.4; kept clear of skin_orc (not the plain OKLab midpoint)

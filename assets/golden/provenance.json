@@ -1,9 +1,9 @@
 {
-  "_doc": "Golden references (06 section 8), 1x logical (960 x 540): look_target.gd captures of the real StreetStage at 3840 x 2160 (exact 4x4 blocks), one pixel kept per block. Changes only by a director decision in DECISIONS.md. 2026-10-16 (director: grey-olive orc skin): grass pixels in the old skin_orc colours moved to their nearest verdure step, the orc figures' skin to the new ramp by index (tools/look/cast_r3/remap_golden.py). Round 4 (2026-10-16): the orc figures' skin follows the green-grey ramp by index; overworld lit grass flattened from a verdure_1/2 checker to verdure_2 (lead call, stop-gap until the B7 tile re-render; director to approve) (tools/look/cast_r4/remap_golden.py). Round 5 (2026-10-16): overworld rebuilt from the approved golden with its lit grass on verdure_mid_0 and no dark rims; orc figures' skin on the round-5 ramp by index; director to approve (tools/look/cast_r5/remap_golden.py).",
+  "_doc": "Golden references (06 section 8), 1x logical (960 x 540): look_target.gd captures of the real StreetStage at 3840 x 2160 (exact 4x4 blocks), one pixel kept per block. Changes only by a director decision in DECISIONS.md. 2026-10-16 (director: grey-olive orc skin): grass pixels in the old skin_orc colours moved to their nearest verdure step, the orc figures' skin to the new ramp by index (tools/look/cast_r3/remap_golden.py). Round 4 (2026-10-16): the orc figures' skin follows the green-grey ramp by index; overworld lit grass flattened from a verdure_1/2 checker to verdure_2 (lead call, stop-gap until the B7 tile re-render; director to approve) (tools/look/cast_r4/remap_golden.py). Round 5 (2026-10-16): overworld rebuilt from the approved golden with its lit grass on verdure_mid_0 and no dark rims; orc figures' skin on the round-5 ramp by index; director to approve (tools/look/cast_r5/remap_golden.py). Round 6 (2026-10-16): every old lit-grass pixel on verdure_mid_0 (no neighbour rule, so no lattice); orc figures' skin on the round-6 ramp by index (tools/look/cast_r6/remap_golden.py).",
   "asset": "golden",
   "files": {
-    "overworld_map.png": "7e08efa4a68b16810baf684af582e8ac9975d2be46cbdac3e99116eae1dfdbcf",
-    "street_day.png": "a4278fc3313ade1ab49321f493fcac667fe48cb841c5c382fe03fb331787981a",
+    "overworld_map.png": "100cfc09c0e6795c61d8da8ee72ecaf57d204acd7deda9e18e2d1ef2303db464",
+    "street_day.png": "bdaa6fc4ba3c088ccc5bb988e9b26364a03a6948514061a72e9421212871eb3d",
     "street_rain_night.png": "0376e96abc0f66bf5298def0f2a1ccb79f62c2b98bf97b16cdaeffd7274ee884"
   },
   "produced_by": {
@@ -14,7 +14,8 @@
     "tools/look/build_sprites.py": "fa6a36cfba532049",
     "tools/look/cast_r3/remap_golden.py": "cba07b1d0b653fd9",
     "tools/look/cast_r4/remap_golden.py": "3f13c48617ed81d3",
-    "tools/look/cast_r5/remap_golden.py": "acddcb187f35fbae"
+    "tools/look/cast_r5/remap_golden.py": "acddcb187f35fbae",
+    "tools/look/cast_r6/remap_golden.py": "28a913bbc5511f96"
   },
   "models": [],
   "licence_rows": [

@@ -56,7 +56,11 @@ def main() -> None:
           "armour (slim spaulders, no fauld box) with a fanned cape; tokens are the SE frames at half scale. Round 5 "
           "(2026-10-16, tools/look/cast_r5/): the orc's heads hand-placed as planes (broad jaw, brow shelf, mouth, "
           "tusks from the lower jaw), skin on the moss-hue skin_orc ramp, plate one iron step darker; the Vampyr's "
-          "armour darker with a cuirass ridge and the cape lining showing at the front; the orc token head by hand.",
+          "armour darker with a cuirass ridge and the cape lining showing at the front; the orc token head by hand. "
+          "Round 6 (2026-10-16, tools/look/cast_r6/): the orc's heads rebuilt as skulls (rounded crown, brow "
+          "arches, ears, nose, neck, a sloped back in profile) on a mossier skin_orc ramp; the orc token head "
+          "redrawn so the tusks cross a straight mouth; the Vampyr's breastplate tapered to the waist with a "
+          "plackart line and fauld lames, the lining as cape folds, and the E/W jaw blob replaced by a jaw line.",
           ["tools/pipeline/render_character.py", "tools/pipeline/kit_extras.py", "tools/pipeline/pixelate.py",
            "tools/pipeline/pack_sheets.py", "tools/pipeline/kits/orc_s1_blockout.json",
            "tools/pipeline/kits/vampyr_s1_blockout.json", "tools/look/build_sprites.py",
@@ -75,11 +79,14 @@ def main() -> None:
           "(lead call, stop-gap until the B7 tile re-render; director to approve) (tools/look/cast_r4/remap_golden.py). "
           "Round 5 (2026-10-16): overworld rebuilt from the approved golden with its lit grass on verdure_mid_0 and "
           "no dark rims; orc figures' skin on the round-5 ramp by index; director to approve "
-          "(tools/look/cast_r5/remap_golden.py).",
+          "(tools/look/cast_r5/remap_golden.py). Round 6 (2026-10-16): every old lit-grass pixel on "
+          "verdure_mid_0 (no neighbour rule, so no lattice); orc figures' skin on the round-6 ramp by index "
+          "(tools/look/cast_r6/remap_golden.py).",
           ["tools/look/look_target.gd", "tools/look/look_map.gd", "tools/look/palette_post.gdshader",
            "tools/look/build_look_kit.py",
            "tools/look/build_sprites.py", "tools/look/cast_r3/remap_golden.py",
-           "tools/look/cast_r4/remap_golden.py", "tools/look/cast_r5/remap_golden.py"],
+           "tools/look/cast_r4/remap_golden.py", "tools/look/cast_r5/remap_golden.py",
+           "tools/look/cast_r6/remap_golden.py"],
           [blender, mpfb, py, "Godot Engine"],
           approved)
 
