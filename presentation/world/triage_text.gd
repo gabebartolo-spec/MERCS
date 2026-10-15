@@ -9,8 +9,11 @@ extends RefCounted
 ## One line per event, in the order the sim gave them; a quiet fight says so.
 static func lines(events: Array[Dictionary], wounds: CompanyWounds) -> Array[String]:
 	var out: Array[String] = []
+	var xp: Array[String] = []
 	for event: Dictionary in events:
 		match str(event.get("type", "")):
+			"xp":
+				xp.append_array(_xp(event, wounds.company))
 			"triage":
 				out.append(_triage(event, wounds))
 			"death":
@@ -19,6 +22,7 @@ static func lines(events: Array[Dictionary], wounds: CompanyWounds) -> Array[Str
 				out.append(_succession(event, wounds.company))
 	if out.is_empty():
 		out.append(Text.t("wiring.none"))
+	out.append_array(xp)
 	return out
 
 
@@ -30,6 +34,19 @@ static func name_of(fighter_id: String, held: Company) -> String:
 		return held.name_of(fighter_id)
 	var kind := fighter_id.rstrip("0123456789").trim_suffix("_")
 	return Text.t("enemy.%s.name" % kind)
+
+
+## The experience a merc earned, one short line, and a second when it raised their level.
+static func _xp(event: Dictionary, held: Company) -> Array[String]:
+	var params := {
+		"name": name_of(str(event.get("merc", "")), held),
+		"gain": Injury.num(event, "gain"),
+		"level": Injury.num(event, "level")
+	}
+	var out: Array[String] = [Text.t("wiring.xp", params)]
+	if event.get("raised", false) == true:
+		out.append(Text.t("wiring.level_up", params))
+	return out
 
 
 static func _triage(event: Dictionary, wounds: CompanyWounds) -> String:

@@ -18,6 +18,7 @@ static func build(
 	var units := wounds.units(cells, BattleUnit.COMPANY)
 	var battle := EncounterBattle.build(pending, scenario, battle_data, rng, units)
 	battle.set_hit_hook(wounds.hit_hook)
+	FieldCommand.apply(wounds.company, battle)
 	return battle
 
 

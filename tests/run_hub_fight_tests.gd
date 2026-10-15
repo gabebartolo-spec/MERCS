@@ -3,7 +3,8 @@ extends "res://tests/lib/runner.gd"
 ## on the walkable map (a saved world on the balance seed with a patrol three tiles from the
 ## band; real key taps walk into it, real clicks on Fight and the battle's buttons) ends with
 ## the hub open on a prisoner and the loot exactly when the company won, and shut when it lost;
-## the triage panel comes first and the hub opens on its Continue.
+## the triage panel comes first and the hub opens on its Continue. A won fight where no enemy
+## surrendered (a rout or a wipe, Phase 4 ruling Q-C) opens the hub on the loot, no prisoner.
 ## Seeded by design: the balance seed (data/balance/world.json); nothing else rolls.
 ##   godot --headless --path . --script tests/run_hub_fight_tests.gd
 
@@ -25,6 +26,8 @@ func run_checks() -> void:
 	root.size = WINDOW_SIZE
 	_clear_save()
 	await _check_real_fight()
+	_clear_save()
+	await _check_win_without_surrender()
 	_clear_save()
 
 
@@ -90,6 +93,30 @@ func _check_real_fight() -> void:
 			"a real fight on the map ended %s: the hub is %s"
 			% ["won" if won else "lost", "open on a prisoner" if won else "left shut"]
 		)
+	)
+	game.queue_free()
+	await process_frame
+
+
+## The world applies a won fight nobody surrendered in: the loot, but no prisoner (Q-C).
+func _check_win_without_surrender() -> void:
+	var packed: PackedScene = load(SLICE_SCENE) as PackedScene
+	var game: SliceGame = packed.instantiate() as SliceGame
+	root.add_child(game)
+	await process_frame
+	var hub := game.hub_director()
+	var world := hub.world
+	world.encounter = {"type": "patrol", "from": world.at, "to": world.at, "days_left": 0}
+	world.resolve_encounter({"won": true, "surrendered": false, "prisoners": []})
+	await InputKit.frames(self, InputKit.LAYOUT_FRAMES)
+	check(
+		(
+			game.hub_open()
+			and not hub.company.economy.last_loot.is_empty()
+			and hub.company.economy.prisoner.is_empty()
+			and hub.panel.button_for("prisoner", Economy.RELEASE) == null
+		),
+		"a won fight with no surrender opens the hub on the loot and no prisoner"
 	)
 	game.queue_free()
 	await process_frame
