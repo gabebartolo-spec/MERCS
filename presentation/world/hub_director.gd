@@ -8,9 +8,16 @@ extends Node
 ## words what the sim decides (Text.t, data/text/en.json) and shows it in HubPanel. Wages,
 ## contracts and hiring are done at the hub only; the pack and a prisoner anywhere. Hiding the
 ## panel (set_open) keeps everything as it is.
+## Phase 5 C8: the board names each contract's job and its pay is talked over on the terms
+## screen (TermsPanel) before it is taken; a taken contract can be walked away from
+## (ContractRows); wages and dues are shown by merc (WageRows). The armoury (C6) plugs in
+## through `armoury_rows` and `armoury_act`.
 
 ## The hub's actions that commit a decision: under Ironman each is saved at once (`autosave`).
-const COMMITS: Array[String] = ["pay", "accept", "hire", "equip", "prisoner"]
+const COMMITS: Array[String] = ["pay", "hire", "equip", "prisoner", ContractRows.ABANDON_YES]
+## Panel actions that begin with this go to the armoury hook.
+const ARMOURY := "armoury"
+const HUB_DATA := "res://data/balance/hub.json"
 
 var company: Company = null
 var world: WorldSim = null
@@ -22,11 +29,21 @@ var jobs: Jobs = null
 ## The overworld's autosave (OverworldDirector.autosave: writes only under Ironman), called after
 ## each committed action so a quit cannot give the decision back (D-087).
 var autosave := Callable()
+## The terms screen: open while a contract's pay is being talked over.
+var talk := TermsPanel.new()
+## The armoury screen (Phase 5 C6, built apart): `armoury_rows` returns its rows for the right
+## column; `armoury_act` takes (action, id) for every panel action that begins "armoury".
+## Unset, the hub has no armoury.
+var armoury_rows := Callable()
+var armoury_act := Callable()
 
 var _layer: CanvasLayer = null
 var _inspected := ""
 var _wearer := ""
 var _reaction := ""
+## The taken contract whose walking away is being asked about ("" for none).
+var _confirm := ""
+var _share_pct := 0
 
 
 ## Builds the hub for the game's company and world (its overworld must exist), hooked to the
@@ -50,6 +67,9 @@ func begin(shared: Company, sim: WorldSim, stream: Rng) -> void:
 	var found: Variant = OverworldDirector.world_data().get("jobs", {})
 	var knobs: Dictionary = found if found is Dictionary else {}
 	jobs = Jobs.make(world, company, knobs)
+	talk.setup(company, world, _block(_read(HUB_DATA), "terms"))
+	var wages := _block(_read(CompanyDirector.ECONOMY_DATA), "wages")
+	_share_pct = Merc.whole(wages.get("share_pct", 0))
 	if company.economy.board.is_empty():
 		company.economy.refresh_board(world.day, _site_ids(), rng)
 	_layer = CanvasLayer.new()
@@ -70,6 +90,8 @@ func set_open(open: bool) -> void:
 	if _layer == null:
 		return
 	_layer.visible = open
+	talk.close()
+	_confirm = ""
 	if open:
 		_show()
 
@@ -100,13 +122,12 @@ func _on_result(kind: String, result: Dictionary) -> void:
 
 
 func _on_action(action: String, id: String) -> void:
+	if _routed(action, id):
+		return
 	var economy := company.economy
 	match action:
 		"pay":
 			economy.pay_wages()
-		"accept":
-			if jobs.take(id):
-				_remember_contract()
 		"inspect":
 			_inspected = id
 		"hire":
@@ -123,6 +144,46 @@ func _on_action(action: String, id: String) -> void:
 	if action in COMMITS and autosave.is_valid():
 		autosave.call()
 	_show()
+
+
+## The buttons another screen answers: the terms screen's while a talk is open (true: it has
+## redrawn), the armoury hook's, and the board's contract buttons.
+func _routed(action: String, id: String) -> bool:
+	if talk.is_open() and action in TermsPanel.ACTIONS:
+		_on_terms(action, id)
+		return true
+	if action.begins_with(ARMOURY) and armoury_act.is_valid():
+		armoury_act.call(action, id)
+	match action:
+		ContractRows.TALK:
+			talk.open(id)
+		ContractRows.ABANDON:
+			_confirm = id
+		ContractRows.ABANDON_NO:
+			_confirm = ""
+		ContractRows.ABANDON_YES:
+			_abandon(id)
+	return false
+
+
+## A terms button: an offer the employer accepts takes the contract on as a job (its party on
+## the map) and is remembered; every offer is a decision, saved at once under Ironman.
+func _on_terms(action: String, id: String) -> void:
+	var contract := talk.contract_id
+	var reply := talk.act(action, id, rng, world.day)
+	if reply == Terms.ACCEPT and jobs.take(contract):
+		_remember_contract()
+	if reply != "" and autosave.is_valid():
+		autosave.call()
+	_show()
+
+
+## Walks away from a taken contract (Economy.abandon): the captain's line is shown.
+func _abandon(id: String) -> void:
+	_confirm = ""
+	var economy := company.economy
+	if economy.abandon(id, company, world.day):
+		_react(economy.chronicle[economy.chronicle.size() - 1])
 
 
 ## The contract taken, one memory sentence on every merc of the company (the shared store).
@@ -145,9 +206,14 @@ func _judge() -> Jobs:
 func _decide(choice: String) -> void:
 	var economy := company.economy
 	if economy.decide_prisoner(company, choice, world.day):
-		var last := economy.chronicle[economy.chronicle.size() - 1]
-		var name := company.member(str(last.get("merc", ""))).display_name
-		_reaction = Text.t("hub.memory." + str(last.get("key", "")), {"name": name})
+		_react(economy.chronicle[economy.chronicle.size() - 1])
+
+
+## The line the merc a chronicle entry names remembers (named from the data even when he is
+## gone, never by a roster lookup that a dead or empty id would break).
+func _react(entry: Dictionary) -> void:
+	var name := company.name_of(str(entry.get("merc", "")))
+	_reaction = Text.t("hub.memory." + str(entry.get("key", "")), {"name": name})
 
 
 func _next_wearer() -> void:
@@ -170,16 +236,29 @@ func _at_hub() -> bool:
 
 
 func _show() -> void:
+	if talk.is_open():
+		panel.show_rows(talk.left_rows(), talk.right_rows())
+		return
 	if company.member(_wearer) == null:
 		_wearer = company.captain_id
 	var left: Array[Dictionary] = _wages_rows()
+	left.append_array(ContractRows.rows(company, world, _at_hub(), _confirm))
 	if _at_hub():
-		left.append_array(_contract_rows())
 		left.append_array(_recruit_rows())
 	else:
 		left.append(_label(Text.t("hub.away")))
-	var right: Array[Dictionary] = _prisoner_rows()
+	var right: Array[Dictionary] = []
+	if _reaction != "":
+		right.append(_label(_reaction))
+	right.append_array(_prisoner_rows())
+	right.append_array(WageRows.rows(company, _share_pct))
 	right.append_array(_pack_rows())
+	if armoury_rows.is_valid():
+		var extra: Variant = armoury_rows.call()
+		if extra is Array:
+			for row: Variant in extra:
+				if row is Dictionary:
+					right.append(row)
 	right.append(_button("close", "hub", Text.t("hub.close"), true))
 	panel.show_rows(left, right)
 
@@ -195,7 +274,7 @@ func _wages_rows() -> Array[Dictionary]:
 		"per_day": economy.wage_per_day(company.roster),
 		"count": company.roster.size(),
 	}
-	var rows: Array[Dictionary] = [_label(Text.t("hub.title", params))]
+	var rows: Array[Dictionary] = [HubPanel.line(HubPanel.HEADING, Text.t("hub.title", params))]
 	rows.append(_label(Text.t("hub.status", params)))
 	if economy.owed <= 0:
 		rows.append(_label(Text.t("hub.wages.clear", params)))
@@ -203,25 +282,6 @@ func _wages_rows() -> Array[Dictionary]:
 	rows.append(_label(Text.t("hub.wages.owed", params)))
 	var can_pay := _at_hub() and economy.purse >= economy.owed
 	rows.append(_button("pay", "wages", Text.t("hub.pay", params), can_pay))
-	return rows
-
-
-func _contract_rows() -> Array[Dictionary]:
-	var economy := company.economy
-	var rows: Array[Dictionary] = [_label(Text.t("hub.contracts.title"))]
-	if economy.board.is_empty():
-		rows.append(_label(Text.t("hub.contracts.none")))
-	for row: Dictionary in economy.board:
-		var site := world.site(str(row.get("site", "")))
-		var params := {
-			"faction": _faction_name(str(row.get("faction", ""))),
-			"site": OverworldMap.site_name(site),
-			"reward": row.get("reward", 0),
-			"deadline": row.get("deadline", 0),
-		}
-		var taken: bool = row.get("accepted") == true
-		var key := "hub.contract.taken" if taken else "hub.contract.accept"
-		rows.append(_button("accept", str(row.get("id", "")), Text.t(key, params), not taken))
 	return rows
 
 
@@ -253,10 +313,8 @@ func _prisoner_rows() -> Array[Dictionary]:
 	if not economy.last_loot.is_empty() and not economy.prisoner.is_empty():
 		rows.append(_label(_loot_line(economy.last_loot)))
 	if economy.prisoner.is_empty():
-		if _reaction != "":
-			rows.append(_label(_reaction))
 		return rows
-	rows.append(_label(Text.t("hub.prisoner.title")))
+	rows.append(HubPanel.line(HubPanel.HEADING, Text.t("hub.prisoner.title")))
 	rows.append(_label(Text.t("hub.prisoner.body")))
 	for choice: String in Economy.CHOICES:
 		var params := {"coin": economy.captives.ransom_coin()}
@@ -269,12 +327,11 @@ func _prisoner_rows() -> Array[Dictionary]:
 
 func _pack_rows() -> Array[Dictionary]:
 	var economy := company.economy
-	var rows: Array[Dictionary] = [_label(Text.t("hub.pack.title"))]
+	var rows: Array[Dictionary] = [HubPanel.line(HubPanel.HEADING, Text.t("hub.pack.title"))]
 	if economy.inventory.is_empty():
 		rows.append(_label(Text.t("hub.pack.empty")))
 		return rows
-	var wearer := company.member(_wearer)
-	var params := {"name": wearer.display_name}
+	var params := {"name": company.name_of(_wearer)}
 	rows.append(_button("wearer", "next", Text.t("hub.wearer", params), true))
 	var shown: Array[String] = []
 	for item: String in economy.inventory:
@@ -313,17 +370,23 @@ func _last_supplies() -> int:
 	return 0
 
 
-func _faction_name(faction_id: String) -> String:
-	return company.economy.book.faction_name(faction_id)
-
-
 func _full() -> bool:
 	return company.roster.size() >= company.cap()
 
 
 static func _label(text: String) -> Dictionary:
-	return {"kind": HubPanel.LABEL, "text": text}
+	return HubPanel.line(HubPanel.LABEL, text)
 
 
 static func _button(action: String, id: String, text: String, enabled: bool) -> Dictionary:
-	return {"kind": HubPanel.BUTTON, "action": action, "id": id, "text": text, "enabled": enabled}
+	return HubPanel.button_row(action, id, text, enabled)
+
+
+static func _block(data: Dictionary, key: String) -> Dictionary:
+	var found: Variant = data.get(key, {})
+	return found if found is Dictionary else {}
+
+
+static func _read(path: String) -> Dictionary:
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	return parsed if parsed is Dictionary else {}
