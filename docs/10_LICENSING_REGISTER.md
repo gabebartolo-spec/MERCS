@@ -28,6 +28,7 @@ each row is re-checked when its version changes.
 | Retro Diffusion (retrodiffusion.ai, web and API) | service, Terms 2026-09-28 | outputs are ours, commercial use allowed, no attribution; they may train on our outputs, we may never train on theirs; outputs from free usage may be shown publicly | CLEARED for trial outputs only | terrain-tile trial 2026-10-15, run by the lead in the browser on the director's prepaid balance (his written yes: US$10). Outputs stay in the vault; nothing enters `assets/` until the director picks a method. Download at original size and pass `validate_pixels.py` |
 | Texel Studio engine (github.com/EYamanS/texel-studio, self-hosted) | `cde7bdd` (2026-10-12) | "Texel Studio License" (source-available): use, modify and self-host for any purpose, internal commercial use included; may not be offered as a competing hosted service; generated output belongs to whoever generated it, for any purpose, no attribution | CLEARED for self-hosted internal use (a tool only: never shipped, kept out of `tools/`) | licence read from the repo's LICENSE file 2026-10-15. Runs locally against Ollama (no account, no key, no spend). Not run yet: installing it on this machine was refused by the session's permission check. The cloud service texel.studio is NOT cleared for use: its free tier makes 16 px only, and 64 px and tileset export need Pro (US$9 a month), which is spend. Trial outputs only, kept in the vault |
 | gitleaks | latest | MIT | CLEARED | CI only |
+| fontTools, skia-pathops | 4.66 / 0.9 | MIT / BSD-3-Clause | CLEARED | tool only: `tools/typeface/build_font.py` builds the game's own typeface (D-092); not shipped |
 | Steamworks SDK | at store time | Steam Partner terms | PENDING | director accepts at store-page time |
 
 ## Generative models on this machine
@@ -78,7 +79,7 @@ Found 2026-10-08 under `Data/Packages/ComfyUI/models/` on C:. Licence tags read 
 | Prompts | no artist names, no game or film titles, no living people |
 | Reference images for concepting | the director's own photos/sketches, CC0, or public-domain sources; record the source in the concept manifest |
 | Training data for the portrait style LoRA | only images generated from CLEARED models in this project and approved by the director; no scraped art |
-| Fonts | SIL OFL only; licence file committed beside the font |
+| Fonts | SIL OFL, or an original face drawn for MERCS and owned by the project (D-092: MERCS Ledger); licence file committed beside the font |
 | Audio | original, CC0, or CC-BY with attribution file; no CC-NC, no "royalty-free" packs without a written licence |
 | Names and places | generated and curated by the team; no real nobility or living persons |
 | Mixamo clips | used only as baked sprite frames; never redistributed as clips |
