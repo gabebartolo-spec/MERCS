@@ -51,6 +51,10 @@ var round_number: int:
 		return _turns.round_number
 ## Every event since setup, in order (rounds and intents included).
 var log: Array[Dictionary] = []
+## The field (walls and props, BattleGrid): the AI reads it to find a way round walls.
+var grid: BattleGrid:
+	get:
+		return _grid
 
 var _rules := BattleRules.new()
 var _grid := BattleGrid.new()
@@ -82,6 +86,7 @@ func setup(rules: Dictionary, field: Dictionary, fighters: Array[BattleUnit], rn
 		fighter.moves = _actions.kit.techniques(fighter)
 		BattleGrid.face_nearest(fighter, fighters)
 	_turns.skip_downed()
+	BattleKnowledge.remember(self, _rules.num("sight_cells"))
 	_begin_round(log)
 
 
@@ -166,6 +171,7 @@ func apply(action: Dictionary) -> Array[Dictionary]:
 	if not _actions.legal_kind(actor, kind) or not _actions.act(self, actor, action, events):
 		return events
 	_intents.done(actor.id)
+	BattleKnowledge.remember(self, _rules.num("sight_cells"))
 	BattleEnd.check(self, _morale, _grid, events)
 	if not is_over():
 		if _turns.advance():

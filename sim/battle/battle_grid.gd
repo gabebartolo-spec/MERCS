@@ -39,6 +39,22 @@ func reachable(fighter: BattleUnit, units: Array[BattleUnit], limit: int) -> Dic
 	return reach
 
 
+## Steps from every cell the goal can be walked to, around walls and props (8-way, never
+## cutting a blocked corner; fighters ignored, they move): {cell: steps}, the goal at 0. The
+## AI's way round a wall (BattleAi), where a straight walk would stall behind it.
+func distances(goal: Vector2i) -> Dictionary:
+	var nobody: Array[BattleUnit] = []
+	var out := {goal: 0}
+	var frontier: Array[Vector2i] = [goal]
+	while not frontier.is_empty():
+		var from: Vector2i = frontier.pop_front()
+		for step: Vector2i in steps_from(from, nobody):
+			if not out.has(step):
+				out[step] = out[from] + 1
+				frontier.append(step)
+	return out
+
+
 ## True when a standing fighter of the other side stands next to the cell.
 func engaged(cell: Vector2i, side: int, units: Array[BattleUnit]) -> bool:
 	for other: BattleUnit in units:
