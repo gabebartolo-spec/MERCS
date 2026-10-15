@@ -63,10 +63,10 @@ make a contract a real job.
 
 ## Caps every package obeys
 
-4 job types; 1 board; 2 factions (unchanged); company cap 8; road fights of 4-8 enemies; one
-reputation track and one grudge per faction (pending Q-7); one step-in per negotiation; prisoners
+4 job types; 1 board; 2 factions (unchanged); company cap 8; road fights of 4-8 soldiers or up to
+12-16 rabble; one reputation track and one grudge per faction (Q-7); one step-in per negotiation; prisoners
 only from a surrender or rout the battle reports. Caps go in `data/caps.json` (`jobs: 4`, and the
-enemy cap Q-1 settles) so the content-count lint enforces them. No trade, crafting, gladiator
+enemy caps of C7) so the content-count lint enforces them. No trade, crafting, gladiator
 events or banditry (Vision "many ways to earn" stays Q18).
 
 ## Shared files: the only overlaps, and how they stay mechanical
@@ -133,7 +133,7 @@ Sizes are agent-days. "Starts now" means no unmerged dependency.
   on the mercs who fought it.
 - Fixture `contract_jobs`: same seed, each type accepted vs not: a party appears on the map, a
   fight is raised at the place, the purse differs at the end.
-- Needs Q-9 (what wins and loses each type). The mechanism can be built on clear bandits first.
+- Q-9 decided as proposed (see Decided). The mechanism can be built on clear bandits first.
 
 ### C2 — Terms and negotiation (sim) — 3 days — after C0
 
@@ -151,7 +151,8 @@ Sizes are agent-days. "Starts now" means no unmerged dependency.
 - Fixture `contract_terms`: same seed and ask, high vs low reputation: accepted vs countered;
   with a step-in vs without: a different reply; past the line: the employer walks and the
   reputation is lower.
-- Needs Q-6 (what "split" splits), Q-8 (which trait the step-in uses).
+- Q-6 decided: the split is advance vs on return. Q-8 decided: a bargaining trait per merc that the
+  director names (placeholders until then).
 
 ### C3 — Wages: daily wage plus a share (sim) — 2 days — after C0
 
@@ -163,7 +164,8 @@ Sizes are agent-days. "Starts now" means no unmerged dependency.
 - The existing unpaid-wages morale fall stays; a share left unpaid counts as owed wages.
 - Fixture `wages_share`: same seed and contract, share paid vs withheld: a different purse and a
   different morale a week later.
-- Needs Q-3 (a share of what), Q-4 (how it splits), Q-5 (flat or by level).
+- Decided: the share is of contract pay only (Q-3), splits by level (Q-4: each merc's cut is
+  weighted by his level, among those who fought the job), and the daily wage is by level (Q-5).
 
 ### C4 — Reputation and grudges (sim) — 2 days — after C0 (hunter half after C1)
 
@@ -173,11 +175,14 @@ Sizes are agent-days. "Starts now" means no unmerged dependency.
   chases on sight like any other; it is not psychic), `world_sim.gd` (`send_hunters`),
   `tests/economy/standing_checks.gd`, `tests/effect/contract_grudge.gd` (new).
 - Data: `economy.json` `standing`; `world.json` `parties.hunters`; `data/encounters.json`
-  `enc_hunters` (line-ups inside C7's 4-8).
+  `enc_hunters` (line-ups inside C7's caps, growing with the grudge).
 - The captain at the time of the broken deal gets the memory; the hunters' fight names the deal.
 - Fixture `contract_grudge`: same seed, a contract completed vs abandoned: abandoned leaves a
   lower name, a hunter party on the map and a fight it raises; completed leaves neither.
-- Needs Q-7 (one name or one per faction), Q-13 (what counts as badly broken).
+- Q-7 decided: reputation per faction, so `standing.gd` keeps one name and one grudge for each
+  faction. Q-13 decided: only abandoning after taking a sizeable advance sends hunters; "sizeable"
+  is the data knob `standing.sizeable_advance` (new Q-16). Failing honestly dents the name only.
+  Q-15: hunters grow with the grudge.
 
 ### C5 — Prisoners from the fight (sim) — 2 days — after C0 and Phase 4 P2
 
@@ -190,7 +195,9 @@ Sizes are agent-days. "Starts now" means no unmerged dependency.
   stay where they are.
 - Each fate writes a memory on the captain and on the merc whose reaction is strongest (the
   existing `Memory.on_choice`).
-- Needs Q-12 (who joins when a prisoner is recruited, with a fixed cast).
+- Q-12 decided: no prisoner recruiting in this pass. **C5 drops the recruit fate for now**; ransom,
+  release and execute stay (three fates). The Phase 2 recruit-from-pool path is removed from the
+  prisoner choice and its fixture rows; recruiting waits until the director designs it.
 
 ### C6 — Worn loot, armour price and upkeep (sim + data) — 2 days — after C0 and Phase 4 P1b
 
@@ -204,7 +211,7 @@ Sizes are agent-days. "Starts now" means no unmerged dependency.
 - Fixtures: `armour_upkeep`: same seed, the orc in plate vs leather: the purse after ten days
   differs by the upkeep; `loot_gear`: beating a mail-wearing enemy yields worn mail, beating an
   unarmoured one does not.
-- Needs Q-10 (where armour is bought and whether loot sells), Q-11 (what "worn" does).
+- Q-10 decided: towns buy and sell. Q-11 decided: worn = one point weaker, worth less.
 
 ### C7 — The road: 4-8 enemies, company cap 8, the lethality ledger — 2 days — after Phase 4 P2
 
@@ -219,8 +226,14 @@ Sizes are agent-days. "Starts now" means no unmerged dependency.
   death every few fights" and the lead tunes `injury.json` / `battle.json` from his answer.
 - Fixture: none of its own (data). The ledger is itself checked: the same seeds give the same
   report twice.
-- Needs Q-1 (enemies above Phase 4's 6-a-side cap), Q-2 (how many of the 8 deploy), Q-14 (the
-  number the ledger is held to).
+- **Rabble (Q-1).** A separate, weak enemy kind in `data/` (ill-armed, low skill, break fast),
+  with its own line-ups: proper soldiers come 4-8 a fight, rabble up to 12-16. Caps in
+  `data/caps.json`: `enemies_soldiers: 8`, `enemies_rabble: 16`. The combat cap of 6 a side is
+  raised for the enemy side only; the company fields up to 6 (Q-2), 2 in reserve.
+- **Perf check.** A 6 v 16 fight is added to the existing perf suite (no new harness): it must
+  stay inside the suite's current frame and sim-time budgets; if it does not, report the numbers
+  to the lead, do not trim the cap.
+- Q-14 decided: ledger held to 1 named death per 4 fights.
 
 ### C8 — The hub: board, terms, wages, prisoners, armoury (presentation) — 3 days — after C2, C3
 
@@ -265,40 +278,33 @@ campaign routes and two new ones (a negotiated contract, an abandoned one) repla
 in two processes; the lethality ledger's report is attached. PASS, PASS WITH NOTES or FAIL is
 the director's.
 
+## Decided (director, 2026-10-16 ~02:55; quotes word for word)
+
+| Q | Answer | Folded into |
+|---|---|---|
+| Q-1 | "enemies up to 12 or even 16 if theyre rabble". Rabble = a separate weak kind (ill-armed, low skill, break fast); proper soldiers come 4-8 | C7: rabble kind, enemy caps, 6 v 16 perf check |
+| Q-2 | Up to 6 deploy, 2 in reserve | C7 |
+| Q-3 | Share of contract pay only | C3 |
+| Q-4 | Share splits BY LEVEL | C3 |
+| Q-5 | Daily wage by level | C3 |
+| Q-6 | Split = advance vs on return | C2 |
+| Q-7 | Reputation PER FACTION | C4, caps |
+| Q-8 | A bargaining trait per merc that the director names (placeholders until then) | C2 |
+| Q-9 | Job win/lose as proposed | C1 |
+| Q-10 | Towns buy and sell | C6 |
+| Q-11 | Worn = one point weaker, worth less | C6 |
+| Q-12 | "Not until you design it" | C5: recruit fate dropped; ransom, release, execute stay |
+| Q-13 | Hunters only "if you took a sizeable amount of upfront money and abandon the job" | C4; "sizeable" is Q-16 |
+| Q-14 | Lethality target 1 named death per 4 fights | C7 ledger |
+| Q-15 | Hunters grow with the grudge | C4 |
+
+Note on the Vision of the interview rulings above: the line "Prisoners: ransom, recruit, release,
+execute (all four)" is narrowed by Q-12 to three for this pass.
+
 ## Open questions for the director (one decision each; recommended option first)
 
-- **Q-1 Enemy count above the combat cap.** Phase 4 caps a fight at 6 a side; the ruling says
-  4-8 enemies. Recommended: enemies up to 8, the company still fields its side as now. Other:
-  keep 6 enemies and read "4-8" as a later raise.
-- **Q-2 How many of the 8 fight.** Recommended: up to 6 deploy (pillar 3, "five or six
-  deployed"), 2 wait in reserve. Other: all 8 can deploy.
-- **Q-3 A share of what.** Recommended: of the contract's pay only. Other: of the pay and the
-  loot's coin.
-- **Q-4 How the share splits.** Recommended: equal between the mercs who fought the job. Other:
-  by level; equal across the whole roster.
-- **Q-5 The daily wage.** Recommended: by level from data (vision: promotion raises wages).
-  Other: one flat wage per merc as now.
-- **Q-6 What "split" in the terms means.** Recommended: how much is paid up front and how much on
-  completion. Other: a share of the loot the employer claims.
-- **Q-7 Reputation.** Recommended: one name for the company (the board reads it), plus a grudge
-  per faction for broken deals. Other: a separate name with each faction.
-- **Q-8 The trait a merc steps in with.** `data/traits.json` is empty. Recommended: one
-  bargaining trait per merc, with a word and a number, that you name for the six (the agent
-  wires placeholders until then). Other: use an existing stat (presence) until traits exist.
-- **Q-9 What wins and loses each job.** Recommended: clear bandits, beat the camp party; escort,
-  reach the place with the charge before the deadline, losing a fight on the way loses the job;
-  hold a place, stay there the set days and win the fight that comes; hunt a man, beat the
-  quarry party before the deadline. Every type fails at the deadline.
-- **Q-10 Where armour is bought, and whether loot sells.** Recommended: the hub sells a short
-  list and buys gear back. Other: buy only, no selling (loot is worn or left).
-- **Q-11 What "worn" does.** Recommended: the same piece with one bonus point less, worth less.
-  Other: the same stats, worth less only.
-- **Q-12 Recruiting a prisoner with a fixed cast (Q21).** Recommended: keep the Phase 2 rule (the
-  next recruit from the pool joins) until Q21 is answered. Other: no recruit choice until then.
-- **Q-13 What counts as badly broken.** Recommended: abandoning an accepted contract sends
-  hunters; failing one honestly (deadline passed, fight lost) dents the name only. Other: both
-  send hunters.
-- **Q-14 The lethality target the ledger is held to.** Recommended: on average one named death
-  per four fights over twenty seeded campaigns. Other: one per three; one per five.
-- **Q-15 How strong the hunters are.** Recommended: an ordinary road fight (4-8). Other: harder
-  than the road, growing with the grudge.
+- **Q-16 What is a "sizeable" advance (from Q-13)?** It is a data knob,
+  `economy.json` `standing.sizeable_advance`, so the number is not in code. Recommended: an
+  advance of at least half the contract's pay (stored as a percent). Other: a flat coin amount; any
+  advance above zero. Until answered the builder uses the placeholder and C4's fixture reads it
+  from data.
