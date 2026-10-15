@@ -21,6 +21,7 @@ const EXPECTED_IDS: Array[String] = [
 	"death_memory",
 	"battle_blocking",
 	"battle_rout",
+	"battle_delegate",
 	"battle_captain",
 	"battle_surrender",
 	"battle_ai_knowledge",
@@ -40,6 +41,7 @@ const EXPECTED_IDS: Array[String] = [
 	"hiring",
 	"battle_kit",
 	"levels",
+	"xp_from_fights",
 ]
 
 
