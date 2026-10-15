@@ -31,8 +31,12 @@ const SEEDS := {
 ## ("job", drawn on the new "jobs" stream after the board's own draws), so all ten saves gain
 ## that key and a "jobs" stream position; with both stripped each hashes as P1b left it.
 ## C1 also added the "job" route (route_kit.gd).
+## Re-pinned by Phase 5 C5 (claude/c5-prisoners): win/424310 only. Its fight leaves one
+## surrendered man, released at the hub; the release is now remembered by the merc who reacts
+## most strongly (merc_3, economy.json "prisoner" "reactions") beside the captain, so the save
+## gains that one chronicle line and memory. 6e3ccee3... -> a9086cba...; the rest hold.
 const GOLDEN := {
-	"win/424310": "6e3ccee3237ce098c920f80dc6908cc41f64ba2403d1880cdd395e98614aa81d",
+	"win/424310": "a9086cbadb4e1e94b8678169deec7cc482d4b06ea6737de9b13f945808fd6c16",
 	"win/424311": "e98f9d247a6b8190b4674119a691bf6c7149bcfb2d28af524a71be0940c490d5",
 	"loss/424308": "78527d9fb2aeea09260487d334b9cf12c1a433219f7ff89de46564a9ed4daf1c",
 	"loss/424316": "ae1491173ccf7b35563033ab048932fe88b7f9e34b0a41d32b40520df5a03e9b",
