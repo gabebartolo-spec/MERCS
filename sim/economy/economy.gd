@@ -10,13 +10,14 @@ extends RefCounted
 ## This file is the facade every caller uses (Phase 5 C0, docs/plans/phase5_contracts.md); the
 ## parts each package grows live in modules:
 ## - ContractBook (contract_book.gd, `book`): the board, accept, complete, expire;
-## - Prisoners (prisoners.gd, `captives`): the waiting prisoner and the four choices.
+## - Prisoners (prisoners.gd, `captives`): the waiting prisoner and the four choices;
+## - Terms (terms.gd, `terms`): the ask, the employer's reply, the step-in (C2).
 ## The facade keeps at most 14 public methods; a package prefers a module or a field read
 ## through state() over a new one.
 ##
 ## defs: {"economy": data/balance/economy.json, "factions": data/factions.json, "equipment":
-## data/equipment.json, "recruits": data/recruits.json}. Missing data reads as nothing: no
-## coin, no wages, no board, no recruits, no gear.
+## data/equipment.json, "recruits": data/recruits.json, "traits": data/traits.json}. Missing
+## data reads as nothing: no coin, no wages, no board, no recruits, no gear, no bargaining.
 
 const RELEASE := Prisoners.RELEASE
 const RANSOM := Prisoners.RANSOM
@@ -33,6 +34,8 @@ var morale := 0
 var book := ContractBook.new()
 ## The prisoner a won fight leaves (take(day), ransom_coin(), can_recruit() are read there).
 var captives := Prisoners.new()
+## Negotiation (negotiate(); reputation(id), odds(merc_id), judge() are read there).
+var terms := Terms.new()
 ## The posted contracts: Contracts records plus "id" ("ctr_<n>"). Held by the book.
 var board: Array[Dictionary]:
 	get:
@@ -88,11 +91,12 @@ static func restore(saved: Dictionary, defs: Dictionary) -> Economy:
 	economy.last_loot = _whole_row(_dict(saved, "last_loot"))
 	for row: Dictionary in _rows(saved, "chronicle"):
 		economy.chronicle.append(_whole_row(row))
+	economy.terms.restore(_dict(saved, "standing_stub"))
 	return economy
 
 
 func state() -> Dictionary:
-	return {
+	var held := {
 		"purse": purse,
 		"owed": owed,
 		"unpaid_days": unpaid_days,
@@ -106,6 +110,9 @@ func state() -> Dictionary:
 		"last_loot": last_loot.duplicate(),
 		"chronicle": chronicle.duplicate(true),
 	}
+	if not terms.stub_reputation.is_empty():
+		held["standing_stub"] = terms.state()
+	return held
 
 
 ## Generic gear definitions by id (data/equipment.json), for the mercs who wear them.
@@ -160,6 +167,17 @@ func complete(id: String) -> bool:
 		return false
 	purse += _num(row, "reward", 0)
 	return true
+
+
+## Negotiates a posted contract's terms (Terms). ask: {"price": total coin, "advance": the
+## coin of it paid now (the rest on return), "speaker": the merc id who steps in or "",
+## "day": today}; rng: the world's Rng ("terms" stream, rolled only by a step-in). The
+## employer accepts (the contract is taken, the advance paid), counters (his terms are kept on
+## the contract) or walks (it leaves the board, the name falls). Returns the reply and why.
+func negotiate(company: Company, id: String, ask: Dictionary, rng: Rng) -> Dictionary:
+	var talk := ask.duplicate()
+	talk["rng"] = rng
+	return terms.negotiate(self, company, id, talk)
 
 
 ## Loot from a won fight of this encounter type: coin to the purse, a piece of gear to the
@@ -242,6 +260,7 @@ func _read(defs: Dictionary) -> void:
 		_items[str(def.get("id", ""))] = def
 	book.setup(_dict(_rules, "contracts"), factions)
 	captives.setup(_dict(_rules, "prisoner"), _recruits, _max_morale())
+	terms.setup(_dict(_rules, "terms"), factions, _rows(_dict(defs, "traits"), "traits"))
 
 
 static func _num(block: Dictionary, key: String, fallback: int) -> int:

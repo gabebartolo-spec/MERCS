@@ -32,3 +32,16 @@ One line per knob (docs/05_STYLE_CODE.md "Data"). Read by `sim/economy/` (Phase 
 ## prisoner (the company's reaction to each choice)
 - `ransom_coin`: coin a ransom brings.
 - `release_morale`, `ransom_morale`, `execute_morale`, `recruit_morale`: morale change for each choice.
+
+## terms (Phase 5 C2: the ask, the employer's reply, the step-in; placeholder numbers, whole numbers)
+- `base_limit_pct`: the most any employer gives, in percent of the posted reward, before his regard and need.
+- `reputation_weight_pct`: percent of the company's name with the faction (0 to `reputation_max`) added to his limit.
+- `need_weight_pct`: percent of the faction's pressure (data/factions.json) added to his limit.
+- `advance_cost_pct`: how much each coin of advance weighs against his limit, in percent of a coin paid on return.
+- `counter_band_pct`: how far past his limit (percent of the reward) an ask still gets a counter; beyond it he walks.
+- `reputation_start`: the company's name with a faction before any deal moved it (stub until C4's standing).
+- `reputation_max`: the ceiling of that name (a floor of 0 is fixed).
+- `walk_dent`: how far the name falls with a faction whose employer walks away from an ask.
+- `die_sides`: the step-in check's die.
+- `step_in_difficulty`: the step-in succeeds when the roll plus the merc's bargaining reaches this.
+- `step_in_shift_pct`: how far a step-in moves the employer's limit (up on success, down on failure), in percent of the reward.

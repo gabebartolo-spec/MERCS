@@ -23,5 +23,18 @@
     "ransom_morale": -2,
     "execute_morale": -6,
     "recruit_morale": 3
+  },
+  "terms": {
+    "base_limit_pct": 90,
+    "reputation_weight_pct": 20,
+    "need_weight_pct": 10,
+    "advance_cost_pct": 25,
+    "counter_band_pct": 20,
+    "reputation_start": 50,
+    "reputation_max": 100,
+    "walk_dent": 10,
+    "die_sides": 10,
+    "step_in_difficulty": 9,
+    "step_in_shift_pct": 10
   }
 }

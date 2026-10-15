@@ -13,7 +13,10 @@
         "required": ["id"],
         "additionalProperties": false,
         "properties": {
-          "id": {"type": "string", "pattern": "^trait_[a-z0-9]+(_[a-z0-9]+)*$"}
+          "id": {"type": "string", "pattern": "^trait_[a-z0-9]+(_[a-z0-9]+)*$"},
+          "placeholder": {"type": "boolean", "description": "True until the director names the trait (Q-8)."},
+          "bargain": {"type": "integer", "minimum": 0, "description": "Added to the merc's step-in roll in contract talks (Phase 5 C2)."},
+          "held_by": {"type": "array", "items": {"type": "string"}, "description": "Merc ids (data/mercs.json) who have the trait; placeholder link until Q-8."}
         }
       }
     }
