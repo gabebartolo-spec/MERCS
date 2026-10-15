@@ -3,7 +3,7 @@ extends RefCounted
 ## terms.gd): the employer's reply is the rule over name, need and ask (accept, counter, walk);
 ## an agreed advance is paid now and the rest on return; a counter can be taken; a walk takes
 ## the contract off the board and dents the name; the step-in is once per contract, by a merc
-## on the roster, on the "terms" stream only, and leaves a line on him; the stub name saves only
+## on the roster, on the "terms" stream only, and leaves a line on him; the name saves only
 ## once moved, an old save loads, and save, reload, continue equals uninterrupted.
 ## Seeded by design: seed 424242 for the board, and the step-in seeds found by _seed_for().
 
@@ -94,9 +94,9 @@ func _check_rule() -> void:
 		_reply(terms.judge(row, at_limit, at_limit)) != Terms.ACCEPT,
 		"the same price wholly in advance weighs more: no longer accepted"
 	)
-	terms.stub_reputation[faction] = 100
+	company.economy.standing.names[faction] = 100
 	var high := terms.limit_pct(row)
-	terms.stub_reputation[faction] = 0
+	company.economy.standing.names[faction] = 0
 	var low := terms.limit_pct(row)
 	_ok(
 		high > limit and limit > low,
@@ -178,7 +178,7 @@ func _check_walk() -> void:
 		"past the line he walks and the contract leaves the board"
 	)
 	_ok(
-		economy.terms.reputation(faction) < before and economy.state().has("standing_stub"),
+		economy.terms.reputation(faction) < before and economy.state().has("standing"),
 		(
 			"the name with that faction falls (%d to %d) and is saved"
 			% [before, economy.terms.reputation(faction)]
@@ -273,15 +273,15 @@ func _check_step_in_once() -> void:
 	)
 
 
-## The stub saves only once moved (old routes keep their save text); an old save loads at the
+## The name saves only once moved (old routes keep their save text); an old save loads at the
 ## starting name; a talk saved halfway and reloaded ends as the uninterrupted one.
 func _check_save() -> void:
 	var fresh := Company.start(Case.defs())
 	var old_state := fresh.economy.state()
-	_ok(not old_state.has("standing_stub"), "an untouched economy saves no new key")
+	_ok(not old_state.has("standing"), "an untouched economy saves no new key")
 	var loaded := Economy.restore(_json(old_state), Case.defs())
-	var rules := Fixture.sect(Fixture.sect(Case.defs(), "economy"), "terms")
-	var start := Merc.whole(rules.get("reputation_start", 0))
+	var rules := Fixture.sect(Fixture.sect(Case.defs(), "economy"), "standing")
+	var start := Merc.whole(rules.get("start", 0))
 	_ok(
 		loaded.terms.reputation("fac_placeholder_a") == start,
 		"an old save loads at the starting name"

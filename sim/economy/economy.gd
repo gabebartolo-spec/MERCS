@@ -12,6 +12,7 @@ extends RefCounted
 ## - ContractBook (contract_book.gd, `book`): the board, accept, complete, expire;
 ## - Prisoners (prisoners.gd, `captives`): the waiting prisoner and the four choices;
 ## - Terms (terms.gd, `terms`): the ask, the employer's reply, the step-in (C2).
+## - Standing (standing.gd, `standing`): the name with each faction and the grudges (C4).
 ## The facade keeps at most 14 public methods; a package prefers a module or a field read
 ## through state() over a new one.
 ##
@@ -36,6 +37,8 @@ var book := ContractBook.new()
 var captives := Prisoners.new()
 ## Negotiation (negotiate(); reputation(id), odds(merc_id), judge() are read there).
 var terms := Terms.new()
+## The company's name with each faction and its grudges (reputation(faction) is read there).
+var standing := Standing.new()
 ## The posted contracts: Contracts records plus "id" ("ctr_<n>"). Held by the book.
 var board: Array[Dictionary]:
 	get:
@@ -91,12 +94,14 @@ static func restore(saved: Dictionary, defs: Dictionary) -> Economy:
 	economy.last_loot = _whole_row(_dict(saved, "last_loot"))
 	for row: Dictionary in _rows(saved, "chronicle"):
 		economy.chronicle.append(_whole_row(row))
-	economy.terms.restore(_dict(saved, "standing_stub"))
+	economy.standing.load_state(_dict(saved, "standing"))
 	return economy
 
 
+## The economy as a save holds it; "standing" is left out until it has moved (an optional key,
+## so a game that never touched a name saves as before C4).
 func state() -> Dictionary:
-	var held := {
+	var saved := {
 		"purse": purse,
 		"owed": owed,
 		"unpaid_days": unpaid_days,
@@ -110,9 +115,9 @@ func state() -> Dictionary:
 		"last_loot": last_loot.duplicate(),
 		"chronicle": chronicle.duplicate(true),
 	}
-	if not terms.stub_reputation.is_empty():
-		held["standing_stub"] = terms.state()
-	return held
+	if not standing.is_new():
+		saved["standing"] = standing.state()
+	return saved
 
 
 ## Generic gear definitions by id (data/equipment.json), for the mercs who wear them.
@@ -167,6 +172,22 @@ func complete(id: String) -> bool:
 	if row.is_empty():
 		return false
 	purse += _num(row, "reward", 0) - _num(row, "advance", 0)
+	standing.completed(str(row.get("faction", "")))
+	return true
+
+
+## Walks away from an accepted contract on `day`: it leaves the board, the name with its
+## faction dents, and after a sizeable advance the faction's grudge grows (Standing.abandoned).
+## The captain remembers it (a chronicle line). False (and no change) when the contract is not
+## on the board or not accepted.
+func abandon(id: String, company: Company, day: int) -> bool:
+	var row := book.contract(id)
+	if row.is_empty() or row.get("accepted") != true:
+		return false
+	board.erase(row)
+	var grew := standing.abandoned(row, company.captain_id, day)
+	var key := "standing.grudge" if grew else "standing.abandon"
+	chronicle.append({"day": day, "merc": company.captain_id, "key": key})
 	return true
 
 
@@ -261,7 +282,8 @@ func _read(defs: Dictionary) -> void:
 		_items[str(def.get("id", ""))] = def
 	book.setup(_dict(_rules, "contracts"), factions)
 	captives.setup(_dict(_rules, "prisoner"), _recruits, _max_morale())
-	terms.setup(_dict(_rules, "terms"), factions, _rows(_dict(defs, "traits"), "traits"))
+	standing.setup(_dict(_rules, "standing"))
+	terms.setup(_dict(_rules, "terms"), factions, _rows(_dict(defs, "traits"), "traits"), standing)
 
 
 static func _num(block: Dictionary, key: String, fallback: int) -> int:

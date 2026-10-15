@@ -62,7 +62,7 @@ func _by_name(name_value: int) -> String:
 	var company: Company = made[0]
 	var contract_id: String = made[1]
 	var faction := str(company.economy.book.contract(contract_id).get("faction", ""))
-	company.economy.terms.stub_reputation[faction] = name_value
+	company.economy.standing.names[faction] = name_value
 	var reply := company.economy.negotiate(
 		company, contract_id, ask(company, contract_id, MODEST), Rng.from_seed(SEED)
 	)

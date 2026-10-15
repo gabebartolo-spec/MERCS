@@ -14,10 +14,8 @@ extends RefCounted
 ## in the economy's chronicle). An ask past the walk line ends the offer: the contract leaves
 ## the board and the faction thinks less of the company.
 ##
-## The faction's name is C4's standing (sim/economy/standing.gd, PR #134). Until C4 merges it
-## is the STUB below, with C4's names: reputation(faction) and walked(faction); a number per
-## faction, saved by the economy only once one has moved. When C4 lands, these two calls go to
-## economy.standing and the stub, its rules and its "standing_stub" save key are deleted.
+## The faction's name is C4's Standing (sim/economy/standing.gd, the economy's `standing`):
+## the employer reads standing.reputation(faction) and a walk calls standing.walked(faction).
 ## Rules: data/balance/economy.json "terms". No node, no clock, no file.
 
 const STREAM := "terms"
@@ -29,19 +27,20 @@ const PERCENT := 100
 const KEY_STEP_WON := "hub.terms.step_in_won"
 const KEY_STEP_LOST := "hub.terms.step_in_lost"
 
-## STUB until C4: the company's name with each faction, by faction id; a faction not held
-## here stands at "reputation_start".
-var stub_reputation: Dictionary = {}
-
+var _standing: Standing = null
 var _rules := {}
 var _pressure := {}
 var _bargain := {}
 
 
 ## rules: economy.json "terms"; factions: data/factions.json "factions"; traits:
-## data/traits.json "traits" (each trait's "bargain" counts for every merc in its "held_by").
-func setup(rules: Dictionary, factions: Array[Dictionary], traits: Array[Dictionary]) -> void:
+## data/traits.json "traits" (each trait's "bargain" counts for every merc in its "held_by");
+## standing: the economy's Standing, the company's name with each faction (C4).
+func setup(
+	rules: Dictionary, factions: Array[Dictionary], traits: Array[Dictionary], standing: Standing
+) -> void:
 	_rules = rules
+	_standing = standing
 	for def: Dictionary in factions:
 		_pressure[str(def.get("id", ""))] = Merc.whole(def.get("pressure", 0))
 	for def: Dictionary in traits:
@@ -52,16 +51,9 @@ func setup(rules: Dictionary, factions: Array[Dictionary], traits: Array[Diction
 				_bargain[key] = Merc.whole(_bargain.get(key, 0)) + Merc.whole(def.get("bargain", 0))
 
 
-## The company's name with a faction, 0 to "reputation_max". (C4 replaces the stub.)
+## The company's name with a faction, as the employer reads it (C4's Standing).
 func reputation(faction_id: String) -> int:
-	return Merc.whole(stub_reputation.get(faction_id, _rule("reputation_start")))
-
-
-## STUB until C4: the faction's employer walked from an ask; the name dents by "walk_dent".
-func walked(faction_id: String) -> void:
-	stub_reputation[faction_id] = clampi(
-		reputation(faction_id) - _rule("walk_dent"), 0, _rule("reputation_max")
-	)
+	return _standing.reputation(faction_id) if _standing != null else 0
 
 
 ## A faction's need: its pressure on the region.
@@ -141,20 +133,8 @@ func negotiate(
 			row["counter_advance"] = result["counter_advance"]
 		WALK:
 			economy.book.board.erase(row)
-			walked(str(row.get("faction", "")))
+			economy.standing.walked(str(row.get("faction", "")))
 	return result
-
-
-## The saved stub (only once a name has moved; {} otherwise).
-func state() -> Dictionary:
-	return stub_reputation.duplicate()
-
-
-func restore(saved: Dictionary) -> void:
-	for key: Variant in saved:
-		var value: Variant = saved[key]
-		if value is int or value is float:
-			stub_reputation[str(key)] = clampi(Merc.whole(value), 0, _rule("reputation_max"))
 
 
 ## The deal is struck: the advance is paid now; the contract's reward becomes the agreed price
