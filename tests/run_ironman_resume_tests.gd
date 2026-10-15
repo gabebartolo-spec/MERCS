@@ -10,7 +10,10 @@ extends "res://tests/lib/runner.gd"
 ## The commits the first pass left open (tests/ironman_resume/gap_checks.gd): meeting an
 ## encounter, a storylet attempt, the captain's appointment and a recorded action's types.
 ## Save order (tests/ironman_resume/save_order_checks.gd): a prisoner's fate and a won fight's
-## triage, each quit at its autosave and reopened in a new process, match the run played on.
+## triage, each quit at its autosave and reopened in a new process, match the run played on;
+## B over a triage keeps the hub shut; a quit mid-walk reopens at the last day's end. Unsaved
+## (tests/ironman_resume/unsaved_checks.gd): no change without a following save, every input of
+## three scripted campaigns, and the guard shown to catch each way a change can miss its save.
 ## Seeded by design: world seed 424270, a lone ambush or patrol three steps out, the battle played
 ## by BattleAi on both sides (InputKit), the start of the Ironman suite's own fight.
 ##   godot --headless --path . --script tests/run_ironman_resume_tests.gd
@@ -23,6 +26,7 @@ const SAVE_SYSTEM := preload("res://presentation/autoload/save_system.gd")
 const SitOutChecks := preload("res://tests/ironman_resume/sit_out_checks.gd")
 const GapChecks := preload("res://tests/ironman_resume/gap_checks.gd")
 const SaveOrderChecks := preload("res://tests/ironman_resume/save_order_checks.gd")
+const UnsavedChecks := preload("res://tests/ironman_resume/unsaved_checks.gd")
 const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const WINDOW_SIZE := Vector2i(1920, 1080)
 const SEED := 424270
@@ -55,6 +59,9 @@ func run_checks() -> void:
 	var order := SaveOrderChecks.new()
 	order.setup(self, Callable(self, "check"))
 	await order.run()
+	var unsaved := UnsavedChecks.new()
+	unsaved.setup(self, Callable(self, "check"))
+	await unsaved.run()
 	_clear_save()
 	await process_frame
 

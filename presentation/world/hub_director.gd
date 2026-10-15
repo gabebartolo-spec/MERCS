@@ -25,6 +25,8 @@ var hunters: GrudgeParties = null
 ## The overworld's autosave (OverworldDirector.autosave: writes only under Ironman), called after
 ## each committed action so a quit cannot give the decision back (D-087).
 var autosave := Callable()
+## True while the overworld's triage stands: the hub stays shut until Continue (show_result).
+var waiting := Callable()
 
 var _layer: CanvasLayer = null
 var _inspected := ""
@@ -41,6 +43,7 @@ static func attach(game: SliceGame) -> HubDirector:
 	hub.begin(game.company_director().company, map.world, map.rng)
 	hub.autosave = map.autosave
 	map.after_fight = hub.show_result
+	hub.waiting = func() -> bool: return map.triage != ""
 	return hub
 
 
@@ -70,9 +73,9 @@ func is_open() -> bool:
 	return _layer != null and _layer.visible
 
 
-## Shows the hub (redrawn) or hides it; nothing is lost either way.
+## Shows the hub (redrawn) or hides it; nothing is lost either way. Not over a triage.
 func set_open(open: bool) -> void:
-	if _layer == null:
+	if _layer == null or (open and waiting.is_valid() and waiting.call()):
 		return
 	_layer.visible = open
 	if open:

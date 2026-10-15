@@ -23,6 +23,8 @@ const NEAR := 3
 const TAP_LIMIT := 8
 const SETTLE := 6
 const FIXED_FPS := "60"
+const WALK_LIMIT := 16
+const MID_DAY_STEPS := 2
 
 var _tree: SceneTree = null
 var _check: Callable
@@ -36,6 +38,7 @@ func setup(tree: SceneTree, check: Callable) -> void:
 func run() -> void:
 	await prisoner_memory()
 	await fight_loot()
+	await walked_day()
 
 
 ## A prisoner's fate, decided at the hub: quit at its autosave, the reopened run holds the
@@ -82,6 +85,7 @@ func fight_loot() -> void:
 	var won: Array[bool] = []
 	var purses: Array[int] = []
 	var shown := false
+	var peek_shut := false
 	for quit_at_autosave: bool in [false, true]:
 		var game := await _fight_start()
 		var director := game.overworld_director()
@@ -94,6 +98,8 @@ func fight_loot() -> void:
 			purses.append(Merc.whole(reopened.get("purse", -1)))
 		else:
 			var waited := not game.hub_open()
+			await InputKit.tap(_tree, KEY_B)
+			peek_shut = not game.hub_open()
 			await InputKit.click(_tree, director.panel.button_for(OverworldDirector.CONTINUE))
 			await InputKit.frames(_tree, SETTLE)
 			shown = waited and game.hub_open()
@@ -110,6 +116,39 @@ func fight_loot() -> void:
 		"Ironman On, quit at a won fight's triage: the reopened run matches the run that went on"
 	)
 	_check.call(shown, "the hub opens on the won fight's result at Continue, not over the triage")
+	_check.call(
+		peek_shut, "B over the triage keeps the hub shut: no loot or prisoner before Continue"
+	)
+
+
+## Lead ruling under D-087: a day's walk is saved at its end. Steps until a day passes, then two
+## more, then quit: the reopened run (a new process) stands where that day ended.
+func walked_day() -> void:
+	_clear_save()
+	_save_out_of_town()
+	var game := await _spawn()
+	await InputKit.tap(_tree, KEY_M)
+	var director := game.overworld_director()
+	var day := director.world.day
+	var at_day_end := ""
+	var steps := 0
+	while steps < WALK_LIMIT and at_day_end.is_empty():
+		await InputKit.tap(_tree, KEY_S if steps % 2 == 0 else KEY_D)
+		steps += 1
+		if director.world.day != day:
+			await InputKit.frames(_tree, SETTLE)
+			at_day_end = Probe.snapshot(game)
+	var band := director.world.band
+	for extra: int in MID_DAY_STEPS:
+		await InputKit.tap(_tree, KEY_S if (steps + extra) % 2 == 0 else KEY_D)
+	var moved := director.world.band != band and director.world.day == day + 1
+	await _quit(game)
+	var reopened := str(_reopen_elsewhere().get("state", ""))
+	print("SAVE ORDER walk: %d steps to day %d, moved on %s" % [steps, day + 1, moved])
+	_check.call(
+		not at_day_end.is_empty() and moved and reopened == at_day_end,
+		"Ironman On, quit mid-walk: the reopened run (new process) stands at the last day's end"
+	)
 
 
 ## The save on disk opened by a new Godot process (reload_probe.gd): {"state": its snapshot,
@@ -188,6 +227,17 @@ func _save_world() -> void:
 	world.parties.clear()
 	World.out_of_town(world, NEAR)
 	World.lone_party(world, "ambush", NEAR)
+	var made := Kit.wounds(rng, "", {}, Kit.led_by(End.LAST))
+	_saves().ironman = true
+	_saves().save_game(world, rng, made.company, made.state())
+
+
+func _save_out_of_town() -> void:
+	var rng := Rng.from_seed(SEED)
+	var world := WorldSim.new()
+	world.start(World.data(), rng)
+	world.parties.clear()
+	World.out_of_town(world, NEAR)
 	var made := Kit.wounds(rng, "", {}, Kit.led_by(End.LAST))
 	_saves().ironman = true
 	_saves().save_game(world, rng, made.company, made.state())
