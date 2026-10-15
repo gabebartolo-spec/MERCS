@@ -23,8 +23,8 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
   save v1) at matched heads after checking every suite ran (13 suites at floor). Main 38b2659
   green; Windows build at `Documents/GitHub/MERCS-builds/2026-10-15_m1_38b2659/MERCS.exe`
   (headless boot clean).
-- Board PR #76 (D-063..D-071, Phase 2 items, roadmap D-072 typo -> D-071): builder pushing a
-  second commit with today's rulings; lead merges when green.
+- Board PR #76 merged (8df923a): D-063..D-071 logged, Phase 2 items 1-2, Art paused, roadmap
+  D-072 typo -> D-071. Local branch claude/board-after-75 remains (delete refused by settings).
 - Pruned two stale clean worktrees (dual-desktop, loving-elgamal).
 
 ## Director today (2026-10-15)
@@ -41,7 +41,7 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
   build for the director.
 
 ## Next for the lead
-1. Merge #76 when green at its head. 2. Review the milestone 2 PR (sim review on the save,
+1. (done: #76 merged.) 2. Review the milestone 2 PR (sim review on the save,
    fixtures failing first, real taps), merge on green, fetch the build, ask him to play it.
 3. Record his milestone verdicts the same turn (board PR body + this file).
 4. Brief milestone 3 (six mercs in data, roster, captain, inspect screen) after his M2 verdict
@@ -53,10 +53,10 @@ says carry on or wrong. Entry condition of every milestone: its player-effect fi
 data 96, smoke 24, stage 43, stage_scale 11, stage_light 8, assets 13, slice 15, battle 14,
 loop 4, sim_world 9, save 7, effect 4, overworld 8.
 
-## Worktrees (4 / 4)
-`../MERCS-wt/slice-m1` (mine, branch claude/lead-handoff-1015), `../MERCS-wt/board` (#76),
-`../MERCS-wt/p2-m2` (milestone 2), `../MERCS-wt/art-publish` (Art, paused). Remove board and
-p2-m2 when their PRs merge.
+## Worktrees (3 / 4)
+`../MERCS-wt/slice-m1` (mine, branch claude/lead-handoff-1015, pushed, no PR yet: open a
+docs-only PR at session end), `../MERCS-wt/p2-m2` (milestone 2), `../MERCS-wt/art-publish`
+(Art, paused). Remove p2-m2 when its PR merges.
 
 ## Co-lead playbook
 playbook: nothing new (2026-10-15; no worker findings yet).
