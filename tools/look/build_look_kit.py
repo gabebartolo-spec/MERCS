@@ -161,13 +161,10 @@ def ground(col):
     mud = [(1.01, P("soil", 2))]
     tris(g, -14.0, 14.0, -12.0, -1.6, 0.6, mud, 0.015)
     tris(g, -14.0, 14.0, 1.9, 7.0, 0.6, mud, 0.015)
-    for k in range(60):  # loose stones, straw and puddles break up the mud
+    for k in range(40):  # loose stones break up the mud
         sx = h(k, 31) * 24.0 - 12.0
         sz = 2.1 + h(k, 37) * 4.0 if k % 2 else -1.8 - h(k, 37) * 2.0
-        kind = k % 3
-        m = P("slate", 2) if kind == 0 else P("timber", 3) if kind == 1 else P("soil", 1)
-        size = (0.14, 0.1, 0.06) if kind == 0 else (0.3, 0.05, 0.015) if kind == 1 else (0.7, 0.45, 0.01)
-        g.box(size, (sx, -sz, size[2] / 2), m, rot_z=h(k, 41) * math.pi)
+        g.box((0.14, 0.1, 0.06), (sx, -sz, 0.03), P("slate", 2 if k % 3 else 1), rot_z=h(k, 41) * math.pi)
     # kerb stones along the road edges
     for ix in range(-28, 28):
         for z in (-1.65, 1.95):

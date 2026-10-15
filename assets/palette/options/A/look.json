@@ -1,5 +1,5 @@
 {
- "_doc": "Option A 'Ash and Hearth' lighting and post: overcast-white day sun, cool grey ambient; night is a weak blue moon and one warm torch; no dither.",
+ "_doc": "Option A 'Ash and Hearth' lighting and post: overcast-white day sun, cool grey ambient; night is a weak blue moon and one warm torch; no dither. Sun and ambient energy +5% (director, 2026-10-15: \"the lighting could stand to be 5% brighter\").",
  "day": {
   "elevation_degrees": 50,
   "azimuth_degrees": -35,
@@ -8,13 +8,13 @@
    0.95,
    0.88
   ],
-  "energy": 1.05,
+  "energy": 1.1025,
   "ambient_rgb": [
    0.62,
    0.66,
    0.72
   ],
-  "ambient_energy": 0.75,
+  "ambient_energy": 0.7875,
   "sky": "slate:4"
  },
  "night": {
@@ -25,13 +25,13 @@
    0.62,
    0.85
   ],
-  "energy": 0.28,
+  "energy": 0.294,
   "ambient_rgb": [
    0.16,
    0.19,
    0.28
   ],
-  "ambient_energy": 0.55,
+  "ambient_energy": 0.5775,
   "sky": "soot:0",
   "torch_energy": 3.0,
   "torch_range_m": 9.5,

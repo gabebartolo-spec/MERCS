@@ -3,10 +3,10 @@
   "asset": "look_target/kit",
   "files": {
     "overworld_kit.glb": "1481ad0992f19c3655332d3c09025d9f227ebe94ff64bd91d22743dc35a18a8f",
-    "street_kit.glb": "c18bb5c4a85a09c3040ab9bb74f93a209881fb58733cd170af17e0e86c1d682d"
+    "street_kit.glb": "87d5607cc8719a538cd7e231864e37948510b161bddcbbbe5837fb483e94a6c4"
   },
   "produced_by": {
-    "tools/look/build_look_kit.py": "02e217d0c945eff3"
+    "tools/look/build_look_kit.py": "65e1ad60d0048f90"
   },
   "models": [],
   "licence_rows": [

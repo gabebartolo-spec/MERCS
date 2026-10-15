@@ -2,7 +2,7 @@
   "_doc": "Look-target palette option A: hand-set ramp anchors, steps spaced in OKLab by script.",
   "asset": "palette/options/A",
   "files": {
-    "look.json": "c33ca14cef879cf44e4e3e39bdc073456fdecc8b11938052cae96e1d7197138e",
+    "look.json": "49f0863efbc491507cfc14f2838b80e0621dcfc3dff8a23e1b8e320e112422e7",
     "palette.gpl": "9c45023b2753c0b36caf0b55cb53b5eb1c3604326d5d5942cb2ff657178d4552",
     "palette.json": "f0178bbf3fbf4f890d267b45dc0168df0c6210acc0967ac993b79a801f07cea9",
     "pixelate.json": "26d94369c314ba11270554c2dba697225cde322cb1db4a2d33824f334bd8fbc9",

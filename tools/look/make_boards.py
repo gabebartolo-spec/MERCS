@@ -19,6 +19,7 @@ FRAMES = (("day", "1  Street, day"), ("night", "2  Street, night and rain"), ("m
 FRAME_W, FRAME_H = 1920, 1080
 GAP = 24
 HEAD = 150
+CAPTION = "Figures are stage-1 blockouts: judge palette, light and finish, not shapes"
 LABEL = 64
 BG = (24, 23, 26)
 INK = (235, 229, 211)
@@ -39,8 +40,9 @@ def board(caps: Path, key: str) -> Image.Image:
     width = 3 * FRAME_W + 4 * GAP
     img = Image.new("RGB", (width, HEAD + LABEL + FRAME_H + GAP), BG)
     d = ImageDraw.Draw(img)
-    d.text((GAP, 28), f"Option {key}: {pal['name']}", fill=INK, font=font(64))
-    x = GAP + 1150
+    d.text((GAP, 10), f"Option {key}: {pal['name']}", fill=INK, font=font(60))
+    d.text((GAP, 88), CAPTION, fill=INK, font=font(38))
+    x = GAP + 1750
     for ramp in pal["ramps"]:
         for c in ramp["colours"]:
             d.rectangle((x, 40, x + SWATCH - 3, 40 + 2 * SWATCH), fill=c)
