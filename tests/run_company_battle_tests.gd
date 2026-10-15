@@ -136,20 +136,22 @@ func _check_blood_price_kept_in_hand() -> void:
 	var vampyr := company.member("vampyr").to_battle_unit(BattleUnit.COMPANY, Vector2i(1, 1), false)
 	var foe := BattleUnit.make("foe", BattleUnit.ENEMY, Vector2i(2, 1), Fixture.fighter("bandit"))
 	var duel := _duel(vampyr, foe, rules)
+	var unhurt := MercPlay.choose(duel, vampyr, rules)
+	foe.wounded = true
 	var healthy := MercPlay.choose(duel, vampyr, rules)
 	var price := Fixture.sect(Fixture.sect(rules, "moves"), BattleUnit.MOVE_BLOOD_PRICE)
 	vampyr.hp = Merc.whole(price.get("hp_cost", 0)) * 2
 	var weak := MercPlay.choose(duel, vampyr, rules)
-	vampyr.hp = vampyr.max_hp
-	foe.hp = Merc.whole(Fixture.fighter("bandit_chief")["hp"])
-	var too_tough := MercPlay.choose(duel, vampyr, rules)
 	check(
 		(
 			_is(healthy.get("type"), Battle.ACTION_BLOOD_PRICE)
 			and _is(weak.get("type"), Battle.ACTION_ATTACK)
-			and _is(too_tough.get("type"), Battle.ACTION_ATTACK)
+			and _is(unhurt.get("type"), Battle.ACTION_ATTACK)
 		),
-		"the Vampyr pays his blood price only to finish a foe and only while he can afford it"
+		(
+			"the Vampyr pays his blood price only on a foe he saw wounded (rule 6) and only "
+			+ "while he can afford it"
+		)
 	)
 
 
