@@ -4,7 +4,7 @@ extends "res://tests/lib/runner.gd"
 ## handler call: held keys walk the merc cell by cell, a left click on the ground walks it
 ## there, houses and the well block it, the camera follows in whole logical pixels, the
 ## street door leads into the interior and back, T steps the time of day and lights the
-## torch, R toggles the rain, F1 hides the help, and the crowd walks the same way twice.
+## torch, R toggles the rain, H hides the help, and the crowd walks the same way twice.
 ## Seeded by design: no randomness; the runner's --fixed-fps 60 makes every delta 1/60 s.
 ##   godot --headless --path . --script tests/run_slice_tests.gd
 
@@ -181,9 +181,9 @@ func _check_conditions(game: SliceGame) -> void:
 	check(raining and dry and stage.rain == false, "R starts and stops the rain")
 	var help := _first_label(game)
 	var shown := help != null and help.visible
-	await _tap(KEY_F1)
+	await _tap(KEY_H)
 	check(
-		shown and help != null and not help.visible, "the key help shows at start and F1 hides it"
+		shown and help != null and not help.visible, "the key help shows at start and H hides it"
 	)
 
 
@@ -255,16 +255,16 @@ func _check_clip_playback() -> void:
 	)
 
 
-## F5 opens the loop example; real mouse clicks on its panel buttons walk it from the
+## L opens the loop example; real mouse clicks on its panel buttons walk it from the
 ## arrival to the recruit card, hire, the contract and the road at dusk in the rain.
 func _check_loop_panels() -> void:
 	# The headless window is tiny; give it the game's size so the panel lies on screen.
 	root.size = WINDOW_SIZE
 	var game := await _spawn()
-	await _tap(KEY_F5)
+	await _tap(KEY_L)
 	var director := game.loop_director()
 	var opened := director != null and director.loop.stage == SliceLoop.Stage.ARRIVE
-	check(opened and director.panel.visible, "F5 opens the loop example on its arrival panel")
+	check(opened and director.panel.visible, "L opens the loop example on its arrival panel")
 	if not opened:
 		return
 	for choice: String in ["continue", "hire", "accept", "continue"]:
