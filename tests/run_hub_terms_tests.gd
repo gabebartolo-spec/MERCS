@@ -18,18 +18,17 @@ extends "res://tests/lib/runner.gd"
 ##   godot --path . --resolution 1920x1080 --script tests/run_hub_terms_tests.gd -- --shots=<dir>
 
 const InputKit := preload("res://tests/lib/input_kit.gd")
+const NoAdvance := preload("res://tests/panels/no_advance_checks.gd")
 const SLICE_SCENE := "res://presentation/world/slice_game.tscn"
 const WINDOW_SIZE := Vector2i(1920, 1080)
 const SAVE_SYSTEM := preload("res://presentation/autoload/save_system.gd")
 ## The merc whose placeholder bargaining trait is the strongest (data/traits.json).
 const TALKER := "vampyr"
-## A merc with no bargaining trait.
-const PLAIN := "merc_3"
+const PLAIN := "merc_3"  # a merc with no bargaining trait
 ## Ask-more clicks that carry the ask past the limit (a counter) and far past it (a walk).
 const COUNTER_CLICKS := 3
 const WALK_CLICKS := 10
-## More-now clicks that make the advance half the price (a sizeable advance, Q-16).
-const HALF_CLICKS := 2
+const HALF_CLICKS := 2  # More-now clicks: half the price up front (sizeable, Q-16)
 const ARMOURY_ID := "armoury_test"
 const SHOTS_ARG := "--shots="
 
@@ -65,6 +64,7 @@ func run_checks() -> void:
 	await _check_walk(first)
 	await _check_accept(second)
 	await _check_abandon(second)
+	await NoAdvance.new().run(self, _hub(), check, _shot)
 	await _check_wages()
 	await _check_prisoner_without_captain()
 	await _check_armoury_hook()
