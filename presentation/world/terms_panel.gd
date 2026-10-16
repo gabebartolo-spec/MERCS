@@ -103,6 +103,9 @@ func _move_price(up: bool) -> void:
 
 
 func _move_advance(up: bool) -> void:
+	if not _company.economy.terms.advance_open(_row(contract_id)):
+		advance = 0
+		return
 	var step := maxi(1, price * _step("advance_step_pct") / PERCENT)
 	advance = clampi(advance + (step if up else -step), 0, price)
 
@@ -120,8 +123,13 @@ func left_rows() -> Array[Dictionary]:
 		HubPanel.line(HubPanel.LABEL, Text.t("hub.terms.ask", params)),
 	]
 	var open := _talking(row)
+	var pays_now := _company.economy.terms.advance_open(row)
 	rows.append(_pair("price", "hub.terms.price_up", "hub.terms.price_down", open))
-	rows.append(_pair("advance", "hub.terms.advance_up", "hub.terms.advance_down", open))
+	rows.append(
+		_pair("advance", "hub.terms.advance_up", "hub.terms.advance_down", open and pays_now)
+	)
+	if not pays_now:
+		rows.append(HubPanel.line(HubPanel.NOTE, Text.t(Terms.KEY_NO_ADVANCE)))
 	rows.append(HubPanel.line(HubPanel.NOTE, Text.t("hub.terms.advance_note")))
 	rows.append(HubPanel.button_row("offer", contract_id, Text.t("hub.terms.offer"), open))
 	return rows
