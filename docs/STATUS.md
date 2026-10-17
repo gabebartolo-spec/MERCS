@@ -5,16 +5,16 @@ merged PR's "Board and log" section (D-026, D-030). History rolls to `docs/archi
 
 ## Phase
 Current phase: **4 (combat depth, D-091) and 5 (Contracts and the road) in progress; art in critic loops** (Phase 2 horizontal slice built and playtested, D-084; Phase 0 gate PASS WITH NOTES, D-027). Gate signer: Concept Lead.
-Phase 4: merged P1a (#121, #126), P1b equipment physics (#127), P2 morale and surrender (#123), P4 deploy or delegate (#124), P5 non-psychic enemy (#122), P6b/P6c blood and hit-stop (#129, #133), XP (#125), levels (#120), Ledger typeface (#116). Open: P1c ranged and spear reach (in progress), P7 hover odds (not built).
-Phase 5: plan #130; C0 economy facade (#132) and C4 reputation half (#134) merged; C3 wages (#135) merging; C1 and C2 (#136) in review.
+Phase 4: merged P1a (#121, #126), P1b equipment physics (#127), P1c ranged and spear reach (#139), P2 morale and surrender (#123), P4 deploy or delegate (#124), P5 non-psychic enemy (#122), P6b/P6c blood and hit-stop (#129, #133), XP (#125), levels (#120), stall fix (#147), Ledger typeface (#116). Open: P7 hover odds (not built).
+Phase 5: C0-C8 merged (#132, #134-#136, #138, #142-#146, #148); baseline tune #152; director rulings D-113..D-115 shipped (#153-#155, #157). Open: faction/place names (drafted, awaiting his pick), armoury buy/sell screen, styled contract screens.
 
 ## Agents
 
 | Agent | State | Item | Branch / PR | Since |
 |-------|-------|------|-------------|-------|
-| Dev Lead (Opus 5.5) | working | Combat depth merged except P1c ranged (in progress); contracts C0, C3, C4 merged or merging, C1 and C2 in review; overnight team of builders (D-090) | claude/p4-p1c-ranged | 2026-10-16 |
-| Merge & CI (Sonnet 5.5) | working | board PR after #134 (D-091..D-112) | docs/board-after-134 | 2026-10-16 |
-| Art Factory (Opus 5.5) | working | cast fix #118 and tile boards (method B', D-106) in critic loops; palette PR (heather, water ramp, grey-olive) after SHIP | claude/tiles-b6, #118 | 2026-10-16 |
+| Dev Lead (Opus 5.5) | working | Lightweight shift (no Godot, no helpers): board and log; heather B11 seed re-pick (CPU only); orc hand-paint round 6 paused | docs/board-after-157 | 2026-10-18 |
+| Merge & CI (Sonnet 5.5) | available | board done by the Dev Lead after #157 (D-113..D-117) | docs/board-after-157 | 2026-10-18 |
+| Art Factory (Opus 5.5) | available | cast r7 rejected (D-117), #118 draft on hold; orc hand-painted rounds 1-5 in critic loop, round 6 paused; heather B11 paused | #118 (draft) | 2026-10-16 |
 | Concept Lead (Fable 5.1) | available | roadmap rewrite DONE (#74); handoff #77 open | claude/concept-lead-handoff (#77) | 2026-10-15 |
 
 States: working · running a check · awaiting director · blocked · available.
