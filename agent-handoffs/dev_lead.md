@@ -3,11 +3,11 @@ Start: this file, CLAUDE.md, ~/.claude/memory-shared/MEMORY.md + co-lead-playboo
 (agent-briefs/DEV_LEAD_OPUS.md), docs/plans/phase5_contracts.md ("Decided"), docs/DECISIONS.md D-091..D-112,
 ~/.claude/skills/ai-slop-art/SKILL.md. Then `git fetch`, `gh pr list`, `git worktree list`.
 
-## State: awaiting director (plan review). 2026-10-18 shift: "run a lightweight shift, dont spawn any helpers, you dont have
+## State: PAUSED (director 2026-10-18: "neither, comit the plan and pause"). Plan merged (#159); no execution method chosen. 2026-10-18 shift: "run a lightweight shift, dont spawn any helpers, you dont have
 godot or tripo or blender access". Then he asked for a demo release plan: draft PR #159 docs/plans/demo_release.md
-(branch docs/demo-release-plan, worktree MERCS-wt/handoff5). It asks him: review + execution method + Task 0 decisions.
+(merged). Next, only when he says go: Task 0 decisions, one question at a time.
 Done this shift: board PR #158 merged (D-113..D-117). Orc round 6 SE checked by the lead: hump and shield gone; S polish,
-boards and a fresh critic still to do (needs a helper). Heather v2-v5 seed re-pick RUNNING in background (CPU only):
+boards and a fresh critic still to do (needs a helper). Heather v2-v5 seed re-pick STOPPED at the pause (all seedpick processes killed by PID; v2-v5 seeds still invalid; rerun `bash _wip/repick_b11.sh heather_v2 heather_v3 heather_v4 heather_v5`):
 log D:/MERCS-vault/renders/tile_trial_2026-10-15/B11_claude/_wip/b11g_repick.txt; then rebuild x2, checks, board, critic.
 
 ## Who does what
