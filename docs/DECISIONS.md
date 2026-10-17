@@ -4,6 +4,28 @@ Cap: 400 lines; oldest roll to `docs/archive/`. One decision per entry, newest f
 that is not here does not exist. Format: date · id · who decided · the decision · why · what it
 changes.
 
+## 2026-10-16 · D-117 · Director · Cast r7 rejected; the cast is redone by hand
+Words: "both look awful. both of their heads are featureless stumps and their postures are bizarre and unnatural" (orc and Vampyr, #118 r7); yes to downloading about 12 free-licence reference photos for the critics (reference only, never in the game).
+Why: Seven rounds of colour and metric fixes never judged whether the head reads as a face or the stance as a person.
+Changes: #118 is a draft on hold, not synced. Render-based studies failed lead QC twice, so the orc is hand-painted pixel by pixel (D:/MERCS-vault/renders/cast_paint_2026-10-16/, round 6 paused); critics judge the read against photos first.
+
+## 2026-10-16 · D-116 · Director · Mercs 3-6 picked; bargaining traits; grass B
+Words: slot 3 "Wren", slot 4 "Gauda Kettle", slot 5 "Ser Ambrose Vell", slot 6 "Yaro Sedlak" (as drafted); traits as drafted (Hungry, Shrewd, Flatterer, Gambler), Orc "Hard bargain" and Vampyr "Silver tongue" kept; grass "B: new grass" (darker, greener) as the overworld reference.
+Changes: Names and sex in `data/mercs.json` (#145); grass B and `verdure_mid` #40501d, palette 65 colours (#151).
+
+## 2026-10-16 · D-115 · Director · Lethality, dead men's wages, kept advances
+Words: "Downed die 1 in 3"; a dead merc's unpaid wages "Forfeit"; a kept advance on abandon gives the mercs "No share"; the lead may make the death-roll data edit a builder was refused.
+Changes: triage bands 30/52/67, named deaths 0.30 -> 0.88 per 4 fights (#154); wages forfeit on burial and on loading old saves (#153, #155).
+
+## 2026-10-16 · D-114 · Director · Walk out, no more advances
+Words: "Walk out, no more advances": after the company abandons a job, that faction pays nothing up front until the company finishes a job for it.
+Why: With the #152 economy, taking advances and walking away covered 87-162% of the bills.
+Changes: #155 (farm 17-32%), terms screen line and buttons off (#157). Reopen loop still farms up to 56-110% of the bill (upper bound): for his playtest.
+
+## 2026-10-16 · D-113 · Director · Contract screens ship as working panels; names drafted for him
+Words: contract screens "Merge as working panels" (styled look later, own look gate); faction and place names "You draft, I pick".
+Changes: #145 merged; drafts in MERCS-builds/faction_place_candidates_2026-10-16.md. Lead (not director): baseline tune #152 (income 119% of the bill, sergeant + 4 patrol from day 8).
+
 ## 2026-10-16 · D-112 · Lead (not director) · Lead calls made overnight, for the director's veto
 Calls: P1c ranged lines (walls block arrows and spears, fighters block neither, range 6 in data); #127 placeholder gear retuned to keep the slice at 89-109 wins in 200; orc skin option A (the golden's grass remapped to verdure, #118 r4, needs his golden decision before merge); P6c impact (deterministic, no physics raycasts, hit-stop is presentation only, #133); C0 split behind a facade with the five campaign routes pinned (#132); the orc head size (#118).
 Why: Each was the simplest option that kept a director ruling intact; none is a taste ruling.
