@@ -1,10 +1,14 @@
-# Dev Lead handoff, 2026-10-16 10:52 (desktop, personal account, "Game Studio Lead mercs")
+# Dev Lead handoff, 2026-10-18 (lightweight shift) (desktop, personal account, "Game Studio Lead mercs")
 Start: this file, CLAUDE.md, ~/.claude/memory-shared/MEMORY.md + co-lead-playbook.md, your brief
 (agent-briefs/DEV_LEAD_OPUS.md), docs/plans/phase5_contracts.md ("Decided"), docs/DECISIONS.md D-091..D-112,
 ~/.claude/skills/ai-slop-art/SKILL.md. Then `git fetch`, `gh pr list`, `git worktree list`.
 
-## State: working. Director was back 09:43-10:26, answered the queue, then "afk, no more questions for now".
-Ask NOTHING until he writes again. Team calls are yours; taste calls go in the queue below.
+## State: awaiting director (plan review). 2026-10-18 shift: "run a lightweight shift, dont spawn any helpers, you dont have
+godot or tripo or blender access". Then he asked for a demo release plan: draft PR #159 docs/plans/demo_release.md
+(branch docs/demo-release-plan, worktree MERCS-wt/handoff5). It asks him: review + execution method + Task 0 decisions.
+Done this shift: board PR #158 merged (D-113..D-117). Orc round 6 SE checked by the lead: hump and shield gone; S polish,
+boards and a fresh critic still to do (needs a helper). Heather v2-v5 seed re-pick RUNNING in background (CPU only):
+log D:/MERCS-vault/renders/tile_trial_2026-10-15/B11_claude/_wip/b11g_repick.txt; then rebuild x2, checks, board, critic.
 
 ## Who does what
 Session = lead AND Dev Lead. Team = builder subagents (die with the session: check ListAgents).
