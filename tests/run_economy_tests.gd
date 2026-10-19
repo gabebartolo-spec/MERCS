@@ -30,14 +30,14 @@ func suite_name() -> String:
 
 
 func run_checks() -> void:
-	_check_data()
-	_check_wages_fall_due()
-	_check_paying()
-	_check_morale()
-	_check_contract_board()
-	_check_contracts_by_pressure()
-	_check_contract_lifecycle()
-	_check_loot()
+	await _t("_test_data")
+	await _t("_test_wages_fall_due")
+	await _t("_test_paying")
+	await _t("_test_morale")
+	await _t("_test_contract_board")
+	await _t("_test_contracts_by_pressure")
+	await _t("_test_contract_lifecycle")
+	await _t("_test_loot")
 	GoldenChecks.new().run(check)
 	TermsChecks.new().run(check)
 	TermsDealChecks.new().run(check)
@@ -78,7 +78,7 @@ func _is(found: Variant, expected: Variant) -> bool:
 	return found == expected
 
 
-func _check_data() -> void:
+func _test_data() -> void:
 	var factions: Array = Fixture.json(Fixture.FACTIONS).get("factions", [])
 	var pressures: Array[int] = []
 	for entry: Variant in factions:
@@ -119,7 +119,7 @@ func _check_recruits_and_gear() -> void:
 	)
 
 
-func _check_wages_fall_due() -> void:
+func _test_wages_fall_due() -> void:
 	var company := _company()
 	var per_day: int = company.economy.wage_per_day(company.roster)
 	check(per_day > 0, "a roster of six costs coin every day, got %d" % per_day)
@@ -142,7 +142,7 @@ func _check_wages_fall_due() -> void:
 	)
 
 
-func _check_paying() -> void:
+func _test_paying() -> void:
 	var company := _company()
 	var economy := company.economy
 	check(not economy.pay_wages(), "nothing owed, nothing to pay")
@@ -162,7 +162,7 @@ func _check_paying() -> void:
 	)
 
 
-func _check_morale() -> void:
+func _test_morale() -> void:
 	var rules: Dictionary = Fixture.json(Fixture.ECONOMY)
 	var grace: int = rules["wages"]["grace_days"]
 	var loss: int = rules["wages"]["morale_loss_per_day"]
@@ -201,7 +201,7 @@ func _board(seed_value: int) -> Array[Dictionary]:
 	return economy.board
 
 
-func _check_contract_board() -> void:
+func _test_contract_board() -> void:
 	var rules: Dictionary = Fixture.json(Fixture.ECONOMY)["contracts"]
 	var board := _board(SEED)
 	var factions: Array[String] = ["fac_placeholder_a", "fac_placeholder_b"]
@@ -242,7 +242,7 @@ func _check_contract_board() -> void:
 	check(economy.board.is_empty(), "with no site to name there is no contract")
 
 
-func _check_contracts_by_pressure() -> void:
+func _test_contracts_by_pressure() -> void:
 	var loud_a := _faction_counts(100, 1)
 	var loud_b := _faction_counts(1, 100)
 	check(
@@ -270,7 +270,7 @@ func _faction_counts(pressure_a: int, pressure_b: int) -> Dictionary:
 	return counts
 
 
-func _check_contract_lifecycle() -> void:
+func _test_contract_lifecycle() -> void:
 	var economy := _company().economy
 	economy.refresh_board(0, SITES, Rng.from_seed(SEED))
 	var row: Dictionary = economy.board[0]
@@ -305,7 +305,7 @@ func _check_contract_lifecycle() -> void:
 	)
 
 
-func _check_loot() -> void:
+func _test_loot() -> void:
 	var rules: Dictionary = Fixture.json(Fixture.ECONOMY)["loot"]["patrol"]
 	var items := _worn_ids()
 	var seen: Array[String] = []

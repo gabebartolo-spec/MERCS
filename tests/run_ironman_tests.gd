@@ -34,15 +34,15 @@ func suite_name() -> String:
 
 func run_checks() -> void:
 	root.size = WINDOW_SIZE
-	_check_key_and_fixtures()
-	await _check_choice_at_start()
+	await _t("_test_key_and_fixtures")
+	await _t("_test_choice_at_start")
 	var on := await _fight(true)
-	await _check_reload_continues(on)
+	await _t("_test_reload_continues", [on])
 	var off := await _fight(false)
-	_check_quit_after_fight(on, off)
-	_check_same_outcomes(on, off)
-	_check_xp_saved(on, off)
-	await _check_quit_mid_fight()
+	await _t("_test_quit_after_fight", [on, off])
+	await _t("_test_same_outcomes", [on, off])
+	await _t("_test_xp_saved", [on, off])
+	await _t("_test_quit_mid_fight")
 	var last: SliceGame = off["game"]
 	last.queue_free()
 	_clear_save()
@@ -54,7 +54,7 @@ func _json(path: String) -> Dictionary:
 	return parsed if parsed is Dictionary else {}
 
 
-func _check_key_and_fixtures() -> void:
+func _test_key_and_fixtures() -> void:
 	var rng := Rng.from_seed(SEED)
 	var world := World.world(SEED)
 	var plain := SaveModel.to_dict(world, rng)
@@ -83,7 +83,7 @@ func _check_key_and_fixtures() -> void:
 	)
 
 
-func _check_choice_at_start() -> void:
+func _test_choice_at_start() -> void:
 	_clear_save()
 	var game := await _spawn()
 	await InputKit.tap(self, KEY_M)
@@ -190,7 +190,7 @@ func _roster_of(text: String) -> Array[String]:
 	return ids
 
 
-func _check_quit_after_fight(on: Dictionary, off: Dictionary) -> void:
+func _test_quit_after_fight(on: Dictionary, off: Dictionary) -> void:
 	var start := _roster_of(str(on["before"]))
 	var died: Array[String] = on["died"]
 	var wiped: bool = on["wiped"]
@@ -225,7 +225,7 @@ func _check_quit_after_fight(on: Dictionary, off: Dictionary) -> void:
 
 ## D-095: the fight's experience is committed with the triage, so with Ironman On a quit at the
 ## triage or after Continue reloads every survivor with it; Off reloads the pre-fight numbers.
-func _check_xp_saved(on: Dictionary, off: Dictionary) -> void:
+func _test_xp_saved(on: Dictionary, off: Dictionary) -> void:
 	var before := _xp_of(str(on["before"]))
 	var at_triage := _xp_of(str(on["at_triage"]))
 	var after := _xp_of(str(on["after"]))
@@ -256,7 +256,7 @@ func _xp_of(text: String) -> Dictionary:
 	return held
 
 
-func _check_same_outcomes(on: Dictionary, off: Dictionary) -> void:
+func _test_same_outcomes(on: Dictionary, off: Dictionary) -> void:
 	check(
 		str(on["state"]) == str(off["state"]) and not str(on["state"]).is_empty(),
 		"same seed, Ironman On and Off: the world, every Rng stream and the company end identical"
@@ -266,7 +266,7 @@ func _check_same_outcomes(on: Dictionary, off: Dictionary) -> void:
 ## Ironman On, a patrol met (the toll on offer), Fight chosen, the game closed mid-fight: each
 ## reload goes straight into the very same battle (units, hp, cells, turn order, every Rng stream)
 ## and does not offer the toll again.
-func _check_quit_mid_fight() -> void:
+func _test_quit_mid_fight() -> void:
 	_clear_save()
 	_save_world(true, "patrol")
 	var first := await _spawn()
@@ -313,7 +313,7 @@ func _battle_of(director: OverworldDirector) -> String:
 
 ## Game A goes on from the autosave's moment; game B is a fresh session reading that file. Both
 ## rest the same days and match.
-func _check_reload_continues(on: Dictionary) -> void:
+func _test_reload_continues(on: Dictionary) -> void:
 	var game: SliceGame = on["game"]
 	var uninterrupted: OverworldDirector = game.overworld_director()
 	var reloaded_game := await _spawn()

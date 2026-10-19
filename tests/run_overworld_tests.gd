@@ -33,21 +33,21 @@ func run_checks() -> void:
 	preload("res://tests/world/map_words_checks.gd").new().run(check)
 	_clear_save()
 	var game := await _spawn()
-	await _check_open(game)
-	await _check_texel_grid(game)
-	await _check_walking_paused(game)
-	await _check_tap_walks(game)
-	await _check_hold_repeats(game)
-	await _check_blocked_step(game)
-	await _check_rest(game)
-	await _check_not_at_gate(game)
-	await _check_gate_cuts_to_street(game)
-	await _check_hidden_keeps_run(game)
-	await _check_save_and_load(game)
+	await _t("_test_open", [game])
+	await _t("_test_texel_grid", [game])
+	await _t("_test_walking_paused", [game])
+	await _t("_test_tap_walks", [game])
+	await _t("_test_hold_repeats", [game])
+	await _t("_test_blocked_step", [game])
+	await _t("_test_rest", [game])
+	await _t("_test_not_at_gate", [game])
+	await _t("_test_gate_cuts_to_street", [game])
+	await _t("_test_hidden_keeps_run", [game])
+	await _t("_test_save_and_load", [game])
 	game.queue_free()
 	await process_frame
 	var fresh := await _spawn()
-	await _check_continue_from_save(fresh)
+	await _t("_test_continue_from_save", [fresh])
 	fresh.queue_free()
 	await process_frame
 	_clear_save()
@@ -65,7 +65,7 @@ func _spawn() -> SliceGame:
 	return game
 
 
-func _check_open(game: SliceGame) -> void:
+func _test_open(game: SliceGame) -> void:
 	await _tap(KEY_M)
 	var director := game.overworld_director()
 	if director == null:
@@ -111,7 +111,7 @@ func _token_centred(director: OverworldDirector) -> bool:
 ## One texel grid (D-035): the map is drawn at 1x in a logical viewport shown at a whole-number
 ## scale with nearest filtering; no canvas item under the map is scaled; the band's token sits
 ## on a whole logical pixel.
-func _check_texel_grid(game: SliceGame) -> void:
+func _test_texel_grid(game: SliceGame) -> void:
 	var map := game.overworld_director().map
 	var view := map.pixel_view()
 	var shown := map.pixel_container()
@@ -154,7 +154,7 @@ func _canvas_items(under: Node) -> Array[CanvasItem]:
 	return found
 
 
-func _check_walking_paused(game: SliceGame) -> void:
+func _test_walking_paused(game: SliceGame) -> void:
 	var start := game.player.cell
 	var band := game.overworld_director().world.band
 	await _hold(KEY_D)
@@ -165,7 +165,7 @@ func _check_walking_paused(game: SliceGame) -> void:
 
 
 ## A tap of S: one tile south out of the gate, a day's units started, the map scrolled.
-func _check_tap_walks(game: SliceGame) -> void:
+func _test_tap_walks(game: SliceGame) -> void:
 	var director := game.overworld_director()
 	var world := director.world
 	var before := world.band
@@ -190,7 +190,7 @@ func _check_tap_walks(game: SliceGame) -> void:
 
 ## Holding S walks on a tile at a time: more than one step, never more than one per frame,
 ## each a single tile.
-func _check_hold_repeats(game: SliceGame) -> void:
+func _test_hold_repeats(game: SliceGame) -> void:
 	var world := game.overworld_director().world
 	var before := world.band
 	await _hold(KEY_S)
@@ -206,7 +206,7 @@ func _check_hold_repeats(game: SliceGame) -> void:
 
 ## A real tap into water, a town's wall and the map's edge does not move the band and the
 ## panel says why (never a silent no-op).
-func _check_blocked_step(game: SliceGame) -> void:
+func _test_blocked_step(game: SliceGame) -> void:
 	var world := game.overworld_director().world
 	var panel := game.overworld_director().panel
 	var wall: Dictionary[String, TileRegion.Terrain] = {
@@ -228,7 +228,7 @@ func _check_blocked_step(game: SliceGame) -> void:
 	check(edge == Text.t("world.panel.blocked_edge"), "a step off the map's edge says so")
 
 
-func _check_rest(game: SliceGame) -> void:
+func _test_rest(game: SliceGame) -> void:
 	var director := game.overworld_director()
 	var day_before := director.world.day
 	var band_before := director.world.band
@@ -239,7 +239,7 @@ func _check_rest(game: SliceGame) -> void:
 	)
 
 
-func _check_not_at_gate(game: SliceGame) -> void:
+func _test_not_at_gate(game: SliceGame) -> void:
 	var director := game.overworld_director()
 	await _tap(KEY_M)
 	await _tap(KEY_ESCAPE)
@@ -250,7 +250,7 @@ func _check_not_at_gate(game: SliceGame) -> void:
 
 
 ## Walks north back to the gate by taps of W: the map hides and the street is played again.
-func _check_gate_cuts_to_street(game: SliceGame) -> void:
+func _test_gate_cuts_to_street(game: SliceGame) -> void:
 	var director := game.overworld_director()
 	var world := director.world
 	var gate := world.region.entrance(RegionGen.HUB_ID)
@@ -277,7 +277,7 @@ func _check_gate_cuts_to_street(game: SliceGame) -> void:
 
 
 ## M on the street shows the same run, the band on the gate, the day as it was.
-func _check_hidden_keeps_run(game: SliceGame) -> void:
+func _test_hidden_keeps_run(game: SliceGame) -> void:
 	var director := game.overworld_director()
 	var day := director.world.day
 	await _tap(KEY_M)
@@ -296,7 +296,7 @@ func _check_hidden_keeps_run(game: SliceGame) -> void:
 
 ## A real click on Save writes the file under this run's own user dir; load_game reads a
 ## world equal to the one on screen.
-func _check_save_and_load(game: SliceGame) -> void:
+func _test_save_and_load(game: SliceGame) -> void:
 	var director := game.overworld_director()
 	await _click_button(director.panel.button_for(OverworldDirector.SAVE))
 	var path := ProjectSettings.globalize_path(SAVE_SYSTEM.SAVE_PATH)
@@ -320,7 +320,7 @@ func _check_save_and_load(game: SliceGame) -> void:
 	)
 
 
-func _check_continue_from_save(game: SliceGame) -> void:
+func _test_continue_from_save(game: SliceGame) -> void:
 	var model := _saves().load_game(OverworldDirector.world_data())
 	await _tap(KEY_M)
 	var director := game.overworld_director()

@@ -39,26 +39,26 @@ func run_checks() -> void:
 	_clear_save()
 	var game := await _game_with("patrol", NEAR)
 	var director := game.overworld_director()
-	await _check_patrol_met(director)
-	await _check_encounter_holds(director)
+	await _t("_test_patrol_met", [director])
+	await _t("_test_encounter_holds", [director])
 	var before := {
 		"supplies": director.world.supplies,
 		"band": director.world.band,
 		"mercs": game.stage().extra_mercs.size(),
 	}
-	await _check_fight_starts(game, director)
-	await _check_fight_returns(game, director, before)
+	await _t("_test_fight_starts", [game, director])
+	await _t("_test_fight_returns", [game, director, before])
 	await _close(game)
 	var tolled := await _game_with("patrol", NEAR)
-	await _check_toll(tolled.overworld_director())
+	await _t("_test_toll", [tolled.overworld_director()])
 	await _close(tolled)
 	var ambushed := await _game_with("ambush", NEAR)
-	await _check_ambush(ambushed.overworld_director())
+	await _t("_test_ambush", [ambushed.overworld_director()])
 	await _close(ambushed)
 	var avoided := await _game_with("ambush", FAR)
-	await _check_avoid(avoided.overworld_director())
+	await _t("_test_avoid", [avoided.overworld_director()])
 	await _close(avoided)
-	await _check_saved_encounter()
+	await _t("_test_saved_encounter")
 	_clear_save()
 
 
@@ -115,7 +115,7 @@ func _expected_body(director: OverworldDirector) -> String:
 	return body + "\n" + OverworldWords.deploy_lines(director.company)
 
 
-func _check_patrol_met(director: OverworldDirector) -> void:
+func _test_patrol_met(director: OverworldDirector) -> void:
 	var taps := await _walk_into(director)
 	var world := director.world
 	var party := world.party(str(world.encounter.get("party", "")))
@@ -139,7 +139,7 @@ func _check_patrol_met(director: OverworldDirector) -> void:
 	)
 
 
-func _check_encounter_holds(director: OverworldDirector) -> void:
+func _test_encounter_holds(director: OverworldDirector) -> void:
 	var band := director.world.band
 	for code: Key in [KEY_S, KEY_A, KEY_M, KEY_ESCAPE]:
 		await _tap(code)
@@ -156,7 +156,7 @@ func _check_encounter_holds(director: OverworldDirector) -> void:
 
 ## Fight hides the map on the street battle: the company's turn first, every fighter on the
 ## street, and M cannot close the map under the fight.
-func _check_fight_starts(game: SliceGame, director: OverworldDirector) -> void:
+func _test_fight_starts(game: SliceGame, director: OverworldDirector) -> void:
 	var mercs_before := game.stage().extra_mercs.size()
 	var enemies: Array = director.world.encounter.get("enemies", [])
 	await _click_button(director.panel.button_for(OverworldDirector.FIGHT))
@@ -183,7 +183,7 @@ func _check_fight_starts(game: SliceGame, director: OverworldDirector) -> void:
 
 
 ## The fight to its end: fighters off the street, the result applied, the map back in words.
-func _check_fight_returns(game: SliceGame, director: OverworldDirector, before: Dictionary) -> void:
+func _test_fight_returns(game: SliceGame, director: OverworldDirector, before: Dictionary) -> void:
 	var won := await InputKit.finish_fight(self, director)
 	await _frames(LAYOUT_FRAMES)
 	await InputKit.click(self, director.panel.button_for(OverworldDirector.CONTINUE))
@@ -229,7 +229,7 @@ func _after_fight(world: WorldSim, won: bool, before: Dictionary) -> Dictionary:
 	}
 
 
-func _check_toll(director: OverworldDirector) -> void:
+func _test_toll(director: OverworldDirector) -> void:
 	await _walk_into(director)
 	var world := director.world
 	var party := world.party(str(world.encounter.get("party", "")))
@@ -260,7 +260,7 @@ func _check_toll(director: OverworldDirector) -> void:
 	)
 
 
-func _check_ambush(director: OverworldDirector) -> void:
+func _test_ambush(director: OverworldDirector) -> void:
 	await _walk_into(director)
 	var found := str(director.world.encounter.get("type"))
 	var only_fight := (
@@ -296,7 +296,7 @@ func _check_ambush(director: OverworldDirector) -> void:
 
 
 ## Bandits beyond their sight do not come for a band walking away from them.
-func _check_avoid(director: OverworldDirector) -> void:
+func _test_avoid(director: OverworldDirector) -> void:
 	var world := director.world
 	var party := world.parties[0]
 	var away := world.band - party.tile
@@ -322,7 +322,7 @@ func _check_avoid(director: OverworldDirector) -> void:
 
 
 ## A save written with an encounter standing: the next session's first M reopens on it.
-func _check_saved_encounter() -> void:
+func _test_saved_encounter() -> void:
 	var met := await _game_with("ambush", NEAR)
 	var director := met.overworld_director()
 	await _walk_into(director)

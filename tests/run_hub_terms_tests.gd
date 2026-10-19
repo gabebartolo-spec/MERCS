@@ -55,19 +55,19 @@ func run_checks() -> void:
 	await process_frame
 	await _open_hub()
 	_ensure_two_contracts()
-	await _check_board_names_jobs()
+	await _t("_test_board_names_jobs")
 	var first := str(_economy().board[0]["id"])
 	var second := str(_economy().board[1]["id"])
-	await _check_terms_screen(first)
-	await _check_counter(first)
-	await _check_step_in(first)
-	await _check_walk(first)
-	await _check_accept(second)
-	await _check_abandon(second)
+	await _t("_test_terms_screen", [first])
+	await _t("_test_counter", [first])
+	await _t("_test_step_in", [first])
+	await _t("_test_walk", [first])
+	await _t("_test_accept", [second])
+	await _t("_test_abandon", [second])
 	await NoAdvance.new().run(self, _hub(), check, _shot)
-	await _check_wages()
-	await _check_prisoner_without_captain()
-	await _check_armoury_hook()
+	await _t("_test_wages")
+	await _t("_test_prisoner_without_captain")
+	await _t("_test_armoury_hook")
 	_game.queue_free()
 	await process_frame
 	_clear_save()
@@ -113,7 +113,7 @@ func _job_words(row: Dictionary) -> String:
 	return Text.t(str(template.get("words", "")))
 
 
-func _check_board_names_jobs() -> void:
+func _test_board_names_jobs() -> void:
 	await InputKit.frames(self, InputKit.LAYOUT_FRAMES)
 	var named := 0
 	var shown: Array[String] = []
@@ -136,7 +136,7 @@ func _check_board_names_jobs() -> void:
 	await _shot("1_board")
 
 
-func _check_terms_screen(id: String) -> void:
+func _test_terms_screen(id: String) -> void:
 	await _click(ContractRows.TALK, id)
 	var terms := _economy().terms
 	var talker := _panel().button_for("speaker", TALKER)
@@ -168,7 +168,7 @@ func _check_terms_screen(id: String) -> void:
 	await _shot("2_terms_open")
 
 
-func _check_counter(id: String) -> void:
+func _test_counter(id: String) -> void:
 	for _click_count: int in COUNTER_CLICKS:
 		await _click("price", TermsPanel.UP)
 	await _click("offer", id)
@@ -188,7 +188,7 @@ func _check_counter(id: String) -> void:
 	)
 
 
-func _check_step_in(id: String) -> void:
+func _test_step_in(id: String) -> void:
 	await _click("speaker", TALKER)
 	var picked := _panel().button_for("speaker", TALKER).text
 	await _shot("3_counter_talker_picked")
@@ -214,7 +214,7 @@ func _check_step_in(id: String) -> void:
 	)
 
 
-func _check_walk(id: String) -> void:
+func _test_walk(id: String) -> void:
 	var talk := _hub().talk
 	if talk.last.get("reply") == Terms.ACCEPT:
 		push_error("the step-in took the contract: no walk to show on this seed")
@@ -237,7 +237,7 @@ func _check_walk(id: String) -> void:
 	await _click("back", "board")
 
 
-func _check_accept(id: String) -> void:
+func _test_accept(id: String) -> void:
 	await _click(ContractRows.TALK, id)
 	for _click_count: int in HALF_CLICKS:
 		await _click("advance", TermsPanel.UP)
@@ -271,7 +271,7 @@ func _check_accept(id: String) -> void:
 	await _click("back", "board")
 
 
-func _check_abandon(id: String) -> void:
+func _test_abandon(id: String) -> void:
 	var row := _economy().book.contract(id)
 	var faction := str(row.get("faction", ""))
 	await _click(ContractRows.ABANDON, id)
@@ -298,7 +298,7 @@ func _check_abandon(id: String) -> void:
 	)
 
 
-func _check_wages() -> void:
+func _test_wages() -> void:
 	await InputKit.tap(self, KEY_ESCAPE)
 	await InputKit.tap(self, KEY_M)
 	var map := _game.overworld_director()
@@ -322,7 +322,7 @@ func _check_wages() -> void:
 	)
 
 
-func _check_prisoner_without_captain() -> void:
+func _test_prisoner_without_captain() -> void:
 	var company := _hub().company
 	_economy().captives.take(_hub().world.day)
 	var office := company.captain_id
@@ -339,7 +339,7 @@ func _check_prisoner_without_captain() -> void:
 	company.captain_id = office
 
 
-func _check_armoury_hook() -> void:
+func _test_armoury_hook() -> void:
 	var hub := _hub()
 	hub.armoury_rows = func() -> Array[Dictionary]:
 		return [HubPanel.button_row(ARMOURY_ID, "open", "armoury", true)]

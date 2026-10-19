@@ -19,9 +19,9 @@ func suite_name() -> String:
 
 func run_checks() -> void:
 	_stage_data = _load_stage_data()
-	await _check_lit_capsule()
-	await _check_unlit()
-	await _check_lit_sheet()
+	await _t("_test_lit_capsule")
+	await _t("_test_unlit")
+	await _t("_test_lit_sheet")
 
 
 func _spawn_lit(lit: bool, night: bool) -> StreetStage:
@@ -36,7 +36,7 @@ func _spawn_lit(lit: bool, night: bool) -> StreetStage:
 	return stage
 
 
-func _check_lit_capsule() -> void:
+func _test_lit_capsule() -> void:
 	var stage: StreetStage = await _spawn_lit(true, true)
 	var normal := _lit_normal(stage.merc())
 	var albedo: Variant = null
@@ -84,7 +84,7 @@ func _check_capsule_normals(image: Image) -> void:
 	)
 
 
-func _check_unlit() -> void:
+func _test_unlit() -> void:
 	var stage: StreetStage = await _spawn_lit(false, true)
 	check(
 		_is_unlit(stage.merc()) and not stage.merc().shaded,
@@ -97,7 +97,7 @@ func _check_unlit() -> void:
 ## Writes copies of the good sheet's manifest into user://: one naming a flat normal map, one
 ## naming a missing file, and one with no normal_image (the good sheet itself ships one), then
 ## loads all three.
-func _check_lit_sheet() -> void:
+func _test_lit_sheet() -> void:
 	var lit_manifest := _write_lit_sheet("lit.json", "flat_normal.png")
 	var broken_manifest := _write_lit_sheet("broken.json", "missing_normal.png")
 	var stage: StreetStage = await _spawn_lit(true, false)

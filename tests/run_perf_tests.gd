@@ -53,6 +53,10 @@ func suite_name() -> String:
 
 
 func run_checks() -> void:
+	await _t("_test_measure")
+
+
+func _test_measure() -> void:
 	_baseline = _load_baseline()
 	_battle()
 	_battle_rabble()

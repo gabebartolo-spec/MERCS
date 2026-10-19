@@ -44,15 +44,15 @@ func suite_name() -> String:
 func run_checks() -> void:
 	root.size = WINDOW_SIZE
 	var whole := await _uninterrupted()
-	await _check_quit_after_a_fall(whole)
+	await _t("_test_quit_after_a_fall", [whole])
 	var sit_out := SitOutChecks.new()
 	sit_out.setup(self, Callable(self, "check"))
 	await sit_out.run()
-	await _check_toll(true)
-	await _check_toll(false)
-	await _check_rest_and_wages()
-	await _check_hire()
-	await _check_prisoner()
+	await _t("_test_toll", [true])
+	await _t("_test_toll", [false])
+	await _t("_test_rest_and_wages")
+	await _t("_test_hire")
+	await _t("_test_prisoner")
 	var gaps := GapChecks.new()
 	gaps.setup(self, Callable(self, "check"))
 	await gaps.run()
@@ -79,7 +79,7 @@ func _uninterrupted() -> Dictionary:
 	return out
 
 
-func _check_quit_after_a_fall(whole: Dictionary) -> void:
+func _test_quit_after_a_fall(whole: Dictionary) -> void:
 	var game := await _fight_start("ambush")
 	var director := game.overworld_director()
 	var fallen := await _play_until_a_fall(director)
@@ -119,7 +119,7 @@ func _check_quit_after_a_fall(whole: Dictionary) -> void:
 
 
 ## Ironman On: the toll paid survives a quit. Off: paying writes nothing (the pre-fight save).
-func _check_toll(ironman: bool) -> void:
+func _test_toll(ironman: bool) -> void:
 	_clear_save()
 	_save_world(ironman, "patrol")
 	var before := _saved_text()
@@ -147,7 +147,7 @@ func _check_toll(ironman: bool) -> void:
 
 
 ## Ironman On, at the hub: rest days on the map, then wages paid at the hub, each survive a quit.
-func _check_rest_and_wages() -> void:
+func _test_rest_and_wages() -> void:
 	_clear_save()
 	_save_home()
 	var game := await _spawn()
@@ -184,7 +184,7 @@ func _check_rest_and_wages() -> void:
 
 
 ## Ironman On, at the hub: a hire survives a quit.
-func _check_hire() -> void:
+func _test_hire() -> void:
 	_clear_save()
 	_save_home()
 	var game := await _spawn()
@@ -202,7 +202,7 @@ func _check_hire() -> void:
 
 
 ## Ironman On: a surrendered bandit, decided at the hub, stays decided after a quit.
-func _check_prisoner() -> void:
+func _test_prisoner() -> void:
 	_clear_save()
 	_save_home()
 	var game := await _spawn()

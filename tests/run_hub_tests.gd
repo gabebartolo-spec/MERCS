@@ -33,14 +33,14 @@ func run_checks() -> void:
 	root.size = WINDOW_SIZE
 	_clear_save()
 	_game = await _spawn()
-	await _check_open()
-	await _check_wages_by_clicks()
-	await _check_contract_and_hire()
-	await _check_win_opens_prisoner()
-	await _check_equip()
-	await _check_prisoner_click()
-	await _check_away()
-	await _check_save()
+	await _t("_test_open")
+	await _t("_test_wages_by_clicks")
+	await _t("_test_contract_and_hire")
+	await _t("_test_win_opens_prisoner")
+	await _t("_test_equip")
+	await _t("_test_prisoner_click")
+	await _t("_test_away")
+	await _t("_test_save")
 	_game.queue_free()
 	await process_frame
 	_clear_save()
@@ -70,7 +70,7 @@ func _w(value: Variant) -> int:
 	return Merc.whole(value)
 
 
-func _check_open() -> void:
+func _test_open() -> void:
 	await _tap(KEY_B)
 	await _frames(LAYOUT_FRAMES)
 	var panel := _hub().panel
@@ -122,7 +122,7 @@ func _rest_on_the_map() -> void:
 	await _frames(LAYOUT_FRAMES)
 
 
-func _check_wages_by_clicks() -> void:
+func _test_wages_by_clicks() -> void:
 	await _rest_on_the_map()
 	var panel := _hub().panel
 	var economy := _economy()
@@ -159,7 +159,7 @@ func _check_wages_by_clicks() -> void:
 	)
 
 
-func _check_contract_and_hire() -> void:
+func _test_contract_and_hire() -> void:
 	var panel := _hub().panel
 	var economy := _economy()
 	var id := str(economy.board[0]["id"])
@@ -201,7 +201,7 @@ func _check_contract_and_hire() -> void:
 
 
 ## A won fight with a surrender applied as the overworld does; the hub shown as Continue shows it.
-func _check_win_opens_prisoner() -> void:
+func _test_win_opens_prisoner() -> void:
 	await _tap(KEY_ESCAPE)
 	var world := _hub().world
 	world.encounter = {"type": "patrol", "from": world.at, "to": world.at, "days_left": 0}
@@ -259,7 +259,7 @@ func _ids() -> Array[String]:
 	return ids
 
 
-func _check_equip() -> void:
+func _test_equip() -> void:
 	var economy := _economy()
 	economy.inventory.append(BLADE)
 	_hub().set_open(true)
@@ -289,7 +289,7 @@ func _check_equip() -> void:
 	)
 
 
-func _check_prisoner_click() -> void:
+func _test_prisoner_click() -> void:
 	var economy := _economy()
 	var company := _hub().company
 	var purse := economy.purse + economy.captives.ransom_coin()
@@ -310,7 +310,7 @@ func _check_prisoner_click() -> void:
 	)
 
 
-func _check_away() -> void:
+func _test_away() -> void:
 	_hub().world.at = HAMLET
 	_hub().set_open(true)
 	await _frames(LAYOUT_FRAMES)
@@ -329,7 +329,7 @@ func _check_away() -> void:
 	await _tap(KEY_B)
 
 
-func _check_save() -> void:
+func _test_save() -> void:
 	await _tap(KEY_M)
 	await _click_button(_game.overworld_director().panel.button_for(OverworldDirector.SAVE))
 	var model := _saves().load_game(_json(WORLD_BALANCE), CompanyDirector.defs())

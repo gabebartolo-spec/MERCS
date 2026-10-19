@@ -26,12 +26,12 @@ func suite_name() -> String:
 func run_checks() -> void:
 	_stage_data = _load_stage_data()
 	check(not _stage_data.is_empty(), "%s parses as a JSON object" % STAGE_DATA)
-	await _check_scene_loads()
-	await _check_camera_pitch()
-	await _check_sprite_pixel_size()
-	await _check_pixel_modes()
-	await _check_path_loop()
-	await _check_lighting()
+	await _t("_test_scene_loads")
+	await _t("_test_camera_pitch")
+	await _t("_test_sprite_pixel_size")
+	await _t("_test_pixel_modes")
+	await _t("_test_path_loop")
+	await _t("_test_lighting")
 
 
 func _load_stage_data() -> Dictionary:
@@ -79,7 +79,7 @@ func _despawn(stage: StreetStage) -> void:
 	await process_frame
 
 
-func _check_scene_loads() -> void:
+func _test_scene_loads() -> void:
 	var packed: PackedScene = load(STAGE_SCENE) as PackedScene
 	check(packed != null and packed.can_instantiate(), "%s loads as a scene" % STAGE_SCENE)
 	if packed == null:
@@ -157,7 +157,7 @@ func _expected_distance(pitch: float, height_px: int) -> float:
 	return texel * _knob("pixel", "logical_height_px") / (HALF * tan(half_fov))
 
 
-func _check_camera_pitch() -> void:
+func _test_camera_pitch() -> void:
 	var stage: StreetStage = await _spawn(StreetStage.PixelMode.CRISP, 48, 35.0)
 	var camera: Camera3D = stage.camera()
 	var rail: Node3D = stage.get_node("%CameraRail") as Node3D
@@ -198,7 +198,7 @@ func _check_camera_pitch() -> void:
 ## pixel_size is one texel of the image plane (merc_height_m × cos(pitch) / height px);
 ## the sprite stretches by 1 / cos(pitch) on Y so the standing figure is merc_height_m
 ## tall in the world and foreshortens back to height px on screen.
-func _check_sprite_pixel_size() -> void:
+func _test_sprite_pixel_size() -> void:
 	var height := _knob("sprite", "merc_height_m") * cos(deg_to_rad(35.0))
 	var stage: StreetStage = await _spawn(StreetStage.PixelMode.CRISP, 48, 35.0)
 	var merc: Sprite3D = stage.merc()
@@ -228,7 +228,7 @@ func _check_sprite_pixel_size() -> void:
 	await _despawn(tall)
 
 
-func _check_pixel_modes() -> void:
+func _test_pixel_modes() -> void:
 	await _check_crisp_mode()
 	await _check_whole_screen_mode()
 
@@ -284,7 +284,7 @@ func _check_whole_screen_mode() -> void:
 	await _despawn(whole)
 
 
-func _check_path_loop() -> void:
+func _test_path_loop() -> void:
 	var stage: StreetStage = await _spawn(StreetStage.PixelMode.CRISP, 48, 35.0)
 	var seconds := stage.loop_seconds()
 	check(seconds > 0.0, "the walk loop has a length and a speed")
@@ -326,7 +326,7 @@ func _check_path_loop() -> void:
 
 ## DAY has no torch or rain and an untinted sprite; RAIN_NIGHT adds the torch and rain
 ## (fixed particle seed, so captures repeat), dims the key and tints the unshaded sprite.
-func _check_lighting() -> void:
+func _test_lighting() -> void:
 	var day: StreetStage = await _spawn(StreetStage.PixelMode.CRISP, 48, 35.0)
 	check(
 		(

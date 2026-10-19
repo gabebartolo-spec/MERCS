@@ -35,9 +35,9 @@ MERCS/
   tools/
     pipeline/                Blender, ComfyUI, pixel post, validators (Python)
     lint/                    project lints (Python)
-    run_tests.sh  check_ci_shards.sh  machine_profile.json
+    run_tests.sh  plan_ci_shards.sh  ci_timings.txt  machine_profile.json
   tests/
-    run_<suite>_tests.gd  expected_checks.txt  fixtures/  effect/
+    run_<suite>_tests.gd  functions_ran.gd  fixtures/  effect/
   .github/workflows/         tests.yml  build.yml  assets.yml
 ```
 
@@ -95,7 +95,7 @@ scene tree (D-021). A test constructs `Rng.from_seed(424242)`. Nothing else make
 ## Tests
 
 - One runner per suite `tests/run_<suite>_tests.gd`, prints `"<Suite> tests: %d checks, %d failures"`
-  and quits non-zero on failure. Floors in `tests/expected_checks.txt` only go up.
+  and quits non-zero on failure. Tests are `_test_*` functions called through `_t`; one never run, or with no check, fails.
 - Suites: `smoke` and `data` (schema + caps) from Phase 0; then `sim_merc`, `sim_battle`,
   `sim_world`, `story`, `save`, `effect` (player-effect fixtures, see guardrail A1), `assets`,
   `ui`, `perf` as their phases arrive. gdlint and gdformat run in `lint.yml` from Phase 0.
@@ -119,5 +119,5 @@ scene tree (D-021). A test constructs `Rng.from_seed(424242)`. Nothing else make
 
 Untyped `var`; `get_node` in `sim/`; a number literal in `sim/` that is not 0/1/-1/100; a string
 literal a player will read outside `data/text/`; a colour literal outside `UiKit.gd`; a new
-autoload; a `.import` change in a code PR; `git add -A`; a test whose floor went down; a PR with
+autoload; a `.import` change in a code PR; `git add -A`; a test deleted or left uncalled; a PR with
 no "Not exercised" line.

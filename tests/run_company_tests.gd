@@ -26,26 +26,26 @@ func suite_name() -> String:
 
 
 func run_checks() -> void:
-	_check_cast_in_data()
-	_check_battle_numbers_one_source()
-	_check_moves_known_to_the_battle()
-	_check_starting_company()
-	_check_state_through_json()
-	_check_appoint()
-	_check_appoint_saved()
-	_check_experience_bar()
-	_check_moves_by_level()
-	_check_growth_by_level()
-	_check_levels_in_data()
-	_check_roster_cap()
+	await _t("_test_cast_in_data")
+	await _t("_test_battle_numbers_one_source")
+	await _t("_test_moves_known_to_the_battle")
+	await _t("_test_starting_company")
+	await _t("_test_state_through_json")
+	await _t("_test_appoint")
+	await _t("_test_appoint_saved")
+	await _t("_test_experience_bar")
+	await _t("_test_moves_by_level")
+	await _t("_test_growth_by_level")
+	await _t("_test_levels_in_data")
+	await _t("_test_roster_cap")
 	var field := FieldChecks.new()
 	field.setup(Callable(self, "check"))
 	field.run()
 	var over_cap := OverCapChecks.new()
 	over_cap.setup(Callable(self, "check"))
 	over_cap.run()
-	_check_older_save_defaults()
-	_check_odd_saves()
+	await _t("_test_older_save_defaults")
+	await _t("_test_odd_saves")
 	await process_frame
 
 
@@ -70,7 +70,7 @@ func _through_json(value: Dictionary) -> Dictionary:
 	return parsed if parsed is Dictionary else {}
 
 
-func _check_cast_in_data() -> void:
+func _test_cast_in_data() -> void:
 	var mercs: Array = Fixture.json(Fixture.MERCS).get("mercs", [])
 	var ids: Array[String] = []
 	var bad: Array[String] = []
@@ -98,7 +98,7 @@ func _check_cast_in_data() -> void:
 	)
 
 
-func _check_battle_numbers_one_source() -> void:
+func _test_battle_numbers_one_source() -> void:
 	var company := _company()
 	var fighters := Fixture.sect(Fixture.defs(), "fighters")
 	var drift: Array[String] = []
@@ -119,7 +119,7 @@ func _check_battle_numbers_one_source() -> void:
 	)
 
 
-func _check_moves_known_to_the_battle() -> void:
+func _test_moves_known_to_the_battle() -> void:
 	var unknown: Array[String] = []
 	var mercs: Array = Fixture.json(Fixture.MERCS).get("mercs", [])
 	for entry: Variant in mercs:
@@ -135,7 +135,7 @@ func _check_moves_known_to_the_battle() -> void:
 	)
 
 
-func _check_starting_company() -> void:
+func _test_starting_company() -> void:
 	var company := _company()
 	check(
 		(
@@ -154,7 +154,7 @@ func _check_starting_company() -> void:
 	)
 
 
-func _check_state_through_json() -> void:
+func _test_state_through_json() -> void:
 	var company := _company()
 	company.appoint("vampyr")
 	company.gain("merc_3", 12)
@@ -171,7 +171,7 @@ func _check_state_through_json() -> void:
 	)
 
 
-func _check_appoint() -> void:
+func _test_appoint() -> void:
 	var company := _company()
 	var before := JSON.stringify(company.state())
 	var refused := not company.appoint("nobody")
@@ -193,7 +193,7 @@ func _check_appoint() -> void:
 
 
 ## The captain survives the whole save: SaveModel -> JSON -> SaveModel.
-func _check_appoint_saved() -> void:
+func _test_appoint_saved() -> void:
 	var balance := Fixture.json(WORLD_BALANCE)
 	var rng := Rng.from_seed(SEED)
 	var world := WorldSim.new()
@@ -216,7 +216,7 @@ func _check_appoint_saved() -> void:
 	)
 
 
-func _check_experience_bar() -> void:
+func _test_experience_bar() -> void:
 	var company := _company()
 	var merc := company.member("orc")
 	var xp: Dictionary = Fixture.json(Fixture.COMPANY).get("xp", {})
@@ -246,7 +246,7 @@ func _check_experience_bar() -> void:
 	)
 
 
-func _check_moves_by_level() -> void:
+func _test_moves_by_level() -> void:
 	var defs := Fixture.defs()
 	var mercs: Dictionary = defs["mercs"]
 	var list: Array = mercs["mercs"]
@@ -271,7 +271,7 @@ func _check_moves_by_level() -> void:
 	)
 
 
-func _check_growth_by_level() -> void:
+func _test_growth_by_level() -> void:
 	var merc := _company().member("orc")
 	var base_hp := merc.stat("hp")
 	var base_attack := merc.stat("attack")
@@ -290,7 +290,7 @@ func _check_growth_by_level() -> void:
 	)
 
 
-func _check_levels_in_data() -> void:
+func _test_levels_in_data() -> void:
 	var company := _company()
 	var odd: Array[String] = []
 	for merc: Merc in company.roster:
@@ -316,7 +316,7 @@ func _check_levels_in_data() -> void:
 	)
 
 
-func _check_roster_cap() -> void:
+func _test_roster_cap() -> void:
 	var defs := Fixture.defs()
 	Fixture.sect(Fixture.sect(defs, "company"), "roster")["cap"] = CAP_FOR_TEST
 	var company := Company.start(defs)
@@ -341,7 +341,7 @@ func _check_roster_cap() -> void:
 	)
 
 
-func _check_older_save_defaults() -> void:
+func _test_older_save_defaults() -> void:
 	var balance := Fixture.json(WORLD_BALANCE)
 	var v0 := Fixture.json(V0_FIXTURE)
 	var from_v0 := SaveModel.from_dict(v0, balance, Fixture.defs())
@@ -369,7 +369,7 @@ func _check_older_save_defaults() -> void:
 	)
 
 
-func _check_odd_saves() -> void:
+func _test_odd_saves() -> void:
 	var defs := Fixture.defs()
 	var odd := {
 		"captain": "ghost",

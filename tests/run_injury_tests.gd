@@ -30,19 +30,19 @@ func suite_name() -> String:
 
 
 func run_checks() -> void:
-	_check_data()
-	_check_thresholds()
-	_check_triage_seeded()
-	_check_ladder_effects()
-	_check_permanent_effects()
-	_check_apply_is_copy()
-	_check_aftermath_death()
-	_check_aftermath_injuries()
-	_check_succession()
-	_check_succession_passed_over()
-	_check_mortality_final()
-	_check_save_reload()
-	_check_old_save_defaults()
+	await _t("_test_data")
+	await _t("_test_thresholds")
+	await _t("_test_triage_seeded")
+	await _t("_test_ladder_effects")
+	await _t("_test_permanent_effects")
+	await _t("_test_apply_is_copy")
+	await _t("_test_aftermath_death")
+	await _t("_test_aftermath_injuries")
+	await _t("_test_succession")
+	await _t("_test_succession_passed_over")
+	await _t("_test_mortality_final")
+	await _t("_test_save_reload")
+	await _t("_test_old_save_defaults")
 	await process_frame
 
 
@@ -51,7 +51,7 @@ func _verify(condition: Variant, expectation: String) -> void:
 	check(holds, expectation)
 
 
-func _check_data() -> void:
+func _test_data() -> void:
 	var problems: Array[String] = []
 	var text := Kit.json(TEXT)
 	for kind: String in Injury.LADDER:
@@ -77,7 +77,7 @@ func _check_data() -> void:
 	)
 
 
-func _check_thresholds() -> void:
+func _test_thresholds() -> void:
 	var rules: Dictionary = Kit.rules().get("triage", {})
 	var cuts := {
 		"wound_upto": "wound", "temporary_upto": "temporary", "permanent_upto": "permanent"
@@ -96,7 +96,7 @@ func _check_thresholds() -> void:
 	_verify(wrong.is_empty(), "the triage thresholds cut the die as the balance says: %s" % wrong)
 
 
-func _check_triage_seeded() -> void:
+func _test_triage_seeded() -> void:
 	var rules: Dictionary = Kit.rules().get("triage", {})
 	var ids: Array = []
 	for index: int in MANY:
@@ -119,7 +119,7 @@ func _check_triage_seeded() -> void:
 	)
 
 
-func _check_ladder_effects() -> void:
+func _test_ladder_effects() -> void:
 	var defs := Kit.defs()
 	var merc := Kit.merc("m_a", 3)
 	var broken := Injury.apply(merc, "inj_broken_arm", DAY, defs)
@@ -145,7 +145,7 @@ func _check_ladder_effects() -> void:
 	)
 
 
-func _check_permanent_effects() -> void:
+func _test_permanent_effects() -> void:
 	var defs := Kit.defs()
 	var merc := Kit.merc("m_a", 3)
 	var wound := Injury.apply(merc, "inj_gash", DAY, defs)
@@ -173,7 +173,7 @@ func _check_permanent_effects() -> void:
 	)
 
 
-func _check_apply_is_copy() -> void:
+func _test_apply_is_copy() -> void:
 	var merc := Kit.merc("m_a", 3)
 	var hurt := Injury.apply(merc, "inj_lost_eye", DAY, Kit.defs())
 	var unknown := Injury.apply(merc, "inj_nothing", DAY, Kit.defs())
@@ -183,7 +183,7 @@ func _check_apply_is_copy() -> void:
 	)
 
 
-func _check_aftermath_death() -> void:
+func _test_aftermath_death() -> void:
 	var mercs := Kit.company()
 	var aftermath := Kit.aftermath(SEED, ALL_DIE)
 	var events := aftermath.resolve(Kit.battle_log(["m_c", "bandit_1"], "bandit_1"), mercs)
@@ -219,7 +219,7 @@ func _check_aftermath_death() -> void:
 	_verify(repeat == events, "same seed and log, same aftermath events")
 
 
-func _check_aftermath_injuries() -> void:
+func _test_aftermath_injuries() -> void:
 	var mercs := Kit.company()
 	var aftermath := Kit.aftermath(SEED, ALL_PERMANENT)
 	var events := aftermath.resolve(Kit.battle_log(["m_b", "m_a"], "bandit_1"), mercs)
@@ -241,7 +241,7 @@ func _check_aftermath_injuries() -> void:
 	)
 
 
-func _check_succession() -> void:
+func _test_succession() -> void:
 	var mercs := Kit.company()
 	var aftermath := Kit.aftermath(SEED, ALL_DIE)
 	aftermath.captain_id = "m_b"
@@ -278,7 +278,7 @@ func _check_succession() -> void:
 	)
 
 
-func _check_succession_passed_over() -> void:
+func _test_succession_passed_over() -> void:
 	var rules: Dictionary = Kit.rules().get("succession", {})
 	var other := Kit.aftermath(SEED, ALL_DIE)
 	other.captain_id = "m_b"
@@ -303,7 +303,7 @@ func _check_succession_passed_over() -> void:
 	)
 
 
-func _check_mortality_final() -> void:
+func _test_mortality_final() -> void:
 	var chronicle := Chronicle.new()
 	var first := chronicle.record_death("m_a", DAY, "bandit_1")
 	var second := chronicle.record_death("m_a", DAY + 1, "fever")
@@ -339,7 +339,7 @@ func _check_mortality_final() -> void:
 	)
 
 
-func _check_save_reload() -> void:
+func _test_save_reload() -> void:
 	var mercs := Kit.company()
 	var aftermath := Kit.aftermath(SEED, ALL_DIE)
 	aftermath.captain_id = "m_b"
@@ -377,7 +377,7 @@ func _check_save_reload() -> void:
 	)
 
 
-func _check_old_save_defaults() -> void:
+func _test_old_save_defaults() -> void:
 	var world_balance := Kit.json(WORLD_BALANCE)
 	var world := WorldSim.new()
 	var rng := Rng.from_seed(SEED)

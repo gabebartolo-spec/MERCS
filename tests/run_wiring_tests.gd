@@ -37,15 +37,15 @@ func suite_name() -> String:
 
 func run_checks() -> void:
 	root.size = WINDOW_SIZE
-	_check_fielding()
-	_check_hook()
-	_check_hook_leaves_battle_stream()
-	_check_aftermath_applied()
-	_check_permanent_injury_fielded()
-	_check_temporary_injury_heals()
-	_check_save_round_trip()
-	_check_no_save_revives()
-	_check_xp()
+	await _t("_test_fielding")
+	await _t("_test_hook")
+	await _t("_test_hook_leaves_battle_stream")
+	await _t("_test_aftermath_applied")
+	await _t("_test_permanent_injury_fielded")
+	await _t("_test_temporary_injury_heals")
+	await _t("_test_save_round_trip")
+	await _t("_test_no_save_revives")
+	await _t("_test_xp")
 	var gui := GuiChecks.new()
 	gui.setup(self, check)
 	await gui.run()
@@ -62,7 +62,7 @@ func _ids(units: Array[BattleUnit]) -> Array[String]:
 	return ids
 
 
-func _check_fielding() -> void:
+func _test_fielding() -> void:
 	var made := Kit.wounds(Rng.from_seed(1))
 	var units := made.units(_cells(), BattleUnit.COMPANY)
 	var captain_leads := not units.is_empty() and units[0].id == "orc" and units[0].is_leader
@@ -90,7 +90,7 @@ func _check_fielding() -> void:
 	)
 
 
-func _check_hook() -> void:
+func _test_hook() -> void:
 	var made := Kit.wounds(Rng.from_seed(1))
 	made.units(_cells(), BattleUnit.COMPANY)
 	var graze := {"type": "hit", "unit": "bandit_0", "target": "orc", "down": false}
@@ -118,7 +118,7 @@ func _check_hook() -> void:
 	)
 
 
-func _check_hook_leaves_battle_stream() -> void:
+func _test_hook_leaves_battle_stream() -> void:
 	var streams: Array[Dictionary] = []
 	for hooked: bool in [true, false]:
 		var rng := Rng.from_seed(DEATH_SEED)
@@ -136,7 +136,7 @@ func _check_hook_leaves_battle_stream() -> void:
 	)
 
 
-func _check_aftermath_applied() -> void:
+func _test_aftermath_applied() -> void:
 	var rng := Rng.from_seed(DEATH_SEED)
 	var made := Kit.wounds(rng, "", {}, Kit.led_by(DEATH_CAPTAIN))
 	var result := Kit.fight(made, rng, true)
@@ -190,7 +190,7 @@ func _check_hook_off_changes_nothing() -> void:
 	)
 
 
-func _check_permanent_injury_fielded() -> void:
+func _test_permanent_injury_fielded() -> void:
 	var rng := Rng.from_seed(SCAR_SEED)
 	var made := Kit.wounds(rng)
 	var base := made.company.member("merc_3").stat("attack")
@@ -216,7 +216,7 @@ func _check_permanent_injury_fielded() -> void:
 	)
 
 
-func _check_temporary_injury_heals() -> void:
+func _test_temporary_injury_heals() -> void:
 	var rng := Rng.from_seed(SCAR_SEED)
 	var made := Kit.wounds(rng, "temporary")
 	var base := made.company.member(TEMPORARY_MERC).stat("attack")
@@ -241,7 +241,7 @@ func _attack_of(made: CompanyWounds, merc_id: String) -> int:
 	return -1
 
 
-func _check_save_round_trip() -> void:
+func _test_save_round_trip() -> void:
 	var rng := Rng.from_seed(DEATH_SEED)
 	var made := Kit.wounds(rng, "", {}, Kit.led_by(DEATH_CAPTAIN))
 	Kit.fight(made, rng, true)
@@ -270,7 +270,7 @@ func _check_save_round_trip() -> void:
 ## D-095: experience from the fight. The captain's-death fight (seed 424264): every merc who
 ## lived gets the fight's XP plus a kill's worth per enemy they put down, the dead get none,
 ## a merc not fielded gets none, the battle stream is not touched, and it survives a save.
-func _check_xp() -> void:
+func _test_xp() -> void:
 	var rng := Rng.from_seed(DEATH_SEED)
 	var held := Kit.led_by(DEATH_CAPTAIN)
 	var made := Kit.wounds(rng, "", {}, held)
@@ -319,7 +319,7 @@ func _paid(events: Array[Dictionary], held: Company, made: CompanyWounds) -> boo
 	return paid and gains > 0
 
 
-func _check_no_save_revives() -> void:
+func _test_no_save_revives() -> void:
 	var rng := Rng.from_seed(DEATH_SEED)
 	var made := Kit.wounds(rng, "", {}, Kit.led_by(DEATH_CAPTAIN))
 	Kit.fight(made, rng, true)

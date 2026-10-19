@@ -37,15 +37,15 @@ func suite_name() -> String:
 
 
 func run_checks() -> void:
-	_check_settings()
-	_check_text_size()
-	_check_no_function_keys()
-	_check_autoloads()
-	_check_scripts_compile()
-	await _check_main_scene()
+	await _t("_test_settings")
+	await _t("_test_text_size")
+	await _t("_test_no_function_keys")
+	await _t("_test_autoloads")
+	await _t("_test_scripts_compile")
+	await _t("_test_main_scene")
 
 
-func _check_settings() -> void:
+func _test_settings() -> void:
 	for key: String in STRICT_WARNINGS:
 		var level: int = ProjectSettings.get_setting(key, 0)
 		check(level == WARNING_AS_ERROR, "%s is an error (2), not %d" % [key, level])
@@ -55,7 +55,7 @@ func _check_settings() -> void:
 		check(same, "%s is %s, not %s" % [key, PROJECT_SETTINGS[key], value])
 
 
-func _check_text_size() -> void:
+func _test_text_size() -> void:
 	var theme := load(str(ProjectSettings.get_setting("gui/theme/custom", ""))) as Theme
 	var size := theme.default_font_size if theme != null else 0
 	check(
@@ -64,7 +64,7 @@ func _check_text_size() -> void:
 
 
 ## Director, 2026-10-15: "function buttons dont work on my keyboard": no command may need one.
-func _check_no_function_keys() -> void:
+func _test_no_function_keys() -> void:
 	var paths: Array[String] = []
 	_collect_scripts("res://presentation", paths)
 	_collect_scripts("res://ui", paths)
@@ -76,7 +76,7 @@ func _check_no_function_keys() -> void:
 	check(found.is_empty(), "no function key is bound in presentation or ui: %s" % [found])
 
 
-func _check_autoloads() -> void:
+func _test_autoloads() -> void:
 	var names: Array[String] = []
 	for property: Dictionary in ProjectSettings.get_property_list():
 		var key: String = property["name"]
@@ -96,7 +96,7 @@ func _check_autoloads() -> void:
 
 ## One check for all scripts, so adding or deleting a script never moves the floor;
 ## a failure names every script that did not compile.
-func _check_scripts_compile() -> void:
+func _test_scripts_compile() -> void:
 	var paths: Array[String] = []
 	_collect_scripts("res://", paths)
 	var broken: Array[String] = []
@@ -124,7 +124,7 @@ func _collect_scripts(dir_path: String, into: Array[String]) -> void:
 			_collect_scripts(dir_path.path_join(sub), into)
 
 
-func _check_main_scene() -> void:
+func _test_main_scene() -> void:
 	var path: String = ProjectSettings.get_setting("application/run/main_scene", "")
 	check(ResourceLoader.exists(path), "the main scene is set and exists, not '%s'" % path)
 	if not ResourceLoader.exists(path):

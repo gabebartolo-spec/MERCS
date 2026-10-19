@@ -24,8 +24,8 @@ func suite_name() -> String:
 func run_checks() -> void:
 	root.size = WINDOW_SIZE
 	_clear_save()
-	await _check_gui()
-	await _check_gui_without_memory()
+	await _t("_test_gui")
+	await _t("_test_gui_without_memory")
 	_clear_save()
 
 
@@ -40,7 +40,7 @@ func _spawn() -> SliceGame:
 	return game
 
 
-func _check_gui() -> void:
+func _test_gui() -> void:
 	var game := await _spawn()
 	var story := game.get_node("StoryDirector") as StoryDirector
 	check(story != null, "the game attaches a story director")
@@ -184,7 +184,7 @@ func _check_inspect(game: SliceGame, merc_id: String) -> void:
 	)
 
 
-func _check_gui_without_memory() -> void:
+func _test_gui_without_memory() -> void:
 	_clear_save()
 	var game := await _spawn()
 	var story := game.get_node("StoryDirector") as StoryDirector

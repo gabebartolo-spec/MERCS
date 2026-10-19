@@ -43,7 +43,7 @@ section missing, and a PR with no "Not exercised" line fails review on sight.
 ## Board and log                   your STATUS row change and any decision in full (D-TBD-<slug>); "none" is valid
 ## [MERGE NOTE]
 - Hot files touched: <sim core, save model, UiKit, caps, floors, docs>
-- Floors: <suite base -> new (+inc)>
+- Test functions: <suite: added / removed>
 - Review needed: <none | mercs-sim-review by <agent>>
 - Director gate: <none | look approval pending | approved in D-id>
 - Ordering with other PRs: <...>
@@ -72,9 +72,9 @@ file is sent back. States: working, running a check, awaiting director, blocked,
   checked, so every later push means waiting for a new green. Push when the work is final.
 - **Sync your own branch** when main moves under it: merge or rebase `origin/main`
   (`docs/09_REPO_AND_HOSTING.md` "Branching"), then rerun the touched suites. Nobody else pushes to it.
-  - **`tests/expected_checks.txt` conflict:** per suite line keep the higher floor of the two sides,
-    then run that suite; if its real count is higher still (both PRs added checks), raise the line to
-    the real count. Never lower a floor to get green (guardrail B6).
+  - **No floors, no registries** (director 2026-10-19): there is no check-count file or shard list to
+    conflict over. A deleted test is a revert (guardrail B6); the PR body lists test functions added or
+    removed per suite.
   - A capped doc must still be under its cap after the merge (`docs/03_TEAM_WORKFLOW.md` "Document caps").
 - **Remove your worktree when the PR merges** (`git worktree remove ../MERCS-wt/<topic>`). Merge & CI
   does it in its merge procedure; do it yourself if it is still there. The branch is deleted on

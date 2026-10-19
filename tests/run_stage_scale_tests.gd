@@ -26,11 +26,11 @@ func suite_name() -> String:
 
 func run_checks() -> void:
 	_stage_data = _load_stage_data()
-	await _check_texel_scale()
-	await _check_rig_contract()
-	await _check_feet_on_ground()
-	await _check_sheet()
-	await _check_depth_scale()
+	await _t("_test_texel_scale")
+	await _t("_test_rig_contract")
+	await _t("_test_feet_on_ground")
+	await _t("_test_sheet")
+	await _t("_test_depth_scale")
 
 
 func _load_json(path: String) -> Dictionary:
@@ -50,7 +50,7 @@ func _json_num(block: Dictionary, key: String) -> float:
 ## Every sample-set-1 cell (pitch 30/35/40 × height 40/48/56): at the look-at point one
 ## texel spans one logical pixel across and up, so the factory's pixels are neither
 ## stretched nor squashed (square, integer scale, no shimmer).
-func _check_texel_scale() -> void:
+func _test_texel_scale() -> void:
 	var worst := Vector2.ZERO
 	var worst_label: Array[String] = ["", ""]
 	for pitch: float in SAMPLE_PITCHES:
@@ -98,7 +98,7 @@ func _texel_span_px(pitch: float, height_px: int) -> Vector2:
 ## The stage and the sprite factory agree: at the rig's world pitch and world figure height
 ## (the stage's defaults), one stage texel is 1 / px_per_m_1x of camera_rig.json, the scale
 ## the factory renders at (its sprite camera may be flatter; the scale is what must match).
-func _check_rig_contract() -> void:
+func _test_rig_contract() -> void:
 	var rig := _load_json(CAMERA_RIG)
 	var pitch := _json_num(rig, "world_pitch_deg")
 	var height_px := int(_json_num(rig, "world_char_height_px"))
@@ -133,7 +133,7 @@ func _pivot_on_ground(merc: Sprite3D, frame: Vector2, pivot: Vector2) -> bool:
 	)
 
 
-func _check_feet_on_ground() -> void:
+func _test_feet_on_ground() -> void:
 	var stage: StreetStage = await _spawn(StreetStage.PixelMode.CRISP, 48, 35.0)
 	stage.step(FIXED_DELTA)
 	var merc := stage.merc()
@@ -147,7 +147,7 @@ func _check_feet_on_ground() -> void:
 
 ## A factory sheet (tools/pipeline, mercs.sheet/1) shows one frame per facing with its
 ## pivot on the ground; an unknown facing is refused.
-func _check_sheet() -> void:
+func _test_sheet() -> void:
 	var sheet := _load_json(GOOD_SHEET)
 	var frame := Vector2(_json_num(sheet, "frame_w"), _json_num(sheet, "frame_h"))
 	var pivot: Dictionary = sheet.get("pivot", {})
@@ -195,7 +195,7 @@ func _span_at_merc(stage: StreetStage) -> Vector2:
 
 ## CONSTANT depth scale keeps one texel on one logical pixel nearer and further than the
 ## look-at point; PERSPECTIVE lets a nearer merc grow (the look question this exposes).
-func _check_depth_scale() -> void:
+func _test_depth_scale() -> void:
 	var stage: StreetStage = await _spawn(StreetStage.PixelMode.WHOLE_SCREEN, 48, 35.0)
 	var worst := 0.0
 	stage.depth_scale = StreetStage.DepthScale.CONSTANT

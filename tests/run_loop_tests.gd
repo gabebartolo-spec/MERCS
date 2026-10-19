@@ -20,11 +20,11 @@ func suite_name() -> String:
 
 
 func run_checks() -> void:
-	_check_full_run()
-	_check_hire()
-	_check_gate()
-	_check_aftermath_needs_surrender()
-	_check_memories()
+	await _t("_test_full_run")
+	await _t("_test_hire")
+	await _t("_test_gate")
+	await _t("_test_aftermath_needs_surrender")
+	await _t("_test_memories")
 	await process_frame
 
 
@@ -73,7 +73,7 @@ func _steps(loop: SliceLoop) -> Array:
 	return loop.log.map(func(e: Dictionary) -> String: return str(e.get("step", "")))
 
 
-func _check_full_run() -> void:
+func _test_full_run() -> void:
 	var a := _loop(SEED)
 	_play(a)
 	var b := _loop(SEED)
@@ -88,7 +88,7 @@ func _check_full_run() -> void:
 	)
 
 
-func _check_hire() -> void:
+func _test_hire() -> void:
 	var hired := _loop(SEED)
 	hired.advance()
 	hired.hire(true)
@@ -102,7 +102,7 @@ func _check_hire() -> void:
 
 
 ## Finds a seed whose talk-down roll succeeds and one where it fails.
-func _check_gate() -> void:
+func _test_gate() -> void:
 	var lookouts := {}
 	var shaken := {}
 	for seed_value: int in SEED_SEARCH:
@@ -143,7 +143,7 @@ func _enemies(battle: Battle) -> int:
 	)
 
 
-func _check_aftermath_needs_surrender() -> void:
+func _test_aftermath_needs_surrender() -> void:
 	var loop := _loop(SEED)
 	loop.advance()
 	loop.hire(false)
@@ -167,7 +167,7 @@ func _check_aftermath_needs_surrender() -> void:
 
 ## Phase 2 M7: with a Memory set, the contract, the fight and the fate each write a sentence
 ## on every company merc; without one the loop is as it was.
-func _check_memories() -> void:
+func _test_memories() -> void:
 	var loop := _loop(SEED)
 	loop.memory = Memory.new()
 	loop.day = 7

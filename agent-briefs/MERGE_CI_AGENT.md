@@ -33,8 +33,8 @@ B. For each open, non-draft PR, check:
    4. `[MERGE NOTE]` "Review needed" is none or the named review is a comment on the PR;
    5. `[MERGE NOTE]` "Director gate" is none, "approved in D-id", or the body carries the decision
       in full; "look approval pending" blocks only PRs that change what the player sees;
-   6. floors in `tests/expected_checks.txt` did not go down, no test deleted, no lint disabled
-      (CI enforces this; read the diff only if the note says "floors").
+   6. no test deleted, no lint disabled (CI fails a test function that never ran or made no
+      check; read the diff only if the note lists removed test functions).
 C. Eligible: `gh pr merge <n> --squash --match-head-commit <full sha> --delete-branch`. Now.
    Not eligible: one comment on the PR naming the reason (failing job and run id, or the exact
    conflicting files, or the missing section), one line to the owner, move on. Never push to
@@ -81,11 +81,12 @@ housekeeping, `.gitattributes`, `.gitignore`, LFS usage, worktree and branch hyg
 
 ## CI you maintain
 
-`tests.yml` (plan → shards → aggregate `test`; docs-only and draft PRs skip the Godot jobs and
+`tests.yml` (plan → preflight → shards → aggregate `test`; docs-only and draft PRs skip the Godot jobs and
 `test` still reports), `lint.yml` (gdlint, gdformat, layering, magic numbers, strings, content
 counts, no weights, doc caps, gitleaks), `build.yml` (main and dispatch), `assets.yml` and
 `capture.yml` when the Art agent adds them. Stay under 2,000 Actions minutes a month; when a
-shard passes 10 minutes, rebalance `tools/ci_shards.txt`.
+PR run passes 12 minutes, re-measure `tools/ci_timings.txt` (`TIMINGS_FILE=tools/ci_timings.txt
+tools/run_tests.sh`) or raise its `shards` line; at least weekly.
 
 ## Weekly (one PR, `docs: weekly upkeep <date>`)
 

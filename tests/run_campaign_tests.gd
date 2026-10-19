@@ -52,21 +52,21 @@ func suite_name() -> String:
 
 func run_checks() -> void:
 	var first := Campaign.run(SEED)
-	_check_replay(first)
-	_check_other_seed(first)
-	_check_stages(first)
-	_check_reload(first)
-	_check_v2_fixture()
-	_check_memory_names(first)
+	await _t("_test_replay", [first])
+	await _t("_test_other_seed", [first])
+	await _t("_test_stages", [first])
+	await _t("_test_reload", [first])
+	await _t("_test_v2_fixture")
+	await _t("_test_memory_names", [first])
 	for route: String in Routes.ROUTES:
-		_check_route(route)
-	_check_wipe_reads_ended()
-	_check_ledger_replays()
+		await _t("_test_route", [route])
+	await _t("_test_wipe_reads_ended")
+	await _t("_test_ledger_replays")
 	await process_frame
 
 
 ## The lethality ledger reports the same on the same seeds, and its campaigns really fought.
-func _check_ledger_replays() -> void:
+func _test_ledger_replays() -> void:
 	var first := Lethality.ledger(LEDGER_SEED, LEDGER_CAMPAIGNS, LEDGER_FIGHTS)
 	var again := Lethality.ledger(LEDGER_SEED, LEDGER_CAMPAIGNS, LEDGER_FIGHTS)
 	var total: Dictionary = first["total"]
@@ -82,7 +82,7 @@ func _check_ledger_replays() -> void:
 ## A lost fight, a toll paid, a second fight and the campaign's end: each on one seed twice
 ## ends in the same save, byte for byte, on another seed in a different one, and really
 ## happened (tools/audit/route_replay.sh plays the same pairs in two processes).
-func _check_route(route: String) -> void:
+func _test_route(route: String) -> void:
 	var first := Routes.run(route, ROUTE_SEED)
 	var again := Routes.run(route, ROUTE_SEED)
 	var other := Routes.run(route, ROUTE_OTHER_SEED)
@@ -109,7 +109,7 @@ func _check_route(route: String) -> void:
 
 
 ## The wipe route's save says the campaign ended and reads back as not ok.
-func _check_wipe_reads_ended() -> void:
+func _test_wipe_reads_ended() -> void:
 	var played := Routes.run("wipe", SEED)
 	var parsed: Variant = JSON.parse_string(str(played["save"]))
 	var saved: Dictionary = parsed if parsed is Dictionary else {}
@@ -121,7 +121,7 @@ func _check_wipe_reads_ended() -> void:
 	)
 
 
-func _check_replay(first: Dictionary) -> void:
+func _test_replay(first: Dictionary) -> void:
 	var again := Campaign.run(SEED)
 	var text: String = first["save"]
 	check(
@@ -133,7 +133,7 @@ func _check_replay(first: Dictionary) -> void:
 	)
 
 
-func _check_other_seed(first: Dictionary) -> void:
+func _test_other_seed(first: Dictionary) -> void:
 	var other := Campaign.run(OTHER_SEED)
 	check(
 		str(first["save"]) != str(other["save"]),
@@ -141,7 +141,7 @@ func _check_other_seed(first: Dictionary) -> void:
 	)
 
 
-func _check_stages(first: Dictionary) -> void:
+func _test_stages(first: Dictionary) -> void:
 	var stages: Dictionary = first["stages"]
 	var missing: Array[String] = []
 	for stage: String in STAGES:
@@ -156,7 +156,7 @@ func _canon(text: String) -> String:
 
 
 ## The final save, through JSON text, reads back as a model that writes the same save.
-func _check_reload(first: Dictionary) -> void:
+func _test_reload(first: Dictionary) -> void:
 	var parsed: Variant = JSON.parse_string(str(first["save"]))
 	var saved: Dictionary = parsed if parsed is Dictionary else {}
 	var model := SaveModel.from_dict(saved, World.data(), Fixture.defs())
@@ -169,7 +169,7 @@ func _check_reload(first: Dictionary) -> void:
 
 
 ## A real version 2 file (written by this build before the next format) loads whole.
-func _check_v2_fixture() -> void:
+func _test_v2_fixture() -> void:
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(V2_FIXTURE))
 	var saved: Dictionary = parsed if parsed is Dictionary else {}
 	var model := SaveModel.from_dict(saved, World.data(), Fixture.defs())
@@ -191,7 +191,7 @@ func _check_v2_fixture() -> void:
 
 
 ## No memory sentence of a living merc shows a merc id: the dead are named from the data.
-func _check_memory_names(first: Dictionary) -> void:
+func _test_memory_names(first: Dictionary) -> void:
 	var company: Company = first["company"]
 	var memory: Memory = first["memory"]
 	var shown: Array[String] = []

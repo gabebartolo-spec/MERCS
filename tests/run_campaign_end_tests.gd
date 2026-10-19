@@ -27,17 +27,17 @@ func suite_name() -> String:
 
 func run_checks() -> void:
 	root.size = WINDOW_SIZE
-	_check_wipe_against_survivor()
-	_check_wipe_needs_everyone()
-	_check_save_marks_ended()
-	_check_ended_never_plays()
-	_check_close_ended()
+	await _t("_test_wipe_against_survivor")
+	await _t("_test_wipe_needs_everyone")
+	await _t("_test_save_marks_ended")
+	await _t("_test_ended_never_plays")
+	await _t("_test_close_ended")
 	var gui := GuiChecks.new()
 	gui.setup(self, check)
 	await gui.run()
 
 
-func _check_wipe_against_survivor() -> void:
+func _test_wipe_against_survivor() -> void:
 	var dead := End.fight(SEED, "dead")
 	var spared := End.fight(SEED, "wound")
 	var dead_events: Array[Dictionary] = dead["events"]
@@ -61,7 +61,7 @@ func _check_wipe_against_survivor() -> void:
 	)
 
 
-func _check_wipe_needs_everyone() -> void:
+func _test_wipe_needs_everyone() -> void:
 	var fresh := Company.start(Fixture.defs())
 	var one_down := Company.start(Fixture.defs())
 	one_down.bury("vampyr")
@@ -92,7 +92,7 @@ func _ended_model(with_key: bool) -> SaveModel:
 	return SaveModel.from_dict(parsed, balance, Fixture.defs())
 
 
-func _check_save_marks_ended() -> void:
+func _test_save_marks_ended() -> void:
 	var rng := Rng.from_seed(SEED)
 	var world := WorldSim.new()
 	world.start(Kit.json("res://data/balance/world.json"), rng)
@@ -125,7 +125,7 @@ func _check_save_marks_ended() -> void:
 	)
 
 
-func _check_ended_never_plays() -> void:
+func _test_ended_never_plays() -> void:
 	var model := _ended_model(true)
 	var again := Kit.wounds(Rng.from_seed(1), "", model.wounds, model.company)
 	var cells := EncounterBattle.company_cells(Kit.scenario())
@@ -141,7 +141,7 @@ func _check_ended_never_plays() -> void:
 	)
 
 
-func _check_close_ended() -> void:
+func _test_close_ended() -> void:
 	var saves := root.get_node(^"SaveSystem") as SAVE_SYSTEM
 	var balance := Kit.json("res://data/balance/world.json")
 	var rng := Rng.from_seed(SEED)

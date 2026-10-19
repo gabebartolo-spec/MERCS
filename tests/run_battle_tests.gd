@@ -40,15 +40,15 @@ func suite_name() -> String:
 
 
 func run_checks() -> void:
-	_check_rng()
-	_check_replay()
-	_check_moves()
-	_check_attacks()
-	_check_morale_and_surrender()
-	_check_ai_sight()
-	_check_charge()
-	_check_blood_price()
-	_check_checks()
+	await _t("_test_rng")
+	await _t("_test_replay")
+	await _t("_test_moves")
+	await _t("_test_attacks")
+	await _t("_test_morale_and_surrender")
+	await _t("_test_ai_sight")
+	await _t("_test_charge")
+	await _t("_test_blood_price")
+	await _t("_test_checks")
 	SkeletonChecks.new().run(check)
 	GoldenChecks.new().run(check)
 	MoraleChecks.new().run(check)
@@ -67,7 +67,7 @@ func _rules() -> Dictionary:
 	return rules if rules is Dictionary else {}
 
 
-func _check_rng() -> void:
+func _test_rng() -> void:
 	var a := Rng.from_seed(SEED)
 	var b := Rng.from_seed(SEED)
 	b.roll("world", 1, SURE_HIT)
@@ -109,7 +109,7 @@ func _play_out(battle: Battle) -> Array[Dictionary]:
 	return log
 
 
-func _check_replay() -> void:
+func _test_replay() -> void:
 	var first := _skirmish(SEED)
 	var log_a := _play_out(first)
 	var log_b := _play_out(_skirmish(SEED))
@@ -121,7 +121,7 @@ func _check_replay() -> void:
 	check(str(log_a) != str(log_c), "another seed gives another fight")
 
 
-func _check_moves() -> void:
+func _test_moves() -> void:
 	var battle := _skirmish(SEED)
 	var actor := battle.current()
 	var start := actor.cell
@@ -150,7 +150,7 @@ func _check_moves() -> void:
 	)
 
 
-func _check_attacks() -> void:
+func _test_attacks() -> void:
 	var battle := _skirmish(SEED)
 	var actor := battle.current()
 	var far_target := battle.unit("b0")
@@ -169,7 +169,7 @@ func _check_attacks() -> void:
 	)
 
 
-func _check_morale_and_surrender() -> void:
+func _test_morale_and_surrender() -> void:
 	var rules := _rules()
 	var battle := _skirmish(SEED)
 	var start: int = battle.morale(BattleUnit.COMPANY)
@@ -228,7 +228,7 @@ func _check_rout(rules: Dictionary, leader_loss: int) -> void:
 	)
 
 
-func _check_ai_sight() -> void:
+func _test_ai_sight() -> void:
 	var battle := Battle.new()
 	var pair: Array[BattleUnit] = [
 		BattleUnit.make("b", BattleUnit.ENEMY, Vector2i.ZERO, {"initiative": 2}),
@@ -265,7 +265,7 @@ func _duel(attacker: BattleUnit, defender: BattleUnit) -> Battle:
 	return battle
 
 
-func _check_charge() -> void:
+func _test_charge() -> void:
 	var orc := _fighter("orc", "orc", BattleUnit.COMPANY, Vector2i(1, 1))
 	var bandit := _fighter("bandit", "b", BattleUnit.ENEMY, Vector2i(4, 1))
 	var battle := _duel(orc, bandit)
@@ -290,7 +290,7 @@ func _check_charge() -> void:
 	)
 
 
-func _check_blood_price() -> void:
+func _test_blood_price() -> void:
 	var rules := _rules()
 	var moves: Dictionary = rules.get("moves", {})
 	var price: Dictionary = moves.get(Battle.ACTION_BLOOD_PRICE, {})
@@ -323,7 +323,7 @@ func _check_blood_price() -> void:
 	)
 
 
-func _check_checks() -> void:
+func _test_checks() -> void:
 	var data := _data()
 	var gate: Dictionary = data.get("gate", {})
 	var sides: int = gate.get("die_sides", 0)

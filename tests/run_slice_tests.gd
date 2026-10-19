@@ -35,16 +35,16 @@ func run_checks() -> void:
 	# game's size so a click's window position is its canvas position, as on a 1080p screen.
 	root.size = WINDOW_SIZE
 	var game := await _spawn()
-	_check_boot(game)
-	await _check_keys(game)
-	await _check_click(game)
-	_check_blocking(game)
-	_check_camera(game)
-	await _check_doors(game)
-	await _check_conditions(game)
-	await _check_crowd_repeats(game)
-	_check_clip_playback()
-	await _check_loop_panels()
+	await _t("_test_boot", [game])
+	await _t("_test_keys", [game])
+	await _t("_test_click", [game])
+	await _t("_test_blocking", [game])
+	await _t("_test_camera", [game])
+	await _t("_test_doors", [game])
+	await _t("_test_conditions", [game])
+	await _t("_test_crowd_repeats", [game])
+	await _t("_test_clip_playback")
+	await _t("_test_loop_panels")
 
 
 func _spawn() -> SliceGame:
@@ -55,7 +55,7 @@ func _spawn() -> SliceGame:
 	return game
 
 
-func _check_boot(game: SliceGame) -> void:
+func _test_boot(game: SliceGame) -> void:
 	var start := _start_cell()
 	var routes := 0
 	while not _crowd_route(routes + 1).is_empty():
@@ -69,7 +69,7 @@ func _check_boot(game: SliceGame) -> void:
 	)
 
 
-func _check_keys(game: SliceGame) -> void:
+func _test_keys(game: SliceGame) -> void:
 	var start := game.player.cell
 	await _press_key(KEY_D, true)
 	for _frame: int in HOLD_FRAMES:
@@ -86,7 +86,7 @@ func _check_keys(game: SliceGame) -> void:
 	)
 
 
-func _check_click(game: SliceGame) -> void:
+func _test_click(game: SliceGame) -> void:
 	var stage := game.stage()
 	var centre := Vector3(CLICK_TARGET.x + 0.5, 0.0, CLICK_TARGET.y + 0.5)
 	var window := stage.camera().unproject_position(centre) * stage.screen_scale()
@@ -110,7 +110,7 @@ func _check_click(game: SliceGame) -> void:
 	)
 
 
-func _check_blocking(game: SliceGame) -> void:
+func _test_blocking(game: SliceGame) -> void:
 	var walker := game.player
 	check(
 		not walker.is_walkable(WELL_CELL) and not walker.walk_to(WELL_CELL),
@@ -122,7 +122,7 @@ func _check_blocking(game: SliceGame) -> void:
 	check(not walker.is_walkable(house_cell), "a house's cell is blocked")
 
 
-func _check_camera(game: SliceGame) -> void:
+func _test_camera(game: SliceGame) -> void:
 	var stage := game.stage()
 	var rail := stage.camera().get_parent() as Node3D
 	var texel := stage.texel_m()
@@ -142,7 +142,7 @@ func _check_camera(game: SliceGame) -> void:
 	)
 
 
-func _check_doors(game: SliceGame) -> void:
+func _test_doors(game: SliceGame) -> void:
 	var data := game.stage().stage_data
 	var door := data.cell("street", "door_cell")
 	var entry := data.cell("interior", "entry_cell")
@@ -159,7 +159,7 @@ func _check_doors(game: SliceGame) -> void:
 	)
 
 
-func _check_conditions(game: SliceGame) -> void:
+func _test_conditions(game: SliceGame) -> void:
 	var stage := game.stage()
 	var world := stage.world()
 	await _tap(KEY_T)
@@ -185,7 +185,7 @@ func _check_conditions(game: SliceGame) -> void:
 	check(shown and help != null and not help.visible, "the key help shows at start and H hides it")
 
 
-func _check_crowd_repeats(first: SliceGame) -> void:
+func _test_crowd_repeats(first: SliceGame) -> void:
 	first.queue_free()
 	# Both enter the tree in the same frame, so they see the same deltas.
 	var packed: PackedScene = load(SLICE_SCENE) as PackedScene
@@ -211,7 +211,7 @@ func _check_crowd_repeats(first: SliceGame) -> void:
 
 ## A planted walk sheet (2 facings x 3 frames, 4 fps, looping) in user://: frames come out
 ## by facing and time, looping; a sheet missing a frame of a facing drops that facing.
-func _check_clip_playback() -> void:
+func _test_clip_playback() -> void:
 	DirAccess.make_dir_recursive_absolute(CLIP_DIR)
 	var image := Image.create(CLIP_CELL * CLIP_FRAMES, CLIP_CELL * 2, false, Image.FORMAT_RGBA8)
 	image.fill(Color.WHITE)
@@ -255,7 +255,7 @@ func _check_clip_playback() -> void:
 
 ## L opens the loop example; real mouse clicks on its panel buttons walk it from the
 ## arrival to the recruit card, hire, the contract and the road at dusk in the rain.
-func _check_loop_panels() -> void:
+func _test_loop_panels() -> void:
 	# The headless window is tiny; give it the game's size so the panel lies on screen.
 	root.size = WINDOW_SIZE
 	var game := await _spawn()

@@ -17,11 +17,11 @@ func suite_name() -> String:
 
 
 func run_checks() -> void:
-	_check_battle_unit()
-	_check_moves_gate_abilities()
-	_check_captain_leads()
-	_check_mercs_play_their_moves()
-	_check_blood_price_kept_in_hand()
+	await _t("_test_battle_unit")
+	await _t("_test_moves_gate_abilities")
+	await _t("_test_captain_leads")
+	await _t("_test_mercs_play_their_moves")
+	await _t("_test_blood_price_kept_in_hand")
 	await process_frame
 
 
@@ -41,7 +41,7 @@ func _abilities(unit: BattleUnit) -> String:
 	return Battle.ACTION_BLOOD_PRICE if unit.can_blood_price else ""
 
 
-func _check_battle_unit() -> void:
+func _test_battle_unit() -> void:
 	var company := _company()
 	var fighters: Dictionary = Fixture.defs()["fighters"]
 	var cell := Vector2i(3, 4)
@@ -71,7 +71,7 @@ func _check_battle_unit() -> void:
 
 
 ## Abilities follow the moves: without "charge" in the data the orc cannot charge.
-func _check_moves_gate_abilities() -> void:
+func _test_moves_gate_abilities() -> void:
 	var cell := Vector2i(3, 4)
 	var defs := Fixture.defs()
 	var list: Array = Fixture.sect(defs, "mercs").get("mercs", [])
@@ -84,7 +84,7 @@ func _check_moves_gate_abilities() -> void:
 	)
 
 
-func _check_captain_leads() -> void:
+func _test_captain_leads() -> void:
 	var company := _company()
 	var ids: Array[String] = ["orc", "vampyr"]
 	var cells: Array[Vector2i] = [Vector2i(1, 1), Vector2i(1, 2)]
@@ -108,7 +108,7 @@ func _check_captain_leads() -> void:
 	)
 
 
-func _check_mercs_play_their_moves() -> void:
+func _test_mercs_play_their_moves() -> void:
 	var company := _company()
 	var rules := Fixture.rules()
 	var orc := company.member("orc").to_battle_unit(BattleUnit.COMPANY, Vector2i(1, 1), true)
@@ -130,7 +130,7 @@ func _check_mercs_play_their_moves() -> void:
 	)
 
 
-func _check_blood_price_kept_in_hand() -> void:
+func _test_blood_price_kept_in_hand() -> void:
 	var company := _company()
 	var rules := Fixture.rules()
 	var vampyr := company.member("vampyr").to_battle_unit(BattleUnit.COMPANY, Vector2i(1, 1), false)

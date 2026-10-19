@@ -44,18 +44,18 @@ func run_checks() -> void:
 		SHEET_CHECK.check(_plant("clean", {})).is_empty(),
 		"an unchanged copy of the good sheet passes"
 	)
-	_check_rule("ENGINE-LOAD", _plant("load", {"image": "missing.png"}))
-	_check_rule("ENGINE-FACINGS", _plant("facings", {"swap_facings": true}))
-	_check_rule("ENGINE-FRAME", _plant("frame", {"frame_w": WRONG_FRAME_PX}))
-	_check_rule("ENGINE-PIVOT", _plant("pivot", {"pivot_y": WRONG_PIVOT_Y}))
-	_check_rule("ENGINE-NORMAL", _plant("normal", {"small_normal": true}))
-	_check_exported_load()
-	_check_layers()
+	await _t("_test_rule", ["ENGINE-LOAD", _plant("load", {"image": "missing.png"})])
+	await _t("_test_rule", ["ENGINE-FACINGS", _plant("facings", {"swap_facings": true})])
+	await _t("_test_rule", ["ENGINE-FRAME", _plant("frame", {"frame_w": WRONG_FRAME_PX})])
+	await _t("_test_rule", ["ENGINE-PIVOT", _plant("pivot", {"pivot_y": WRONG_PIVOT_Y})])
+	await _t("_test_rule", ["ENGINE-NORMAL", _plant("normal", {"small_normal": true})])
+	await _t("_test_exported_load")
+	await _t("_test_layers")
 	await process_frame
 
 
 ## The planted sheet is rejected, and only by the rule it breaks.
-func _check_rule(rule: String, manifest_path: String) -> void:
+func _test_rule(rule: String, manifest_path: String) -> void:
 	var problems := SHEET_CHECK.check(manifest_path)
 	var only_rule := not problems.is_empty()
 	for problem: String in problems:
@@ -130,7 +130,7 @@ func _copy_normal(manifest: Dictionary, dir: String) -> void:
 ## The Phase 1 gate runs from an export, where res:// is a .pck holding imported textures and
 ## no PNG files. The sheet's pixels must still reach the screen: imported textures load, and
 ## SheetFrame.from_manifest finds a sheet that exists only inside a pack.
-func _check_exported_load() -> void:
+func _test_exported_load() -> void:
 	var manifest := _manifest(GOOD_SHEET)
 	var names: Array[String] = [
 		str(manifest.get("image", "")), str(manifest.get("normal_image", ""))
@@ -206,7 +206,7 @@ func _same_pixels(a: Image, b: Image) -> bool:
 ## Stacked layers (body, then gear, head and injury): an opaque layer pixel replaces the
 ## one below in colour and in the normal map, a clear one leaves it, and a layer on another
 ## grid is refused (director, 2026-10-09: injuries in all spritework).
-func _check_layers() -> void:
+func _test_layers() -> void:
 	DirAccess.make_dir_recursive_absolute(LAYER_DIR)
 	var base := _layer_sheet("body", Color.RED, false)
 	var scar := _layer_sheet("scar", Color.BLUE, true)
