@@ -1,6 +1,6 @@
 ---
 name: mercs-handoff
-description: Writing and starting from a MERCS agent handoff - the file agent-handoffs/ROLE.md inside the repo that lets a fresh session continue without the old transcript, its 120-line cap, rewrite not append, and the context limits that say when to hand off. Use it when a task is done or you switch to unrelated work, when your context is getting long (past about 200k tokens), before the director restarts or clears a session, and at the start of any new session for the Dev Lead, Merge & CI, Art Factory or Concept Lead role.
+description: Writing and starting from a MERCS agent handoff - the file agent-handoffs/ROLE.md inside the repo that lets a fresh session continue without the old transcript, its 120-line cap, edited not appended, and the context limits that say when to hand off. Use it when a task is done or you switch to unrelated work, when your context is getting long (past about 200k tokens), before the director restarts or clears a session, and at the start of any new session for the Dev Lead, Merge & CI, Art Factory or Concept Lead role.
 ---
 
 # Handoffs
