@@ -46,11 +46,10 @@ no share, walk out) may already be logged there; log only what is missing.
 5. Next playtest only after combat + art land; fresh gate build then.
 
 ## Housekeeping
-- Worktrees: 12 live (limit 4). `git worktree remove` was refused by the permission system last shift;
-  ask the director before retrying. Merged and removable: grass-b, baseline, c8, death-roll,
-  wages-forfeit, walkout-advance, no-advance-line (#157), handoff5 (#160). Keep art-cast (#118, ~198
-  dirty files), art-desloppify (~200 dirty, 5 commits ahead: check before any removal), tiles-b6
-  (clean, 2 ahead, unmerged).
+- Worktrees: 4 live (main + art-cast, art-desloppify, tiles-b6), at the limit. Director 2026-10-19
+  "remove the worktrees we dont need": 8 merged ones removed (only .import/.uid churn discarded).
+  Their local branches remain: `git branch -D` is in the project deny list (.claude/settings.json).
+  Kept: art-cast (#118, ~198 dirty), art-desloppify (~200 dirty, 5 ahead), tiles-b6 (clean, 2 ahead).
 - At 2026-10-19 three Godot processes were running (PIDs 13728, 28432, 3392) that this role did not
   start: not ours, never kill them.
 - Follow-ups: armoury buy/sell screen (new UI, look gate; demo Task 5); C2/C4 memory_key list is
