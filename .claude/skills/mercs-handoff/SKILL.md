@@ -1,6 +1,6 @@
 ---
 name: mercs-handoff
-description: Writing and starting from a MERCS agent handoff - the file agent-handoffs/ROLE.md inside the repo that lets a fresh session continue without the old transcript, its 120-line cap, rewrite not append, and the context limits that say when to hand off. Use it when a task is done or you switch to unrelated work, when your context is getting long (past about 150k tokens), before the director restarts or clears a session, and at the start of any new session for the Dev Lead, Merge & CI, Art Factory or Concept Lead role.
+description: Writing and starting from a MERCS agent handoff - the file agent-handoffs/ROLE.md inside the repo that lets a fresh session continue without the old transcript, its 120-line cap, rewrite not append, and the context limits that say when to hand off. Use it when a task is done or you switch to unrelated work, when your context is getting long (past about 200k tokens), before the director restarts or clears a session, and at the start of any new session for the Dev Lead, Merge & CI, Art Factory or Concept Lead role.
 ---
 
 # Handoffs
@@ -9,7 +9,7 @@ Context bloat is a named pitfall (guardrail C6). The rule (CLAUDE.md "Sessions a
 `docs/03_TEAM_WORKFLOW.md` "Concurrency and cadence"):
 - **Fresh session at every task boundary:** the PR is open with its evidence, or you switch to unrelated
   work. Do not restart mid-task, and never restart with in-flight work that is not written down.
-- **Routine work stays at 50-100k tokens of context. Past 150k, hand off.**
+- **Routine work stays at 50-100k tokens of context. Past about 200k, hand off.**
 - Write the handoff first, then start the new session from it.
 
 ## Where
@@ -61,7 +61,7 @@ Director, 2026-10-10: archive and resurrect the team periodically, but only at f
 The general rule is in `~/.claude/memory-shared/refresh-workers-at-task-boundaries.md`; for MERCS:
 - **When:** the worker has just finished a task, its handoff is pushed, and nothing it owns is live
   (no Godot PID, GPU job, Tripo job or CI watch). At least one of these is also true: its context is
-  past 150k tokens (check with `get_usage` on its session id), the next task is unrelated, or it has
+  past about 200k tokens (check with `get_usage` on its session id), the next task is unrelated, or it has
   finished 3 tasks since its last refresh. Never refresh mid-task.
 - **How:** the worker calls `clear_session("self")`. The session id stays the same, so cross-session
   messages still reach it. The lead then sends a one-line kick-off: "You are <role>. Read your

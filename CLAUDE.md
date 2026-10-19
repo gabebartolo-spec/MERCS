@@ -77,7 +77,7 @@ AI-generated fantasy RPG? If the latter, it is not done.
 ## Sessions and context
 
 - Fresh session at every task boundary. Write the handoff first (`agent-briefs/HANDOFF_TEMPLATE.md`).
-- Aim for 50–100k tokens of context on routine work. Past 150k, hand off.
+- Aim for 50–100k tokens of context on routine work. Past about 200k, hand off.
 - Say which state you are in when you report: working, running a check, awaiting director,
   blocked, available. Waiting is valid; invented busywork is not.
 

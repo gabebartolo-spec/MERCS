@@ -22,7 +22,7 @@ MERCS is PC, mouse and keyboard (D-010), so UI proof means real mouse and keyboa
 | Visual or art | validators green, contact sheet beside the golden image, then the director's approval |
 | Animation | `assets` suite (strips vs manifest, every clip played through) plus a 3-second clip |
 | Save or lifecycle | reload, old-save fixture, failure paths, `mercs-sim-review` |
-| Performance | `perf` suite numbers against floors |
+| Performance | `perf` suite numbers against their baselines |
 
 Scale the effort to the change: a data fix does not need a movie, an animation change does.
 

@@ -42,7 +42,7 @@ section missing, and a PR with no "Not exercised" line fails review on sight.
 ## Not exercised                   what this PR does not prove; "insufficient evidence" is honest
 ## Board and log                   your STATUS row change and any decision in full (D-TBD-<slug>); "none" is valid
 ## [MERGE NOTE]
-- Hot files touched: <sim core, save model, UiKit, caps, floors, docs>
+- Hot files touched: <sim core, save model, UiKit, caps, docs>
 - Test functions: <suite: added / removed>
 - Review needed: <none | mercs-sim-review by <agent>>
 - Director gate: <none | look approval pending | approved in D-id>
