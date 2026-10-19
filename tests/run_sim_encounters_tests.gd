@@ -32,17 +32,17 @@ func suite_name() -> String:
 
 
 func run_checks() -> void:
-	_check_contact_stops_the_band()
-	_check_no_party_no_encounter()
-	_check_win()
-	_check_loss()
-	_check_toll_paid()
-	_check_toll_refused()
-	_check_who_strikes_first()
-	_check_encounters_replay()
-	_check_sight()
-	_check_lost_sight()
-	_check_return()
+	await _t("_test_contact_stops_the_band")
+	await _t("_test_no_party_no_encounter")
+	await _t("_test_win")
+	await _t("_test_loss")
+	await _t("_test_toll_paid")
+	await _t("_test_toll_refused")
+	await _t("_test_who_strikes_first")
+	await _t("_test_encounters_replay")
+	await _t("_test_sight")
+	await _t("_test_lost_sight")
+	await _t("_test_return")
 	LineupChecks.new().run(check)
 	await process_frame
 
@@ -80,7 +80,7 @@ func _last_outcome(world: WorldSim) -> String:
 	return str(entry.get("outcome", ""))
 
 
-func _check_contact_stops_the_band() -> void:
+func _test_contact_stops_the_band() -> void:
 	var world := _met("ambush")
 	var pending := world.pending_encounter()
 	var enemies: Array = pending.get("enemies", [])
@@ -101,7 +101,7 @@ func _check_contact_stops_the_band() -> void:
 	)
 
 
-func _check_no_party_no_encounter() -> void:
+func _test_no_party_no_encounter() -> void:
 	var met := _outside(SEED)
 	var party := Fixture.lone_party(met, "ambush", NEAR)
 	var alone := _outside(SEED)
@@ -119,7 +119,7 @@ func _check_no_party_no_encounter() -> void:
 	)
 
 
-func _check_win() -> void:
+func _test_win() -> void:
 	var world := _met("ambush")
 	var party := world.party(str(world.encounter.get("party", "")))
 	var supplies := world.supplies
@@ -145,7 +145,7 @@ func _check_win() -> void:
 	)
 
 
-func _check_loss() -> void:
+func _test_loss() -> void:
 	var world := _met("ambush")
 	var supplies := world.supplies
 	var walked_off := world.band != world.region.entrance(RegionGen.HUB_ID)
@@ -165,7 +165,7 @@ func _check_loss() -> void:
 	)
 
 
-func _check_toll_paid() -> void:
+func _test_toll_paid() -> void:
 	var world := _met("patrol")
 	var party := world.party(str(world.encounter.get("party", "")))
 	var toll: int = _knobs("encounters", "patrol").get("toll_supplies", 0)
@@ -185,7 +185,7 @@ func _check_toll_paid() -> void:
 	)
 
 
-func _check_toll_refused() -> void:
+func _test_toll_refused() -> void:
 	var broke := _met("patrol")
 	var ambush := _met("ambush")
 	var toll: int = _knobs("encounters", "patrol").get("toll_supplies", 0)
@@ -204,7 +204,7 @@ func _check_toll_refused() -> void:
 	)
 
 
-func _check_who_strikes_first() -> void:
+func _test_who_strikes_first() -> void:
 	var ambush := _met("ambush")
 	var patrol := _met("patrol")
 	var scenarios: Array = Fixture.json(SCENARIOS).get("scenarios", [{}])
@@ -227,7 +227,7 @@ func _check_who_strikes_first() -> void:
 
 
 ## The seed's own parties, a long scripted walk: twice the same, and the map's stream unmoved.
-func _check_encounters_replay() -> void:
+func _test_encounters_replay() -> void:
 	var a := Fixture.world(OTHER_SEED)
 	var b := Fixture.world(OTHER_SEED)
 	Fixture.scripted(a, 0, SCRIPT_MOVES)
@@ -252,7 +252,7 @@ func _check_encounters_replay() -> void:
 
 ## The same party, the same time: the band within its sight draws it in; out of sight it
 ## wanders within its range of home and does not close in.
-func _check_sight() -> void:
+func _test_sight() -> void:
 	var world := _outside(SEED)
 	var party := Fixture.lone_party(world, "ambush", NEAR)
 	var knobs: Dictionary = Fixture.data().get("parties", {})
@@ -275,7 +275,7 @@ func _check_sight() -> void:
 
 ## A party chasing the band loses it (the band out of its sight) and goes back to wandering,
 ## then heads home.
-func _check_lost_sight() -> void:
+func _test_lost_sight() -> void:
 	var world := _outside(SEED)
 	var party := Fixture.lone_party(world, "ambush", NEAR)
 	var knobs: Dictionary = Fixture.data().get("parties", {})
@@ -296,7 +296,7 @@ func _check_lost_sight() -> void:
 
 ## A party the band dealt with is off the map until its return day: the band can stand on its
 ## home meanwhile; on the day it is back there, it meets the band.
-func _check_return() -> void:
+func _test_return() -> void:
 	var world := _met("patrol")
 	var party := world.party(str(world.encounter.get("party", "")))
 	world.pay_toll()

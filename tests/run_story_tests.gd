@@ -28,15 +28,15 @@ func suite_name() -> String:
 
 
 func run_checks() -> void:
-	_check_memory_records()
-	_check_tags_and_relationship()
-	_check_casting()
-	_check_odds()
-	_check_state()
-	_check_eligibility()
-	_check_branches()
-	_check_save()
-	_check_text_and_data()
+	await _t("_test_memory_records")
+	await _t("_test_tags_and_relationship")
+	await _t("_test_casting")
+	await _t("_test_odds")
+	await _t("_test_state")
+	await _t("_test_eligibility")
+	await _t("_test_branches")
+	await _t("_test_save")
+	await _t("_test_text_and_data")
 	await process_frame
 
 
@@ -85,7 +85,7 @@ func _rolled(want_success: bool) -> Dictionary:
 # --- sim ----------------------------------------------------------------------------
 
 
-func _check_memory_records() -> void:
+func _test_memory_records() -> void:
 	var memory := Memory.new()
 	memory.record("a", "memory.fight_won", {"site": "x"}, 4)
 	memory.record("", "memory.fight_won", {}, 4)
@@ -124,7 +124,7 @@ func _check_memory_records() -> void:
 	check(fights.has_key("a", "memory.fate_spare"), "a choice writes its sentence")
 
 
-func _check_tags_and_relationship() -> void:
+func _test_tags_and_relationship() -> void:
 	var book := _book(SEED, true)
 	var orc := book.company.member("orc")
 	var tags := StoryTags.of_merc(orc, book.company.captain_id, book.memory)
@@ -151,7 +151,7 @@ func _check_tags_and_relationship() -> void:
 	check(not lone.shared("a", "b"), "the same sentence about two different deaths is not shared")
 
 
-func _check_casting() -> void:
+func _test_casting() -> void:
 	var book := _book(SEED, true)
 	var found := book.casts_for(book.definition(STORY_ID), REST_CONTEXT)
 	var count := book.company.roster.size()
@@ -175,7 +175,7 @@ func _check_casting() -> void:
 	)
 
 
-func _check_odds() -> void:
+func _test_odds() -> void:
 	var table_ok := true
 	for skill: int in range(0, 14):
 		var wins := 0
@@ -207,7 +207,7 @@ func _check_odds() -> void:
 	check(not streams.has("story"), "making the offer rolls nothing on the check's stream")
 
 
-func _check_state() -> void:
+func _test_state() -> void:
 	var state := StoryletState.new()
 	check(state.ready("st_a", 1, true, 0), "a storylet never fired is ready")
 	state.mark("st_a", 5)
@@ -219,7 +219,7 @@ func _check_state() -> void:
 	check(StoryletState.restore({}).fired.is_empty(), "no block reads as nothing fired")
 
 
-func _check_eligibility() -> void:
+func _test_eligibility() -> void:
 	var with_memory := _book(SEED, true).offer(REST_CONTEXT)
 	var without := _book(SEED, false).offer(REST_CONTEXT)
 	check(
@@ -255,7 +255,7 @@ func _check_eligibility() -> void:
 	check(book.offer(REST_CONTEXT).is_empty(), "after it fires it does not come back")
 
 
-func _check_branches() -> void:
+func _test_branches() -> void:
 	var won := _rolled(true)
 	var lost := _rolled(false)
 	check(not won.is_empty() and not lost.is_empty(), "pinned seeds reach both outcomes")
@@ -304,7 +304,7 @@ func _check_same_seed(won: Dictionary) -> void:
 	check(_book(SEED, true).choose({"id": STORY_ID}, "mourner").is_empty(), "no attempt, no roll")
 
 
-func _check_save() -> void:
+func _test_save() -> void:
 	var book := _book(SEED, true)
 	var made := book.offer(REST_CONTEXT)
 	var world_balance := _json(WORLD_BALANCE)
@@ -342,7 +342,7 @@ func _check_save() -> void:
 	check(reloaded.memory.of("orc").size() == 1, "the memories come back from the save")
 
 
-func _check_text_and_data() -> void:
+func _test_text_and_data() -> void:
 	var def := _d(_a(_json(STORYLETS).get("storylets"))[0])
 	var strings := _json(TEXT)
 	var keys: Array[String] = [str(def.get("title_key")), str(def.get("scene_key"))]

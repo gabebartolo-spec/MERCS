@@ -35,15 +35,15 @@ func suite_name() -> String:
 
 
 func run_checks() -> void:
-	_check_palette()
-	_check_scripts()
-	_check_data()
-	_check_contrast()
-	_check_theme()
-	_check_map()
+	await _t("_test_palette")
+	await _t("_test_scripts")
+	await _t("_test_data")
+	await _t("_test_contrast")
+	await _t("_test_theme")
+	await _t("_test_map")
 
 
-func _check_palette() -> void:
+func _test_palette() -> void:
 	var all := Palette.all_colours()
 	check(
 		all.size() == PALETTE_SIZE,
@@ -63,7 +63,7 @@ func _check_palette() -> void:
 
 
 ## No colour literal in presentation/ or ui/ outside the colour owner is off the palette.
-func _check_scripts() -> void:
+func _test_scripts() -> void:
 	var offences: Array[String] = []
 	var scanned := 0
 	for path: String in _files():
@@ -146,7 +146,7 @@ func _off_calls(line: String) -> Array[String]:
 
 
 ## Every colour reference in the data files names a palette step.
-func _check_data() -> void:
+func _test_data() -> void:
 	var refs := 0
 	var bad: Array[String] = []
 	for entry: Array in COLOUR_DATA:
@@ -178,7 +178,7 @@ func _check_data() -> void:
 
 
 ## Each text role on its background keeps the contrast floor (listed in look_ui.json).
-func _check_contrast() -> void:
+func _test_contrast() -> void:
 	var look := Palette.look()
 	var floor_ratio: float = look.get("min_contrast", 0.0)
 	var pairs: Array = look.get("contrast_pairs", [])
@@ -203,7 +203,7 @@ func _check_contrast() -> void:
 
 
 ## The painted theme holds only palette colours, and a button is the role's colour.
-func _check_theme() -> void:
+func _test_theme() -> void:
 	var ui_look: GDScript = load("res://presentation/ui_look.gd")
 	var theme := Theme.new()
 	var applied: bool = ui_look != null and ui_look.call("apply", theme) == true
@@ -246,7 +246,7 @@ func _check_roles(theme: Theme) -> void:
 
 
 ## The map and the battle markers draw in palette colours and stay told apart.
-func _check_map() -> void:
+func _test_map() -> void:
 	var terrain: Array[Color] = []
 	for key: String in TileRegion.TERRAIN_KEYS:
 		terrain.append(OverworldMap.token_colour(key))

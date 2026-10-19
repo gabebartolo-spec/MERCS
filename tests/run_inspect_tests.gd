@@ -30,19 +30,19 @@ func run_checks() -> void:
 	root.size = WINDOW_SIZE
 	_clear_save()
 	var game := await _spawn()
-	await _check_open(game)
-	await _check_pick(game)
-	_check_initiative(game)
-	await _check_placeholder(game)
-	await _check_experience_bar(game)
-	await _check_walking_paused(game)
-	await _check_appoint(game)
-	await _check_hide_keeps_screen(game)
-	await _check_saved_captain(game)
+	await _t("_test_open", [game])
+	await _t("_test_pick", [game])
+	await _t("_test_initiative", [game])
+	await _t("_test_placeholder", [game])
+	await _t("_test_experience_bar", [game])
+	await _t("_test_walking_paused", [game])
+	await _t("_test_appoint", [game])
+	await _t("_test_hide_keeps_screen", [game])
+	await _t("_test_saved_captain", [game])
 	game.queue_free()
 	await process_frame
 	var fresh := await _spawn()
-	await _check_fresh_session(fresh)
+	await _t("_test_fresh_session", [fresh])
 	fresh.queue_free()
 	await process_frame
 	_clear_save()
@@ -56,7 +56,7 @@ func _spawn() -> SliceGame:
 	return game
 
 
-func _check_open(game: SliceGame) -> void:
+func _test_open(game: SliceGame) -> void:
 	await _tap(KEY_C)
 	var director := game.company_director()
 	if director == null:
@@ -87,7 +87,7 @@ func _check_open(game: SliceGame) -> void:
 
 
 ## A real click on the Vampyr's row: his name, level, role, stats, moves and gear on show.
-func _check_pick(game: SliceGame) -> void:
+func _test_pick(game: SliceGame) -> void:
 	var panel := game.company_director().panel
 	await _click_button(panel.row_for("vampyr"))
 	var lines := panel.lines_text()
@@ -122,7 +122,7 @@ func _check_pick(game: SliceGame) -> void:
 
 ## One source for initiative: the screen shows what the Vampyr acts at once a battle has set
 ## him up (his plate counted), not his bare stat.
-func _check_initiative(game: SliceGame) -> void:
+func _test_initiative(game: SliceGame) -> void:
 	var lines := game.company_director().panel.lines_text()
 	var vampyr := game.company_director().company.member("vampyr")
 	var unit := vampyr.to_battle_unit(BattleUnit.COMPANY, Vector2i.ZERO, true)
@@ -148,7 +148,7 @@ func _check_initiative(game: SliceGame) -> void:
 	)
 
 
-func _check_placeholder(game: SliceGame) -> void:
+func _test_placeholder(game: SliceGame) -> void:
 	var panel := game.company_director().panel
 	await _click_button(panel.row_for("merc_3"))
 	var lines := panel.lines_text()
@@ -164,7 +164,7 @@ func _check_placeholder(game: SliceGame) -> void:
 
 
 ## The bar is the experience into this level over the level's width; it moves with the sim.
-func _check_experience_bar(game: SliceGame) -> void:
+func _test_experience_bar(game: SliceGame) -> void:
 	var director := game.company_director()
 	var panel := director.panel
 	await _tap(KEY_C)
@@ -191,7 +191,7 @@ func _check_experience_bar(game: SliceGame) -> void:
 	)
 
 
-func _check_walking_paused(game: SliceGame) -> void:
+func _test_walking_paused(game: SliceGame) -> void:
 	var start := game.player.cell
 	await _hold(KEY_D)
 	check(
@@ -201,7 +201,7 @@ func _check_walking_paused(game: SliceGame) -> void:
 
 
 ## A real click on the office button: the sim's captain changes and the rows follow.
-func _check_appoint(game: SliceGame) -> void:
+func _test_appoint(game: SliceGame) -> void:
 	var director := game.company_director()
 	var panel := director.panel
 	var before := JSON.stringify(game.company_director().company.state())
@@ -222,7 +222,7 @@ func _check_appoint(game: SliceGame) -> void:
 	)
 
 
-func _check_hide_keeps_screen(game: SliceGame) -> void:
+func _test_hide_keeps_screen(game: SliceGame) -> void:
 	var director := game.company_director()
 	await _tap(KEY_C)
 	var hidden := is_instance_valid(director) and not director.is_open()
@@ -239,7 +239,7 @@ func _check_hide_keeps_screen(game: SliceGame) -> void:
 
 
 ## The captain picked here is in the save the overworld writes (a real click on its Save).
-func _check_saved_captain(game: SliceGame) -> void:
+func _test_saved_captain(game: SliceGame) -> void:
 	await _tap(KEY_C)
 	await _tap(KEY_M)
 	var overworld := game.overworld_director()
@@ -258,7 +258,7 @@ func _check_saved_captain(game: SliceGame) -> void:
 	await _tap(KEY_M)
 
 
-func _check_fresh_session(game: SliceGame) -> void:
+func _test_fresh_session(game: SliceGame) -> void:
 	await _tap(KEY_C)
 	await _frames(LAYOUT_FRAMES)
 	var director := game.company_director()

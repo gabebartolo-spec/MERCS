@@ -25,9 +25,9 @@ func suite_name() -> String:
 func run_checks() -> void:
 	root.size = WINDOW_SIZE
 	_clear_save()
-	await _check_real_fight()
+	await _t("_test_real_fight")
 	_clear_save()
-	await _check_win_without_surrender()
+	await _t("_test_win_without_surrender")
 	_clear_save()
 
 
@@ -61,7 +61,7 @@ func _walk_into(director: OverworldDirector) -> void:
 
 
 ## A real fight on the map: the hub opens on a prisoner exactly when the company won.
-func _check_real_fight() -> void:
+func _test_real_fight() -> void:
 	_save_patrol_world()
 	var packed: PackedScene = load(SLICE_SCENE) as PackedScene
 	var game: SliceGame = packed.instantiate() as SliceGame
@@ -100,7 +100,7 @@ func _check_real_fight() -> void:
 
 ## The world applies a won fight nobody surrendered in: the loot, but no prisoner (Q-C); the hub
 ## opens on it as the overworld's Continue after the triage opens it (show_result).
-func _check_win_without_surrender() -> void:
+func _test_win_without_surrender() -> void:
 	var packed: PackedScene = load(SLICE_SCENE) as PackedScene
 	var game: SliceGame = packed.instantiate() as SliceGame
 	root.add_child(game)

@@ -25,10 +25,10 @@ func suite_name() -> String:
 
 func run_checks() -> void:
 	_load_schemas()
-	_check_data_files()
-	_check_fixtures("valid")
-	_check_fixtures("invalid")
-	_check_unsupported_keyword_is_reported()
+	await _t("_test_data_files")
+	await _t("_test_fixtures", ["valid"])
+	await _t("_test_fixtures", ["invalid"])
+	await _t("_test_unsupported_keyword_is_reported")
 	check(
 		_parse_errors.is_empty(),
 		"every data, schema and fixture file is valid JSON: %s" % [_parse_errors]
@@ -50,7 +50,7 @@ func _load_schemas() -> void:
 ## data/<name>.json uses schema <name>; data/<dir>/<file>.json uses schema <dir>.
 ## One check per rule, not per file or entry: adding or removing content never moves
 ## the floor, and a failure names every file that broke the rule.
-func _check_data_files() -> void:
+func _test_data_files() -> void:
 	var files := _data_files()
 	var unschemed: Array[String] = []
 	var invalid: Array[String] = []
@@ -98,7 +98,7 @@ func _data_files() -> Array[String]:
 
 
 ## Fixture files are named <schema>.<case>.json.
-func _check_fixtures(kind: String) -> void:
+func _test_fixtures(kind: String) -> void:
 	var dir := FIXTURE_DIR.path_join(kind)
 	var covered: Dictionary = {}
 	for file: String in DirAccess.get_files_at(dir):
@@ -136,7 +136,7 @@ func _check_rejected(path: String, document: Variant, errors: Array[String]) -> 
 	check(found, "known-bad %s is rejected with '%s', got %s" % [path, expected, errors])
 
 
-func _check_unsupported_keyword_is_reported() -> void:
+func _test_unsupported_keyword_is_reported() -> void:
 	var errors := JsonSchema.new().validate({}, {"type": "object", "maxProperties": 3})
 	check(
 		errors.size() == 1 and "not supported" in errors[0],

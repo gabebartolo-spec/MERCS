@@ -64,10 +64,10 @@ func suite_name() -> String:
 func run_checks() -> void:
 	root.size = WINDOW_SIZE
 	for seed_value: int in SEEDS:
-		_check_model(seed_value)
-	_check_pictures()
-	_check_pixels()
-	await _check_scene()
+		await _t("_test_model", [seed_value])
+	await _t("_test_pictures")
+	await _t("_test_pixels")
+	await _t("_test_scene")
 
 
 ## Plays the fight to its end with no scene, handing every action's events to the marks.
@@ -91,7 +91,7 @@ func _play_model(seed_value: int, marks: BattleMarks) -> Played:
 	return played
 
 
-func _check_model(seed_value: int) -> void:
+func _test_model(seed_value: int) -> void:
 	var tag := "seed %d" % seed_value
 	var marks := BattleMarks.new()
 	var played := _play_model(seed_value, marks)
@@ -170,7 +170,7 @@ func _check_replay(marks: BattleMarks, played: Played, tag: String) -> void:
 	check(same, "%s: the same events draw the same field, pixel for pixel" % tag)
 
 
-func _check_pictures() -> void:
+func _test_pictures() -> void:
 	var marks := BattleMarks.new()
 	var allowed: Array[Color] = []
 	for ref: String in BLOOD_REFS:
@@ -200,7 +200,7 @@ func _check_pictures() -> void:
 	)
 
 
-func _check_pixels() -> void:
+func _test_pixels() -> void:
 	var fall := BattleMarks.new()
 	var here := Vector2i(3, 3)
 	var turned := (
@@ -229,7 +229,7 @@ func _check_pixels() -> void:
 
 
 ## The fight on the street with the player's turns as real clicks: nodes follow the log.
-func _check_scene() -> void:
+func _test_scene() -> void:
 	var mounted := Kit.mount(self, SEEDS[0])
 	var view := mounted.view
 	var seen := Seen.new()

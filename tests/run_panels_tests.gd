@@ -40,10 +40,10 @@ func suite_name() -> String:
 func run_checks() -> void:
 	_clear_save()
 	root.size = WINDOW_SIZE
-	await _check_fight_and_screens()
-	await _check_encounter_under_screen(KEY_B)
-	await _check_encounter_under_screen(KEY_C)
-	_check_chase_ring()
+	await _t("_test_fight_and_screens")
+	await _t("_test_encounter_under_screen", [KEY_B])
+	await _t("_test_encounter_under_screen", [KEY_C])
+	await _t("_test_chase_ring")
 	await OddsHover.new().run(self, check)
 	_clear_save()
 
@@ -99,7 +99,7 @@ func _start_game() -> SliceGame:
 	return game
 
 
-func _check_fight_and_screens() -> void:
+func _test_fight_and_screens() -> void:
 	var game := await _start_game()
 	var director := game.overworld_director()
 	await _walk_into(director)
@@ -141,7 +141,7 @@ func _check_fight_and_screens() -> void:
 ## An encounter that stands while the hub (B) or the company screen (C) is up: walking waits,
 ## and when the map is redrawn the panel with Fight stays out from under the screen, then comes
 ## back when the screen closes.
-func _check_encounter_under_screen(code: Key) -> void:
+func _test_encounter_under_screen(code: Key) -> void:
 	var game := await _start_game()
 	var director := game.overworld_director()
 	await InputKit.tap(self, code)
@@ -304,7 +304,7 @@ func _check_apart(view: BattleView) -> void:
 				)
 
 
-func _check_chase_ring() -> void:
+func _test_chase_ring() -> void:
 	var ring := OverworldMap.chase_ring()
 	var outline := OverworldMap.outline()
 	var colours: Array[Color] = [outline["colour"]]

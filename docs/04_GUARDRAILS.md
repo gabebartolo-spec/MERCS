@@ -86,10 +86,10 @@ before trying again.
 *Enforced by:* review; the handoff's "Attempts" field.
 
 ### B6. Test gaming
-*Rule:* check floors only go up. Threshold widening in a test (the AFL commit "widen rating-parity
+*Rule:* a test function must run and make a check (no floors, no counts to keep). Threshold widening in a test (the AFL commit "widen rating-parity
 limit to 32") needs a one-line justification in `docs/DECISIONS.md` and a Concept Lead ack. A test
 deleted to get green is a revert.
-*Enforced by:* CI floor file (`tests/expected_checks.txt`); review.
+*Enforced by:* `tests/functions_ran.gd` and `tools/run_tests.sh` (a function that never ran or made no check fails by name); review.
 
 ### B7. Save-breaking changes
 *Rule:* versioned saves from the first save. New keys have defaults; renames need a migration and

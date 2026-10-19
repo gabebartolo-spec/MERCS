@@ -40,18 +40,18 @@ func suite_name() -> String:
 
 
 func run_checks() -> void:
-	_check_round_trip()
-	_check_continue_after_reload()
-	_check_continue_through_json()
-	_check_defaults()
-	_check_newer_version_refused()
-	_check_migrate_v0()
-	_check_rng_exact_through_json()
-	_check_company_round_trip()
-	_check_migrate_v1()
-	_check_encounter_through_json()
-	_check_old_save_has_no_encounter()
-	_check_band_and_parties()
+	await _t("_test_round_trip")
+	await _t("_test_continue_after_reload")
+	await _t("_test_continue_through_json")
+	await _t("_test_defaults")
+	await _t("_test_newer_version_refused")
+	await _t("_test_migrate_v0")
+	await _t("_test_rng_exact_through_json")
+	await _t("_test_company_round_trip")
+	await _t("_test_migrate_v1")
+	await _t("_test_encounter_through_json")
+	await _t("_test_old_save_has_no_encounter")
+	await _t("_test_band_and_parties")
 	await process_frame
 
 
@@ -76,7 +76,7 @@ func _walk(world: WorldSim, first: int, last: int) -> void:
 	World.scripted(world, first, last)
 
 
-func _check_round_trip() -> void:
+func _test_round_trip() -> void:
 	var rng := Rng.from_seed(SEED)
 	var world := _world(rng)
 	_walk(world, 0, SPLIT)
@@ -95,7 +95,7 @@ func _check_round_trip() -> void:
 	)
 
 
-func _check_continue_after_reload() -> void:
+func _test_continue_after_reload() -> void:
 	var whole := _world(Rng.from_seed(SEED))
 	_walk(whole, 0, STEPS)
 	var paused_rng := Rng.from_seed(SEED)
@@ -110,7 +110,7 @@ func _check_continue_after_reload() -> void:
 
 
 ## The save as presentation will write it: through JSON, where every number comes back a float.
-func _check_continue_through_json() -> void:
+func _test_continue_through_json() -> void:
 	var whole := _world(Rng.from_seed(SEED))
 	_walk(whole, 0, STEPS)
 	var paused_rng := Rng.from_seed(SEED)
@@ -128,7 +128,7 @@ func _check_continue_through_json() -> void:
 	)
 
 
-func _check_defaults() -> void:
+func _test_defaults() -> void:
 	var model := SaveModel.from_dict({}, _balance())
 	var fresh := _world(Rng.from_seed(model.rng.seed_value))
 	var world_block: Dictionary = _balance().get("world", {})
@@ -145,7 +145,7 @@ func _check_defaults() -> void:
 	)
 
 
-func _check_newer_version_refused() -> void:
+func _test_newer_version_refused() -> void:
 	var rng := Rng.from_seed(SEED)
 	var save := SaveModel.to_dict(_world(rng), rng)
 	save["version"] = SaveModel.VERSION + 1
@@ -159,7 +159,7 @@ func _check_newer_version_refused() -> void:
 	)
 
 
-func _check_migrate_v0() -> void:
+func _test_migrate_v0() -> void:
 	var fixture := _json(V0_FIXTURE)
 	var model := SaveModel.from_dict(fixture, _balance())
 	var after := SaveModel.to_dict(model.world, model.rng) if model.ok else {}
@@ -191,7 +191,7 @@ func _check_migrate_v0() -> void:
 
 
 ## A 64-bit stream position survives the save as JSON writes it (every number a double).
-func _check_rng_exact_through_json() -> void:
+func _test_rng_exact_through_json() -> void:
 	var exact := true
 	for position: int in [BIG_STATE, HUGE_STATE]:
 		var rng := Rng.restore({"seed": SEED, "streams": {WORLD_STREAM: position}})
@@ -214,7 +214,7 @@ func _check_rng_exact_through_json() -> void:
 
 
 ## The company rides in the save: written, read back (through JSON) and written again equal.
-func _check_company_round_trip() -> void:
+func _test_company_round_trip() -> void:
 	var rng := Rng.from_seed(SEED)
 	var world := _world(rng)
 	var company := Company.start(Fixture.defs())
@@ -236,7 +236,7 @@ func _check_company_round_trip() -> void:
 
 
 ## A save from before the company: the world carries over, the company is the starting six.
-func _check_migrate_v1() -> void:
+func _test_migrate_v1() -> void:
 	var fixture := _json(V1_FIXTURE)
 	var model := SaveModel.from_dict(fixture, _balance(), Fixture.defs())
 	var starting := Company.start(Fixture.defs())
@@ -277,7 +277,7 @@ func _met(rng: Rng) -> WorldSim:
 
 ## The run stopped by an encounter, saved as JSON text, read back and carried on (win, then
 ## the next road) matches the run that never stopped.
-func _check_encounter_through_json() -> void:
+func _test_encounter_through_json() -> void:
 	var whole := _met(Rng.from_seed(ROAD_SEED))
 	var paused_rng := Rng.from_seed(ROAD_SEED)
 	var paused := _met(paused_rng)
@@ -300,7 +300,7 @@ func _check_encounter_through_json() -> void:
 	)
 
 
-func _check_old_save_has_no_encounter() -> void:
+func _test_old_save_has_no_encounter() -> void:
 	var from_v0 := SaveModel.from_dict(_json(V0_FIXTURE), _balance())
 	var rng := Rng.from_seed(SEED)
 	var current := SaveModel.to_dict(_world(rng), rng)
@@ -322,7 +322,7 @@ func _check_old_save_has_no_encounter() -> void:
 ## The walking map's state rides in the save: the band's tile, the day's units walked and
 ## every party (through JSON); a save from before it (no band, no parties) puts the band at
 ## the hub's gate with the seed's own parties.
-func _check_band_and_parties() -> void:
+func _test_band_and_parties() -> void:
 	var rng := Rng.from_seed(SEED)
 	var world := _world(rng)
 	_walk(world, 0, STEPS)

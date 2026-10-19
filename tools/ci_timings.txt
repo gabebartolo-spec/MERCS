@@ -1,0 +1,43 @@
+# Seconds per suite from tools/run_tests.sh (TIMINGS_FILE=...), 2026-10-19 (main run 38827766002).
+# Nobody edits this per PR: a new suite counts as DEFAULT_SECS until the next re-measure (at least weekly).
+# tools/plan_ci_shards.sh splits the suites across shards from these. 'pr_skip' suites run on main and
+# nightly only (tests.yml 'slow' job), not in a PR's shards.
+shards 2
+pr_skip perf
+data 1
+smoke 2
+stage 1
+stage_scale 1
+stage_light 1
+assets 1
+slice 1
+battle 14
+loop 1
+sim_world 13
+sim_encounters 2
+save 3
+effect 6
+overworld 2
+road 5
+company 2
+company_battle 1
+inspect 2
+injury 1
+economy 3
+economy_company 1
+hub 2
+hub_terms 2
+hub_reload 3
+hub_fight 2
+story 1
+story_gui 1
+wiring 4
+campaign_end 4
+campaign 3
+panels 3
+ironman 10
+ironman_resume 32
+look 1
+battle_view 4
+impact 6
+perf 4

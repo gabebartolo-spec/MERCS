@@ -1,6 +1,6 @@
 ---
 name: mercs-godot-tests
-description: Extends the general game-architecture skill (tests and CI shape) with this repo's runners, floors and shards. How to run, add and debug MERCS Godot test suites and CI without tripping over other agents on the same PC - the tools/run_tests.sh interface, isolated user data, check floors, pinned seeds, one Godot process per agent, killing by recorded PID, and reading a red CI run (tests.yml plan, shards, aggregate test). Use it whenever you run tools/run_tests.sh or a Godot --script, add or change a suite or a floor in tests/expected_checks.txt, read a red or cancelled CI run, or see a failure that might not be your change's fault - even if you think you already know how to run the tests.
+description: Extends the general game-architecture skill (tests and CI shape) with this repo's runners, function counts and shards. How to run, add and debug MERCS Godot test suites and CI without tripping over other agents on the same PC - the tools/run_tests.sh interface, isolated user data, check floors, pinned seeds, one Godot process per agent, killing by recorded PID, and reading a red CI run (tests.yml plan, shards, aggregate test). Use it whenever you run tools/run_tests.sh or a Godot --script, add or change a suite or a floor in tests/expected_checks.txt, read a red or cancelled CI run, or see a failure that might not be your change's fault - even if you think you already know how to run the tests.
 ---
 
 # Running Godot tests in MERCS
@@ -49,19 +49,18 @@ the work the way CI does.
 ## Adding a suite or checks
 
 - Runner: `tests/run_<suite>_tests.gd`, extending `tests/lib/runner.gd`: override `suite_name()` and
-  `run_checks()` and call `check(condition, expectation)` once per check; the base prints
-  `<Suite> tests: N checks, M failures` and quits non-zero on failure. Model it on
-  `tests/run_smoke_tests.gd`.
-- Register a new suite in four places: `ALL_SUITES` in `tools/run_tests.sh`; one line in
-  `tools/ci_shards.txt` (a short shard; Merge & CI rebalances when a shard passes 10 minutes); a floor
-  in `tests/expected_checks.txt` as `<suite> <floor>`; a row in the suites table of `tests/README.md`. Then run `bash tools/check_ci_shards.sh`: every
-  suite in `ALL_SUITES` must sit in exactly one shard.
-- **Floors only go up** (guardrail B6). A suite under its floor fails ("checks went missing"); a suite
-  with no floor fails. Count checks per rule, not per data entry or file (one check whose message names every
-  offender), so adding or removing content never moves a floor. Set a new suite's floor to its real count; when you add checks to an existing
-  suite, raise only that suite's line by your increment. Never lower a floor, widen a threshold, delete
-  a test or skip a lint to get green. A threshold change needs a line in `docs/DECISIONS.md` and a
-  Concept Lead ack.
+  `run_checks()`, keep the tests in `_test_*` functions that `run_checks()` calls as
+  `await _t("_test_x")` (args as `await _t("_test_x", [a])`), and call `check(condition, expectation)`
+  once per check. The base prints `<Suite> tests: K of M functions, N checks, F failures`
+  (`tests/functions_ran.gd`) and quits non-zero on failure. Model it on `tests/run_smoke_tests.gd`.
+- **No floors, no registries** (director 2026-10-19, github-hygiene section 4). A `_test_*` function
+  never called, or one that made no check, fails by name; a line short of functions fails
+  ("functions short"). A new suite is just the file plus a row in the suites table of `tests/README.md`:
+  suites are found by filename, CI shards come from `tools/ci_timings.txt` (`tools/plan_ci_shards.sh`;
+  a new suite counts as 60 s until the next re-measure). Never widen a threshold, delete a test or
+  skip a lint to get green; a threshold change needs a line in `docs/DECISIONS.md` and a Concept Lead ack.
+- **Local loop:** `tools/run_tests.sh --quick <suite>` skips the re-import (run once without it after
+  asset changes).
 - **Seeds:** pin them (`docs/05_STYLE_CODE.md` "Randomness"); a test that reads the clock is a bug
   (CLAUDE.md rule 2). A suite with no randomness says `## Seeded by design: <why>` in its header.
 - **Autoloads in a `--script`:** if a suite fails to compile with "Identifier not found" on an autoload
@@ -86,10 +85,13 @@ the last good commit, the runtime state (CLAUDE.md rule 10).
 
 ## CI
 
-- `.github/workflows/tests.yml`: `plan` (runs `tools/check_ci_shards.sh`; skips the Godot jobs for
-  docs-only and draft PRs) -> shard jobs from `tools/ci_shards.txt` plus one harness self-test job ->
-  the aggregate `test`, the required check, which still reports (green) when the Godot jobs were skipped. While shards
-  run, "no `test` result yet" is normal.
+- `.github/workflows/tests.yml`: `plan` (skips the Godot jobs for docs-only and draft PRs, and for a
+  push to main whose tree a green PR run already tested: `tools/ci_reuse_pr_run.sh`) -> `preflight`
+  (import + compile only) -> shard jobs from `tools/ci_timings.txt` plus the harness self-test -> the
+  aggregate `test`, the required check, which still reports (green) when the Godot jobs were skipped.
+  `perf` ("pr_skip") runs on main and nightly only, never blocking. While shards run, "no `test`
+  result yet" is normal. Re-measure timings at least weekly:
+  `TIMINGS_FILE=tools/ci_timings.txt tools/run_tests.sh`.
 - Read a failure with `gh run view <id> --log-failed`. A job cancelled with no steps never started
   (runner trouble or a newer push); that is not a test result.
 - Run the suites locally and push when the work is ready, not to see what CI says: every agent waits on

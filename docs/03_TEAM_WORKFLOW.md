@@ -37,7 +37,7 @@ protocol format. Reviews phase gates. Is never asked to read a wall of text.
   register's "recorded in PR" column, and the handoff files' housekeeping.
 - Merges on green for the exact head commit, after any required review and after the director's
   gate where one applies, at once and without asking anyone (D-030). Never enables auto-merge.
-  Never force-pushes. Never lowers a check floor. Never pushes to another agent's branch.
+  Never force-pushes. Never deletes a test to get green. Never pushes to another agent's branch.
 - A routine git or GitHub permission refusal is a bug in `.claude/settings.json` to fix by PR,
   never a command handed to the director (D-030).
 - Prunes merged worktrees and remote branches every pass; fails the build if more than four live
@@ -123,6 +123,6 @@ protocol format. Reviews phase gates. Is never asked to read a wall of text.
 ## Skills to create in `.claude/skills/` (Phase 0, ported from AFL and adapted)
 
 `mercs-pr` (PR body and merge note), `mercs-proof-evidence` (evidence by change type),
-`mercs-godot-tests` (isolated runs, floors, seeds), `mercs-handoff`, `mercs-art-pipeline`
+`mercs-godot-tests` (isolated runs, function counts, seeds), `mercs-handoff`, `mercs-art-pipeline`
 (sheet contract, may/ask/never), `mercs-sim-review` (review packet for anything touching the
 save schema, world tick, injury, death, recruitment or memory systems).

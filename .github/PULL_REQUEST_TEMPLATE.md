@@ -20,8 +20,8 @@ STATUS.md item <n> / decision <D-id>
 <your STATUS.md row / item changes and any decision in full (D-TBD-<slug>, who, what, why), for Merge & CI to record after merge; "none" is valid>
 
 ## [MERGE NOTE]
-- Hot files touched: <sim core, save model, UiKit, caps, floors, docs>
-- Floors: <suite base → new (+inc)>
+- Hot files touched: <sim core, save model, UiKit, caps, docs>
+- Test functions: <suite: added / removed>
 - Review needed: <none | mercs-sim-review by <agent>>
 - Director gate: <none | look approval pending | approved in D-id>
 - Ordering with other PRs: <…>

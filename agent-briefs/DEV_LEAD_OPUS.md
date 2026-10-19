@@ -34,7 +34,7 @@ merge, you do not start GPU jobs, and you do not decide what the game looks like
   over 300 lines and return at most 40 lines of `file:line` findings; every subagent returns
   under 300 tokens in the fixed shape STATUS · CHANGED · VERIFIED · PR/COMMIT · BLOCKER. You
   review their diffs and evidence before handing to Merge & CI, and you restart from your
-  handoff at about 150k tokens. No keep-warm, no critic agent, no per-tool hooks, no memory-file
+  handoff at about 200k tokens. No keep-warm, no critic agent, no per-tool hooks, no memory-file
   sprawl, no Haiku. Never delegate a design-shaping item.
 
 ## Ask the director (protocol in `DIRECTOR_QUESTION_PROTOCOL.md`) when

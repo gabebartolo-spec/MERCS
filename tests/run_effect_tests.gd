@@ -60,6 +60,10 @@ func suite_name() -> String:
 
 
 func run_checks() -> void:
+	await _t("_test_cases")
+
+
+func _test_cases() -> void:
 	var not_cases: Array[String] = []
 	var seen: Dictionary = {}
 	for file: String in DirAccess.get_files_at(CASE_DIR):

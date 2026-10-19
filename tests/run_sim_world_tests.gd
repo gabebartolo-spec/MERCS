@@ -26,17 +26,17 @@ func suite_name() -> String:
 
 
 func run_checks() -> void:
-	_check_same_seed_same_region()
-	_check_other_seed_other_map()
-	_check_counts()
-	_check_entrances()
-	_check_connected()
-	_check_stamps()
-	_check_terrain_mix()
-	_check_step_refused()
-	_check_step_costs()
-	_check_starving()
-	_check_restore_continues()
+	await _t("_test_same_seed_same_region")
+	await _t("_test_other_seed_other_map")
+	await _t("_test_counts")
+	await _t("_test_entrances")
+	await _t("_test_connected")
+	await _t("_test_stamps")
+	await _t("_test_terrain_mix")
+	await _t("_test_step_refused")
+	await _t("_test_step_costs")
+	await _t("_test_starving")
+	await _t("_test_restore_continues")
 	JobChecks.new().run(check)
 	GrudgePartyChecks.new().run(check)
 	await process_frame
@@ -57,7 +57,7 @@ func _company() -> Dictionary:
 	return Fixture.data().get("company", {})
 
 
-func _check_same_seed_same_region() -> void:
+func _test_same_seed_same_region() -> void:
 	var a := Fixture.world(SEED)
 	var b := Fixture.world(SEED)
 	check(
@@ -70,7 +70,7 @@ func _check_same_seed_same_region() -> void:
 	)
 
 
-func _check_other_seed_other_map() -> void:
+func _test_other_seed_other_map() -> void:
 	var a := Fixture.world(SEED)
 	var b := Fixture.world(OTHER_SEED)
 	var same_size := a.region.width == b.region.width and a.region.height == b.region.height
@@ -83,7 +83,7 @@ func _check_other_seed_other_map() -> void:
 	)
 
 
-func _check_counts() -> void:
+func _test_counts() -> void:
 	var world := Fixture.world(SEED)
 	var hamlets: int = _region().get("hamlets", 0)
 	var wilds: int = _region().get("sites", 0)
@@ -112,7 +112,7 @@ func _of_kind(world: WorldSim, kind: WorldSite.Kind) -> int:
 	return world.sites.filter(func(s: WorldSite) -> bool: return s.kind == kind).size()
 
 
-func _check_entrances() -> void:
+func _test_entrances() -> void:
 	var world := Fixture.world(SEED)
 	var seen := {}
 	var fine := true
@@ -128,7 +128,7 @@ func _check_entrances() -> void:
 	)
 
 
-func _check_connected() -> void:
+func _test_connected() -> void:
 	var failures: Array[String] = []
 	for seed_value: int in [SEED, OTHER_SEED]:
 		var world := Fixture.world(seed_value)
@@ -156,7 +156,7 @@ func _walkable_from(world: WorldSim, start: Vector2i) -> Dictionary:
 
 
 ## Every '#' of the hub's and the hamlets' stamps is a town wall around their entrances.
-func _check_stamps() -> void:
+func _test_stamps() -> void:
 	var world := Fixture.world(SEED)
 	var walls := 0
 	var wrong: Array[String] = []
@@ -196,7 +196,7 @@ func _walls_of(rows: Array) -> Array[Vector2i]:
 	return walls
 
 
-func _check_terrain_mix() -> void:
+func _test_terrain_mix() -> void:
 	var world := Fixture.world(SEED)
 	var kinds := {}
 	for tile: int in world.region.tiles:
@@ -207,7 +207,7 @@ func _check_terrain_mix() -> void:
 	)
 
 
-func _check_step_refused() -> void:
+func _test_step_refused() -> void:
 	var world := _alone(SEED)
 	var before := str(world.state())
 	var wall := world.band + Vector2i(0, -1)
@@ -249,7 +249,7 @@ func _beside_water(world: WorldSim) -> Array:
 
 ## Walks out of the hub's gate and back, over and over: each step costs its tile's units;
 ## every full day's worth ticks a day and its supplies, the rest waits in `march`.
-func _check_step_costs() -> void:
+func _test_step_costs() -> void:
 	var world := _alone(SEED)
 	var per_day: int = _company().get("supplies_per_day", 0)
 	var start: int = _company().get("start_supplies", 0)
@@ -280,7 +280,7 @@ func _check_step_costs() -> void:
 	)
 
 
-func _check_starving() -> void:
+func _test_starving() -> void:
 	var world := _alone(SEED)
 	for _day: int in HUNGRY_DAYS:
 		world.rest()
@@ -306,7 +306,7 @@ func _check_starving() -> void:
 
 ## Parties on the map: the run split by a restore (the Rng's streams carried as a save does)
 ## walks on exactly as the run that never stopped.
-func _check_restore_continues() -> void:
+func _test_restore_continues() -> void:
 	var whole := Fixture.world(SEED)
 	Fixture.scripted(whole, 0, STEPS)
 	var paused_rng := Rng.from_seed(SEED)

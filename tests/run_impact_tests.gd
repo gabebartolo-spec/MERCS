@@ -62,8 +62,8 @@ func suite_name() -> String:
 
 func run_checks() -> void:
 	root.size = WINDOW_SIZE
-	_check_data()
-	_check_threshold()
+	await _t("_test_data")
+	await _t("_test_threshold")
 	var on := await _play(true)
 	var again := await _play(true)
 	var off := await _play(false)
@@ -74,7 +74,7 @@ func run_checks() -> void:
 	check(on.on_splat, "every drop lands on one of its own splat's pixels (the splat spot)")
 	check(on.looks, "a drop faces the camera, is one blood red, 1 to drop_px_max pixels square")
 	check(on.texel, "a drop's pixel is the figures' pixel size where it flies")
-	_check_shape(on)
+	await _t("_test_shape", [on])
 	check(on.drops_text == again.drops_text, "the same fight throws the same drops in two runs")
 	check(on.log_text == off.log_text, "hit-stop on or off: the battle log is identical")
 	check(on.held > 0 and off.held == 0, "hit-stop holds frames on (%d), none off" % on.held)
@@ -88,7 +88,7 @@ func run_checks() -> void:
 
 
 ## The spray as the lead's QC asked (round 1): count, sizes, torso start, burst, not over the body.
-func _check_shape(on: Run) -> void:
+func _test_shape(on: Run) -> void:
 	check(on.counts, "every hit throws 10 to 16 drops")
 	check(on.sizes == [1, 2, 3], "drops come in mixed sizes, 1 to 3 pixels (%s)" % [on.sizes])
 	check(on.torso, "drops leave the struck figure's picture at torso height")
@@ -123,7 +123,7 @@ func _report(on: Run, off: Run) -> void:
 
 
 ## The director's ruling in the data: a few frames, on by default.
-func _check_data() -> void:
+func _test_data() -> void:
 	var data := StageData.load_file(DATA_PATH)
 	var frames := int(data.num("hit_stop", "frames"))
 	check(
@@ -138,7 +138,7 @@ func _check_data() -> void:
 
 
 ## Big means damage at least min_damage, or at least max_hp_share of the target's health.
-func _check_threshold() -> void:
+func _test_threshold() -> void:
 	var data := StageData.load_file(DATA_PATH)
 	var battle := Kit.fight(SEED).battle
 	var impact := BattleImpact.new()

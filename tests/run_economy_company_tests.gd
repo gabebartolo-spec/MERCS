@@ -25,11 +25,11 @@ func suite_name() -> String:
 
 
 func run_checks() -> void:
-	_check_equip()
-	_check_hiring()
-	_check_save_round_trip()
-	_check_older_save()
-	_check_world_hooks()
+	await _t("_test_equip")
+	await _t("_test_hiring")
+	await _t("_test_save_round_trip")
+	await _t("_test_older_save")
+	await _t("_test_world_hooks")
 	StandingChecks.new().run(check)
 	PrisonerChecks.new().run(check)
 	await process_frame
@@ -52,7 +52,7 @@ func _is(found: Variant, expected: Variant) -> bool:
 	return found == expected
 
 
-func _check_equip() -> void:
+func _test_equip() -> void:
 	var company := _company()
 	var economy := company.economy
 	var cells: Array[Vector2i] = [Vector2i.ZERO]
@@ -93,7 +93,7 @@ func _check_equip() -> void:
 	)
 
 
-func _check_hiring() -> void:
+func _test_hiring() -> void:
 	var company := _company()
 	var preview := company.preview("recruit_2")
 	check(
@@ -134,7 +134,7 @@ func _check_hiring() -> void:
 	)
 
 
-func _check_save_round_trip() -> void:
+func _test_save_round_trip() -> void:
 	var company := _company()
 	var economy := company.economy
 	_day(company, 1)
@@ -163,7 +163,7 @@ func _check_save_round_trip() -> void:
 	)
 
 
-func _check_older_save() -> void:
+func _test_older_save() -> void:
 	var older := Fixture.json(V1_FIXTURE)
 	var model := SaveModel.from_dict(older, Fixture.json(WORLD_BALANCE), Fixture.defs())
 	var fresh := _company().economy
@@ -189,7 +189,7 @@ func _check_older_save() -> void:
 	check(odd.economy.purse == fresh.purse, "an economy beside an empty roster starts the new game")
 
 
-func _check_world_hooks() -> void:
+func _test_world_hooks() -> void:
 	var company := _company()
 	var rng := Rng.from_seed(SEED)
 	var world := WorldSim.new()

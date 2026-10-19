@@ -19,6 +19,10 @@ func suite_name() -> String:
 
 
 func run_checks() -> void:
+	await _t("_test_phases")
+
+
+func _test_phases() -> void:
 	var phase := _phase()
 	if phase == "write":
 		await _write_phase()
