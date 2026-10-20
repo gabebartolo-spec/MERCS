@@ -1,9 +1,20 @@
 # MERCS: working rules for every Claude Code session
 
 Godot 4.7.2, GDScript (static typing on). Windows PC first. Read this file, then your brief in
-`agent-briefs/`, then only the roadmap phase you were assigned (`docs/08_ROADMAP.md`, by section).
-Never read `docs/08_ROADMAP.md` or `docs/STATUS.md` whole if they exceed 400 lines; that is a bug
-in the docs, report it to the Merge & CI agent.
+`agent-briefs/`, then the roadmap phase you were assigned (`docs/08_ROADMAP.md`, by section). The vision and the
+status board load automatically ("Always loaded" below). A must-read doc over 400 lines is a
+bug in the docs; report it to the Merge & CI agent.
+
+## Always loaded
+
+Claude Code imports these core documents in full at every session start (the `@` lines below),
+so they are part of this file: read them as rules, never skim or skip them.
+
+@docs/00_VISION.md
+@docs/STATUS.md
+
+Too big to load every session; read in full before the work it covers:
+- `docs/08_ROADMAP.md` (25 KB): the phase you were assigned.
 
 ## Philosophy (permanent)
 
